@@ -1,1 +1,17 @@
-target/
+# Maven
+target
+
+# IntelliJ
+.idea/workspace.xml
+.idea
+.idea_modules
+*.iml
+*.ipr
+*.iws
+out
+
+# OpenOffice
+*~lock*#
+
+# Sublime
+*.sublime-workspace
