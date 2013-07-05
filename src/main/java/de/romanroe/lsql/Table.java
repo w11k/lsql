@@ -10,12 +10,16 @@ public class Table {
         this.tableName = tableName;
     }
 
+    public LSql getlSql() {
+        return lSql;
+    }
+
     public String getTableName() {
         return tableName;
     }
 
     public SelectStatement select(String columns) {
-        return new SelectStatement(lSql, this, columns);
+        return new SelectStatement(this, columns);
     }
 
     public SelectStatement select() {

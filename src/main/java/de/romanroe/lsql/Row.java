@@ -11,18 +11,21 @@ import java.util.Set;
 
 public class Row implements Map<String, Object> {
 
-    public final ResultSet resultSet;
-    public final int rowNumber;
+    private static Object NOT_YET_FETCHED_VALUE = new Object() {
+      public String toString() {
+          return "<<< lazy >>>";
+      }
+    };
 
-    private final HashMap<String, Object> data = Maps.newHashMap();
+    public final ResultSet resultSet;
+
+    private final HashMap<String, Object> cache = Maps.newHashMap();
 
     public Row(ResultSet resultSet) {
         try {
             this.resultSet = resultSet;
-            this.rowNumber = resultSet.getRow();
             for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                data.put(resultSet.getMetaData().getColumnLabel(i), resultSet.getObject(i));
-
+                cache.put(resultSet.getMetaData().getColumnLabel(i), NOT_YET_FETCHED_VALUE);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -30,14 +33,28 @@ public class Row implements Map<String, Object> {
     }
 
     private Object getValue(String key) {
-        return data.get(key);
+        if (cache.get(key) == NOT_YET_FETCHED_VALUE) {
+            try {
+                cache.put(key, resultSet.getObject(key));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return cache.get(key);
     }
+
+    private void loadAllValues() {
+        for (String key : cache.keySet()) {
+            get(key);
+        }
+    }
+
 
     // ----------------------------------------------------
 
     @Override
     public int size() {
-        return data.size();
+        return cache.size();
     }
 
     @Override
@@ -47,12 +64,12 @@ public class Row implements Map<String, Object> {
 
     @Override
     public boolean containsKey(Object key) {
-        return data.containsKey(key);
+        return cache.containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return data.containsValue(value);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -88,17 +105,19 @@ public class Row implements Map<String, Object> {
 
     @Override
     public Set<String> keySet() {
-        return data.keySet();
+        return cache.keySet();
     }
 
     @Override
     public Collection<Object> values() {
-        return data.values();
+        loadAllValues();
+        return cache.values();
     }
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
-        return data.entrySet();
+        loadAllValues();
+        return cache.entrySet();
     }
 
     @Override
@@ -111,19 +130,16 @@ public class Row implements Map<String, Object> {
         }
 
         Row row = (Row) o;
-        return data.equals(row.data);
+        return cache.equals(row.cache);
     }
 
     @Override
     public int hashCode() {
-        return data.hashCode() * 7;
+        return cache.hashCode() * 7;
     }
 
     @Override
     public String toString() {
-        return "Row{" +
-                "no=" + rowNumber + ", " +
-                "data=" + data +
-                '}';
+        return "Row{" + cache + '}';
     }
 }

@@ -1,17 +1,21 @@
 package de.romanroe.lsql;
 
+import com.beust.jcommander.internal.Lists;
+import com.google.common.base.Function;
 import org.h2.jdbcx.JdbcDataSource;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.testng.internal.Nullable;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
-import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.*;
 
-@Test
 public class LSqlTest {
 
     private LSql lSql;
@@ -22,7 +26,7 @@ public class LSqlTest {
         dataSource.setURL("jdbc:h2:mem:testdb");
     }
 
-    @BeforeTest
+    @BeforeMethod
     public void beforeTest() throws SQLException {
         final Connection connection = dataSource.getConnection();
         connection.setAutoCommit(true);
@@ -34,27 +38,57 @@ public class LSqlTest {
                 return connection;
             }
         });
-
-        lSql.executeSql("create table table1 (name char(50), age int)");
-        lSql.executeSql("insert into table1 (name, age) values ('cus1', 20)");
-        lSql.executeSql("insert into table1 (name, age) values ('cus2', 30)");
     }
 
-    @AfterTest
+    @AfterMethod
     public void afterTest() throws SQLException {
-        System.out.println("clean");
-        lSql.executeSql("drop table table1");
+        lSql.executeSql("drop table if exists table1");
+        lSql.getConnection().commit();
     }
 
+    @Test
     public void getConnectionFromConnectionFactory() throws SQLException {
         assertNotNull(lSql.getConnection());
     }
 
-    public void testSelect() throws SQLException {
-        Iterable<Row> users = lSql.table("table1").select().run();
-        for (Row user : users) {
-            System.out.println(user);
+    @Test
+    public void testSelectFieldAccess() throws SQLException {
+        lSql.executeSql("create table table1 (name char(50), age int);" +
+                "insert into table1 (name, age) values ('cus1', 20);" +
+                "insert into table1 (name, age) values ('cus2', 30)");
+
+        List<Integer> ages = lSql.table("table1").select().where().map(new Function<Row, Integer>() {
+            @Override
+            public Integer apply(@Nullable Row input) {
+                return Integer.parseInt(input.get("AGE").toString());
+            }
+        });
+        int sum = 0;
+        for (int age : ages) {
+            sum += age;
         }
+        assertEquals(sum, 50);
+    }
+
+    @Test
+    public void testSelectFullAccessToMapEntrySet() throws SQLException {
+        lSql.executeSql("create table table1 (name char (50), age int);" +
+                "insert into table1 (name, age) values ('cus1', 20);");
+
+        // All key->values
+        final List<String> entries = Lists.newArrayList();
+
+        lSql.table("table1").select().where().map(new Function<Row, Integer>() {
+            @Override
+            public Integer apply(@Nullable Row input) {
+                for (Map.Entry<String, Object> entry : input.entrySet()) {
+                    entries.add(entry.getKey() + "->" + entry.getValue());
+                }
+                return null;
+            }
+        });
+        assertTrue(entries.contains("NAME->cus1"));
+        assertTrue(entries.contains("AGE->20"));
     }
 
 }
