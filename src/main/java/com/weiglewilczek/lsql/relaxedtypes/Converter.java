@@ -1,17 +1,17 @@
-package de.romanroe.lsql.types;
+package com.weiglewilczek.lsql.relaxedtypes;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import de.romanroe.lsql.types.option.Option;
+import com.weiglewilczek.lsql.relaxedtypes.option.Option;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static de.romanroe.lsql.types.option.Option.none;
-import static de.romanroe.lsql.types.option.Option.some;
+import static com.weiglewilczek.lsql.relaxedtypes.option.Option.none;
+import static com.weiglewilczek.lsql.relaxedtypes.option.Option.some;
 
 public class Converter {
 

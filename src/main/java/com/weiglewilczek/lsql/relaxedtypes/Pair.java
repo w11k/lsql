@@ -1,4 +1,4 @@
-package de.romanroe.lsql.types;
+package com.weiglewilczek.lsql.relaxedtypes;
 
 public class Pair<A, B> {
 

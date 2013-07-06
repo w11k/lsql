@@ -1,4 +1,4 @@
-package de.romanroe.lsql;
+package com.weiglewilczek.lsql;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Function;

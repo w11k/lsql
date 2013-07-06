@@ -1,4 +1,4 @@
-package de.romanroe.lsql.types.option;
+package com.weiglewilczek.lsql.relaxedtypes.option;
 
 import java.util.concurrent.Callable;
 

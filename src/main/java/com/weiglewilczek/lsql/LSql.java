@@ -1,4 +1,4 @@
-package de.romanroe.lsql;
+package com.weiglewilczek.lsql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
