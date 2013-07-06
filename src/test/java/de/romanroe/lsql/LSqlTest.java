@@ -57,10 +57,10 @@ public class LSqlTest {
                 "insert into table1 (name, age) values ('cus1', 20);" +
                 "insert into table1 (name, age) values ('cus2', 30)");
 
-        List<Integer> ages = lSql.table("table1").select().where().map(new Function<Row, Integer>() {
+        List<Integer> ages = lSql.select().from("table1").map(new Function<Row, Integer>() {
             @Override
-            public Integer apply(@Nullable Row input) {
-                return Integer.parseInt(input.get("AGE").toString());
+            public Integer apply(@Nullable Row row) {
+                return Integer.parseInt(row.get("AGE").toString());
             }
         });
         int sum = 0;
@@ -78,7 +78,7 @@ public class LSqlTest {
         // All key->values
         final List<String> entries = Lists.newArrayList();
 
-        lSql.table("table1").select().where().map(new Function<Row, Integer>() {
+        lSql.select().from("table1").map(new Function<Row, Integer>() {
             @Override
             public Integer apply(@Nullable Row input) {
                 for (Map.Entry<String, Object> entry : input.entrySet()) {

@@ -44,8 +44,12 @@ public class LSql {
         }
     }
 
-    public Table table(String tableName) {
-        return new Table(this, tableName);
+    public SelectStatement select() {
+        return new SelectStatement(this);
+    }
+
+    public SelectStatement select(String columns) {
+        return new SelectStatement(this, columns);
     }
 
 }
