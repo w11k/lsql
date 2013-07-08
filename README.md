@@ -1,2 +1,3 @@
-lsql
-====
+Literate SQL
+===
+
