@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import static junit.framework.Assert.*;
 
@@ -23,7 +22,7 @@ public class LSqlTest {
     private JdbcDataSource dataSource = new JdbcDataSource();
 
     public LSqlTest() {
-        dataSource.setURL("jdbc:h2:mem:testdb");
+        dataSource.setURL("jdbc:h2:mem:testdb;MODE=PostgreSQL");
     }
 
     @BeforeMethod
@@ -32,17 +31,12 @@ public class LSqlTest {
         connection.setAutoCommit(true);
 
         lSql = new LSql();
-        lSql.setConnectionFactory(new Callable<Connection>() {
-            @Override
-            public Connection call() throws Exception {
-                return connection;
-            }
-        });
+        lSql.setConnectionFactory(ConnectionFactories.fromInstance(connection));
     }
 
     @AfterMethod
     public void afterTest() throws SQLException {
-        lSql.executeSql("drop table if exists table1");
+        lSql.execute("drop table if exists table1");
         lSql.getConnection().commit();
     }
 
@@ -53,16 +47,19 @@ public class LSqlTest {
 
     @Test
     public void testSelectFieldAccess() throws SQLException {
-        lSql.executeSql("create table table1 (name char(50), age int);" +
+        lSql.execute("create table table1 (name char(50), age int);" +
                 "insert into table1 (name, age) values ('cus1', 20);" +
                 "insert into table1 (name, age) values ('cus2', 30)");
 
-        List<Integer> ages = lSql.table("table1").select().where().map(new Function<Row, Integer>() {
-            @Override
-            public Integer apply(@Nullable Row input) {
-                return Integer.parseInt(input.get("AGE").toString());
-            }
-        });
+        List<Integer> ages = lSql.executeQuery(
+                "select * from table1",
+                new Function<Row, Integer>() {
+                    @Override
+                    public Integer apply(@Nullable Row input) {
+                        return Integer.parseInt(input.get("age").toString());
+                    }
+                });
+
         int sum = 0;
         for (int age : ages) {
             sum += age;
@@ -72,23 +69,73 @@ public class LSqlTest {
 
     @Test
     public void testSelectFullAccessToMapEntrySet() throws SQLException {
-        lSql.executeSql("create table table1 (name char (50), age int);" +
-                "insert into table1 (name, age) values ('cus1', 20);");
+        lSql.execute("create table table1 (name char (50), age int);" +
+                "insert into table1 (name, age) values ('cus1', '20');");
 
         // All key->values
         final List<String> entries = Lists.newArrayList();
 
-        lSql.table("table1").select().where().map(new Function<Row, Integer>() {
-            @Override
-            public Integer apply(@Nullable Row input) {
-                for (Map.Entry<String, Object> entry : input.entrySet()) {
-                    entries.add(entry.getKey() + "->" + entry.getValue());
-                }
-                return null;
-            }
-        });
-        assertTrue(entries.contains("NAME->cus1"));
-        assertTrue(entries.contains("AGE->20"));
+        lSql.executeQuery(
+                "select * from table1",
+                new Function<Row, Integer>() {
+                    @Override
+                    public Integer apply(@Nullable Row input) {
+                        for (Map.Entry<String, Object> entry : input.entrySet()) {
+                            entries.add(entry.getKey() + "->" + entry.getValue());
+                        }
+                        return null;
+                    }
+                });
+
+        assertTrue(entries.contains("name->cus1"));
+        assertTrue(entries.contains("age->20"));
+    }
+
+    @Test
+    public void testNameConversions() {
+        lSql.execute("create table table1 (test_name1 char (50), TEST_NAME2 char (50));" +
+                "insert into table1 (test_name1, TEST_NAME2) values ('name1', 'name2');");
+
+        final boolean[] assertCallbackCalled = {false};
+        lSql.executeQuery(
+                "select * from table1",
+                new Function<Row, Integer>() {
+                    @Override
+                    public Integer apply(@Nullable Row input) {
+                        assertCallbackCalled[0] = true;
+                        assertEquals("name1", input.get("testName1"));
+                        assertEquals("name2", input.get("testName2"));
+                        return null;
+                    }
+                });
+        assertTrue(assertCallbackCalled[0]);
+
+    }
+
+    @Test
+    public void testInsert() {
+        lSql.execute("create table table1 (id serial, test_name1 char (50), age int)");
+
+        Object newId = lSql.executeInsert("table1", L.createMap(
+                "testName1", "a name",
+                "age", 2));
+        assertNotNull(newId);
+
+        Map<String, Object> query = lSql.executeQueryAndGetFirstRow("select * from table1 where id = " + newId);
+        assertEquals("a name", query.get("testName1"));
+        assertEquals(2, query.get("age"));
+    }
+
+    @Test
+    public void testExecuteQueryAndGetFirstRow() {
+        lSql.execute("create table table1 (id serial, number int)");
+        lSql.executeInsert("table1", L.createMap("number", 1));
+        lSql.executeInsert("table1", L.createMap("number", 2));
+        lSql.executeInsert("table1", L.createMap("number", 3));
+
+        Map<String, Object> map = lSql.executeQueryAndGetFirstRow("select sum(number) as X from table1");
+        System.out.println(map);
+        assertEquals(6L, map.get("x"));
     }
 
 }
