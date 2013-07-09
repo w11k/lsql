@@ -13,7 +13,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 public class LSqlTest {
 
@@ -29,9 +31,7 @@ public class LSqlTest {
     public void beforeTest() throws SQLException {
         final Connection connection = dataSource.getConnection();
         connection.setAutoCommit(true);
-
-        lSql = new LSql();
-        lSql.setConnectionFactory(ConnectionFactories.fromInstance(connection));
+        lSql = new LSql(ConnectionFactories.fromInstance(connection));
     }
 
     @AfterMethod
@@ -100,11 +100,10 @@ public class LSqlTest {
         lSql.executeQuery(
                 "select * from table1",
                 new Function<Row, Integer>() {
-                    @Override
                     public Integer apply(@Nullable Row input) {
                         assertCallbackCalled[0] = true;
-                        assertEquals("name1", input.get("testName1"));
-                        assertEquals("name2", input.get("testName2"));
+                        assertEquals(input.get("testName1"), "name1");
+                        assertEquals(input.get("testName2"), "name2");
                         return null;
                     }
                 });
@@ -113,7 +112,7 @@ public class LSqlTest {
     }
 
     @Test
-    public void testInsert() {
+    public void testInsertAndKeyRetrieval() {
         lSql.execute("create table table1 (id serial, test_name1 char (50), age int)");
 
         Object newId = lSql.executeInsert("table1", L.createMap(
@@ -122,8 +121,8 @@ public class LSqlTest {
         assertNotNull(newId);
 
         Map<String, Object> query = lSql.executeQueryAndGetFirstRow("select * from table1 where id = " + newId);
-        assertEquals("a name", query.get("testName1"));
-        assertEquals(2, query.get("age"));
+        assertEquals(query.get("testName1"), "a name");
+        assertEquals(query.get("age"), 2);
     }
 
     @Test
@@ -135,7 +134,7 @@ public class LSqlTest {
 
         Map<String, Object> map = lSql.executeQueryAndGetFirstRow("select sum(number) as X from table1");
         System.out.println(map);
-        assertEquals(6L, map.get("x"));
+        assertEquals(map.get("x"), 6L);
     }
 
 }

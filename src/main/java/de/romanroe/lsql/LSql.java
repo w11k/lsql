@@ -30,7 +30,7 @@ public class LSql {
         return connectionFactory;
     }
 
-    public void setConnectionFactory(Callable<Connection> connectionFactory) {
+    public LSql(Callable<Connection> connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
 

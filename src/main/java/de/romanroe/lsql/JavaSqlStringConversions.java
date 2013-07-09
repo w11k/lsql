@@ -17,8 +17,8 @@ public class JavaSqlStringConversions {
     public String escapeJavaObjectForSqlStatement(Object obj) {
         checkNotNull(obj);
         if (obj instanceof String) {
-            // TODO escape ', etc.
-            return "'" + obj + "'";
+            // TODO check escaping
+            return "'" + ((String) obj).replaceAll("'", "\'") + "'";
         } else {
             return obj.toString();
         }
