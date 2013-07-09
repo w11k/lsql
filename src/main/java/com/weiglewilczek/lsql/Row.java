@@ -1,5 +1,6 @@
 package com.weiglewilczek.lsql;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 
 import java.sql.ResultSet;
@@ -13,19 +14,23 @@ public class Row implements Map<String, Object> {
 
     private static Object NOT_YET_FETCHED_VALUE = new Object() {
       public String toString() {
-          return "<<< lazy >>>";
+          return "<lazy>";
       }
     };
 
-    public final ResultSet resultSet;
+    private final LSql lSql;
 
     private final HashMap<String, Object> cache = Maps.newHashMap();
 
-    public Row(ResultSet resultSet) {
+    private final ResultSet resultSet;
+
+    public Row(LSql lSql, ResultSet resultSet) {
+        this.lSql = lSql;
         try {
             this.resultSet = resultSet;
             for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                cache.put(resultSet.getMetaData().getColumnLabel(i), NOT_YET_FETCHED_VALUE);
+                String key = lSql.getJavaSqlStringConversions().identifierSqlToJava(resultSet.getMetaData().getColumnLabel(i));
+                cache.put(key, NOT_YET_FETCHED_VALUE);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -35,7 +40,7 @@ public class Row implements Map<String, Object> {
     private Object getValue(String key) {
         if (cache.get(key) == NOT_YET_FETCHED_VALUE) {
             try {
-                cache.put(key, resultSet.getObject(key));
+                cache.put(key, resultSet.getObject(lSql.getJavaSqlStringConversions().identifierJavaToSql(key)));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -43,12 +48,11 @@ public class Row implements Map<String, Object> {
         return cache.get(key);
     }
 
-    private void loadAllValues() {
+    public void fetchAllValues() {
         for (String key : cache.keySet()) {
             get(key);
         }
     }
-
 
     // ----------------------------------------------------
 
@@ -110,13 +114,13 @@ public class Row implements Map<String, Object> {
 
     @Override
     public Collection<Object> values() {
-        loadAllValues();
+        fetchAllValues();
         return cache.values();
     }
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
-        loadAllValues();
+        fetchAllValues();
         return cache.entrySet();
     }
 
@@ -140,6 +144,6 @@ public class Row implements Map<String, Object> {
 
     @Override
     public String toString() {
-        return "Row{" + cache + '}';
+        return Objects.toStringHelper(this).add("cache", cache).toString();
     }
 }
