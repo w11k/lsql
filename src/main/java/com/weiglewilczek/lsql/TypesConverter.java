@@ -1,24 +1,24 @@
-package com.weiglewilczek.lsql.relaxedtypes;
+package com.weiglewilczek.lsql;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.weiglewilczek.lsql.relaxedtypes.option.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.weiglewilczek.lsql.relaxedtypes.option.Option.none;
-import static com.weiglewilczek.lsql.relaxedtypes.option.Option.some;
+public class TypesConverter {
 
-public class Converter {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    // from type -> to type -> Converter(from, to)
+    // from type -> to type -> Function(from -> to)
     private final Map<Class<?>, Map<Class<?>, Function<Object, Object>>> converters = Maps.newHashMap();
 
-    public Converter() {
+    public TypesConverter() {
         addDefaultConverters();
     }
 
@@ -33,10 +33,16 @@ public class Converter {
         converters.get(fromType).put(toType, converter);
     }
 
-    public <A, B> Option<B> convert(Class<A> fromType, Class<B> toType, Object value) {
+    public <B> Optional<B> convert(Class<B> toType, Object value) {
+        return convert(value.getClass(), toType, value);
+    }
+
+    public <A, B> Optional<B> convert(Class <A> fromType, Class<B> toType, Object value) {
+        logger.info("Converting value {} from type {} to type {}.", value, fromType.getName(), toType.getName());
+
         if (fromType.equals(toType)) {
             // Nothing to do
-            return some(toType.cast(value));
+            return Optional.of(toType.cast(value));
         }
 
         Map<Class<?>, Function<Object, Object>> toConverters = converters.get(fromType);
@@ -54,15 +60,15 @@ public class Converter {
 
                 // ... and try to convert with them
                 for (Class<?> superTypeOrInterface : superTypeAndInterfaces) {
-                    Option<B> withSuper = convert(superTypeOrInterface, toType, value);
-                    if (withSuper.isDefined()) {
+                    Optional<B> withSuper = convert(superTypeOrInterface, toType, value);
+                    if (withSuper.isPresent()) {
                         return withSuper;
                     }
                 }
                 // no converter for a superclass or interface found
-                return none();
+                return Optional.absent();
             } else {
-                return none();
+                return Optional.absent();
             }
         }
 
@@ -80,7 +86,7 @@ public class Converter {
 
         if (converter == null) {
             if (fromType.equals(Object.class)) {
-                return none();
+                return Optional.absent();
             } else {
                 // We had a fromType match but couldn't find a converter for a subtype of toType.
                 // Start again with the superclass of fromType.
@@ -88,55 +94,47 @@ public class Converter {
             }
         }
 
-        return some(toType.cast(converter.apply(value)));
+        return Optional.of(toType.cast(converter.apply(value)));
     }
 
     private void addDefaultConverters() {
         addConverter(Number.class, Integer.class, new Function<Object, Object>() {
-            @Override
-            public Object apply(@Nullable Object input) {
+            public Object apply(Object input) {
                 return ((Number) input).intValue();
             }
         });
         addConverter(Number.class, Float.class, new Function<Object, Object>() {
-            @Override
-            public Object apply(@Nullable Object input) {
+            public Object apply(Object input) {
                 return ((Number) input).floatValue();
             }
         });
         addConverter(Number.class, Double.class, new Function<Object, Object>() {
-            @Override
-            public Object apply(@Nullable Object input) {
+            public Object apply(Object input) {
                 return ((Number) input).doubleValue();
             }
         });
         addConverter(String.class, Integer.class, new Function<Object, Object>() {
-            @Override
-            public Object apply(@Nullable Object input) {
+            public Object apply(Object input) {
                 return Integer.parseInt((String) input);
             }
         });
         addConverter(String.class, Long.class, new Function<Object, Object>() {
-            @Override
-            public Object apply(@Nullable Object input) {
+            public Object apply(Object input) {
                 return Long.parseLong((String) input);
             }
         });
         addConverter(String.class, Float.class, new Function<Object, Object>() {
-            @Override
-            public Object apply(@Nullable Object input) {
+            public Object apply(Object input) {
                 return Float.parseFloat((String) input);
             }
         });
         addConverter(String.class, Double.class, new Function<Object, Object>() {
-            @Override
-            public Object apply(@Nullable Object input) {
+            public Object apply(Object input) {
                 return Double.parseDouble((String) input);
             }
         });
         addConverter(Object.class, String.class, new Function<Object, Object>() {
-            @Override
-            public Object apply(@Nullable Object input) {
+            public Object apply(Object input) {
                 return String.valueOf(input);
             }
         });

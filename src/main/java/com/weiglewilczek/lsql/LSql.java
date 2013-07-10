@@ -14,9 +14,20 @@ import java.util.concurrent.Callable;
 
 public class LSql {
 
-    private JavaSqlStringConversions javaSqlStringConversions = new JavaSqlStringConversions();
+    private JavaSqlStringConversions javaSqlStringConversions;
+
+    private TypesConverter typesConverter;
 
     private Callable<Connection> connectionFactory;
+
+    /**
+     * @param connectionFactory The factory to get an active JDBC Connection
+     */
+    public LSql(Callable<Connection> connectionFactory) {
+        this.connectionFactory = connectionFactory;
+        this.javaSqlStringConversions = new JavaSqlStringConversions();
+        this.typesConverter = new TypesConverter();
+    }
 
     public JavaSqlStringConversions getJavaSqlStringConversions() {
         return javaSqlStringConversions;
@@ -26,12 +37,16 @@ public class LSql {
         this.javaSqlStringConversions = javaSqlStringConversions;
     }
 
-    public Callable<Connection> getConnectionFactory() {
-        return connectionFactory;
+    public TypesConverter getTypesConverter() {
+        return typesConverter;
     }
 
-    public LSql(Callable<Connection> connectionFactory) {
-        this.connectionFactory = connectionFactory;
+    public void setTypesConverter(TypesConverter typesConverter) {
+        this.typesConverter = typesConverter;
+    }
+
+    public Callable<Connection> getConnectionFactory() {
+        return connectionFactory;
     }
 
     public Connection getConnection() {
@@ -59,21 +74,13 @@ public class LSql {
         }
     }
 
-<<<<<<< HEAD:src/main/java/com/weiglewilczek/lsql/LSql.java
-    public SelectStatement select() {
-        return new SelectStatement(this);
-    }
-
-    public SelectStatement select(String columns) {
-        return new SelectStatement(this, columns);
-=======
-    public <T> List<T> executeQuery(String sql, Function<Row, T> rowHandler) {
+    public <T> List<T> executeQuery(String sql, Function<LMap, T> rowHandler) {
         List<T> list = Lists.newLinkedList();
         Statement st = createStatement();
         try {
             ResultSet resultSet = st.executeQuery(sql);
             while (resultSet.next()) {
-                list.add(rowHandler.apply(new Row(this, resultSet)));
+                list.add(rowHandler.apply(new LMap(new ResultSetMap(this, resultSet))));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -81,12 +88,10 @@ public class LSql {
         return list;
     }
 
-    public Map<String, Object> executeQueryAndGetFirstRow(String sql) {
-        final List<Map<String, Object>> rows = Lists.newLinkedList();
-        executeQuery(sql, new Function<Row, Object>() {
-            @Override
-            public Object apply(Row row) {
-                row.fetchAllValues();
+    public LMap executeQueryAndGetFirstRow(String sql) {
+        final List<LMap> rows = Lists.newLinkedList();
+        executeQuery(sql, new Function<LMap, Object>() {
+            public Object apply(LMap row) {
                 rows.add(row);
                 return null;
             }
@@ -116,17 +121,16 @@ public class LSql {
             String sql = sb.toString();
             st.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
             ResultSet resultSet = st.getGeneratedKeys();
-            Row row = new Row(this, resultSet);
+            resultSet.next();
+            LMap row = new LMap(new ResultSetMap(this, resultSet));
             if (row.keySet().size() != 1) {
                 throw new RuntimeException("INSERT operation did not return the generated keys.");
             }
-            resultSet.next();
             return row.values().toArray()[0];
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
->>>>>>> origin/master:src/main/java/de/romanroe/lsql/LSql.java
     }
 
 }
