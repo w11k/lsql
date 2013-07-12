@@ -28,7 +28,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="lsql" target="1.7" />
+      <module name="lsql" target="1.6" />
     </bytecodeTargetLevel>
   </component>
 </project>
