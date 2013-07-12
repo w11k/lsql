@@ -3,11 +3,7 @@ target
 
 # IntelliJ
 .idea/workspace.xml
-.idea
-.idea_modules
-*.iml
-*.ipr
-*.iws
+.idea/tasks.xml
 out
 
 # OpenOffice
