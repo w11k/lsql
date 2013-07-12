@@ -1,4 +1,4 @@
-package com.weiglewilczek.lsql;
+package com.w11k.mtypes;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -17,6 +17,7 @@ public class TypesConverter {
 
     // from type -> to type -> Function(from -> to)
     private final Map<Class<?>, Map<Class<?>, Function<Object, Object>>> converters = Maps.newHashMap();
+    //private final Multimap<Class<?>, Function<Object, Object>> converters = Multimaps.newMultimap();
 
     public TypesConverter() {
         addDefaultConverters();
@@ -65,11 +66,9 @@ public class TypesConverter {
                         return withSuper;
                     }
                 }
-                // no converter for a superclass or interface found
-                return Optional.absent();
-            } else {
-                return Optional.absent();
             }
+            // no converter for a superclass or interface found
+            return Optional.absent();
         }
 
         Function<Object, Object> converter = toConverters.get(toType);

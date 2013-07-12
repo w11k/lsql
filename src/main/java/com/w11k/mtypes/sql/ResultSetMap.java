@@ -1,4 +1,4 @@
-package com.weiglewilczek.lsql;
+package com.w11k.mtypes.sql;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ForwardingMap;

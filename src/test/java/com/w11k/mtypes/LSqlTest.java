@@ -1,7 +1,9 @@
-package com.weiglewilczek.lsql;
+package com.w11k.mtypes;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Function;
+import com.w11k.mtypes.sql.ConnectionFactories;
+import com.w11k.mtypes.sql.LSql;
 import org.h2.jdbcx.JdbcDataSource;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -15,6 +17,8 @@ import java.util.Map;
 import static org.testng.Assert.*;
 
 public class LSqlTest {
+
+    private final Mt mt = new Mt();
 
     private LSql lSql;
 
@@ -50,8 +54,8 @@ public class LSqlTest {
 
         List<Integer> ages = lSql.executeQuery(
                 "select * from table1",
-                new Function<LMap, Integer>() {
-                    public Integer apply(LMap input) {
+                new Function<MtMap, Integer>() {
+                    public Integer apply(MtMap input) {
                         return Integer.parseInt(input.get("age").toString());
                     }
                 });
@@ -74,8 +78,8 @@ public class LSqlTest {
 
         lSql.executeQuery(
                 "select * from table1",
-                new Function<LMap, Integer>() {
-                    public Integer apply(LMap input) {
+                new Function<MtMap, Integer>() {
+                    public Integer apply(MtMap input) {
                         for (Map.Entry<String, Object> entry : input.entrySet()) {
                             entries.add(entry.getKey() + "->" + entry.getValue());
                         }
@@ -95,8 +99,8 @@ public class LSqlTest {
         final boolean[] assertCallbackCalled = {false};
         lSql.executeQuery(
                 "select * from table1",
-                new Function<LMap, Integer>() {
-                    public Integer apply(LMap input) {
+                new Function<MtMap, Integer>() {
+                    public Integer apply(MtMap input) {
                         assertCallbackCalled[0] = true;
                         assertEquals(input.get("testName1"), "name1");
                         assertEquals(input.get("testName2"), "name2");
@@ -110,25 +114,24 @@ public class LSqlTest {
     @Test
     public void testInsertAndKeyRetrieval() {
         lSql.execute("create table table1 (id serial, test_name1 text, age int)");
-
-        Object newId = lSql.executeInsert("table1", LMap.fromKeyVals(
+        Object newId = lSql.executeInsert("table1", mt.newMap().addKeyVals(
                 "testName1", "a name",
                 "age", 2));
         assertNotNull(newId);
 
-        LMap query = lSql.executeQueryAndGetFirstRow("select * from table1 where id = " + newId);
-        assertEquals(query.get("testName1"), "a name");
-        assertEquals(query.get("age"), 2);
+        MtMap query = lSql.executeQueryAndGetFirstRow("select * from table1 where id = " + newId);
+        assertEquals(query.getString("testName1"), "a name");
+        assertEquals(query.getInt("age"), 2);
     }
 
     @Test
     public void testExecuteQueryAndGetFirstRow() {
         lSql.execute("create table table1 (id serial, number int)");
-        lSql.executeInsert("table1", LMap.fromKeyVals("number", 1));
-        lSql.executeInsert("table1", LMap.fromKeyVals("number", 2));
-        lSql.executeInsert("table1", LMap.fromKeyVals("number", 3));
+        lSql.executeInsert("table1", mt.newMap().addKeyVals("number", 1));
+        lSql.executeInsert("table1", mt.newMap().addKeyVals("number", 2));
+        lSql.executeInsert("table1", mt.newMap().addKeyVals("number", 3));
 
-        LMap map = lSql.executeQueryAndGetFirstRow("select sum(number) as X from table1");
+        MtMap map = lSql.executeQueryAndGetFirstRow("select sum(number) as X from table1");
         assertEquals(map.getInt("x"), 6);
     }
 

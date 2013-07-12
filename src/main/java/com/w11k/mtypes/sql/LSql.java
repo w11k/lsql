@@ -1,8 +1,11 @@
-package com.weiglewilczek.lsql;
+package com.w11k.mtypes.sql;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.w11k.mtypes.Mt;
+import com.w11k.mtypes.MtMap;
+import com.w11k.mtypes.TypesConverter;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -13,6 +16,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class LSql {
+
+    private final Mt mt = new Mt(); // TODO
 
     private JavaSqlStringConversions javaSqlStringConversions;
 
@@ -74,13 +79,13 @@ public class LSql {
         }
     }
 
-    public <T> List<T> executeQuery(String sql, Function<LMap, T> rowHandler) {
+    public <T> List<T> executeQuery(String sql, Function<MtMap, T> rowHandler) {
         List<T> list = Lists.newLinkedList();
         Statement st = createStatement();
         try {
             ResultSet resultSet = st.executeQuery(sql);
             while (resultSet.next()) {
-                list.add(rowHandler.apply(new LMap(new ResultSetMap(this, resultSet))));
+                list.add(rowHandler.apply(mt.newMap(new ResultSetMap(this, resultSet))));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -88,10 +93,10 @@ public class LSql {
         return list;
     }
 
-    public LMap executeQueryAndGetFirstRow(String sql) {
-        final List<LMap> rows = Lists.newLinkedList();
-        executeQuery(sql, new Function<LMap, Object>() {
-            public Object apply(LMap row) {
+    public MtMap executeQueryAndGetFirstRow(String sql) {
+        final List<MtMap> rows = Lists.newLinkedList();
+        executeQuery(sql, new Function<MtMap, Object>() {
+            public Object apply(MtMap row) {
                 rows.add(row);
                 return null;
             }
@@ -122,7 +127,7 @@ public class LSql {
             st.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
             ResultSet resultSet = st.getGeneratedKeys();
             resultSet.next();
-            LMap row = new LMap(new ResultSetMap(this, resultSet));
+            MtMap row = mt.newMap(new ResultSetMap(this, resultSet));
             if (row.keySet().size() != 1) {
                 throw new RuntimeException("INSERT operation did not return the generated keys.");
             }
