@@ -1,4 +1,4 @@
-package com.w11k.mtypes;
+package com.w11k.lsql;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -11,15 +11,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class TypesConverter {
+public class TypeConverter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // from type -> to type -> Function(from -> to)
     private final Map<Class<?>, Map<Class<?>, Function<Object, Object>>> converters = Maps.newHashMap();
-    //private final Multimap<Class<?>, Function<Object, Object>> converters = Multimaps.newMultimap();
 
-    public TypesConverter() {
+    public TypeConverter() {
         addDefaultConverters();
     }
 

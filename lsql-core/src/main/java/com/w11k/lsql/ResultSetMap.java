@@ -1,8 +1,9 @@
-package com.w11k.mtypes.sql;
+package com.w11k.lsql;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Maps;
+import org.joda.time.DateTime;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,7 +23,7 @@ public class ResultSetMap extends ForwardingMap<String, Object> {
         try {
             this.resultSet = resultSet;
             for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                String key = lSql.getJavaSqlStringConversions().identifierSqlToJava(resultSet.getMetaData().getColumnLabel(i));
+                String key = lSql.getNamingConventions().identifierSqlToJava(resultSet.getMetaData().getColumnLabel(i));
                 values.put(key, getColumnValue(i, resultSet.getMetaData().getColumnType(i)));
             }
         } catch (SQLException e) {
@@ -50,6 +51,12 @@ public class ResultSetMap extends ForwardingMap<String, Object> {
                     Types.BIGINT)) {
                 return resultSet.getInt(index);
             } else if (isOneOf(type,
+                    Types.FLOAT)) {
+                return resultSet.getFloat(index);
+            } else if (isOneOf(type,
+                    Types.DATE)) {
+                return new DateTime(resultSet.getDate(index).getTime());
+            } else if (isOneOf(type,
                     Types.LONGNVARCHAR,
                     Types.LONGVARCHAR,
                     Types.NCHAR,
@@ -57,9 +64,6 @@ public class ResultSetMap extends ForwardingMap<String, Object> {
                     Types.VARCHAR,
                     Types.CLOB)) {
                 return resultSet.getString(index);
-            } else if (isOneOf(type,
-                    Types.FLOAT)) {
-                return resultSet.getFloat(index);
             } else {
                 throw new RuntimeException("SQL Type " + type + " is not implemented yet.");
             }

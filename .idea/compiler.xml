@@ -23,13 +23,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="lsql" />
+        <module name="lsql (1)" />
+        <module name="lsql-core" />
+        <module name="lsql-example" />
         <module name="mtypes" />
         <module name="vertxtest" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="lsql" target="1.6" />
+      <module name="lsql (1)" target="1.6" />
+      <module name="lsql-core" target="1.6" />
+      <module name="lsql-example" target="1.6" />
       <module name="mtypes" target="1.6" />
     </bytecodeTargetLevel>
   </component>

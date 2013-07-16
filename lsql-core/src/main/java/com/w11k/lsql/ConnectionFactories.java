@@ -1,4 +1,4 @@
-package com.w11k.mtypes.sql;
+package com.w11k.lsql;
 
 import java.sql.Connection;
 import java.util.concurrent.Callable;
