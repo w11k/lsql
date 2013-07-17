@@ -51,10 +51,6 @@ public class Query implements Iterable<LMap> {
         }
     }
 
-    public void run() {
-        iterator();
-    }
-
     public <T> List<T> map(Function<LMap, T> rowHandler) {
         List<T> list = Lists.newLinkedList();
         for (LMap lMap : this) {

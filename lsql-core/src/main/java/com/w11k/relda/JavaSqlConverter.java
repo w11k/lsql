@@ -24,6 +24,8 @@ public class JavaSqlConverter {
         }
     }
 
+    private final Converter defaultConverter = new Converter();
+
     private CaseFormat javaIdentifierCaseFormat = CaseFormat.LOWER_UNDERSCORE;
 
     private CaseFormat sqlIdentifierCaseFormat = CaseFormat.UPPER_UNDERSCORE;
@@ -106,6 +108,7 @@ public class JavaSqlConverter {
         try {
             int columnType = rs.getMetaData().getColumnType(index);
             Converter converter = sqlValueToJavaConverters.get(columnType);
+            converter = converter == null ? defaultConverter : converter;
             return converter.sqlValueToJava(rs, index);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -114,6 +117,7 @@ public class JavaSqlConverter {
 
     public String escapeJavaObjectForSqlStatement(Object obj) {
         Converter converter = javaValueToSqlConverters.get(obj.getClass());
+        converter = converter == null ? defaultConverter : converter;
         return converter.javaValueToSql(obj);
     }
 
