@@ -1,4 +1,4 @@
-package com.w11k.lsql;
+package com.w11k.relda;
 
 import java.sql.Connection;
 import java.util.concurrent.Callable;

@@ -1,9 +1,9 @@
 package com.w11k.lsql_example;
 
 import com.google.common.base.Function;
-import com.w11k.lsql.ConnectionFactories;
-import com.w11k.lsql.LMap;
-import com.w11k.lsql.LSql;
+import com.w11k.relda.ConnectionFactories;
+import com.w11k.relda.LMap;
+import com.w11k.relda.LSql;
 import org.h2.jdbcx.JdbcDataSource;
 
 import java.sql.Connection;
@@ -25,9 +25,8 @@ public class LSqlExample {
         lSql.executeInsert("persons", person1);
         lSql.executeInsert("persons", person2);
 
-        List<Integer> ages = lSql.executeQuery(
-                "select * from persons",
-                new Function<LMap, Integer>() {
+        List<Integer> ages = lSql.executeQuery("select * from persons")
+                .map(new Function<LMap, Integer>() {
                     public Integer apply(LMap input) {
                         return input.getInt("age");
                     }

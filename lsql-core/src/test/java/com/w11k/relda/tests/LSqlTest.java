@@ -1,8 +1,10 @@
-package com.w11k.lsql;
+package com.w11k.relda.tests;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
+import com.w11k.relda.ConnectionFactories;
+import com.w11k.relda.LMap;
+import com.w11k.relda.LSql;
 import org.h2.jdbcx.JdbcDataSource;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -11,7 +13,6 @@ import org.testng.annotations.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -49,9 +50,8 @@ public class LSqlTest {
                 "insert into table1 (name, age) values ('cus1', 20);" +
                 "insert into table1 (name, age) values ('cus2', 30)");
 
-        List<Integer> ages = lSql.executeQuery(
-                "select * from table1",
-                new Function<LMap, Integer>() {
+        List<Integer> ages = lSql.executeQuery("select * from table1")
+                .map(new Function<LMap, Integer>() {
                     public Integer apply(LMap input) {
                         return input.getInt("age");
                     }
@@ -65,6 +65,7 @@ public class LSqlTest {
     }
 
     //@Test
+    /*
     // TODO reimplement test logic
     public void testFetchAllValues() throws SQLException {
         lSql.execute("create table table1 (name text, age int);" +
@@ -87,26 +88,18 @@ public class LSqlTest {
         assertTrue(entries.contains("name->cus1"));
         assertTrue(entries.contains("age->20"));
     }
+    */
 
     @Test
     public void testNameConversions() {
-        lSql.getNamingConventions().setJavaCodeFormat(CaseFormat.LOWER_CAMEL);
+        lSql.getJavaSqlConverter().setJavaIdentifierCaseFormat(CaseFormat.LOWER_CAMEL);
 
         lSql.execute("create table table1 (test_name1 text, TEST_NAME2 text);" +
                 "insert into table1 (test_name1, TEST_NAME2) values ('name1', 'name2');");
 
-        final boolean[] assertCallbackCalled = {false};
-        lSql.executeQuery(
-                "select * from table1",
-                new Function<LMap, Integer>() {
-                    public Integer apply(LMap input) {
-                        assertCallbackCalled[0] = true;
-                        assertEquals(input.get("testName1"), "name1");
-                        assertEquals(input.get("testName2"), "name2");
-                        return null;
-                    }
-                });
-        assertTrue(assertCallbackCalled[0]);
+        LMap row = lSql.executeQuery("select * from table1").getFirstRow();
+        assertEquals(row.get("testName1"), "name1");
+        assertEquals(row.get("testName2"), "name2");
     }
 
     @Test
@@ -116,7 +109,7 @@ public class LSqlTest {
                 "test_name1", "a name",
                 "age", 2)).get();
 
-        LMap query = lSql.executeQueryAndGetFirstRow("select * from table1 where id = " + newId);
+        LMap query = lSql.executeQuery("select * from table1 where id = " + newId).getFirstRow();
         assertEquals(query.getString("test_name1"), "a name");
         assertEquals(query.getInt("age"), 2);
     }
@@ -128,7 +121,7 @@ public class LSqlTest {
         lSql.executeInsert("table1", LMap.fromKeyVals("number", 2));
         lSql.executeInsert("table1", LMap.fromKeyVals("number", 3));
 
-        LMap map = lSql.executeQueryAndGetFirstRow("select sum(number) as X from table1");
+        LMap map = lSql.executeQuery("select sum(number) as X from table1").getFirstRow();
         assertEquals(map.getInt("x"), 6);
     }
 

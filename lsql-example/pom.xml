@@ -8,6 +8,10 @@
   <artifactId>lsql-example</artifactId>
   <version>0.0.10-SNAPSHOT</version>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.w11k.lsql</groupId>

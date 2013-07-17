@@ -30,3 +30,4 @@ exit_on_error
 ../mvnrepository/commit_and_push.sh
 exit_on_error
 
+dev/get_current_version.sh >> VERSION

@@ -1,6 +1,5 @@
-package com.w11k.lsql;
+package com.w11k.relda;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -13,11 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class LSql {
 
-    private NamingConventions namingConventions;
+    private JavaSqlConverter javaSqlConverter;
 
     private Callable<Connection> connectionFactory;
 
@@ -26,15 +23,15 @@ public class LSql {
      */
     public LSql(Callable<Connection> connectionFactory) {
         this.connectionFactory = connectionFactory;
-        this.namingConventions = new NamingConventions();
+        this.javaSqlConverter = new JavaSqlConverter();
     }
 
-    public NamingConventions getNamingConventions() {
-        return namingConventions;
+    public JavaSqlConverter getJavaSqlConverter() {
+        return javaSqlConverter;
     }
 
-    public void setNamingConventions(NamingConventions namingConventions) {
-        this.namingConventions = namingConventions;
+    public void setJavaSqlConverter(JavaSqlConverter javaSqlConverter) {
+        this.javaSqlConverter = javaSqlConverter;
     }
 
     public Callable<Connection> getConnectionFactory() {
@@ -66,37 +63,16 @@ public class LSql {
         }
     }
 
-    public <T> List<T> executeQuery(String sql, Function<LMap, T> rowHandler) {
-        List<T> list = Lists.newLinkedList();
-        Statement st = createStatement();
-        try {
-            ResultSet resultSet = st.executeQuery(sql);
-            while (resultSet.next()) {
-                list.add(rowHandler.apply(LMap.fromMap(new ResultSetMap(this, resultSet))));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return list;
-    }
-
-    public LMap executeQueryAndGetFirstRow(String sql) {
-        Statement st = createStatement();
-        try {
-            ResultSet resultSet = st.executeQuery(sql);
-            resultSet.next();
-            return LMap.fromMap(new ResultSetMap(this, resultSet));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public <T> Query executeQuery(String sql) {
+        return new Query(this, sql);
     }
 
     public Optional<Object> executeInsert(String tableName, Map<String, Object> data) {
         List<String> columns = Lists.newLinkedList();
         List<Object> values = Lists.newLinkedList();
         for (Map.Entry<String, Object> keyValue : data.entrySet()) {
-            columns.add(namingConventions.identifierJavaToSql(keyValue.getKey()));
-            values.add(escapeJavaObjectForSqlStatement(keyValue.getValue()));
+            columns.add(javaSqlConverter.identifierJavaToSql(keyValue.getKey()));
+            values.add(javaSqlConverter.escapeJavaObjectForSqlStatement(keyValue.getValue()));
         }
 
         Statement st = createStatement();
@@ -123,16 +99,6 @@ public class LSql {
             return Optional.absent();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    public String escapeJavaObjectForSqlStatement(Object obj) {
-        checkNotNull(obj);
-        if (obj instanceof String) {
-            // TODO check escaping
-            return "'" + ((String) obj).replaceAll("'", "\'") + "'";
-        } else {
-            return obj.toString();
         }
     }
 

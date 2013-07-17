@@ -1,4 +1,4 @@
-package com.w11k.lsql;
+package com.w11k.relda;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
