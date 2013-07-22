@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.w11k.lsql:lsql-core:0.0.14-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$M2_REPO$/com/w11k/lsql/lsql-core/0.0.14-SNAPSHOT/lsql-core-0.0.14-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$M2_REPO$/com/w11k/lsql/lsql-core/0.0.14-SNAPSHOT/lsql-core-0.0.14-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$M2_REPO$/com/w11k/lsql/lsql-core/0.0.14-SNAPSHOT/lsql-core-0.0.14-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
