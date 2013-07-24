@@ -1,4 +1,4 @@
-package com.w11k.relda;
+package com.w11k.lsql;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
@@ -15,7 +15,7 @@ import static java.util.Arrays.asList;
 public class JavaSqlConverter {
 
     public static class Converter {
-        public String javaValueToSql(Object value) {
+        public String javaValueToSql(Object value){
             return value.toString();
         }
 
@@ -87,6 +87,8 @@ public class JavaSqlConverter {
                         return rs.getString(index);
                     }
                 });
+
+        // TODO add more types
     }
 
     public void addConverter(List<Integer> sqlTypes, Class<?> javaType, Converter converter) {
@@ -104,7 +106,7 @@ public class JavaSqlConverter {
         return javaIdentifierCaseFormat.to(sqlIdentifierCaseFormat, javaName);
     }
 
-    public Object getColumnValue(ResultSet rs, int index) {
+    public Object getColumnValue(ResultSet rs, int index) throws SQLException {
         try {
             int columnType = rs.getMetaData().getColumnType(index);
             Converter converter = sqlValueToJavaConverters.get(columnType);
@@ -115,7 +117,7 @@ public class JavaSqlConverter {
         }
     }
 
-    public String escapeJavaObjectForSqlStatement(Object obj) {
+    public String javaToSqlStringRepr(Object obj) {
         Converter converter = javaValueToSqlConverters.get(obj.getClass());
         converter = converter == null ? defaultConverter : converter;
         return converter.javaValueToSql(obj);

@@ -1,13 +1,11 @@
 package com.w11k.lsql_example;
 
-import com.google.common.base.Function;
-import com.w11k.relda.ConnectionFactories;
-import com.w11k.relda.LMap;
-import com.w11k.relda.LSql;
+import com.w11k.lsql.ConnectionFactories;
+import com.w11k.lsql.LSql;
+import com.w11k.lsql.Row;
 import org.h2.jdbcx.JdbcDataSource;
 
 import java.sql.Connection;
-import java.util.List;
 
 public class LSqlExample {
 
@@ -20,21 +18,14 @@ public class LSqlExample {
         LSql lSql = new LSql(ConnectionFactories.fromInstance(connection));
 
         lSql.execute("create table persons (name text, age int);");
-        LMap person1 = LMap.fromKeyVals("name", "Joe", "age", 10);
-        LMap person2 = LMap.fromKeyVals("name", "John", "age", 20);
-        lSql.executeInsert("persons", person1);
-        lSql.executeInsert("persons", person2);
-
-        List<Integer> ages = lSql.executeQuery("select * from persons")
-                .map(new Function<LMap, Integer>() {
-                    public Integer apply(LMap input) {
-                        return input.getInt("age");
-                    }
-                });
+        Row person1 = new Row(lSql, "persons").addKeyVals("name", "Joe", "age", 10);
+        Row person2 = new Row(lSql, "persons").addKeyVals("name", "John", "age", 20);
+        lSql.executeInsert(person1);
+        lSql.executeInsert(person2);
 
         int sum = 0;
-        for (int age : ages) {
-            sum += age;
+        for (Row row : lSql.executeQuery("select * from persons")) {
+            sum += row.getInt("age");
         }
         System.out.println("SUM = " + sum);
     }
