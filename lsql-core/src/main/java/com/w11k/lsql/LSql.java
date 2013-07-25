@@ -27,11 +27,18 @@ public class LSql {
         this.connectionFactory = connectionFactory;
     }
 
-    public ConverterRegistry getConverterRegistry() {
-        return converterRegistry;
+    public JavaSqlConverter getGlobalConverter() {
+        return globalConverter;
     }
 
-    // ----- convenience methods for JDBC  -----
+    // ----- public -----
+
+    public Table table(String tableName) {
+        if (!tables.containsKey(tableName)) {
+            tables.put(tableName, new Table(this, tableName));
+        }
+        return tables.get(tableName);
+    }
 
     public Connection getConnection() {
         try {
@@ -47,13 +54,6 @@ public class LSql {
         } catch (SQLException e) {
             throw new DatabaseAccessException(e);
         }
-    }
-
-    public Table table(String tableName) {
-        if (!tables.containsKey(tableName)) {
-            tables.put(tableName, new Table(this, tableName));
-        }
-        return tables.get(tableName);
     }
 
     public void execute(String sql) {
