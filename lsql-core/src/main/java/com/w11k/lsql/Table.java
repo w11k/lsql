@@ -65,7 +65,7 @@ public class Table {
 
             JavaSqlConverter converter = column(key).getColumnConverter();
 
-            columns.add(converter.identifierJavaToSql(key));
+            columns.add(lSql.identifierJavaToSql(key));
             values.add(converter.javaToSqlStringRepr(value));
         }
 

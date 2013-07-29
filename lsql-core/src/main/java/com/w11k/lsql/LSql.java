@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 
@@ -13,11 +14,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class LSql {
 
-    private Callable<Connection> connectionFactory;
+    private final Map<String, Table> tables = Maps.newHashMap();
 
     private JavaSqlConverter globalConverter = new JavaSqlConverter();
 
-    private final Map<String, Table> tables = Maps.newHashMap();
+    private CaseFormat javaCaseFormat = CaseFormat.LOWER_UNDERSCORE;
+
+    private CaseFormat sqlCaseFormat = CaseFormat.UPPER_UNDERSCORE;
+
+    private Callable<Connection> connectionFactory;
 
     /**
      * @param connectionFactory Factory to get an active JDBC Connection
@@ -35,7 +40,31 @@ public class LSql {
         this.globalConverter = globalConverter;
     }
 
+    public CaseFormat getJavaCaseFormat() {
+        return javaCaseFormat;
+    }
+
+    public void setJavaCaseFormat(CaseFormat javaCaseFormat) {
+        this.javaCaseFormat = javaCaseFormat;
+    }
+
+    public CaseFormat getSqlCaseFormat() {
+        return sqlCaseFormat;
+    }
+
+    public void setSqlCaseFormat(CaseFormat sqlCaseFormat) {
+        this.sqlCaseFormat = sqlCaseFormat;
+    }
+
     // ----- public -----
+
+    public String identifierSqlToJava(String sqlName) {
+        return sqlCaseFormat.to(javaCaseFormat, sqlName);
+    }
+
+    public String identifierJavaToSql(String javaName) {
+        return javaCaseFormat.to(sqlCaseFormat, javaName);
+    }
 
     public Table table(String tableName) {
         if (!tables.containsKey(tableName)) {

@@ -66,9 +66,9 @@ public class Query implements Iterable<QueriedRow> {
                 lastUsedSqlTableName = sqlTable;
 
                 String sqlColumn = metaData.getColumnLabel(i);
-                String javaTable = lSql.getGlobalConverter().identifierSqlToJava(sqlTable);
+                String javaTable = lSql.identifierSqlToJava(sqlTable);
                 Table table = lSql.table(javaTable);
-                String javaColumn = table.getTableConverter().identifierSqlToJava(sqlColumn);
+                String javaColumn = lSql.identifierSqlToJava(sqlColumn);
                 Column column = table.column(javaColumn);
 
                 String name = javaColumn;
@@ -107,6 +107,21 @@ public class Query implements Iterable<QueriedRow> {
 
     public List<QueriedRow> asList() {
         return Lists.newLinkedList(rows);
+    }
+
+    public Map<String, List<Row>> groupByTables() {
+        Map<String, List<Row>> byTables = Maps.newHashMap();
+        for (QueriedRow queriedRow : asList()) {
+            Map<String, Row> rowByTables = queriedRow.groupByTables();
+            for (String key : rowByTables.keySet()) {
+                Row row = rowByTables.get(key);
+                if (!byTables.containsKey(key)) {
+                    byTables.put(key, Lists.<Row>newLinkedList());
+                }
+                byTables.get(key).add(row);
+            }
+        }
+        return byTables;
     }
 
 }

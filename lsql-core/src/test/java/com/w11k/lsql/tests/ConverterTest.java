@@ -34,7 +34,8 @@ public class ConverterTest extends AbstractLSqlTest {
 
     @Test
     public void caseFormatConversion() {
-        lSql.setGlobalConverter(new JavaSqlConverter(CaseFormat.LOWER_CAMEL, CaseFormat.UPPER_UNDERSCORE));
+        lSql.setJavaCaseFormat(CaseFormat.LOWER_CAMEL);
+        lSql.setSqlCaseFormat(CaseFormat.UPPER_UNDERSCORE);
 
         lSql.execute("CREATE TABLE table1 (test_name1 TEXT, TEST_NAME2 TEXT)");
         lSql.execute("INSERT INTO table1 (test_name1, TEST_NAME2) VALUES ('name1', 'name2')");
@@ -75,18 +76,6 @@ public class ConverterTest extends AbstractLSqlTest {
         Row row = lSql.executeQuery("select * from table1").getFirstRow();
         assertEquals(row.get("yesno1"), true);
         assertEquals(row.get("yesno2"), "true");
-    }
-
-    @Test public void converterForColumnName() {
-        lSql.execute("CREATE TABLE table1 (first_name text)");
-
-        lSql.table("table1").column("firstName").setColumnConverter(
-                new JavaSqlConverter(CaseFormat.LOWER_CAMEL, CaseFormat.UPPER_UNDERSCORE));
-
-        lSql.table("table1").insert(Row.fromKeyVals("firstName", "John"));
-
-        // TODO add test
-
     }
 
 }

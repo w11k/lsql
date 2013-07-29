@@ -1,6 +1,5 @@
 package com.w11k.lsql;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
@@ -35,31 +34,15 @@ public class JavaSqlConverter {
 
     private final Converter defaultConverter;
 
-    private final CaseFormat javaCaseFormat;
-
-    private final CaseFormat sqlCaseFormat;
 
     public JavaSqlConverter() {
-        this(null, null, null);
+        this(null);
     }
 
-    public JavaSqlConverter(Converter defaultConverter) {
-        this(defaultConverter, null, null);
-    }
-
-    public JavaSqlConverter(CaseFormat javaCaseFormat, CaseFormat sqlCaseFormat) {
-        this(null, javaCaseFormat, sqlCaseFormat);
-    }
-
-    public JavaSqlConverter(@Nullable Converter defaultConverter,
-                            @Nullable CaseFormat javaCaseFormat,
-                            @Nullable CaseFormat sqlCaseFormat) {
-
+    public JavaSqlConverter(@Nullable Converter defaultConverter) {
         // TODO add map to statically override IDs
 
         this.defaultConverter = defaultConverter != null ? defaultConverter : new Converter();
-        this.javaCaseFormat = javaCaseFormat != null ? javaCaseFormat : CaseFormat.LOWER_UNDERSCORE;
-        this.sqlCaseFormat = sqlCaseFormat != null ? sqlCaseFormat : CaseFormat.UPPER_UNDERSCORE;
 
         addConverter(
                 asList(Types.BIT, Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT),
@@ -99,22 +82,6 @@ public class JavaSqlConverter {
                 });
 
         // TODO add more types
-    }
-
-    public CaseFormat getJavaCaseFormat() {
-        return javaCaseFormat;
-    }
-
-    public CaseFormat getSqlCaseFormat() {
-        return sqlCaseFormat;
-    }
-
-    public String identifierSqlToJava(String sqlName) {
-        return sqlCaseFormat.to(javaCaseFormat, sqlName);
-    }
-
-    public String identifierJavaToSql(String javaName) {
-        return javaCaseFormat.to(sqlCaseFormat, javaName);
     }
 
     public Object getColumnValue(ResultSet rs, int index) throws SQLException {
