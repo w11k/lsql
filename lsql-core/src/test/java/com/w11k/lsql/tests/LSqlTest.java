@@ -1,0 +1,45 @@
+package com.w11k.lsql.tests;
+
+import com.w11k.lsql.LSql;
+import com.w11k.lsql.exceptions.DatabaseAccessException;
+import org.testng.annotations.Test;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.concurrent.Callable;
+
+import static org.testng.Assert.assertNotNull;
+
+public class LSqlTest extends AbstractLSqlTest {
+
+    @Test public void getConnectionFromConnectionFactory() throws SQLException {
+        assertNotNull(lSql.getConnection());
+    }
+
+    @Test(expectedExceptions = DatabaseAccessException.class)
+    public void getConnectionThrowsDatabaseAccessException() throws SQLException {
+        new LSql(new Callable<Connection>() {
+            @Override public Connection call() throws Exception {
+                throw new RuntimeException();
+            }
+        }).getConnection();
+    }
+
+    @Test(expectedExceptions = DatabaseAccessException.class)
+    public void createStatementThrowsDatabaseAccessExceptionOnClosedConnection() throws SQLException {
+        lSql.getConnection().close();
+        lSql.createStatement();
+    }
+
+    @Test public void execute() {
+        lSql.execute("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.execute("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void executeShouldThrowRuntimeExceptionOnWrongStatement() {
+        lSql.execute("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.execute("INSERT INTO tableX (name, age) VALUES ('cus1', 20)");
+    }
+
+}
