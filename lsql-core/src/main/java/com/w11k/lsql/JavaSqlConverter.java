@@ -4,6 +4,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -12,6 +13,10 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 
+/**
+ * Note: This Class must behave immutable because by default one instance is shared
+ * between LSql, all Tables and all Column.
+ */
 public class JavaSqlConverter {
 
     public static class Converter {
@@ -24,33 +29,38 @@ public class JavaSqlConverter {
         }
     }
 
-    private final Converter defaultConverter = new Converter();
+    private final Map<Class<?>, Converter> javaValueToSqlConverters = Maps.newHashMap();
 
-    private CaseFormat javaIdentifierCaseFormat = CaseFormat.LOWER_UNDERSCORE;
+    private final Map<Integer, Converter> sqlValueToJavaConverters = Maps.newHashMap();
 
-    private CaseFormat sqlIdentifierCaseFormat = CaseFormat.UPPER_UNDERSCORE;
+    private final Converter defaultConverter;
 
-    private Map<Class<?>, Converter> javaValueToSqlConverters = Maps.newHashMap();
+    private final CaseFormat javaCaseFormat;
 
-    private Map<Integer, Converter> sqlValueToJavaConverters = Maps.newHashMap();
-
-    public CaseFormat getJavaIdentifierCaseFormat() {
-        return javaIdentifierCaseFormat;
-    }
-
-    public void setJavaIdentifierCaseFormat(CaseFormat javaIdentifierCaseFormat) {
-        this.javaIdentifierCaseFormat = javaIdentifierCaseFormat;
-    }
-
-    public CaseFormat getSqlIdentifierCaseFormat() {
-        return sqlIdentifierCaseFormat;
-    }
-
-    public void setSqlIdentifierCaseFormat(CaseFormat sqlIdentifierCaseFormat) {
-        this.sqlIdentifierCaseFormat = sqlIdentifierCaseFormat;
-    }
+    private final CaseFormat sqlCaseFormat;
 
     public JavaSqlConverter() {
+        this(null, null, null);
+    }
+
+    public JavaSqlConverter(Converter defaultConverter) {
+        this(defaultConverter, null, null);
+    }
+
+    public JavaSqlConverter(CaseFormat javaCaseFormat, CaseFormat sqlCaseFormat) {
+        this(null, javaCaseFormat, sqlCaseFormat);
+    }
+
+    public JavaSqlConverter(@Nullable Converter defaultConverter,
+                            @Nullable CaseFormat javaCaseFormat,
+                            @Nullable CaseFormat sqlCaseFormat) {
+
+        // TODO add map to statically override IDs
+
+        this.defaultConverter = defaultConverter != null ? defaultConverter : new Converter();
+        this.javaCaseFormat = javaCaseFormat != null ? javaCaseFormat : CaseFormat.LOWER_UNDERSCORE;
+        this.sqlCaseFormat = sqlCaseFormat != null ? sqlCaseFormat : CaseFormat.UPPER_UNDERSCORE;
+
         addConverter(
                 asList(Types.BIT, Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT),
                 Integer.class,
@@ -91,19 +101,20 @@ public class JavaSqlConverter {
         // TODO add more types
     }
 
-    public void addConverter(List<Integer> sqlTypes, Class<?> javaType, Converter converter) {
-        for (int sqlType : sqlTypes) {
-            sqlValueToJavaConverters.put(sqlType, converter);
-        }
-        javaValueToSqlConverters.put(javaType, converter);
+    public CaseFormat getJavaCaseFormat() {
+        return javaCaseFormat;
+    }
+
+    public CaseFormat getSqlCaseFormat() {
+        return sqlCaseFormat;
     }
 
     public String identifierSqlToJava(String sqlName) {
-        return sqlIdentifierCaseFormat.to(javaIdentifierCaseFormat, sqlName);
+        return sqlCaseFormat.to(javaCaseFormat, sqlName);
     }
 
     public String identifierJavaToSql(String javaName) {
-        return javaIdentifierCaseFormat.to(sqlIdentifierCaseFormat, javaName);
+        return javaCaseFormat.to(sqlCaseFormat, javaName);
     }
 
     public Object getColumnValue(ResultSet rs, int index) throws SQLException {
@@ -122,5 +133,13 @@ public class JavaSqlConverter {
         converter = converter == null ? defaultConverter : converter;
         return converter.javaValueToSql(obj);
     }
+
+    private void addConverter(List<Integer> sqlTypes, Class<?> javaType, Converter converter) {
+        for (int sqlType : sqlTypes) {
+            sqlValueToJavaConverters.put(sqlType, converter);
+        }
+        javaValueToSqlConverters.put(javaType, converter);
+    }
+
 
 }

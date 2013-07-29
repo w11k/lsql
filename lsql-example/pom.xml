@@ -60,12 +60,16 @@
       <id>WeigleWilczek GitHub Maven Repository Snapshots</id>
       <url>https://github.com/weiglewilczek/mvnrepository/raw/master/releases</url>
       <snapshots>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
       </snapshots>
     </repository>
     <repository>
       <id>WeigleWilczek GitHub Maven Repository Releases</id>
       <url>https://github.com/weiglewilczek/mvnrepository/raw/master/releases</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+
     </repository>
   </repositories>
 

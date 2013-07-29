@@ -13,6 +13,7 @@ import static org.testng.Assert.assertEquals;
 
 public class ConverterTest extends AbstractLSqlTest {
 
+
     private final JavaSqlConverter javaBoolToSqlYesNoStringConverter = new JavaSqlConverter() {
         @Override
         public Object getColumnValue(ResultSet rs, int index) throws SQLException {
@@ -31,8 +32,9 @@ public class ConverterTest extends AbstractLSqlTest {
         }
     };
 
-    @Test public void caseFormatConversion() {
-        lSql.getConverterRegistry().getGlobalConverters().setJavaIdentifierCaseFormat(CaseFormat.LOWER_CAMEL);
+    @Test
+    public void caseFormatConversion() {
+        lSql.setGlobalConverter(new JavaSqlConverter(CaseFormat.LOWER_CAMEL, CaseFormat.UPPER_UNDERSCORE));
 
         lSql.execute("CREATE TABLE table1 (test_name1 TEXT, TEST_NAME2 TEXT)");
         lSql.execute("INSERT INTO table1 (test_name1, TEST_NAME2) VALUES ('name1', 'name2')");
@@ -45,7 +47,7 @@ public class ConverterTest extends AbstractLSqlTest {
     @Test public void converterGlobal() {
         lSql.execute("CREATE TABLE table1 (yesno TEXT)");
         Table table1 = lSql.table("table1");
-        lSql.getConverterRegistry().setGlobalConverter(javaBoolToSqlYesNoStringConverter);
+        lSql.setGlobalConverter(javaBoolToSqlYesNoStringConverter);
         table1.insert(Row.fromKeyVals("yesno", true));
         Row row = lSql.executeQuery("select * from table1").getFirstRow();
         assertEquals(row.get("yesno"), true);
@@ -56,7 +58,7 @@ public class ConverterTest extends AbstractLSqlTest {
         lSql.execute("CREATE TABLE table2 (yesno TEXT)");
         Table t1 = lSql.table("table1");
         Table t2 = lSql.table("table2");
-        lSql.getConverterRegistry().setTableConverter("table1", javaBoolToSqlYesNoStringConverter);
+        lSql.table("table1").setTableConverter(javaBoolToSqlYesNoStringConverter);
         t1.insert(Row.fromKeyVals("yesno", true));
         t2.insert(Row.fromKeyVals("yesno", "true"));
         Row row1 = lSql.executeQuery("select * from table1").getFirstRow();
@@ -65,14 +67,26 @@ public class ConverterTest extends AbstractLSqlTest {
         assertEquals(row2.get("yesno"), "true");
     }
 
-    @Test public void converterForColumn() {
+    @Test public void converterForColumnValue() {
         lSql.execute("CREATE TABLE table1 (yesno1 TEXT, yesno2 TEXT)");
         Table t1 = lSql.table("table1");
-        lSql.getConverterRegistry().setColumnConverter("table1", "yesno1", javaBoolToSqlYesNoStringConverter);
+        lSql.table("table1").column("yesno1").setColumnConverter(javaBoolToSqlYesNoStringConverter);
         t1.insert(Row.fromKeyVals("yesno1", true, "yesno2", "true"));
         Row row = lSql.executeQuery("select * from table1").getFirstRow();
         assertEquals(row.get("yesno1"), true);
         assertEquals(row.get("yesno2"), "true");
+    }
+
+    @Test public void converterForColumnName() {
+        lSql.execute("CREATE TABLE table1 (first_name text)");
+
+        lSql.table("table1").column("firstName").setColumnConverter(
+                new JavaSqlConverter(CaseFormat.LOWER_CAMEL, CaseFormat.UPPER_UNDERSCORE));
+
+        lSql.table("table1").insert(Row.fromKeyVals("firstName", "John"));
+
+        // TODO add test
+
     }
 
 }

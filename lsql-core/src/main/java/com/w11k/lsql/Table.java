@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.w11k.lsql.exceptions.InsertException;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -49,6 +50,7 @@ public class Table {
 
     public Column column(String columnName) {
         if (!columns.containsKey(columnName)) {
+            // TODO check if column exists
             columns.put(columnName, new Column(this, columnName));
         }
         return columns.get(columnName);
@@ -83,14 +85,15 @@ public class Table {
             st.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
             ResultSet resultSet = st.getGeneratedKeys();
             if (resultSet.next()) {
-                Row rowWithKey = new Row(new ResultSetMap(lSql, resultSet));
-                if (rowWithKey.keySet().size() == 0) {
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                if (columnCount == 0) {
                     return Optional.absent();
-                } else if (rowWithKey.keySet().size() > 1) {
+                } else if (columnCount > 1) {
                     throw new IllegalStateException("ResultSet for retrieval of the generated " +
                             "ID contains more than one column.");
                 }
-                return Optional.of(rowWithKey.values().toArray()[0]);
+                return Optional.of(resultSet.getObject(1));
             }
             return Optional.absent();
         } catch (SQLException e) {

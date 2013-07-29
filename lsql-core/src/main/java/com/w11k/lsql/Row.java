@@ -40,7 +40,8 @@ public class Row extends ForwardingMap<String, Object> {
         for (List<Object> objects : partition) {
             Object key = objects.get(0);
             checkArgument(key instanceof String, "argument " + key + " is not a String");
-            put(key.toString(), objects.get(1));
+            Object value = objects.get(1);
+            put(key.toString(), value);
         }
         return this;
     }
@@ -50,7 +51,7 @@ public class Row extends ForwardingMap<String, Object> {
     public Object put(String key, Object value) {
         return super.put(key, value);
     }
-
+    
     // ----- getter convenience -----
 
     public <A> A getAs(Class<A> type, String key) {

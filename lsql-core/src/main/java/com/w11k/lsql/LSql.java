@@ -15,7 +15,7 @@ public class LSql {
 
     private Callable<Connection> connectionFactory;
 
-    private final JavaSqlConverter globalConverter = new JavaSqlConverter();
+    private JavaSqlConverter globalConverter = new JavaSqlConverter();
 
     private final Map<String, Table> tables = Maps.newHashMap();
 
@@ -29,6 +29,10 @@ public class LSql {
 
     public JavaSqlConverter getGlobalConverter() {
         return globalConverter;
+    }
+
+    public void setGlobalConverter(JavaSqlConverter globalConverter) {
+        this.globalConverter = globalConverter;
     }
 
     // ----- public -----

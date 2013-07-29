@@ -1,7 +1,11 @@
 package com.w11k.lsql.tests;
 
+import com.google.common.base.Optional;
+import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Row;
 import org.testng.annotations.Test;
+
+import java.util.Map;
 
 import static junit.framework.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
@@ -26,6 +30,26 @@ public class RowTest extends AbstractLSqlTest {
     public void getAsThrowsClassCastExceptionOnWrongType() {
         Row r = new Row().addKeyVals("a", "1");
         assertEquals(r.getInt("a"), 1);
+    }
+
+    @Test public void groupByTable() {
+        lSql.execute("CREATE TABLE city (id serial primary key, zipcode text, name text)");
+        lSql.execute("CREATE TABLE person (id serial primary key, name text, zipcode integer references city (id))");
+
+        Optional<Object> cityId = lSql.table("city").insert(Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
+        lSql.table("person").insert(Row.fromKeyVals("name", "John", "zipcode", cityId.get()));
+
+        QueriedRow row = lSql.executeQuery("select * from person, city").getFirstRow();
+        assertEquals(row.getString("city.zipcode"), "53721");
+        assertEquals(row.getString("city.name"), "Siegburg");
+        assertEquals(row.getString("person.name"), "John");
+        assertEquals(row.getInt("person.zipcode"), cityId.get());
+
+        Map<String, Row> byTables = row.groupByTables();
+        assertEquals(byTables.get("city").getString("name"), "Siegburg");
+        assertEquals(byTables.get("city").getString("zipcode"), "53721");
+        assertEquals(byTables.get("person").getString("name"), "John");
+        assertEquals(byTables.get("person").getInt("zipcode"), cityId.get());
     }
 
 }

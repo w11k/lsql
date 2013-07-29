@@ -1,3 +1,1 @@
-Literate SQL
-===
-
+# Literate SQL - A Java JDBC Library
