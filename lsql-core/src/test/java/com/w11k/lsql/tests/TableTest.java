@@ -1,11 +1,13 @@
 package com.w11k.lsql.tests;
 
+import com.google.common.base.Optional;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 
+import static junit.framework.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 
 public class TableTest extends AbstractLSqlTest {
@@ -29,6 +31,15 @@ public class TableTest extends AbstractLSqlTest {
 
         Row query = lSql.executeQuery("select * from table1 where id = " + newId).getFirstRow();
         assertEquals(query.getInt("age"), 1);
+    }
+
+    @Test public void insertShouldPutIdIntoRowObject() {
+        lSql.execute("CREATE TABLE table1 (id serial primary key, age int)");
+        Table table1 = lSql.table("table1");
+        Row row = new Row().addKeyVals("age", 1);
+        Optional<Object> optional = table1.insert(row);
+        assertTrue(optional.isPresent());
+        assertEquals(optional.get(), row.get("id"));
     }
 
 }

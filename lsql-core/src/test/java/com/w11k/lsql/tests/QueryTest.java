@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
+import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -90,32 +91,24 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.execute("CREATE TABLE city (id SERIAL PRIMARY KEY, zipcode TEXT, name TEXT)");
         lSql.execute("CREATE TABLE person (id SERIAL PRIMARY KEY, name TEXT, zipcode INTEGER REFERENCES city (id))");
 
-        Optional<Object> city1Id = lSql.table("city").insert(Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
-        Optional<Object> city2Id = lSql.table("city").insert(Row.fromKeyVals("zipcode", "50935", "name", "Cologne"));
-        lSql.table("person").insert(Row.fromKeyVals("name", "John", "zipcode", city1Id.get()));
-        lSql.table("person").insert(Row.fromKeyVals("name", "Jim", "zipcode", city2Id.get()));
+        Row city1 = Row.fromKeyVals("zipcode", "53721", "name", "Siegburg");
+        Optional<Object> city1Id = lSql.table("city").insert(city1);
 
-        // TODO add test
+        Row city2 = Row.fromKeyVals("zipcode", "50935", "name", "Cologne");
+        Optional<Object> city2Id = lSql.table("city").insert(city2);
+
+        Row person1 = Row.fromKeyVals("name", "John", "zipcode", city1Id.get());
+        lSql.table("person").insert(person1);
+
+        Row person2 = Row.fromKeyVals("name", "Jim", "zipcode", city2Id.get());
+        lSql.table("person").insert(person2);
+
         Query query = lSql.executeQuery("select * from person, city");
-        for (QueriedRow queriedRow : query) {
-            System.out.println(queriedRow);
-        }
-
         Map<String, List<Row>> byTables = query.groupByTables();
-        System.out.println(byTables);
-
-        /*
-        assertEquals(row.getString("city.zipcode"), "53721");
-        assertEquals(row.getString("city.name"), "Siegburg");
-        assertEquals(row.getString("person.name"), "John");
-        assertEquals(row.getInt("person.zipcode"), cityId.get());
-
-        Map<String, Row> byTables = row.groupByTables();
-        assertEquals(byTables.get("city").getString("name"), "Siegburg");
-        assertEquals(byTables.get("city").getString("zipcode"), "53721");
-        assertEquals(byTables.get("person").getString("name"), "John");
-        assertEquals(byTables.get("person").getInt("zipcode"), cityId.get());
-        */
+        Assert.assertTrue(byTables.get("city").contains(city1));
+        Assert.assertTrue(byTables.get("city").contains(city2));
+        Assert.assertTrue(byTables.get("person").contains(person1));
+        Assert.assertTrue(byTables.get("person").contains(person2));
     }
 
 }

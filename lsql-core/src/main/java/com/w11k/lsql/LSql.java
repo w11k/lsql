@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
@@ -31,6 +32,8 @@ public class LSql {
         checkNotNull(connectionFactory);
         this.connectionFactory = connectionFactory;
     }
+
+    // ----- getter/setter -----
 
     public JavaSqlConverter getGlobalConverter() {
         return globalConverter;
@@ -89,6 +92,14 @@ public class LSql {
         }
     }
 
+    public PreparedStatement prepareStatement(String sqlString) {
+        try {
+            return getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
+        } catch (SQLException e) {
+            throw new DatabaseAccessException(e);
+        }
+    }
+
     public void execute(String sql) {
         Statement st = createStatement();
         try {
@@ -98,11 +109,10 @@ public class LSql {
         }
     }
 
-    // ----- DML and DQL abstractions -----
-
     public Query executeQuery(String sql) {
         return new Query(this, sql);
     }
 
+    // ----- private -----
 
 }

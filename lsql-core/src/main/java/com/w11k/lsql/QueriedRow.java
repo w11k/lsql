@@ -5,7 +5,6 @@ import com.google.common.collect.Maps;
 import com.w11k.lsql.exceptions.SelectException;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
 
 public class QueriedRow extends Row {
@@ -19,11 +18,11 @@ public class QueriedRow extends Row {
             for (String name : meta.keySet()) {
                 Query.ResultSetColumn resultSetColumn = meta.get(name);
                 JavaSqlConverter columnConverter = resultSetColumn.column.getColumnConverter();
-                Object value = columnConverter.getColumnValue(resultSet, resultSetColumn.index);
+                Object value = columnConverter.getValueFromResultSet(resultSet, resultSetColumn.index);
                 values.put(name, value);
                 columns.put(name, resultSetColumn.column);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new SelectException(e);
         }
     }

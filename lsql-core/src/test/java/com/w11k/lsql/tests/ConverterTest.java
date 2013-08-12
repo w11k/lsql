@@ -4,33 +4,14 @@ import com.google.common.base.CaseFormat;
 import com.w11k.lsql.JavaSqlConverter;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.converter.JavaBoolToSqlString;
 import org.testng.annotations.Test;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static org.testng.Assert.assertEquals;
 
 public class ConverterTest extends AbstractLSqlTest {
 
-
-    private final JavaSqlConverter javaBoolToSqlYesNoStringConverter = new JavaSqlConverter() {
-        @Override
-        public Object getColumnValue(ResultSet rs, int index) throws SQLException {
-            String val = rs.getString(index);
-            if (val.equals("yes")) {
-                return true;
-            } else if (val.equals("no")) {
-                return false;
-            } else {
-                throw new IllegalArgumentException("Value must be yes or no");
-            }
-        }
-
-        @Override public String javaToSqlStringRepr(Object obj) {
-            return ((Boolean) obj) ? "'yes'" : "'no'";
-        }
-    };
+    private final JavaSqlConverter javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlString("yes", "no");
 
     @Test
     public void caseFormatConversion() {
