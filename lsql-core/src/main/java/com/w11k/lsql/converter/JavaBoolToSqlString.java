@@ -6,12 +6,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class JavaBoolToSqlString extends JavaSqlConverter {
 
     private final String sqlStringValueForTrue;
     private final String sqlStringValueForFalse;
 
     public JavaBoolToSqlString(String sqlStringValueForTrue, String sqlStringValueForFalse) {
+        checkArgument(!sqlStringValueForTrue.equals(sqlStringValueForFalse));
         this.sqlStringValueForTrue = sqlStringValueForTrue;
         this.sqlStringValueForFalse = sqlStringValueForFalse;
     }
@@ -34,6 +37,5 @@ public class JavaBoolToSqlString extends JavaSqlConverter {
         String yesOrNo = ((Boolean) val) ? sqlStringValueForTrue : sqlStringValueForFalse;
         ps.setString(index, yesOrNo);
     }
-
 
 }

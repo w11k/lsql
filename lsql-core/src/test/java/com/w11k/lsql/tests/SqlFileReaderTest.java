@@ -7,7 +7,7 @@ public class SqlFileReaderTest {
 
     @Test
     public void readSqlFile() {
-        SqlFileReader.fromRelativeToClass(getClass(), "file1.sql");
+        SqlFileReader.relativeToClass(getClass(), "file1.sql");
     }
 
 }

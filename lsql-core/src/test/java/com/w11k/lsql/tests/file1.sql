@@ -1,8 +1,8 @@
 
-XX getAll
-select * from table1;
-
+-- getAll
+aaaaaaaaaaaaaaaaabb;
 
 -- getSome
-select * from table1;
-
+aaaaaaaaaaaa
+bbbbbbbbbb
+abababababa;

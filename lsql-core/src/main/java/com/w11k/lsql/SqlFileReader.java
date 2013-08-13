@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class SqlFileReader {
 
-    public static SqlFileReader fromRelativeToClass(Class clazz, String fileName) {
+    public static SqlFileReader relativeToClass(Class clazz, String fileName) {
         String p = clazz.getPackage().getName();
         p = "/" + p.replaceAll("\\.", "/") + "/";
         InputStream is = clazz.getResourceAsStream(p + fileName);
@@ -23,23 +23,36 @@ public class SqlFileReader {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String fileName;
     //private final Pattern namedStatementBlockPattern = Pattern.compile("^-- \\w*$\\n.*;$");
+
+    private static final String NEWLINE = "((\\r\\n)|(\\n))";
+
+    /*
     private static final Pattern NAMED_STMT_BLOCK_PATTERN = Pattern.compile(
-            "^XX (.*)$",
-            Pattern.MULTILINE);
+            "^-- (.*)$" + NEWLINE + "([\\w\\W" + NEWLINE  + "]*;\\s*$)",
+            Pattern.MULTILINE //| Pattern.DOTALL
+    );
+    */
+
+    private static final Pattern NAMED_STMT_BLOCK_PATTERN = Pattern.compile(
+            "^--(\\w*)(.*(?!--));\\s*$",
+            Pattern.MULTILINE | Pattern.DOTALL
+    );
 
     public SqlFileReader(String fileName, InputStream is) {
         this.fileName = fileName;
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         try {
             String content = CharStreams.toString(reader);
+            Matcher match = NAMED_STMT_BLOCK_PATTERN.matcher(content);
 
-            Matcher blocks = NAMED_STMT_BLOCK_PATTERN.matcher(content);
-
-            System.out.println(blocks.groupCount());
-            for (int i = 1; i <= blocks.groupCount(); i++) {
-                String g = blocks.group(i);
-                System.out.println(g);
-
+            while (match.find()) {
+                System.out.println("####################################################################");
+                for (int i = 1; i <= match.groupCount(); i++) {
+                    String group = match.group(i);
+                    if (group != null && !"".equals(group.trim())) {
+                        System.out.println("group(" + i + ") = {" + group + "}");
+                    }
+                }
             }
 
         } catch (IOException e) {
