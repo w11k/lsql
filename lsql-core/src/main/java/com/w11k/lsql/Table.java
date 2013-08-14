@@ -73,9 +73,9 @@ public class Table {
         }
 
         // create PreparedStatement and execute
-        String sqlString = SqlStringUtils.createInsertString(lSql, tableName, columns);
-        PreparedStatement ps = lSql.prepareStatement(sqlString);
+        String sqlString = SqlStringUtils.createInsertString(this, columns);
         try {
+            PreparedStatement ps = lSql.prepareStatement(sqlString);
             for (int i = 0; i < valueConverter.size(); i++) {
                 JavaSqlConverter javaSqlConverter = valueConverter.get(i);
                 javaSqlConverter.setValueInStatement(ps, i + 1, values.get(i));
@@ -105,6 +105,19 @@ public class Table {
         } catch (Exception e) {
             throw new InsertException(e, sqlString);
         }
+    }
+
+    public QueriedRow get(Object id) {
+        String pkColumn = getPrimaryKeyColumn().get();
+        Column column = column(pkColumn);
+        String insertString = SqlStringUtils.createSelectByIdString(this, column);
+        PreparedStatement preparedStatement = lSql.prepareStatement(insertString);
+        try {
+            column.getColumnConverter().setValueInStatement(preparedStatement, 1, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new Query(lSql, preparedStatement).getFirstRow();
     }
 
     // ----- private -----

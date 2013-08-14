@@ -3,7 +3,11 @@ package com.w11k.lsql;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
+import com.w11k.lsql.sqlfile.SqlFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,6 +18,8 @@ import java.util.concurrent.Callable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class LSql {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<String, Table> tables = Maps.newHashMap();
 
@@ -69,6 +75,14 @@ public class LSql {
         return javaCaseFormat.to(sqlCaseFormat, javaName);
     }
 
+    public SqlFile sqlFileRelativeToClass(Class clazz, String fileName) {
+        String p = clazz.getPackage().getName();
+        p = "/" + p.replaceAll("\\.", "/") + "/";
+        InputStream is = clazz.getResourceAsStream(p + fileName);
+        return new SqlFile(this, fileName, is);
+    }
+
+
     public Table table(String tableName) {
         if (!tables.containsKey(tableName)) {
             tables.put(tableName, new Table(this, tableName));
@@ -100,7 +114,9 @@ public class LSql {
         }
     }
 
-    public void execute(String sql) {
+    // ----- execute SQL methods -----
+
+    public void executeRawSql(String sql) {
         Statement st = createStatement();
         try {
             st.execute(sql);
@@ -109,7 +125,7 @@ public class LSql {
         }
     }
 
-    public Query executeQuery(String sql) {
+    public Query executeRawQuery(String sql) {
         return new Query(this, sql);
     }
 

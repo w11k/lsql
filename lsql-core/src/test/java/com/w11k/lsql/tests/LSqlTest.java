@@ -32,14 +32,14 @@ public class LSqlTest extends AbstractLSqlTest {
     }
 
     @Test public void execute() {
-        lSql.execute("CREATE TABLE table1 (name TEXT, age INT)");
-        lSql.execute("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+        lSql.executeRawSql("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
     }
 
     @Test(expectedExceptions = RuntimeException.class)
     public void executeShouldThrowRuntimeExceptionOnWrongStatement() {
-        lSql.execute("CREATE TABLE table1 (name TEXT, age INT)");
-        lSql.execute("INSERT INTO tableX (name, age) VALUES ('cus1', 20)");
+        lSql.executeRawSql("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO tableX (name, age) VALUES ('cus1', 20)");
     }
 
 }

@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.exceptions.SelectException;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -26,13 +27,19 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     private final LSql lSql;
-    private final String sql;
+    private final PreparedStatement preparedStatement;
     private List<QueriedRow> rows;
     private Map<String, ResultSetColumn> meta = Maps.newHashMap();
 
+    public Query(LSql lSql, PreparedStatement preparedStatement) {
+        this.lSql = lSql;
+        this.preparedStatement = preparedStatement;
+        run();
+    }
+
     public Query(LSql lSql, String sql) {
         this.lSql = lSql;
-        this.sql = sql;
+        this.preparedStatement = lSql.prepareStatement(sql);
         run();
     }
 
@@ -43,7 +50,7 @@ public class Query implements Iterable<QueriedRow> {
     public Query run() {
         rows = Lists.newLinkedList();
         try {
-            final ResultSet resultSet = lSql.createStatement().executeQuery(sql);
+            final ResultSet resultSet = preparedStatement.executeQuery();
             ResultSetMetaData metaData = resultSet.getMetaData();
 
             boolean useTablePrefix = false;

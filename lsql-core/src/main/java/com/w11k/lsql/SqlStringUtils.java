@@ -6,15 +6,22 @@ import java.util.List;
 
 public class SqlStringUtils {
 
-    public static String createInsertString(LSql lSql, String tableName, List<String> columns) {
-        String sqlString = "insert into `" + lSql.identifierJavaToSql(tableName) + "`";
-        sqlString += "(`" + Joiner.on("`,`").join(columns) + "`)";
+    public static String createInsertString(Table table, List<String> sqlColumnNames) {
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlString = "insert into `" + sqlTableName + "`";
+        sqlString += "(`" + Joiner.on("`,`").join(sqlColumnNames) + "`)";
         sqlString += "values(";
-        for (int i = 0; i < columns.size() - 1; i++) {
+        for (int i = 0; i < sqlColumnNames.size() - 1; i++) {
             sqlString += "?,";
         }
         sqlString += "?);";
         return sqlString;
+    }
+
+    public static String createSelectByIdString(Table table, Column idColumn) {
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getColumnName());
+        return "select * from `" + sqlTableName + "` where `" + sqlColumnName + "`=?";
     }
 
 }

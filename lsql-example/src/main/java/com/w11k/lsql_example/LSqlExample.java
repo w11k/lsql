@@ -17,14 +17,14 @@ public class LSqlExample {
 
         LSql lSql = new LSql(ConnectionFactories.fromInstance(connection));
 
-        lSql.execute("create table persons (name text, age int);");
+        lSql.executeRawSql("create table persons (name text, age int);");
         Row person1 = new Row(lSql, "persons").addKeyVals("name", "Joe", "age", 10);
         Row person2 = new Row(lSql, "persons").addKeyVals("name", "John", "age", 20);
         lSql.executeInsert(person1);
         lSql.executeInsert(person2);
 
         int sum = 0;
-        for (Row row : lSql.executeQuery("select * from persons")) {
+        for (Row row : lSql.executeRawQuery("select * from persons")) {
             sum += row.getInt("age");
         }
         System.out.println("SUM = " + sum);
