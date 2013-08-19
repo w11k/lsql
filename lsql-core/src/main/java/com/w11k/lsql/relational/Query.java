@@ -1,9 +1,11 @@
-package com.w11k.lsql;
+package com.w11k.lsql.relational;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.exceptions.SelectException;
+import com.w11k.lsql.LSql;
+import com.w11k.lsql.exceptions.QueryException;
+import com.w11k.lsql.utils.ConnectionUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,7 +41,7 @@ public class Query implements Iterable<QueriedRow> {
 
     public Query(LSql lSql, String sql) {
         this.lSql = lSql;
-        this.preparedStatement = lSql.prepareStatement(sql);
+        this.preparedStatement = ConnectionUtils.prepareStatement(lSql, sql);
         run();
     }
 
@@ -90,7 +92,7 @@ public class Query implements Iterable<QueriedRow> {
                 rows.add(row);
             }
         } catch (SQLException e) {
-            throw new SelectException(e);
+            throw new QueryException(e);
         }
         return this;
     }

@@ -1,8 +1,9 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.Row;
-import com.w11k.lsql.Table;
+import com.w11k.lsql.exceptions.InsertException;
+import com.w11k.lsql.relational.Row;
+import com.w11k.lsql.relational.Table;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;
@@ -40,6 +41,14 @@ public class TableTest extends AbstractLSqlTest {
         Optional<Object> optional = table1.insert(row);
         assertTrue(optional.isPresent());
         assertEquals(optional.get(), row.get("id"));
+    }
+
+    @Test(expectedExceptions = InsertException.class)
+    public void insertShouldFailIfPrimaryKeyIsAlreadyPresent() {
+        lSql.executeRawSql("CREATE TABLE table1 (id serial primary key, age int)");
+        Table table1 = lSql.table("table1");
+        Row row = new Row().addKeyVals("id", 1, "age", 1);
+        table1.insert(row);
     }
 
     @Test public void getById() {

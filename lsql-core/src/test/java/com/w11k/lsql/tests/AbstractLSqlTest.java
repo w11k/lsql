@@ -1,6 +1,6 @@
 package com.w11k.lsql.tests;
 
-import com.w11k.lsql.ConnectionFactories;
+import com.w11k.lsql.jdbc.ConnectionFactories;
 import com.w11k.lsql.LSql;
 import org.h2.jdbcx.JdbcDataSource;
 import org.testng.annotations.AfterMethod;

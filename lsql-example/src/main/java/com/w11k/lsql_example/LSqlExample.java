@@ -1,8 +1,8 @@
 package com.w11k.lsql_example;
 
-import com.w11k.lsql.ConnectionFactories;
+import com.w11k.lsql.jdbc.ConnectionFactories;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.Row;
+import com.w11k.lsql.relational.Row;
 import org.h2.jdbcx.JdbcDataSource;
 
 import java.sql.Connection;

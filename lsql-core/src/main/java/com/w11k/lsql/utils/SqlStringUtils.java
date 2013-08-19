@@ -1,6 +1,8 @@
-package com.w11k.lsql;
+package com.w11k.lsql.utils;
 
 import com.google.common.base.Joiner;
+import com.w11k.lsql.relational.Column;
+import com.w11k.lsql.relational.Table;
 
 import java.util.List;
 

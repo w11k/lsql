@@ -1,7 +1,5 @@
 package com.w11k.lsql.converter;
 
-import com.w11k.lsql.JavaSqlConverter;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

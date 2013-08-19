@@ -1,8 +1,8 @@
 package com.w11k.lsql.exceptions;
 
-public class SelectException extends RuntimeException {
+public class QueryException extends RuntimeException {
 
-    public SelectException(Exception cause) {
+    public QueryException(Exception cause) {
         super("Error while accessing the database", cause);
     }
 }

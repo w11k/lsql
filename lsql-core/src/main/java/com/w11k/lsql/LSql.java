@@ -2,14 +2,16 @@ package com.w11k.lsql;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.exceptions.DatabaseAccessException;
+import com.w11k.lsql.converter.JavaSqlConverter;
+import com.w11k.lsql.relational.Query;
+import com.w11k.lsql.relational.Table;
 import com.w11k.lsql.sqlfile.SqlFile;
+import com.w11k.lsql.utils.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
@@ -65,6 +67,10 @@ public class LSql {
         this.sqlCaseFormat = sqlCaseFormat;
     }
 
+    public Callable<Connection> getConnectionFactory() {
+        return connectionFactory;
+    }
+
     // ----- public -----
 
     public String identifierSqlToJava(String sqlName) {
@@ -90,34 +96,10 @@ public class LSql {
         return tables.get(tableName);
     }
 
-    public Connection getConnection() {
-        try {
-            return connectionFactory.call();
-        } catch (Exception e) {
-            throw new DatabaseAccessException(e);
-        }
-    }
-
-    public Statement createStatement() {
-        try {
-            return getConnection().createStatement();
-        } catch (SQLException e) {
-            throw new DatabaseAccessException(e);
-        }
-    }
-
-    public PreparedStatement prepareStatement(String sqlString) {
-        try {
-            return getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
-        } catch (SQLException e) {
-            throw new DatabaseAccessException(e);
-        }
-    }
-
     // ----- execute SQL methods -----
 
     public void executeRawSql(String sql) {
-        Statement st = createStatement();
+        Statement st = ConnectionUtils.createStatement(this);
         try {
             st.execute(sql);
         } catch (SQLException e) {

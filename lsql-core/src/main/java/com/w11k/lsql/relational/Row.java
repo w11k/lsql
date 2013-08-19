@@ -1,4 +1,4 @@
-package com.w11k.lsql;
+package com.w11k.lsql.relational;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ForwardingMap;

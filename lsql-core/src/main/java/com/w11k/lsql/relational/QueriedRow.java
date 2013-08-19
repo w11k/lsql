@@ -1,8 +1,9 @@
-package com.w11k.lsql;
+package com.w11k.lsql.relational;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.exceptions.SelectException;
+import com.w11k.lsql.converter.JavaSqlConverter;
+import com.w11k.lsql.exceptions.QueryException;
 
 import java.sql.ResultSet;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class QueriedRow extends Row {
                 columns.put(name, resultSetColumn.column);
             }
         } catch (Exception e) {
-            throw new SelectException(e);
+            throw new QueryException(e);
         }
     }
     

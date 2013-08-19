@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.Query;
-import com.w11k.lsql.exceptions.DatabaseAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +11,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +19,7 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 
 public class SqlFile {
 
-    private static final Pattern STMT_BLOCK_BEGINN = Pattern.compile(
+    private static final Pattern STMT_BLOCK_BEGIN = Pattern.compile(
             "^--\\s*(\\w*)\\s*$",
             Pattern.MULTILINE);
 
@@ -39,7 +35,7 @@ public class SqlFile {
 
     private final InputStream inputStream;
 
-    private final Map<String, LazyPreparedStatement> statements = Maps.newHashMap();
+    private final Map<String, SqlFileStatement> statements = Maps.newHashMap();
 
     public SqlFile(LSql lSql, String fileName, InputStream is) {
         this.lSql = lSql;
@@ -48,26 +44,18 @@ public class SqlFile {
         parseSqlStatements();
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     // ----- public -----
 
-    public ImmutableMap<String, LazyPreparedStatement> getStatements() {
+    public ImmutableMap<String, SqlFileStatement> getStatements() {
         return copyOf(statements);
     }
 
-    public void execute(String sqlStatementName) {
-        PreparedStatement ps = statements.get(sqlStatementName).getPreparedStatement();
-        logger.debug("Executing SQL statement {}", sqlStatementName);
-        try {
-            ps.execute();
-        } catch (SQLException e) {
-            throw new DatabaseAccessException(e);
-        }
-    }
-
-    public Query executeQuery(String sqlStatementName) {
-        PreparedStatement ps = statements.get(sqlStatementName).getPreparedStatement();
-        logger.debug("Executing SQL query {}", sqlStatementName);
-        return new Query(lSql, ps);
+    public SqlFileStatement statement(String name) {
+        return statements.get(name);
     }
 
     // ----- private -----
@@ -77,7 +65,7 @@ public class SqlFile {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         try {
             String content = CharStreams.toString(reader);
-            Matcher startMatcher = STMT_BLOCK_BEGINN.matcher(content);
+            Matcher startMatcher = STMT_BLOCK_BEGIN.matcher(content);
             while (startMatcher.find()) {
                 String name = startMatcher.group(1);
                 String sub = content.substring(startMatcher.end());
@@ -88,8 +76,8 @@ public class SqlFile {
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
                 // TODO handle parameters
-                logger.debug("Found SQL statement '" + name + "'");
-                statements.put(name, new LazyPreparedStatement(lSql, sub));
+                logger.debug("Found SQL statement '{}'", name);
+                statements.put(name, new SqlFileStatement(lSql, this, name, sub));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

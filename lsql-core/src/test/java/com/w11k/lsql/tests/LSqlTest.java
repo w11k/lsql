@@ -2,6 +2,7 @@ package com.w11k.lsql.tests;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
+import com.w11k.lsql.utils.ConnectionUtils;
 import org.testng.annotations.Test;
 
 import java.sql.Connection;
@@ -13,22 +14,23 @@ import static org.testng.Assert.assertNotNull;
 public class LSqlTest extends AbstractLSqlTest {
 
     @Test public void getConnectionFromConnectionFactory() throws SQLException {
-        assertNotNull(lSql.getConnection());
+        assertNotNull(ConnectionUtils.getConnection(lSql));
     }
 
     @Test(expectedExceptions = DatabaseAccessException.class)
     public void getConnectionThrowsDatabaseAccessException() throws SQLException {
-        new LSql(new Callable<Connection>() {
+        LSql l = new LSql(new Callable<Connection>() {
             @Override public Connection call() throws Exception {
                 throw new RuntimeException();
             }
-        }).getConnection();
+        });
+        ConnectionUtils.getConnection(l);
     }
 
     @Test(expectedExceptions = DatabaseAccessException.class)
     public void createStatementThrowsDatabaseAccessExceptionOnClosedConnection() throws SQLException {
-        lSql.getConnection().close();
-        lSql.createStatement();
+        ConnectionUtils.getConnection(lSql).close();
+        ConnectionUtils.createStatement(lSql);
     }
 
     @Test public void execute() {

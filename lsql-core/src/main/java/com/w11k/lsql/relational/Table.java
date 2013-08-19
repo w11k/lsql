@@ -1,9 +1,13 @@
-package com.w11k.lsql;
+package com.w11k.lsql.relational;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.w11k.lsql.*;
+import com.w11k.lsql.converter.JavaSqlConverter;
 import com.w11k.lsql.exceptions.InsertException;
+import com.w11k.lsql.utils.ConnectionUtils;
+import com.w11k.lsql.utils.SqlStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +63,11 @@ public class Table {
     }
 
     public Optional<Object> insert(Row row) {
+        if (getPrimaryKeyColumn().isPresent() && row.containsKey(getPrimaryKeyColumn().get())) {
+            throw new InsertException("Can not insert row because the primary key is already present. " +
+                    "Use update or insertOrUpdate instead.");
+        }
+
         // extract column names, values and corresponding converters
         List<String> columns = Lists.newLinkedList();
         List<Object> values = Lists.newLinkedList();
@@ -75,7 +84,7 @@ public class Table {
         // create PreparedStatement and execute
         String sqlString = SqlStringUtils.createInsertString(this, columns);
         try {
-            PreparedStatement ps = lSql.prepareStatement(sqlString);
+            PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlString);
             for (int i = 0; i < valueConverter.size(); i++) {
                 JavaSqlConverter javaSqlConverter = valueConverter.get(i);
                 javaSqlConverter.setValueInStatement(ps, i + 1, values.get(i));
@@ -107,11 +116,20 @@ public class Table {
         }
     }
 
+    public boolean update(Row row) {
+        if (getPrimaryKeyColumn().isPresent() && !row.containsKey(getPrimaryKeyColumn().get())) {
+            throw new InsertException("Can not insert row because the primary key is already present. " +
+                    "Use update or insertOrUpdate instead.");
+        }
+
+        return true;
+    }
+
     public QueriedRow get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String insertString = SqlStringUtils.createSelectByIdString(this, column);
-        PreparedStatement preparedStatement = lSql.prepareStatement(insertString);
+        PreparedStatement preparedStatement = ConnectionUtils.prepareStatement(lSql, insertString);
         try {
             column.getColumnConverter().setValueInStatement(preparedStatement, 1, id);
         } catch (Exception e) {
@@ -123,7 +141,7 @@ public class Table {
     // ----- private -----
 
     private Optional<String> getPrimaryKeyColumn() {
-        Connection con = lSql.getConnection();
+        Connection con = ConnectionUtils.getConnection(lSql);
         try {
             DatabaseMetaData md = con.getMetaData();
             ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.identifierJavaToSql(tableName));

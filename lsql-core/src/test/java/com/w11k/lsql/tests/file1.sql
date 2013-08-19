@@ -1,14 +1,27 @@
-
 -- create
-create table table1 (
-  id serial primary key,
-  age int
+CREATE TABLE table1 (
+  id      SERIAL PRIMARY KEY,
+  age     INT,
+  content TEXT
 );
 
---  getAll
-select * from table1;
+-- getAll
+SELECT
+  *
+FROM table1;
 
--- getSome
-select * from table1 where
-  age > /*age*/1
+-- queryWithIntegerArg
+SELECT
+  *
+FROM table1
+WHERE
+  age > 50 --age
+;
+
+-- queryWithStringArg
+SELECT
+  *
+FROM table1
+WHERE
+  content = 'text1' --content
 ;

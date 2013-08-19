@@ -1,4 +1,4 @@
-package com.w11k.lsql;
+package com.w11k.lsql.converter;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
