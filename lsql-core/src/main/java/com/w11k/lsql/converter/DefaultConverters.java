@@ -160,7 +160,7 @@ public class DefaultConverters {
     public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
         try {
             int columnType = rs.getMetaData().getColumnType(index);
-            logger.debug("SQL type in ResultSet is {}", columnType);
+            logger.trace("SQL type in ResultSet is {}", columnType);
             Converter converter = sqlValueToJavaConverters.get(columnType);
             //converter = converter == null ? defaultConverter : converter;
             if (converter == null) {
