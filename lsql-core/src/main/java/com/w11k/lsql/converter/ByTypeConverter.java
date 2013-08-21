@@ -15,14 +15,14 @@ import java.util.Map;
  * Note: This Class must behave immutable because by default one instance is shared
  * between LSql, all Tables and all Column.
  */
-public class DefaultConverters {
+public class ByTypeConverter implements Converter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<Class<?>, Converter> javaValueToSqlConverters = Maps.newHashMap();
     private final Map<Integer, Converter> sqlValueToJavaConverters = Maps.newHashMap();
 
-    public DefaultConverters() {
+    public ByTypeConverter() {
         addConverter(
                 new int[]{Types.BOOLEAN},
                 Boolean.class,
@@ -76,14 +76,17 @@ public class DefaultConverters {
                 String.class,
                 new Converter() {
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        System.out.println(1);
                         ps.setClob(index, new SerialClob(((String) val).toCharArray()));
                     }
 
                     public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
-                        System.out.println(2);
-                        Reader reader = rs.getClob(index).getCharacterStream();
-                        return CharStreams.toString(reader);
+                        Clob clob = rs.getClob(index);
+                        if (clob != null) {
+                            Reader reader = clob.getCharacterStream();
+                            return CharStreams.toString(reader);
+                        } else {
+                            return null;
+                        }
                     }
                 });
         addConverter(
@@ -103,12 +106,10 @@ public class DefaultConverters {
                 char[].class,
                 new Converter() {
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        System.out.println(3);
                         ps.setString(index, String.valueOf((char[]) val));
                     }
 
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        System.out.println(4);
                         return rs.getString(index).toCharArray();
                     }
                 });

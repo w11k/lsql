@@ -2,7 +2,7 @@ package com.w11k.lsql.relational;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.converter.DefaultConverters;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
 
 import java.sql.ResultSet;
@@ -18,7 +18,7 @@ public class QueriedRow extends Row {
         try {
             for (String name : meta.keySet()) {
                 Query.ResultSetColumn resultSetColumn = meta.get(name);
-                DefaultConverters columnConverter = resultSetColumn.column.getColumnConverter();
+                Converter columnConverter = resultSetColumn.column.getColumnConverter();
                 Object value = columnConverter.getValueFromResultSet(resultSet, resultSetColumn.index);
                 values.put(name, value);
                 columns.put(name, resultSetColumn.column);

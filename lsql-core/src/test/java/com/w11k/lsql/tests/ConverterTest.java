@@ -1,17 +1,43 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.CaseFormat;
-import com.w11k.lsql.converter.DefaultConverters;
+import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
+import com.w11k.lsql.converter.JsonClobConverter;
 import com.w11k.lsql.relational.Row;
 import com.w11k.lsql.relational.Table;
-import com.w11k.lsql.converter.JavaBoolToSqlString;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
 public class ConverterTest extends AbstractLSqlTest {
 
-    private final DefaultConverters javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlString("yes", "no");
+    class Person {
+        public String firstname;
+        public String lastname;
+
+        Person(String firstname, String lastname) {
+            this.firstname = firstname;
+            this.lastname = lastname;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Person person = (Person) o;
+            return firstname.equals(person.firstname) && lastname.equals(person.lastname);
+        }
+
+        @Override public String toString() {
+            return "Person{" +
+                    "firstname='" + firstname + '\'' +
+                    ", lastname='" + lastname + '\'' +
+                    '}';
+        }
+    }
+
+    private final Converter javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlStringConverter("yes", "no");
 
     @Test
     public void caseFormatConversion() {
@@ -21,7 +47,7 @@ public class ConverterTest extends AbstractLSqlTest {
         lSql.executeRawSql("CREATE TABLE table1 (test_name1 TEXT, TEST_NAME2 TEXT)");
         lSql.executeRawSql("INSERT INTO table1 (test_name1, TEST_NAME2) VALUES ('name1', 'name2')");
 
-        Row row = lSql.executeRawQuery("select * from table1").getFirstRow();
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
         assertEquals(row.get("testName1"), "name1");
         assertEquals(row.get("testName2"), "name2");
     }
@@ -31,7 +57,7 @@ public class ConverterTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         lSql.setGlobalConverter(javaBoolToSqlYesNoStringConverter);
         table1.insert(Row.fromKeyVals("yesno", true));
-        Row row = lSql.executeRawQuery("select * from table1").getFirstRow();
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
         assertEquals(row.get("yesno"), true);
     }
 
@@ -43,8 +69,8 @@ public class ConverterTest extends AbstractLSqlTest {
         lSql.table("table1").setTableConverter(javaBoolToSqlYesNoStringConverter);
         t1.insert(Row.fromKeyVals("yesno", true));
         t2.insert(Row.fromKeyVals("yesno", "true"));
-        Row row1 = lSql.executeRawQuery("select * from table1").getFirstRow();
-        Row row2 = lSql.executeRawQuery("select * from table2").getFirstRow();
+        Row row1 = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
+        Row row2 = lSql.executeRawQuery("SELECT * FROM table2").getFirstRow();
         assertEquals(row1.get("yesno"), true);
         assertEquals(row2.get("yesno"), "true");
     }
@@ -54,9 +80,20 @@ public class ConverterTest extends AbstractLSqlTest {
         Table t1 = lSql.table("table1");
         lSql.table("table1").column("yesno1").setColumnConverter(javaBoolToSqlYesNoStringConverter);
         t1.insert(Row.fromKeyVals("yesno1", true, "yesno2", "true"));
-        Row row = lSql.executeRawQuery("select * from table1").getFirstRow();
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
         assertEquals(row.get("yesno1"), true);
         assertEquals(row.get("yesno2"), "true");
+    }
+
+    @Test public void converterForColumnForCustomClass() {
+        lSql.executeRawSql("CREATE TABLE table1 (sometext TEXT, person TEXT)");
+        Table t1 = lSql.table("table1");
+        t1.column("person").setColumnConverter(new JsonClobConverter(Person.class));
+
+        Person p = new Person("John", "Doe");
+        t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
+        assertEquals(row.get("person"), p);
     }
 
 }

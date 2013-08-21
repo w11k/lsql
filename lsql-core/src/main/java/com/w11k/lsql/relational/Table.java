@@ -3,8 +3,8 @@ package com.w11k.lsql.relational;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.*;
-import com.w11k.lsql.converter.DefaultConverters;
+import com.w11k.lsql.LSql;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.utils.ConnectionUtils;
 import com.w11k.lsql.utils.SqlStringUtils;
@@ -25,7 +25,7 @@ public class Table {
 
     private final Optional<String> primaryKeyColumn;
 
-    private Optional<DefaultConverters> tableConverter = Optional.absent();
+    private Optional<Converter> tableConverter = Optional.absent();
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
@@ -37,11 +37,11 @@ public class Table {
 
     // ----- getter/setter -----
 
-    public void setTableConverter(DefaultConverters tableConverter) {
+    public void setTableConverter(Converter tableConverter) {
         this.tableConverter = Optional.fromNullable(tableConverter);
     }
 
-    public DefaultConverters getTableConverter() {
+    public Converter getTableConverter() {
         return tableConverter.or(lSql.getGlobalConverter());
     }
 
@@ -71,11 +71,11 @@ public class Table {
         // extract column names, values and corresponding converters
         List<String> columns = Lists.newLinkedList();
         List<Object> values = Lists.newLinkedList();
-        List<DefaultConverters> valueConverter = Lists.newLinkedList();
+        List<Converter> valueConverter = Lists.newLinkedList();
         for (Map.Entry<String, Object> keyValue : row.entrySet()) {
             String key = keyValue.getKey();
             Object value = keyValue.getValue();
-            DefaultConverters converter = column(key).getColumnConverter();
+            Converter converter = column(key).getColumnConverter();
             columns.add(lSql.identifierJavaToSql(key));
             values.add(value);
             valueConverter.add(converter);
@@ -86,8 +86,8 @@ public class Table {
         try {
             PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlString);
             for (int i = 0; i < valueConverter.size(); i++) {
-                DefaultConverters defaultConverters = valueConverter.get(i);
-                defaultConverters.setValueInStatement(ps, i + 1, values.get(i));
+                Converter converter = valueConverter.get(i);
+                converter.setValueInStatement(ps, i + 1, values.get(i));
             }
             ps.executeUpdate();
 
@@ -121,6 +121,8 @@ public class Table {
             throw new InsertException("Can not insert row because the primary key is already present. " +
                     "Use update or insertOrUpdate instead.");
         }
+
+        // TODO
 
         return true;
     }

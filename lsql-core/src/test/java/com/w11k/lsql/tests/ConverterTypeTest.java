@@ -18,8 +18,8 @@ import static org.testng.Assert.assertEquals;
 public class ConverterTypeTest extends AbstractLSqlTest {
 
     enum DB {
-        POSTGRES("PostgreSQL"),
-        MYSQL("MySQL");
+        POSTGRES("PostgreSQL");
+        //MYSQL("MySQL");
 
         private final String name;
 
@@ -79,6 +79,15 @@ public class ConverterTypeTest extends AbstractLSqlTest {
 
     @Test public void testText() {
         testType(DB.POSTGRES, "TEXT", "foo");
+    }
+
+    @Test public void converterCanHandleClobNullValue() throws SQLException {
+        super.beforeTest();
+        lSql.executeRawSql("CREATE TABLE table1 (col1 TEXT, col2 TEXT)");
+        Table table1 = lSql.table("table1");
+        table1.insert(Row.fromKeyVals("col1", "val1"));
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
+        assertEquals(row.get("col1"), "val1");
     }
 
     @Test public void testChar() {
