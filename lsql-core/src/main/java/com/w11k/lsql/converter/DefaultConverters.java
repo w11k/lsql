@@ -3,177 +3,144 @@ package com.w11k.lsql.converter;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.io.ByteArrayInputStream;
+import javax.sql.rowset.serial.SerialClob;
 import java.io.Reader;
-import java.io.StringReader;
 import java.sql.*;
-import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
 
 /**
  * Note: This Class must behave immutable because by default one instance is shared
  * between LSql, all Tables and all Column.
  */
-public class JavaSqlConverter {
+public class DefaultConverters {
 
-    public static class Converter {
-        public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-            ps.setObject(index, val);
-        }
-
-        public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
-            return rs.getObject(index);
-        }
-    }
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<Class<?>, Converter> javaValueToSqlConverters = Maps.newHashMap();
-
     private final Map<Integer, Converter> sqlValueToJavaConverters = Maps.newHashMap();
 
-    private final Converter defaultConverter;
-
-
-    public JavaSqlConverter() {
-        this(null);
-    }
-
-    public JavaSqlConverter(@Nullable Converter defaultConverter) {
-        this.defaultConverter = defaultConverter != null ? defaultConverter : new Converter();
+    public DefaultConverters() {
         addConverter(
-                asList(Types.BIT, Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT),
-                Integer.class,
+                new int[]{Types.BOOLEAN},
+                Boolean.class,
                 new Converter() {
-                    @Override
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        ps.setInt(index, (Integer) val);
-                    }
-
-                    @Override
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return rs.getInt(index);
-                    }
-                });
-        addConverter(
-                asList(Types.FLOAT),
-                Float.class,
-                new Converter() {
-                    @Override
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        ps.setFloat(index, (Float) val);
-                    }
-
-                    @Override
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return rs.getFloat(index);
-                    }
-                });
-        addConverter(
-                asList(Types.DOUBLE, Types.REAL, Types.DECIMAL),
-                Double.class,
-                new Converter() {
-                    @Override
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        ps.setDouble(index, (Double) val);
-                    }
-
-                    @Override
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
-                        return rs.getDouble(index);
-                    }
-                });
-        addConverter(
-                asList(Types.BOOLEAN),
-                boolean.class,
-                new Converter() {
-                    @Override
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
-                        Boolean b = (Boolean) val;
-                        ps.setBoolean(index, b);
+                        ps.setBoolean(index, (Boolean) val);
                     }
 
-                    @Override
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
                         return rs.getBoolean(index);
                     }
                 });
         addConverter(
-                asList(Types.CHAR),
-                byte.class,
+                new int[]{Types.BIT, Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT},
+                Integer.class,
                 new Converter() {
-                    @Override
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
-                        Byte b = (Byte) val;
-                        ps.setByte(index, b);
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                        ps.setInt(index, (Integer) val);
                     }
 
-                    @Override
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return rs.getByte(index);
+                        return rs.getInt(index);
                     }
                 });
         addConverter(
-                asList(Types.CLOB),
-                String.class,
+                new int[]{Types.FLOAT},
+                Float.class,
                 new Converter() {
-                    @Override
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        ps.setClob(index, new StringReader(val.toString()));
+                        ps.setFloat(index, (Float) val);
                     }
 
-                    @Override
+                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                        return rs.getFloat(index);
+                    }
+                });
+        addConverter(
+                new int[]{Types.DOUBLE, Types.REAL, Types.DECIMAL},
+                Double.class,
+                new Converter() {
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                        ps.setDouble(index, (Double) val);
+                    }
+
+                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                        return rs.getDouble(index);
+                    }
+                });
+        addConverter(
+                new int[]{Types.CLOB},
+                String.class,
+                new Converter() {
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                        System.out.println(1);
+                        ps.setClob(index, new SerialClob(((String) val).toCharArray()));
+                    }
+
                     public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
+                        System.out.println(2);
                         Reader reader = rs.getClob(index).getCharacterStream();
                         return CharStreams.toString(reader);
                     }
                 });
         addConverter(
-                asList(Types.BLOB),
-                byte[].class,
+                new int[]{Types.CHAR},
+                Character.class,
                 new Converter() {
-                    @Override
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
-                        byte[] b = (byte[]) val;
-                        ByteArrayInputStream bais = new ByteArrayInputStream(b);
-                        ps.setBlob(index, bais);
+                        ps.setByte(index, (byte) ((Character) val).charValue());
                     }
 
-                    @Override
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        Blob blob = rs.getBlob(index);
-                        return blob.getBytes(0, (int) blob.length());
+                        return (char) rs.getByte(index);
                     }
                 });
         addConverter(
-                asList(Types.DATE),
+                new int[]{Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR, Types.VARCHAR},
+                char[].class,
+                new Converter() {
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                        System.out.println(3);
+                        ps.setString(index, String.valueOf((char[]) val));
+                    }
+
+                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                        System.out.println(4);
+                        return rs.getString(index).toCharArray();
+                    }
+                });
+        addConverter(
+                new int[]{Types.TIMESTAMP},
                 DateTime.class,
                 new Converter() {
-                    @Override
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                        DateTime dt = (DateTime) val;
+                        Timestamp ts = new Timestamp(dt.getMillis());
+                        ps.setTimestamp(index, ts);
+                    }
+
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return new DateTime(rs.getDate(index).getTime());
+                        return new DateTime(rs.getTimestamp(index).getTime());
                     }
                 });
         addConverter(
-                asList(Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR, Types.VARCHAR),
-                String.class,
+                new int[]{Types.BLOB},
+                com.w11k.lsql.relational.Blob.class,
                 new Converter() {
-                    @Override
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+                        com.w11k.lsql.relational.Blob blob = (com.w11k.lsql.relational.Blob) val;
+                        ps.setBlob(index, blob.getInputStream());
+                    }
+
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return rs.getString(index);
+                        Blob blob = rs.getBlob(index);
+                        return new com.w11k.lsql.relational.Blob(blob.getBinaryStream());
                     }
                 });
-        addConverter(
-                asList(Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR, Types.VARCHAR),
-                String.class,
-                new Converter() {
-                    @Override
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return rs.getString(index);
-                    }
-                });
+
 
         // TODO add more types
         // static int 	DATALINK;
@@ -186,15 +153,19 @@ public class JavaSqlConverter {
         // static int 	REF;
         // static int 	STRUCT;
         // static int 	TIME;
-        // static int 	TIMESTAMP;
+        // static int 	DATE;
         // static int 	VARBINARY;
     }
 
     public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
         try {
             int columnType = rs.getMetaData().getColumnType(index);
+            logger.debug("SQL type in ResultSet is {}", columnType);
             Converter converter = sqlValueToJavaConverters.get(columnType);
-            converter = converter == null ? defaultConverter : converter;
+            //converter = converter == null ? defaultConverter : converter;
+            if (converter == null) {
+                throw new RuntimeException("No converter found for SQL type: " + columnType);
+            }
             return converter.getValueFromResultSet(rs, index);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -203,11 +174,14 @@ public class JavaSqlConverter {
 
     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
         Converter converter = javaValueToSqlConverters.get(val.getClass());
-        converter = converter == null ? defaultConverter : converter;
+        //converter = converter == null ? defaultConverter : converter;
+        if (converter == null) {
+            throw new RuntimeException("No converter found for Java type: " + val.getClass());
+        }
         converter.setValueInStatement(ps, index, val);
     }
 
-    private void addConverter(List<Integer> sqlTypes, Class<?> javaType, Converter converter) {
+    public void addConverter(int[] sqlTypes, Class javaType, Converter converter) {
         for (int sqlType : sqlTypes) {
             sqlValueToJavaConverters.put(sqlType, converter);
         }

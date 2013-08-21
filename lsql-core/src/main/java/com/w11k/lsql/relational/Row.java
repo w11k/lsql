@@ -51,7 +51,7 @@ public class Row extends ForwardingMap<String, Object> {
     public Object put(String key, Object value) {
         return super.put(key, value);
     }
-    
+
     // ----- getter convenience -----
 
     public <A> A getAs(Class<A> type, String key) {
@@ -67,12 +67,28 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(Integer.class, key);
     }
 
+    public Double getDouble(String key) {
+        return getAs(Double.class, key);
+    }
+
+    public Float getFloat(String key) {
+        return getAs(Float.class, key);
+    }
+
+    public Boolean getBoolean(String key) {
+        return getAs(Boolean.class, key);
+    }
+
     public DateTime getDateTime(String key) {
         return getAs(DateTime.class, key);
     }
 
     public String getString(String key) {
         return getAs(String.class, key);
+    }
+
+    public byte[] getByteArray(String key) {
+        return getAs(byte[].class, key);
     }
 
     @Override

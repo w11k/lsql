@@ -3,7 +3,7 @@ package com.w11k.lsql.sqlfile;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.JavaSqlConverter;
+import com.w11k.lsql.converter.DefaultConverters;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.relational.Query;
@@ -91,7 +91,7 @@ public class SqlFileStatement {
                     Object value = parameters.get(paramName);
                     orderedValues.add(value);
                     newLines.append(line.substring(0, matcher.start(1)));
-                    logger.debug("Parameter '{}': value '{}' changed to '{}'",paramName, paramValue, value);
+                    logger.debug("Parameter '{}': value '{}' changed to '{}'", paramName, paramValue, value);
                     newLines.append("?");
                     newLines.append(line.substring(matcher.end(1), line.length())).append("\n");
                 } else {
@@ -107,7 +107,7 @@ public class SqlFileStatement {
         for (int i = 0; i < orderedValues.size(); i++) {
             Object v = orderedValues.get(i);
             // TODO use converter chain sqlFileStatement -> sqlFile -> LSql
-            JavaSqlConverter converter = lSql.getGlobalConverter();
+            DefaultConverters converter = lSql.getGlobalConverter();
             try {
                 converter.setValueInStatement(ps, i + 1, v);
             } catch (Exception e) {

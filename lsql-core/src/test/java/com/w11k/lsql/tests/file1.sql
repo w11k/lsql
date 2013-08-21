@@ -5,6 +5,9 @@ CREATE TABLE table1 (
   content TEXT
 );
 
+
+INSERT INTO table1 (age, content) VALUES (10, '');
+
 -- getAll
 SELECT
   *

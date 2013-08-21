@@ -1,7 +1,7 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.CaseFormat;
-import com.w11k.lsql.converter.JavaSqlConverter;
+import com.w11k.lsql.converter.DefaultConverters;
 import com.w11k.lsql.relational.Row;
 import com.w11k.lsql.relational.Table;
 import com.w11k.lsql.converter.JavaBoolToSqlString;
@@ -11,7 +11,7 @@ import static org.testng.Assert.assertEquals;
 
 public class ConverterTest extends AbstractLSqlTest {
 
-    private final JavaSqlConverter javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlString("yes", "no");
+    private final DefaultConverters javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlString("yes", "no");
 
     @Test
     public void caseFormatConversion() {

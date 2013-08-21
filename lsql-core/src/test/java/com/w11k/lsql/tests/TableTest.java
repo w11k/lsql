@@ -14,15 +14,14 @@ import static org.testng.Assert.assertEquals;
 public class TableTest extends AbstractLSqlTest {
 
     @Test public void insertRow() throws SQLException {
-        lSql.executeRawSql("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("CREATE TABLE table1 (name TEXT)");
         Table table1 = lSql.table("table1");
 
-        Row row = new Row().addKeyVals("name", "cus1", "age", 20);
+        Row row = new Row().addKeyVals("name", "cus1");
         table1.insert(row);
 
         Row insertedRow = lSql.executeRawQuery("select * from table1").getFirstRow();
         assertEquals(insertedRow.getString("name"), "cus1");
-        assertEquals(insertedRow.getInt("age"), 20);
     }
 
     @Test public void insertShouldReturnGeneratedKey() {

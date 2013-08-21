@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class JavaBoolToSqlString extends JavaSqlConverter {
+public class JavaBoolToSqlString extends DefaultConverters {
 
     private final String sqlStringValueForTrue;
     private final String sqlStringValueForFalse;

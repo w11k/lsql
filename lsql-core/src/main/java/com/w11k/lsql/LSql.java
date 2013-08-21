@@ -2,7 +2,7 @@ package com.w11k.lsql;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.converter.JavaSqlConverter;
+import com.w11k.lsql.converter.DefaultConverters;
 import com.w11k.lsql.relational.Query;
 import com.w11k.lsql.relational.Table;
 import com.w11k.lsql.sqlfile.SqlFile;
@@ -25,7 +25,7 @@ public class LSql {
 
     private final Map<String, Table> tables = Maps.newHashMap();
 
-    private JavaSqlConverter globalConverter = new JavaSqlConverter();
+    private DefaultConverters globalConverter = new DefaultConverters();
 
     private CaseFormat javaCaseFormat = CaseFormat.LOWER_UNDERSCORE;
 
@@ -43,11 +43,11 @@ public class LSql {
 
     // ----- getter/setter -----
 
-    public JavaSqlConverter getGlobalConverter() {
+    public DefaultConverters getGlobalConverter() {
         return globalConverter;
     }
 
-    public void setGlobalConverter(JavaSqlConverter globalConverter) {
+    public void setGlobalConverter(DefaultConverters globalConverter) {
         this.globalConverter = globalConverter;
     }
 

@@ -1,13 +1,13 @@
 package com.w11k.lsql.relational;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.converter.JavaSqlConverter;
+import com.w11k.lsql.converter.DefaultConverters;
 
 public class Column {
 
     private final String columnName;
     private final Table table;
-    private Optional<JavaSqlConverter> columnConverter = Optional.absent();
+    private Optional<DefaultConverters> columnConverter = Optional.absent();
 
     public Column(Table table, String columnName) {
         this.table = table;
@@ -16,11 +16,11 @@ public class Column {
 
     // ----- getter/setter -----
 
-    public void setColumnConverter(JavaSqlConverter columnConverter) {
+    public void setColumnConverter(DefaultConverters columnConverter) {
         this.columnConverter = Optional.fromNullable(columnConverter);
     }
 
-    public JavaSqlConverter getColumnConverter() {
+    public DefaultConverters getColumnConverter() {
         return columnConverter.or(table.getTableConverter());
     }
 
