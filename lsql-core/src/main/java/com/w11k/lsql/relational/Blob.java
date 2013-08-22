@@ -12,19 +12,27 @@ public class Blob {
     private byte[] data;
 
     public Blob(byte[] data) {
-        this.data = data;
+        setData(data);
     }
 
     public Blob(InputStream input) {
-        try {
-            this.data = ByteStreams.toByteArray(input);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        setData(input);
     }
 
     public byte[] getData() {
         return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public void setData(InputStream inputStream) {
+        try {
+            this.data = ByteStreams.toByteArray(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public InputStream getInputStream() {
@@ -43,4 +51,9 @@ public class Blob {
     public int hashCode() {
         return Arrays.hashCode(data);
     }
+
+    @Override public String toString() {
+        return "Blob{size=" + data.length + "}";
+    }
+
 }

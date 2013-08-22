@@ -75,7 +75,6 @@ public class SqlFile {
                             name + "'. Did you add ';' at the end?");
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
-                // TODO handle parameters
                 logger.debug("Found SQL statement '{}'", name);
                 statements.put(name, new SqlFileStatement(lSql, this, name, sub));
             }

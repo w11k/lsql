@@ -17,10 +17,9 @@ import java.util.Map;
  */
 public class ByTypeConverter implements Converter {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final Map<Class<?>, Converter> javaValueToSqlConverters = Maps.newHashMap();
     private final Map<Integer, Converter> sqlValueToJavaConverters = Maps.newHashMap();
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ByTypeConverter() {
         addConverter(
@@ -188,6 +187,5 @@ public class ByTypeConverter implements Converter {
         }
         javaValueToSqlConverters.put(javaType, converter);
     }
-
 
 }

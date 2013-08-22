@@ -16,12 +16,12 @@ public class Column {
 
     // ----- getter/setter -----
 
-    public void setColumnConverter(Converter columnConverter) {
-        this.columnConverter = Optional.fromNullable(columnConverter);
-    }
-
     public Converter getColumnConverter() {
         return columnConverter.or(table.getTableConverter());
+    }
+
+    public void setColumnConverter(Converter columnConverter) {
+        this.columnConverter = Optional.fromNullable(columnConverter);
     }
 
     public String getColumnName() {

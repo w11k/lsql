@@ -1,33 +1,29 @@
 package com.w11k.lsql.relational;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.InsertException;
+import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.utils.ConnectionUtils;
-import com.w11k.lsql.utils.SqlStringUtils;
+import com.w11k.lsql.utils.PreparedStatementUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Optional.of;
 
 public class Table {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final LSql lSql;
-
     private final String tableName;
-
     private final Optional<String> primaryKeyColumn;
-
-    private Optional<Converter> tableConverter = Optional.absent();
-
     private final Map<String, Column> columns = Maps.newHashMap();
+    private Optional<Converter> tableConverter = Optional.absent();
 
     public Table(LSql lSql, String tableName) {
         this.lSql = lSql;
@@ -37,12 +33,12 @@ public class Table {
 
     // ----- getter/setter -----
 
-    public void setTableConverter(Converter tableConverter) {
-        this.tableConverter = Optional.fromNullable(tableConverter);
-    }
-
     public Converter getTableConverter() {
         return tableConverter.or(lSql.getGlobalConverter());
+    }
+
+    public void setTableConverter(Converter tableConverter) {
+        this.tableConverter = Optional.fromNullable(tableConverter);
     }
 
     public LSql getlSql() {
@@ -67,28 +63,8 @@ public class Table {
             throw new InsertException("Can not insert row because the primary key is already present. " +
                     "Use update or insertOrUpdate instead.");
         }
-
-        // extract column names, values and corresponding converters
-        List<String> columns = Lists.newLinkedList();
-        List<Object> values = Lists.newLinkedList();
-        List<Converter> valueConverter = Lists.newLinkedList();
-        for (Map.Entry<String, Object> keyValue : row.entrySet()) {
-            String key = keyValue.getKey();
-            Object value = keyValue.getValue();
-            Converter converter = column(key).getColumnConverter();
-            columns.add(lSql.identifierJavaToSql(key));
-            values.add(value);
-            valueConverter.add(converter);
-        }
-
-        // create PreparedStatement and execute
-        String sqlString = SqlStringUtils.createInsertString(this, columns);
         try {
-            PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlString);
-            for (int i = 0; i < valueConverter.size(); i++) {
-                Converter converter = valueConverter.get(i);
-                converter.setValueInStatement(ps, i + 1, values.get(i));
-            }
+            PreparedStatement ps = PreparedStatementUtils.createInsertStatement(this, row);
             ps.executeUpdate();
 
             // check for generated keys
@@ -108,29 +84,44 @@ public class Table {
                             .getValueFromResultSet(resultSet, 1);
                     row.put(primaryKeyColumn.get(), newId);
                 }
-                return Optional.of(newId);
+                return of(newId);
             }
             return Optional.absent();
         } catch (Exception e) {
-            throw new InsertException(e, sqlString);
+            throw new InsertException(e);
         }
     }
 
-    public boolean update(Row row) {
+    public int update(Row row) {
         if (getPrimaryKeyColumn().isPresent() && !row.containsKey(getPrimaryKeyColumn().get())) {
-            throw new InsertException("Can not insert row because the primary key is already present. " +
-                    "Use update or insertOrUpdate instead.");
+            throw new UpdateException("Can not update row because the primary key column " +
+                    "'" + getPrimaryKeyColumn().get() + "' is not present");
         }
+        try {
+            PreparedStatement ps = PreparedStatementUtils.createUpdateStatement(this, row);
+            int i = ps.executeUpdate();
+            if (i == 0) {
+                throw new UpdateException("No rows where updated");
+            }
+            return i;
+        } catch (Exception e) {
+            throw new InsertException(e);
+        }
+    }
 
-        // TODO
-
-        return true;
+    public Optional<Object> insertOrUpdate(Row row) {
+        if (row.containsKey(getPrimaryKeyColumn().get())) {
+            update(row);
+            return Optional.of(row.get(getPrimaryKeyColumn().get()));
+        } else {
+            return insert(row);
+        }
     }
 
     public QueriedRow get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
-        String insertString = SqlStringUtils.createSelectByIdString(this, column);
+        String insertString = PreparedStatementUtils.createSelectByIdString(this, column);
         PreparedStatement preparedStatement = ConnectionUtils.prepareStatement(lSql, insertString);
         try {
             column.getColumnConverter().setValueInStatement(preparedStatement, 1, id);
@@ -140,9 +131,7 @@ public class Table {
         return new Query(lSql, preparedStatement).getFirstRow();
     }
 
-    // ----- private -----
-
-    private Optional<String> getPrimaryKeyColumn() {
+    public Optional<String> getPrimaryKeyColumn() {
         Connection con = ConnectionUtils.getConnection(lSql);
         try {
             DatabaseMetaData md = con.getMetaData();
@@ -160,7 +149,7 @@ public class Table {
             if (primaryKeys.next()) {
                 throw new RuntimeException("Database returned more that one primary key column.");
             }
-            return Optional.of(lSql.identifierSqlToJava(idColumn));
+            return of(lSql.identifierSqlToJava(idColumn));
         } catch (SQLException e) {
             e.printStackTrace();
             return Optional.absent();

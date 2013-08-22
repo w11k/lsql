@@ -6,36 +6,12 @@ import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.converter.JsonClobConverter;
 import com.w11k.lsql.relational.Row;
 import com.w11k.lsql.relational.Table;
+import com.w11k.lsql.tests.utils.Person;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
 public class ConverterTest extends AbstractLSqlTest {
-
-    class Person {
-        public String firstname;
-        public String lastname;
-
-        Person(String firstname, String lastname) {
-            this.firstname = firstname;
-            this.lastname = lastname;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Person person = (Person) o;
-            return firstname.equals(person.firstname) && lastname.equals(person.lastname);
-        }
-
-        @Override public String toString() {
-            return "Person{" +
-                    "firstname='" + firstname + '\'' +
-                    ", lastname='" + lastname + '\'' +
-                    '}';
-        }
-    }
 
     private final Converter javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlStringConverter("yes", "no");
 
@@ -85,7 +61,7 @@ public class ConverterTest extends AbstractLSqlTest {
         assertEquals(row.get("yesno2"), "true");
     }
 
-    @Test public void converterForColumnForCustomClass() {
+    @Test public void jsonClobConverter() {
         lSql.executeRawSql("CREATE TABLE table1 (sometext TEXT, person TEXT)");
         Table t1 = lSql.table("table1");
         t1.column("person").setColumnConverter(new JsonClobConverter(Person.class));
@@ -94,6 +70,22 @@ public class ConverterTest extends AbstractLSqlTest {
         t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
         Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
         assertEquals(row.get("person"), p);
+    }
+
+    @Test public void converterForColumnWithMultipleTablesQuery() {
+        lSql.executeRawSql("CREATE TABLE table1 (sometext TEXT, person TEXT)");
+        lSql.executeRawSql("CREATE TABLE table2 (sometext TEXT, person TEXT)");
+
+        Table t2 = lSql.table("table2");
+        t2.insert(Row.fromKeyVals("sometext", "aaa", "person", "bbb"));
+
+        Table t1 = lSql.table("table1");
+        t1.column("person").setColumnConverter(new JsonClobConverter(Person.class));
+        Person p = new Person("John", "Doe");
+        t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
+
+        Row row = lSql.executeRawQuery("SELECT * FROM table1, table2").getFirstRow();
+        assertEquals(row.get("table1.person"), p);
     }
 
 }

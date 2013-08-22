@@ -25,7 +25,6 @@
         <processorPath useClasspath="true" />
         <module name="lsql (1)" />
         <module name="lsql-core" />
-        <module name="lsql-example" />
         <module name="mtypes" />
         <module name="vertxtest" />
       </profile>

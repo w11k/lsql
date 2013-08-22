@@ -12,7 +12,5 @@ fi
 version_new=$1
 
 mvn versions:set -DnewVersion=$version_new -DgenerateBackupPoms=false
-cd lsql-example
-mvn versions:set -DnewVersion=$version_new -DgenerateBackupPoms=false
 
 dev/get_current_version.sh >> VERSION

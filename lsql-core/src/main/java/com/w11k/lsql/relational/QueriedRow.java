@@ -44,7 +44,7 @@ public class QueriedRow extends Row {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("columns", values).toString();
+        return Objects.toStringHelper(this).add("values", values).toString();
     }
 
     @Override

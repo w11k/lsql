@@ -19,5 +19,3 @@ fi
 
 mvn versions:set -DnewVersion=$version_new -DgenerateBackupPoms=false
 mvn -Dmaven.test.skip=true install
-cd lsql-example
-mvn versions:set -DnewVersion=$version_new -DgenerateBackupPoms=false

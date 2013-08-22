@@ -15,9 +15,6 @@ if [[ $changes != 0 ]]; then
     exit 1
 fi
 
-dev/test_example.sh
-exit_on_error
-
 mvn -Dmaven.test.skip=true -DaltDeploymentRepository=repo-snapshots::default::file:../mvnrepository/snapshots deploy
 exit_on_error
 
