@@ -41,7 +41,7 @@ public class Query implements Iterable<QueriedRow> {
 
     public Query(LSql lSql, String sql) {
         this.lSql = lSql;
-        this.preparedStatement = ConnectionUtils.prepareStatement(lSql, sql);
+        this.preparedStatement = ConnectionUtils.prepareStatement(lSql, sql, false);
         run();
     }
 

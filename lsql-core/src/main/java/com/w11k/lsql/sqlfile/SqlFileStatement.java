@@ -70,7 +70,7 @@ public class SqlFileStatement {
         String sql = createSqlStringWithPlaceholders(queryParameters, parameters);
 
         // Set values
-        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sql);
+        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sql, false);
         for (int i = 0; i < parameters.size(); i++) {
             Parameter p = parameters.get(i);
             if (queryParameters.containsKey(p.name)) {
@@ -95,7 +95,7 @@ public class SqlFileStatement {
     }
 
     public void execute() {
-        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlString);
+        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlString, false);
         try {
             ps.execute();
         } catch (SQLException e) {

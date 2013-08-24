@@ -38,9 +38,9 @@ public class PreparedStatementUtils {
 
         sql.append(")values(");
         sql.append(Joiner.on(",").join(Collections.nCopies(columns.size(), "?")));
-        sql.append(");");
+        sql.append(")");
 
-        PreparedStatement ps = ConnectionUtils.prepareStatement(table.getlSql(), sql.toString());
+        PreparedStatement ps = ConnectionUtils.prepareStatement(table.getlSql(), sql.toString(), true);
         return setValuesInPreparedStatement(columns, ps);
     }
 
@@ -62,7 +62,7 @@ public class PreparedStatementUtils {
         sql.append(" WHERE ");
         sql.append("`").append(table.getPrimaryKeyColumn().get()).append("`=?;");
 
-        PreparedStatement ps = ConnectionUtils.prepareStatement(table.getlSql(), sql.toString());
+        PreparedStatement ps = ConnectionUtils.prepareStatement(table.getlSql(), sql.toString(), false);
         try {
             table.column(table.getPrimaryKeyColumn().get()).getColumnConverter()
                     .setValueInStatement(ps, columns.size() + 1, row.get(table.getPrimaryKeyColumn().get()));

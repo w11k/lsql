@@ -122,7 +122,7 @@ public class Table {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String insertString = PreparedStatementUtils.createSelectByIdString(this, column);
-        PreparedStatement preparedStatement = ConnectionUtils.prepareStatement(lSql, insertString);
+        PreparedStatement preparedStatement = ConnectionUtils.prepareStatement(lSql, insertString, false);
         try {
             column.getColumnConverter().setValueInStatement(preparedStatement, 1, id);
         } catch (Exception e) {
