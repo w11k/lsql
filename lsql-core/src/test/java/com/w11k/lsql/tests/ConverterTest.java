@@ -20,7 +20,7 @@ public class ConverterTest extends AbstractLSqlTest {
         lSql.setJavaCaseFormat(CaseFormat.LOWER_CAMEL);
         lSql.setSqlCaseFormat(CaseFormat.UPPER_UNDERSCORE);
 
-        lSql.executeRawSql("CREATE TABLE table1 (test_name1 TEXT, TEST_NAME2 TEXT)");
+        createTable("CREATE TABLE table1 (test_name1 TEXT, TEST_NAME2 TEXT)");
         lSql.executeRawSql("INSERT INTO table1 (test_name1, TEST_NAME2) VALUES ('name1', 'name2')");
 
         Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
@@ -29,7 +29,7 @@ public class ConverterTest extends AbstractLSqlTest {
     }
 
     @Test public void converterGlobal() {
-        lSql.executeRawSql("CREATE TABLE table1 (yesno TEXT)");
+        createTable("CREATE TABLE table1 (yesno TEXT)");
         Table table1 = lSql.table("table1");
         lSql.setGlobalConverter(javaBoolToSqlYesNoStringConverter);
         table1.insert(Row.fromKeyVals("yesno", true));
@@ -38,8 +38,8 @@ public class ConverterTest extends AbstractLSqlTest {
     }
 
     @Test public void converterForTable() {
-        lSql.executeRawSql("CREATE TABLE table1 (yesno TEXT)");
-        lSql.executeRawSql("CREATE TABLE table2 (yesno TEXT)");
+        createTable("CREATE TABLE table1 (yesno TEXT)");
+        createTable("CREATE TABLE table2 (yesno TEXT)");
         Table t1 = lSql.table("table1");
         Table t2 = lSql.table("table2");
         lSql.table("table1").setTableConverter(javaBoolToSqlYesNoStringConverter);
@@ -52,7 +52,7 @@ public class ConverterTest extends AbstractLSqlTest {
     }
 
     @Test public void converterForColumnValue() {
-        lSql.executeRawSql("CREATE TABLE table1 (yesno1 TEXT, yesno2 TEXT)");
+        createTable("CREATE TABLE table1 (yesno1 TEXT, yesno2 TEXT)");
         Table t1 = lSql.table("table1");
         lSql.table("table1").column("yesno1").setColumnConverter(javaBoolToSqlYesNoStringConverter);
         t1.insert(Row.fromKeyVals("yesno1", true, "yesno2", "true"));
@@ -62,7 +62,7 @@ public class ConverterTest extends AbstractLSqlTest {
     }
 
     @Test public void jsonClobConverter() {
-        lSql.executeRawSql("CREATE TABLE table1 (sometext TEXT, person TEXT)");
+        createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
         Table t1 = lSql.table("table1");
         t1.column("person").setColumnConverter(new JsonClobConverter(Person.class));
 
@@ -73,8 +73,8 @@ public class ConverterTest extends AbstractLSqlTest {
     }
 
     @Test public void converterForColumnWithMultipleTablesQuery() {
-        lSql.executeRawSql("CREATE TABLE table1 (sometext TEXT, person TEXT)");
-        lSql.executeRawSql("CREATE TABLE table2 (sometext TEXT, person TEXT)");
+        createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
+        createTable("CREATE TABLE table2 (sometext TEXT, person TEXT)");
 
         Table t2 = lSql.table("table2");
         t2.insert(Row.fromKeyVals("sometext", "aaa", "person", "bbb"));

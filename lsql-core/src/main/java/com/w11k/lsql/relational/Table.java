@@ -14,15 +14,21 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.Map;
 
+import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
 public class Table {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final LSql lSql;
+
     private final String tableName;
+
     private final Optional<String> primaryKeyColumn;
+
     private final Map<String, Column> columns = Maps.newHashMap();
+
     private Optional<Converter> tableConverter = Optional.absent();
 
     public Table(LSql lSql, String tableName) {
@@ -70,23 +76,13 @@ public class Table {
             // check for generated keys
             ResultSet resultSet = ps.getGeneratedKeys();
             if (resultSet.next()) {
-                ResultSetMetaData metaData = resultSet.getMetaData();
-                int columnCount = metaData.getColumnCount();
-                if (columnCount == 0) {
-                    return Optional.absent();
-                } else if (columnCount > 1) {
-                    throw new IllegalStateException("ResultSet for retrieval of the generated " +
-                            "ID contains more than one column.");
+                Optional<Object> pkOptional = extractGeneratedId(resultSet);
+                if (pkOptional.isPresent()) {
+                    row.put(primaryKeyColumn.get(), pkOptional.get());
+                    return pkOptional;
                 }
-                Object newId = resultSet.getObject(1);
-                if (primaryKeyColumn.isPresent()) {
-                    newId = column(primaryKeyColumn.get()).getColumnConverter()
-                            .getValueFromResultSet(resultSet, 1);
-                    row.put(primaryKeyColumn.get(), newId);
-                }
-                return of(newId);
             }
-            return Optional.absent();
+            return absent();
         } catch (Exception e) {
             throw new InsertException(e);
         }
@@ -144,16 +140,26 @@ public class Table {
             // extract ID column
             // 1 -> catalog, 2 -> schema, 3 -> table, 4 -> column
             String idColumn = primaryKeys.getString(4);
-
-            // Check if only one ID column was returned
-            if (primaryKeys.next()) {
-                throw new RuntimeException("Database returned more that one primary key column.");
-            }
             return of(lSql.identifierSqlToJava(idColumn));
         } catch (SQLException e) {
             e.printStackTrace();
             return Optional.absent();
         }
+    }
+
+    private Optional<Object> extractGeneratedId(ResultSet resultSet) throws Exception {
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+            String label = metaData.getColumnLabel(i);
+            if (!getPrimaryKeyColumn().isPresent()) {
+                return absent();
+            }
+            String pkName = getPrimaryKeyColumn().get();
+            if (lSql.identifierSqlToJava(label).equals(pkName)) {
+                return of(column(pkName).getColumnConverter().getValueFromResultSet(resultSet, i));
+            }
+        }
+        return absent();
     }
 
 }

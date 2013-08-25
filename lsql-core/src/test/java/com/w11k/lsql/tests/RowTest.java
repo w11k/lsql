@@ -7,8 +7,8 @@ import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static junit.framework.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class RowTest extends AbstractLSqlTest {
 
@@ -33,8 +33,8 @@ public class RowTest extends AbstractLSqlTest {
     }
 
     @Test public void groupByTable() {
-        lSql.executeRawSql("CREATE TABLE city (id serial primary key, zipcode text, name text)");
-        lSql.executeRawSql("CREATE TABLE person (id serial primary key, name text, zipcode integer references city (id))");
+        createTable("CREATE TABLE city (id serial primary key, zipcode text, name text)");
+        createTable("CREATE TABLE person (id serial primary key, name text, zipcode integer references city (id))");
 
         Optional<Object> cityId = lSql.table("city").insert(Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
         lSql.table("person").insert(Row.fromKeyVals("name", "John", "zipcode", cityId.get()));

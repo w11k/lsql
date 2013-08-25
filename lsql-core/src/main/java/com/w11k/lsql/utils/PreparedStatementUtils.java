@@ -27,12 +27,12 @@ public class PreparedStatementUtils {
 
         String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
         StringBuilder sql = new StringBuilder();
-        sql.append("insert into `").append(sqlTableName).append("`");
+        sql.append("insert into ").append(sqlTableName);
         sql.append("(");
 
         sql.append(Joiner.on(",").join(Lists.transform(columns, new Function<ColumnInStatement, Object>() {
             @Nullable @Override public Object apply(ColumnInStatement input) {
-                return "`" + input.sqlColumnName + "`";
+                return input.sqlColumnName;
             }
         })));
 
@@ -49,18 +49,18 @@ public class PreparedStatementUtils {
 
         String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
         StringBuilder sql = new StringBuilder();
-        sql.append("update `").append(sqlTableName).append("`");
+        sql.append("update ").append(sqlTableName);
         sql.append(" set ");
 
         sql.append(Joiner.on(",").join(Lists.transform(columns, new Function<ColumnInStatement, Object>() {
             @Nullable @Override public Object apply(ColumnInStatement input) {
-                return "`" + input.sqlColumnName + "`=?";
+                return input.sqlColumnName + "=?";
             }
         })));
 
 
         sql.append(" WHERE ");
-        sql.append("`").append(table.getPrimaryKeyColumn().get()).append("`=?;");
+        sql.append(table.getPrimaryKeyColumn().get()).append("=?;");
 
         PreparedStatement ps = ConnectionUtils.prepareStatement(table.getlSql(), sql.toString(), false);
         try {
@@ -75,7 +75,7 @@ public class PreparedStatementUtils {
     public static String createSelectByIdString(Table table, Column idColumn) {
         String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getColumnName());
-        return "select * from `" + sqlTableName + "` where `" + sqlColumnName + "`=?";
+        return "select * from " + sqlTableName + " where " + sqlColumnName + "=?";
     }
 
     private static PreparedStatement setValuesInPreparedStatement(List<ColumnInStatement> columns, PreparedStatement ps) {

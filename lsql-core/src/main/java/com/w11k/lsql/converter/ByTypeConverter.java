@@ -1,13 +1,10 @@
 package com.w11k.lsql.converter;
 
 import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.rowset.serial.SerialClob;
-import java.io.Reader;
 import java.sql.*;
 import java.util.Map;
 
@@ -70,12 +67,13 @@ public class ByTypeConverter implements Converter {
                         return rs.getDouble(index);
                     }
                 });
+        /*
         addConverter(
                 new int[]{Types.CLOB},
                 String.class,
                 new Converter() {
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        ps.setClob(index, new SerialClob(((String) val).toCharArray()));
+                        ps.setClob(index, new StringClob(val.toString()));
                     }
 
                     public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
@@ -88,6 +86,7 @@ public class ByTypeConverter implements Converter {
                         }
                     }
                 });
+                */
         addConverter(
                 new int[]{Types.CHAR},
                 Character.class,
@@ -102,14 +101,14 @@ public class ByTypeConverter implements Converter {
                 });
         addConverter(
                 new int[]{Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR, Types.VARCHAR},
-                char[].class,
+                String.class,
                 new Converter() {
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        ps.setString(index, String.valueOf((char[]) val));
+                        ps.setString(index, val.toString());
                     }
 
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return rs.getString(index).toCharArray();
+                        return rs.getString(index);
                     }
                 });
         addConverter(

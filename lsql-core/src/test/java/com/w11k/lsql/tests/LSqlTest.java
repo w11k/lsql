@@ -13,7 +13,8 @@ import static org.testng.Assert.assertNotNull;
 
 public class LSqlTest extends AbstractLSqlTest {
 
-    @Test public void getConnectionFromConnectionFactory() throws SQLException {
+    @Test
+    public void getConnectionFromConnectionFactory() throws SQLException {
         assertNotNull(ConnectionUtils.getConnection(lSql));
     }
 
@@ -27,14 +28,8 @@ public class LSqlTest extends AbstractLSqlTest {
         ConnectionUtils.getConnection(l);
     }
 
-    @Test(expectedExceptions = DatabaseAccessException.class)
-    public void createStatementThrowsDatabaseAccessExceptionOnClosedConnection() throws SQLException {
-        ConnectionUtils.getConnection(lSql).close();
-        ConnectionUtils.createStatement(lSql);
-    }
-
     @Test public void execute() {
-        lSql.executeRawSql("CREATE TABLE table1 (name TEXT, age INT)");
+        createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
     }
 

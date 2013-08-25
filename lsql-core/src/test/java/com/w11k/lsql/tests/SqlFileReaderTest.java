@@ -31,6 +31,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     public void executeSqlStatement() {
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         sqlFile.statement("create1").execute();
+        createdTables.add("table1");
         Table table1 = lSql.table("table1");
         table1.insert(Row.fromKeyVals("age", 10, "content", "text1")).get();
         table1.insert(Row.fromKeyVals("age", 30, "content", "text2")).get();
@@ -84,6 +85,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     public void parametersInQueryUseCustomColumnConverter() {
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         sqlFile.statement("create2").execute();
+        createdTables.add("table2");
 
         Table t2 = lSql.table("table2");
         t2.column("number").setColumnConverter(new Converter() {

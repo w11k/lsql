@@ -2,8 +2,8 @@ package com.w11k.lsql;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.converter.ByTypeConverter;
 import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.dialects.Dialect;
 import com.w11k.lsql.relational.Query;
 import com.w11k.lsql.relational.Table;
 import com.w11k.lsql.sqlfile.SqlFile;
@@ -26,7 +26,7 @@ public class LSql {
 
     private final Map<String, Table> tables = Maps.newHashMap();
 
-    private Converter globalConverter = new ByTypeConverter();
+    private final Dialect dialect;
 
     private CaseFormat javaCaseFormat = CaseFormat.LOWER_UNDERSCORE;
 
@@ -37,7 +37,8 @@ public class LSql {
     /**
      * @param connectionFactory Factory to get an active JDBC Connection
      */
-    public LSql(Callable<Connection> connectionFactory) {
+    public LSql(Dialect dialect, Callable<Connection> connectionFactory) {
+        this.dialect = dialect;
         checkNotNull(connectionFactory);
         this.connectionFactory = connectionFactory;
     }
@@ -45,11 +46,7 @@ public class LSql {
     // ----- getter/setter -----
 
     public Converter getGlobalConverter() {
-        return globalConverter;
-    }
-
-    public void setGlobalConverter(Converter globalConverter) {
-        this.globalConverter = globalConverter;
+        return dialect.getConverter();
     }
 
     public CaseFormat getJavaCaseFormat() {
