@@ -15,12 +15,42 @@ import java.util.Map;
 public class ByTypeConverter implements Converter {
 
     private final Map<Class<?>, Converter> javaValueToSqlConverters = Maps.newHashMap();
+
     private final Map<Integer, Converter> sqlValueToJavaConverters = Maps.newHashMap();
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ByTypeConverter() {
-        addConverter(
-                new int[]{Types.BOOLEAN},
+        init();
+    }
+
+    public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
+        try {
+            int columnType = rs.getMetaData().getColumnType(index);
+            logger.trace("SQL type in ResultSet is {}", columnType);
+            Converter converter = sqlValueToJavaConverters.get(columnType);
+            //converter = converter == null ? defaultConverter : converter;
+            if (converter == null) {
+                throw new RuntimeException("No converter found for SQL type: " + columnType);
+            }
+            return converter.getValueFromResultSet(rs, index);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+        Converter converter = javaValueToSqlConverters.get(val.getClass());
+        //converter = converter == null ? defaultConverter : converter;
+        if (converter == null) {
+            throw new RuntimeException("No converter found for Java type: " + val.getClass());
+        }
+        converter.setValueInStatement(ps, index, val);
+    }
+
+    protected void init() {
+        setConverter(
+                new int[]{Types.BIT, Types.BOOLEAN},
                 Boolean.class,
                 new Converter() {
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
@@ -31,8 +61,8 @@ public class ByTypeConverter implements Converter {
                         return rs.getBoolean(index);
                     }
                 });
-        addConverter(
-                new int[]{Types.BIT, Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT},
+        setConverter(
+                new int[]{Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT},
                 Integer.class,
                 new Converter() {
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
@@ -43,7 +73,7 @@ public class ByTypeConverter implements Converter {
                         return rs.getInt(index);
                     }
                 });
-        addConverter(
+        setConverter(
                 new int[]{Types.FLOAT},
                 Float.class,
                 new Converter() {
@@ -55,7 +85,7 @@ public class ByTypeConverter implements Converter {
                         return rs.getFloat(index);
                     }
                 });
-        addConverter(
+        setConverter(
                 new int[]{Types.DOUBLE, Types.REAL, Types.DECIMAL},
                 Double.class,
                 new Converter() {
@@ -67,39 +97,19 @@ public class ByTypeConverter implements Converter {
                         return rs.getDouble(index);
                     }
                 });
-        /*
-        addConverter(
-                new int[]{Types.CLOB},
-                String.class,
-                new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-                        ps.setClob(index, new StringClob(val.toString()));
-                    }
-
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
-                        Clob clob = rs.getClob(index);
-                        if (clob != null) {
-                            Reader reader = clob.getCharacterStream();
-                            return CharStreams.toString(reader);
-                        } else {
-                            return null;
-                        }
-                    }
-                });
-                */
-        addConverter(
+        setConverter(
                 new int[]{Types.CHAR},
                 Character.class,
                 new Converter() {
                     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
-                        ps.setByte(index, (byte) ((Character) val).charValue());
+                        ps.setString(index, val.toString());
                     }
 
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return (char) rs.getByte(index);
+                        return rs.getString(index).charAt(0);
                     }
                 });
-        addConverter(
+        setConverter(
                 new int[]{Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR, Types.VARCHAR},
                 String.class,
                 new Converter() {
@@ -111,7 +121,7 @@ public class ByTypeConverter implements Converter {
                         return rs.getString(index);
                     }
                 });
-        addConverter(
+        setConverter(
                 new int[]{Types.TIMESTAMP},
                 DateTime.class,
                 new Converter() {
@@ -125,7 +135,7 @@ public class ByTypeConverter implements Converter {
                         return new DateTime(rs.getTimestamp(index).getTime());
                     }
                 });
-        addConverter(
+        setConverter(
                 new int[]{Types.BLOB},
                 com.w11k.lsql.relational.Blob.class,
                 new Converter() {
@@ -156,31 +166,7 @@ public class ByTypeConverter implements Converter {
         // static int 	VARBINARY;
     }
 
-    public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
-        try {
-            int columnType = rs.getMetaData().getColumnType(index);
-            logger.trace("SQL type in ResultSet is {}", columnType);
-            Converter converter = sqlValueToJavaConverters.get(columnType);
-            //converter = converter == null ? defaultConverter : converter;
-            if (converter == null) {
-                throw new RuntimeException("No converter found for SQL type: " + columnType);
-            }
-            return converter.getValueFromResultSet(rs, index);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
-        Converter converter = javaValueToSqlConverters.get(val.getClass());
-        //converter = converter == null ? defaultConverter : converter;
-        if (converter == null) {
-            throw new RuntimeException("No converter found for Java type: " + val.getClass());
-        }
-        converter.setValueInStatement(ps, index, val);
-    }
-
-    public void addConverter(int[] sqlTypes, Class javaType, Converter converter) {
+    protected void setConverter(int[] sqlTypes, Class javaType, Converter converter) {
         for (int sqlType : sqlTypes) {
             sqlValueToJavaConverters.put(sqlType, converter);
         }

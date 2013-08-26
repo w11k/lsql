@@ -20,15 +20,17 @@ import static org.testng.Assert.assertTrue;
 
 public class SqlFileReaderTest extends AbstractLSqlTest {
 
-    @Test
-    public void readSqlFile() {
+    @Test(dataProvider = "lSqlProvider")
+    public void readSqlFile(LSqlProvider provider) {
+        provider.init(this);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         ImmutableMap<String, SqlFileStatement> stmts = sqlFile.getStatements();
         assertTrue(stmts.size() > 0, "wrong number of SQL statements in file1.sql");
     }
 
-    @Test
-    public void executeSqlStatement() {
+    @Test(dataProvider = "lSqlProvider")
+    public void executeSqlStatement(LSqlProvider provider) {
+        provider.init(this);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         sqlFile.statement("create1").execute();
         createdTables.add("table1");
@@ -38,9 +40,10 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("age", 60, "content", "text3")).get();
     }
 
-    @Test
-    public void executeQueryWithoutChangingParameters() {
-        executeSqlStatement();
+    @Test(dataProvider = "lSqlProvider")
+    public void executeQueryWithoutChangingParameters(LSqlProvider provider) {
+        provider.init(this);
+        executeSqlStatement(provider);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         SqlFileStatement qInt = sqlFile.statement("queryWithIntegerArg");
         Query query = qInt.query();
@@ -48,26 +51,29 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         assertEquals(contentForAge60, "text3", "Row with age==60 has content==text3");
     }
 
-    @Test(expectedExceptions = QueryException.class)
-    public void executeQueryWithUnusedParameter() {
-        executeSqlStatement();
+    @Test(dataProvider = "lSqlProvider", expectedExceptions = QueryException.class)
+    public void executeQueryWithUnusedParameter(LSqlProvider provider) {
+        provider.init(this);
+        executeSqlStatement(provider);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         SqlFileStatement qInt = sqlFile.statement("queryWithIntegerArg");
         qInt.query("WRONG", 1);
     }
 
-    @Test
-    public void executeQueryWithChangedUnquotedParameter() {
-        executeSqlStatement();
+    @Test(dataProvider = "lSqlProvider")
+    public void executeQueryWithChangedUnquotedParameter(LSqlProvider provider) {
+        provider.init(this);
+        executeSqlStatement(provider);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         SqlFileStatement qInt = sqlFile.statement("queryWithIntegerArg");
         Query query = qInt.query("age", 20);
         assertEquals(query.asList().size(), 2, "query should return 2 rows with age>20");
     }
 
-    @Test
-    public void executeQueryWithChangedQuotedParameter() {
-        executeSqlStatement();
+    @Test(dataProvider = "lSqlProvider")
+    public void executeQueryWithChangedQuotedParameter(LSqlProvider provider) {
+        provider.init(this);
+        executeSqlStatement(provider);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         SqlFileStatement qInt = sqlFile.statement("queryWithStringArg");
 
@@ -81,8 +87,9 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         assertEquals(query.getFirstRow().getInt("age"), 60);
     }
 
-    @Test
-    public void parametersInQueryUseCustomColumnConverter() {
+    @Test(dataProvider = "lSqlProvider")
+    public void parametersInQueryUseCustomColumnConverter(LSqlProvider provider) {
+        provider.init(this);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         sqlFile.statement("create2").execute();
         createdTables.add("table2");
@@ -94,7 +101,8 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
                 ps.setInt(index, ((IntWrapper) val).getI());
             }
 
-            @Override public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
+            @Override
+            public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
                 return new IntWrapper(rs.getInt(index));
             }
         });

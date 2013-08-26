@@ -1,22 +1,20 @@
 package com.w11k.lsql.converter;
 
-import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 
-import javax.sql.rowset.serial.SerialClob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class JsonClobConverter implements Converter {
+public class ObjectToJsonStringConverter implements Converter {
 
     private final Gson gson;
     private final Class<?> type;
 
-    public JsonClobConverter(Class<?> type) {
+    public ObjectToJsonStringConverter(Class<?> type) {
         this(null, type);
     }
 
-    public JsonClobConverter(Gson gson, Class<?> type) {
+    public ObjectToJsonStringConverter(Gson gson, Class<?> type) {
         this.type = type;
         this.gson = gson == null ? new Gson() : gson;
     }
@@ -24,11 +22,11 @@ public class JsonClobConverter implements Converter {
     @Override
     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
         String json = gson.toJson(type.cast(val));
-        ps.setClob(index, new SerialClob(json.toCharArray()));
+        ps.setString(index, json);
     }
 
     @Override public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
-        String json = CharStreams.toString(rs.getClob(index).getCharacterStream());
+        String json = rs.getString(index);
         return gson.fromJson(json, type);
     }
 

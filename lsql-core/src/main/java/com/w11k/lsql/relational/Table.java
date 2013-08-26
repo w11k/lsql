@@ -76,9 +76,11 @@ public class Table {
             // check for generated keys
             ResultSet resultSet = ps.getGeneratedKeys();
             if (resultSet.next()) {
-                Optional<Object> pkOptional = extractGeneratedId(resultSet);
+                Optional<Object> pkOptional = lSql.getDialect().extractGeneratedPk(this, resultSet);
                 if (pkOptional.isPresent()) {
-                    row.put(primaryKeyColumn.get(), pkOptional.get());
+                    if (primaryKeyColumn.isPresent()) {
+                        row.put(primaryKeyColumn.get(), pkOptional.get());
+                    }
                     return pkOptional;
                 }
             }
@@ -145,21 +147,6 @@ public class Table {
             e.printStackTrace();
             return Optional.absent();
         }
-    }
-
-    private Optional<Object> extractGeneratedId(ResultSet resultSet) throws Exception {
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            String label = metaData.getColumnLabel(i);
-            if (!getPrimaryKeyColumn().isPresent()) {
-                return absent();
-            }
-            String pkName = getPrimaryKeyColumn().get();
-            if (lSql.identifierSqlToJava(label).equals(pkName)) {
-                return of(column(pkName).getColumnConverter().getValueFromResultSet(resultSet, i));
-            }
-        }
-        return absent();
     }
 
 }

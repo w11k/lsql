@@ -58,7 +58,9 @@ public class Query implements Iterable<QueriedRow> {
             boolean useTablePrefix = false;
             String lastUsedSqlTableName = null;
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                String sqlTable = metaData.getTableName(i);
+
+                String sqlTable = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, i);
+
                 if (!useTablePrefix
                         && lastUsedSqlTableName != null
                         && !lastUsedSqlTableName.equals(sqlTable)) {

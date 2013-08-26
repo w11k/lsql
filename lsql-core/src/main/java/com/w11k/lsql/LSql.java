@@ -1,6 +1,5 @@
 package com.w11k.lsql;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.Dialect;
@@ -28,10 +27,6 @@ public class LSql {
 
     private final Dialect dialect;
 
-    private CaseFormat javaCaseFormat = CaseFormat.LOWER_UNDERSCORE;
-
-    private CaseFormat sqlCaseFormat = CaseFormat.UPPER_UNDERSCORE;
-
     private Callable<Connection> connectionFactory;
 
     /**
@@ -45,24 +40,12 @@ public class LSql {
 
     // ----- getter/setter -----
 
+    public Dialect getDialect() {
+        return dialect;
+    }
+
     public Converter getGlobalConverter() {
         return dialect.getConverter();
-    }
-
-    public CaseFormat getJavaCaseFormat() {
-        return javaCaseFormat;
-    }
-
-    public void setJavaCaseFormat(CaseFormat javaCaseFormat) {
-        this.javaCaseFormat = javaCaseFormat;
-    }
-
-    public CaseFormat getSqlCaseFormat() {
-        return sqlCaseFormat;
-    }
-
-    public void setSqlCaseFormat(CaseFormat sqlCaseFormat) {
-        this.sqlCaseFormat = sqlCaseFormat;
     }
 
     public Callable<Connection> getConnectionFactory() {
@@ -72,11 +55,11 @@ public class LSql {
     // ----- public -----
 
     public String identifierSqlToJava(String sqlName) {
-        return sqlCaseFormat.to(javaCaseFormat, sqlName);
+        return dialect.identifierSqlToJava(sqlName);
     }
 
     public String identifierJavaToSql(String javaName) {
-        return javaCaseFormat.to(sqlCaseFormat, javaName);
+        return dialect.identifierJavaToSql(javaName);
     }
 
     public SqlFile sqlFileRelativeToClass(Class clazz, String fileName) {
@@ -92,6 +75,13 @@ public class LSql {
             tables.put(tableName, new Table(this, tableName));
         }
         return tables.get(tableName);
+    }
+
+    @Override
+    public String toString() {
+        return "LSql{" +
+                "dialect=" + dialect +
+                '}';
     }
 
     // ----- execute SQL methods -----

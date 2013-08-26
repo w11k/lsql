@@ -1,14 +1,18 @@
 package com.w11k.lsql.tests;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.dialects.H2Dialect;
+import com.w11k.lsql.dialects.PostgresDialect;
 import com.w11k.lsql.jdbc.ConnectionFactories;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.postgresql.Driver;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,32 +23,62 @@ public abstract class AbstractLSqlTest {
             "create table (\\w+).*",
             Pattern.CASE_INSENSITIVE);
 
-    protected LSql lSql;
-
-    protected DataSource dataSource;
-
-    protected Connection connection;
-
     protected List<String> createdTables = Lists.newLinkedList();
 
-    protected AbstractLSqlTest() {
-        dataSource = TestsFactory.createPostgresDataSource();
+    protected LSql lSql;
+
+    @DataProvider(name = "lSqlProvider_postgresql")
+    public Iterator<Object[]> createLSqlProviderForPostgres() throws SQLException {
+        List<Object[]> providers = Lists.newLinkedList();
+
+        BasicDataSource ds = new BasicDataSource();
+        ds.setDriverClassName(Driver.class.getName());
+        ds.setUrl("jdbc:postgresql://localhost/lsqltests?user=lsqltestsuser&password=lsqltestspass");
+        ds.setDefaultAutoCommit(false);
+        Connection connection = ds.getConnection();
+
+        providers.add(new Object[]{
+                new LSqlProvider(new LSql(new PostgresDialect(), ConnectionFactories.fromInstance(connection)))
+        });
+
+        return providers.iterator();
     }
 
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+    @DataProvider(name = "lSqlProvider_h2")
+    public Iterator<Object[]> createLSqlProviderForH2() throws SQLException {
+        List<Object[]> providers = Lists.newLinkedList();
+
+        BasicDataSource ds = new BasicDataSource();
+        ds.setDriverClassName(Driver.class.getName());
+        ds.setUrl("jdbc:h2:mem:testdb;mode=postgresql");
+        ds.setDefaultAutoCommit(false);
+        Connection connection = ds.getConnection();
+
+        providers.add(new Object[]{
+                new LSqlProvider(new LSql(new H2Dialect(), ConnectionFactories.fromInstance(connection)))
+        });
+
+        return providers.iterator();
     }
 
-    @BeforeMethod
-    public void beforeMethod() throws SQLException {
-        connection = dataSource.getConnection();
-        lSql = new LSql(ConnectionFactories.fromInstance(connection));
+    @DataProvider(name = "lSqlProvider")
+    public Iterator<Object[]> createLSqlProviders() throws SQLException {
+        List<Object[]> providers = Lists.newLinkedList();
+        providers.addAll(Lists.newArrayList(createLSqlProviderForPostgres()));
+        providers.addAll(Lists.newArrayList(createLSqlProviderForH2()));
+        return providers.iterator();
+    }
+
+    public void setupLSqlInstanceForTest(LSql upLSqlInstanceForTest) {
+        lSql = upLSqlInstanceForTest;
     }
 
     @AfterMethod
-    public void afterMethod() throws SQLException {
+    public void afterMethod() throws Exception {
         dropCreatedTables();
-        connection.close();
+        if (lSql != null) {
+            lSql.getConnectionFactory().call().close();
+        }
     }
 
     protected void createTable(String sql) {

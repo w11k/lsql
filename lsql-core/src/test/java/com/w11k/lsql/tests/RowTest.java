@@ -12,7 +12,8 @@ import static org.testng.Assert.assertFalse;
 
 public class RowTest extends AbstractLSqlTest {
 
-    @Test public void addKeyVals() {
+    @Test
+    public void addKeyVals() {
         Row r = new Row().addKeyVals("a", 1, "b", "val");
         assertEquals(r.get("a"), 1);
         assertEquals(r.get("b"), "val");
@@ -32,9 +33,12 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(r.getInt("a"), 1);
     }
 
-    @Test public void groupByTable() {
-        createTable("CREATE TABLE city (id serial primary key, zipcode text, name text)");
-        createTable("CREATE TABLE person (id serial primary key, name text, zipcode integer references city (id))");
+    @Test(dataProvider = "lSqlProvider")
+    public void groupByTable(LSqlProvider provider) {
+        provider.init(this);
+
+        createTable("CREATE TABLE city (id SERIAL PRIMARY KEY, zipcode TEXT, name TEXT)");
+        createTable("CREATE TABLE person (id SERIAL PRIMARY KEY, name TEXT, zipcode INTEGER REFERENCES city (id))");
 
         Optional<Object> cityId = lSql.table("city").insert(Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
         lSql.table("person").insert(Row.fromKeyVals("name", "John", "zipcode", cityId.get()));

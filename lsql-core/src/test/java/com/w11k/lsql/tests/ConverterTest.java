@@ -1,9 +1,8 @@
 package com.w11k.lsql.tests;
 
-import com.google.common.base.CaseFormat;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
-import com.w11k.lsql.converter.JsonClobConverter;
+import com.w11k.lsql.converter.ObjectToJsonStringConverter;
 import com.w11k.lsql.relational.Row;
 import com.w11k.lsql.relational.Table;
 import com.w11k.lsql.tests.utils.Person;
@@ -15,29 +14,10 @@ public class ConverterTest extends AbstractLSqlTest {
 
     private final Converter javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlStringConverter("yes", "no");
 
-    @Test
-    public void caseFormatConversion() {
-        lSql.setJavaCaseFormat(CaseFormat.LOWER_CAMEL);
-        lSql.setSqlCaseFormat(CaseFormat.UPPER_UNDERSCORE);
+    @Test(dataProvider = "lSqlProvider")
+    public void converterForTable(LSqlProvider provider) {
+        provider.init(this);
 
-        createTable("CREATE TABLE table1 (test_name1 TEXT, TEST_NAME2 TEXT)");
-        lSql.executeRawSql("INSERT INTO table1 (test_name1, TEST_NAME2) VALUES ('name1', 'name2')");
-
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
-        assertEquals(row.get("testName1"), "name1");
-        assertEquals(row.get("testName2"), "name2");
-    }
-
-    @Test public void converterGlobal() {
-        createTable("CREATE TABLE table1 (yesno TEXT)");
-        Table table1 = lSql.table("table1");
-        lSql.setGlobalConverter(javaBoolToSqlYesNoStringConverter);
-        table1.insert(Row.fromKeyVals("yesno", true));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
-        assertEquals(row.get("yesno"), true);
-    }
-
-    @Test public void converterForTable() {
         createTable("CREATE TABLE table1 (yesno TEXT)");
         createTable("CREATE TABLE table2 (yesno TEXT)");
         Table t1 = lSql.table("table1");
@@ -51,7 +31,9 @@ public class ConverterTest extends AbstractLSqlTest {
         assertEquals(row2.get("yesno"), "true");
     }
 
-    @Test public void converterForColumnValue() {
+    @Test(dataProvider = "lSqlProvider")
+    public void converterForColumnValue(LSqlProvider provider) {
+        provider.init(this);
         createTable("CREATE TABLE table1 (yesno1 TEXT, yesno2 TEXT)");
         Table t1 = lSql.table("table1");
         lSql.table("table1").column("yesno1").setColumnConverter(javaBoolToSqlYesNoStringConverter);
@@ -61,10 +43,12 @@ public class ConverterTest extends AbstractLSqlTest {
         assertEquals(row.get("yesno2"), "true");
     }
 
-    @Test public void jsonClobConverter() {
+    @Test(dataProvider = "lSqlProvider")
+    public void jsonConverter(LSqlProvider provider) {
+        provider.init(this);
         createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("person").setColumnConverter(new JsonClobConverter(Person.class));
+        t1.column("person").setColumnConverter(new ObjectToJsonStringConverter(Person.class));
 
         Person p = new Person("John", "Doe");
         t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
@@ -72,7 +56,9 @@ public class ConverterTest extends AbstractLSqlTest {
         assertEquals(row.get("person"), p);
     }
 
-    @Test public void converterForColumnWithMultipleTablesQuery() {
+    @Test(dataProvider = "lSqlProvider")
+    public void converterForColumnWithMultipleTablesQuery(LSqlProvider provider) {
+        provider.init(this);
         createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
         createTable("CREATE TABLE table2 (sometext TEXT, person TEXT)");
 
@@ -80,7 +66,7 @@ public class ConverterTest extends AbstractLSqlTest {
         t2.insert(Row.fromKeyVals("sometext", "aaa", "person", "bbb"));
 
         Table t1 = lSql.table("table1");
-        t1.column("person").setColumnConverter(new JsonClobConverter(Person.class));
+        t1.column("person").setColumnConverter(new ObjectToJsonStringConverter(Person.class));
         Person p = new Person("John", "Doe");
         t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
 
