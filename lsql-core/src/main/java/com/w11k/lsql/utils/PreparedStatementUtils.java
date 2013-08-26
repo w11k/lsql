@@ -108,4 +108,18 @@ public class PreparedStatementUtils {
         return columns;
     }
 
+    public static PreparedStatement createDeleteByIdString(Table table) {
+        Column idColumn = table.column(table.getPrimaryKeyColumn().get());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getColumnName());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("delete from ");
+        sb.append(sqlTableName);
+        sb.append(" where ");
+        sb.append(sqlColumnName);
+        sb.append("=?;");
+
+        return ConnectionUtils.prepareStatement(table.getlSql(), sb.toString(), false);
+    }
 }

@@ -146,4 +146,29 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(queriedRow, row);
     }
 
+    @Test(dataProvider = "lSqlProvider")
+    public void delete(LSqlProvider provider) throws SQLException {
+        provider.init(this);
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
+        Table table1 = lSql.table("table1");
+
+        // Insert
+        Row row = new Row().addKeyVals("name", "Max");
+        Object id = table1.insert(row).get();
+
+        // Verify insert
+        int tableSize = lSql.executeRawQuery("select * from table1;").asList().size();
+        assertEquals(tableSize, 1);
+
+        // Insert 2nd row
+        table1.insert(new Row().addKeyVals("name", "Phil"));
+
+        // Delete
+        table1.delete(id);
+
+        // Verify delete
+        tableSize = lSql.executeRawQuery("select * from table1;").asList().size();
+        assertEquals(tableSize, 1);
+    }
+
 }
