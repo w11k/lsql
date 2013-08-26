@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 import java.sql.SQLException;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class TableTest extends AbstractLSqlTest {
@@ -26,9 +27,19 @@ public class TableTest extends AbstractLSqlTest {
         Object id2 = table1.insert(Row.fromKeyVals("age", 2)).get();
         Object id3 = table1.insert(Row.fromKeyVals("age", 3)).get();
 
-        assertEquals(table1.get(id1).getInt("age"), 1);
-        assertEquals(table1.get(id2).getInt("age"), 2);
-        assertEquals(table1.get(id3).getInt("age"), 3);
+        assertEquals(table1.get(id1).get().getInt("age"), 1);
+        assertEquals(table1.get(id2).get().getInt("age"), 2);
+        assertEquals(table1.get(id3).get().getInt("age"), 3);
+    }
+
+    @Test(dataProvider = "lSqlProvider")
+    public void getByIdReturnAbsentOnWrongId(LSqlProvider provider) {
+        provider.init(this);
+
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INT)");
+        Table table1 = lSql.table("table1");
+
+        assertFalse(table1.get(999).isPresent());
     }
 
     @Test(dataProvider = "lSqlProvider")
@@ -97,12 +108,12 @@ public class TableTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
         Object id = table1.insert(row).get();
-        QueriedRow queriedRow = table1.get(id);
+        QueriedRow queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
 
         row.put("name", "John");
         table1.update(row);
-        queriedRow = table1.get(id);
+        queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
     }
 
@@ -114,7 +125,7 @@ public class TableTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
         Object id = table1.insert(row).get();
-        QueriedRow queriedRow = table1.get(id);
+        QueriedRow queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
 
         row.put("id", 999);
@@ -134,7 +145,7 @@ public class TableTest extends AbstractLSqlTest {
         Object id = table1.insertOrUpdate(row).get();
 
         // Verify insert
-        QueriedRow queriedRow = table1.get(id);
+        QueriedRow queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
 
         // Update
@@ -142,7 +153,7 @@ public class TableTest extends AbstractLSqlTest {
         id = table1.insertOrUpdate(row).get();
 
         // Verify update
-        queriedRow = table1.get(id);
+        queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
     }
 

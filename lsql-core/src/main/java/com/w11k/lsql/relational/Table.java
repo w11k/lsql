@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Optional.absent;
@@ -127,7 +128,7 @@ public class Table {
         }
     }
 
-    public QueriedRow get(Object id) {
+    public Optional<QueriedRow> get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String insertString = PreparedStatementUtils.createSelectByIdString(this, column);
@@ -137,7 +138,11 @@ public class Table {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return new Query(lSql, preparedStatement).getFirstRow();
+        List<QueriedRow> queriedRows = new Query(lSql, preparedStatement).asList();
+        if (queriedRows.size() == 1) {
+            return of(queriedRows.get(0));
+        }
+        return absent();
     }
 
     public Optional<String> getPrimaryKeyColumn() {
