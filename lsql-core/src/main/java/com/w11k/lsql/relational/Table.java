@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.exceptions.DeleteException;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.utils.ConnectionUtils;
@@ -113,6 +114,16 @@ public class Table {
             return Optional.of(row.get(getPrimaryKeyColumn().get()));
         } else {
             return insert(row);
+        }
+    }
+
+    public void delete(Object id) {
+        PreparedStatement ps = PreparedStatementUtils.createDeleteByIdString(this);
+        try {
+            column(getPrimaryKeyColumn().get()).getColumnConverter().setValueInStatement(ps, 1, id);
+            ps.execute();
+        } catch (Exception e) {
+            throw new DeleteException(e);
         }
     }
 
