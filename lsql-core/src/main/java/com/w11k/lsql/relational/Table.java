@@ -1,6 +1,7 @@
 package com.w11k.lsql.relational;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
@@ -27,16 +28,18 @@ public class Table {
 
     private final String tableName;
 
-    private final Optional<String> primaryKeyColumn;
-
     private final Map<String, Column> columns = Maps.newHashMap();
+
+    private Optional<String> primaryKeyColumn = Optional.absent();
+
+    private Map<Table, Column> exportedForeignKeyTables = Maps.newHashMap();
 
     private Optional<Converter> tableConverter = Optional.absent();
 
     public Table(LSql lSql, String tableName) {
         this.lSql = lSql;
         this.tableName = tableName;
-        primaryKeyColumn = getPrimaryKeyColumn();
+        fetchKeys();
     }
 
     // ----- getter/setter -----
@@ -55,6 +58,14 @@ public class Table {
 
     public String getTableName() {
         return tableName;
+    }
+
+    public Optional<String> getPrimaryKeyColumn() {
+        return primaryKeyColumn;
+    }
+
+    public Map<Table, Column> getExportedForeignKeyTables() {
+        return ImmutableMap.copyOf(exportedForeignKeyTables);
     }
 
     // ----- public -----
@@ -76,6 +87,9 @@ public class Table {
             ps.executeUpdate();
 
             // check for generated keys
+            if (!getPrimaryKeyColumn().isPresent()) {
+                return absent();
+            }
             ResultSet resultSet = ps.getGeneratedKeys();
             if (resultSet.next()) {
                 Optional<Object> pkOptional = lSql.getDialect().extractGeneratedPk(this, resultSet);
@@ -145,24 +159,49 @@ public class Table {
         return absent();
     }
 
-    public Optional<String> getPrimaryKeyColumn() {
+    public void fetchKeys() {
         Connection con = ConnectionUtils.getConnection(lSql);
         try {
             DatabaseMetaData md = con.getMetaData();
+
+            // Fetch Primary Key
             ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.identifierJavaToSql(tableName));
             if (!primaryKeys.next()) {
-                // no row returned
-                return Optional.absent();
+                primaryKeyColumn = Optional.absent();
+                return;
             }
-
-            // extract ID column
-            // 1 -> catalog, 2 -> schema, 3 -> table, 4 -> column
             String idColumn = primaryKeys.getString(4);
-            return of(lSql.identifierSqlToJava(idColumn));
+            primaryKeyColumn = of(lSql.identifierSqlToJava(idColumn));
+
+            // Fetch Foreign keys
+            ResultSet exportedKeys = md.getExportedKeys(null, null, lSql.identifierJavaToSql(tableName));
+            while (exportedKeys.next()) {
+                String sqlTableName = exportedKeys.getString(7);
+                String javaTableName = lSql.identifierSqlToJava(sqlTableName);
+                String sqlColumnName = exportedKeys.getString(8);
+                String javaColumnName = lSql.identifierSqlToJava(sqlColumnName);
+
+                Table foreignTable = lSql.table(javaTableName);
+                Column foreignColumn = foreignTable.column(javaColumnName);
+                exportedForeignKeyTables.put(foreignTable, foreignColumn);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return Optional.absent();
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Table otherTable = (Table) o;
+        return lSql == otherTable.lSql && tableName.equals(otherTable.tableName);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = lSql.hashCode();
+        result = 31 * result + tableName.hashCode();
+        return result;
+    }
 }

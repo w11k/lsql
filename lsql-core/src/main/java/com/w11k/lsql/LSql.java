@@ -2,7 +2,7 @@ package com.w11k.lsql;
 
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.dialects.Dialect;
+import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.relational.Query;
 import com.w11k.lsql.relational.Table;
 import com.w11k.lsql.sqlfile.SqlFile;
@@ -25,14 +25,14 @@ public class LSql {
 
     private final Map<String, Table> tables = Maps.newHashMap();
 
-    private final Dialect dialect;
+    private final BaseDialect dialect;
 
     private Callable<Connection> connectionFactory;
 
     /**
      * @param connectionFactory Factory to get an active JDBC Connection
      */
-    public LSql(Dialect dialect, Callable<Connection> connectionFactory) {
+    public LSql(BaseDialect dialect, Callable<Connection> connectionFactory) {
         this.dialect = dialect;
         checkNotNull(connectionFactory);
         this.connectionFactory = connectionFactory;
@@ -40,7 +40,7 @@ public class LSql {
 
     // ----- getter/setter -----
 
-    public Dialect getDialect() {
+    public BaseDialect getDialect() {
         return dialect;
     }
 

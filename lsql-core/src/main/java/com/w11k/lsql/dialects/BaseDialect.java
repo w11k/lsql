@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-public abstract class Dialect {
+public abstract class BaseDialect {
 
     public Converter getConverter() {
         return new ByTypeConverter();

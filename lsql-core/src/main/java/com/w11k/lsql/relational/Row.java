@@ -96,6 +96,11 @@ public class Row extends ForwardingMap<String, Object> {
         return Objects.toStringHelper(this).add("data", delegate()).toString();
     }
 
+    public List<Row> getJoinedRows(String s) {
+        //noinspection unchecked
+        return getAs(List.class, "__" + s);
+    }
+
     // ----- interface ForwardingMap -----
 
     @Override

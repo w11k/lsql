@@ -2189,24 +2189,6 @@
       <column name="viewowner" sqlType="name" length="2147483647" precision="0" nullable="true" jdbcType="12"/>
       <column name="definition" sqlType="text" length="2147483647" precision="0" nullable="true" jdbcType="12"/>
     </table>
-    <table name="t1" schema="public" catalog="lsqltests" type="TABLE">
-      <column name="id" sqlType="serial" length="10" precision="0" nullable="false" jdbcType="4" def="bmV4dHZhbCgndDFfaWRfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
-      <column name="b" sqlType="bool" length="1" precision="0" nullable="true" jdbcType="-7"/>
-      <column name="b2" sqlType="bool" length="1" precision="0" nullable="true" jdbcType="-7"/>
-      <primary-key name="t1_pkey" columns="id"/>
-    </table>
-    <table name="t1_id_seq" schema="public" catalog="lsqltests" type="SEQUENCE">
-      <column name="sequence_name" sqlType="name" length="2147483647" precision="0" nullable="false" jdbcType="12"/>
-      <column name="last_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="start_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="increment_by" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="max_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="min_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="cache_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="log_cnt" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="is_cycled" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
-      <column name="is_called" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
-    </table>
     <procedure name="_pg_char_max_length" schema="information_schema" catalog="lsqltests" type="2">
       <prototype return="true">
         <parameter name="returnValue" sqlType="int4" length="0" precision="0" nullable="true" jdbcType="4" type="" index="0"/>

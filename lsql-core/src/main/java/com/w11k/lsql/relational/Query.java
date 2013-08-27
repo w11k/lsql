@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public class Query implements Iterable<QueriedRow> {
     public class ResultSetColumn {
 
         public int index;
+
         public Column column;
 
         public ResultSetColumn(int index, Column column) {
@@ -29,8 +31,11 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     private final LSql lSql;
+
     private final PreparedStatement preparedStatement;
+
     private List<QueriedRow> rows;
+
     private Map<String, ResultSetColumn> meta = Maps.newHashMap();
 
     public Query(LSql lSql, PreparedStatement preparedStatement) {
@@ -121,18 +126,68 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     public Map<String, List<Row>> groupByTables() {
-        Map<String, List<Row>> byTables = Maps.newHashMap();
+        Map<String, Map<Object, Row>> byTables = Maps.newHashMap();
+        // For each row in query
         for (QueriedRow queriedRow : asList()) {
             Map<String, Row> rowByTables = queriedRow.groupByTables();
+            // for each table in a row
             for (String key : rowByTables.keySet()) {
                 Row row = rowByTables.get(key);
                 if (!byTables.containsKey(key)) {
-                    byTables.put(key, Lists.<Row>newLinkedList());
+                    byTables.put(key, Maps.<Object, Row>newLinkedHashMap());
                 }
-                byTables.get(key).add(row);
+                String pkColumn = lSql.table(key).getPrimaryKeyColumn().get();
+                Object pkValue = row.get(pkColumn);
+                byTables.get(key).put(pkValue, row);
             }
         }
-        return byTables;
+
+        return Maps.transformEntries(byTables, new Maps.EntryTransformer<String, Map<Object, Row>, List<Row>>() {
+            public List<Row> transformEntry(String key, Map<Object, Row> value) {
+                List<Row> rows = Lists.newLinkedList();
+                for (Map.Entry<Object, Row> objectRowEntry : value.entrySet()) {
+                    rows.add(objectRowEntry.getValue());
+                }
+                return rows;
+            }
+        });
     }
+
+    public List<Row> joinOn(Table startTable) {
+        Map<String, List<Row>> byTables = groupByTables();
+        List<Row> startRows = byTables.get(startTable.getTableName());
+        for (Row row : startRows) {
+            joinRow(row, startTable, byTables);
+        }
+        return startRows;
+    }
+
+    private Row joinRow(Row row, Table tableOfRow, Map<String, List<Row>> fullResult) {
+        Map<Table, Column> foreignTables = tableOfRow.getExportedForeignKeyTables();
+
+        // for each foreign table
+        for (Table foreignTable : foreignTables.keySet()) {
+            // check if the result contains rows for the foreign table
+            if (fullResult.containsKey(foreignTable.getTableName())) {
+                // prepare an empty List in the current row
+                LinkedList<Row> joinedForeignRows = Lists.newLinkedList();
+                row.put("__" + foreignTable.getTableName(), joinedForeignRows);
+
+                // for each row in the foreign table
+                List<Row> foreignRows = fullResult.get(foreignTable.getTableName());
+                for (Row foreignRow : foreignRows) {
+                    // check if they join PK==FK
+                    if (row.get(tableOfRow.getPrimaryKeyColumn().get()).equals(
+                            foreignRow.get(foreignTables.get(foreignTable).getColumnName()))) {
+
+                        joinRow(foreignRow, foreignTable, fullResult);
+                        joinedForeignRows.add(foreignRow);
+                    }
+                }
+            }
+        }
+        return row;
+    }
+
 
 }

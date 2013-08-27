@@ -11,7 +11,7 @@ import java.sql.*;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
-public class PostgresDialect extends Dialect {
+public class PostgresDialect extends BaseDialect {
 
     @Override
     public Converter getConverter() {
@@ -57,10 +57,6 @@ public class PostgresDialect extends Dialect {
 
     @Override
     public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws Exception {
-        if (!table.getPrimaryKeyColumn().isPresent()) {
-            return Optional.absent();
-        }
-
         String pkName = table.getPrimaryKeyColumn().get();
         ResultSetMetaData metaData = resultSet.getMetaData();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {

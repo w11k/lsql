@@ -11,7 +11,7 @@ import javax.sql.rowset.serial.SerialClob;
 import java.io.Reader;
 import java.sql.*;
 
-public class H2Dialect extends Dialect {
+public class H2Dialect extends BaseDialect {
 
     @Override
     public Converter getConverter() {
@@ -47,10 +47,6 @@ public class H2Dialect extends Dialect {
     }
 
     public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws Exception {
-        if (!table.getPrimaryKeyColumn().isPresent()) {
-            return Optional.absent();
-        }
-
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();
         if (columnCount == 0) {
