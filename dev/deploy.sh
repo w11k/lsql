@@ -13,16 +13,16 @@ if [ $branch != "master" ]; then
     exit 1
 fi
 
-# Check for pending changes
-changes=$(git status --porcelain 2>/dev/null| egrep "^(AM|M| M|\?\?)" | wc -l)
-if [[ $changes != 0 ]]; then
-    echo "Project contains pending changes."
-    exit 1
-fi
-
 # Test build
 mvn clean test
 exit_on_error
+
+# Check for pending changes
+#changes=$(git status --porcelain 2>/dev/null| egrep "^(AM|M| M|\?\?)" | wc -l)
+#if [[ $changes != 0 ]]; then
+#    echo "Project contains pending changes."
+#    exit 1
+#fi
 
 # Set the current version
 dev/get_current_version.sh > LATEST_RELEASED_VERSION
