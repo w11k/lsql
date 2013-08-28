@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.w11k.lsql</groupId>
+  <artifactId>lsql-doc</artifactId>
+  <version>0.0.25</version>
+
+  <properties>
+    <github.global.server>github</github.global.server>
+  </properties>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src</directory>
+      </resource>
+    </resources>
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>run grunt build</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <exec dir="." executable="pandoc" failonerror="true">
+                  <arg value="src/index.md"/>
+                  <arg value="--smart"/>
+                  <arg value="--standalone"/>
+                  <arg value="--template=src/template"/>
+                  <arg value="--toc"/>
+                  <arg value="-o"/>
+                  <arg value="${build.outputDirectory}/index.html"/>
+                </exec>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <version>0.8</version>
+        <configuration>
+          <message>GitHub pages for ${project.version}</message>
+          <outputDirectory>${project.basedir}/target/classes</outputDirectory>
+          <branch>refs/heads/gh-pages</branch>
+          <noJekyll>true</noJekyll>
+          <merge>false</merge>
+          <includes>
+            <include>**/*</include>
+          </includes>
+          <repositoryOwner>weiglewilczek</repositoryOwner>
+          <repositoryName>lsql</repositoryName>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>deploy</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+
