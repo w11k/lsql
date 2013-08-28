@@ -52,8 +52,6 @@ public class TableTest extends AbstractLSqlTest {
 
         Row insertedRow = lSql.executeRawQuery("select * from table1").getFirstRow();
         assertEquals(insertedRow.getString("name"), "cus1");
-
-        assertTrue(false);
     }
 
     @Test(dataProvider = "lSqlProvider")
