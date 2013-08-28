@@ -25,17 +25,20 @@ exit_on_error
 #fi
 
 # Set the current version
-dev/get_current_version.sh > LATEST_RELEASED_VERSION
 git tag "`dev/get_current_version.sh`"
+exit_on_error
+dev/get_current_version.sh > LATEST_RELEASED_VERSION
 
 # Commit and push
 git add --all
-git commit -m "`dev/get_current_version.sh`"
+git commit -m "new release `dev/get_current_version.sh`"
 git push origin master
 
 # Deploy
 mvn -Dmaven.test.skip=true deploy
 
-# Increment version in pom.xml
+# Increment version and push
 dev/increment_project_version.sh
-
+git add --all
+git commit -m "started new version `dev/get_current_version.sh`"
+git push origin master
