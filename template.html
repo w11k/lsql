@@ -6,7 +6,7 @@
   <script type="text/javascript" src="jquery.min.js"></script>
   <script type="text/javascript">
     //noinspection JSUnresolvedVariable
-    var J = $;
+    var J = $$;
 
     var getLineIndent = function (line) {
       return line.length - line.replace(/^\s+/,"").length;
@@ -44,7 +44,7 @@
       });
     });
   </script>
-  <title></title>
+  <title>$title$</title>
 </head>
 <body>
 <div>
@@ -61,23 +61,13 @@
         <div class="span4">
           <div class="pa-sidebar">
             <ul class="nav nav-list">
-              <ul>
-              <li><a href="#introduction">Introduction</a><ul>
-              <li><a href="#another-section">Another section</a></li>
-              </ul></li>
-              </ul>
+              $toc$
             </ul>
           </div>
         </div>
 
         <div class="span8">
-          <h2 id="introduction"><a href="#TOC">Introduction</a></h2>
-          <p>start</p>
-          <pre><code>if (true) {
-              test();
-          }</code></pre>
-          <p>ende</p>
-          <h5 id="another-section"><a href="#TOC">Another section</a></h5>
+          $body$
         </div>
       </div>
     </div>
