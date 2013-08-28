@@ -10,9 +10,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class TableTest extends AbstractLSqlTest {
 
@@ -54,6 +52,8 @@ public class TableTest extends AbstractLSqlTest {
 
         Row insertedRow = lSql.executeRawQuery("select * from table1").getFirstRow();
         assertEquals(insertedRow.getString("name"), "cus1");
+
+        assertTrue(false);
     }
 
     @Test(dataProvider = "lSqlProvider")

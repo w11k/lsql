@@ -34,7 +34,7 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
         Query rows = lSql.executeRawQuery("SELECT * FROM table1");
         int sum = 0;
-        for (Row row : rows) {
+        for (QueriedRow row : rows) {
             sum += row.getInt("age");
         }
         assertEquals(sum, 50);
@@ -108,7 +108,6 @@ public class QueryTest extends AbstractLSqlTest {
     public void groupByTable(LSqlProvider provider) {
         provider.init(this);
         setupCompanyEmployeeContact();
-
 
         Query query = lSql.executeRawQuery("SELECT * FROM company, employee, contact");
         Map<String, List<Row>> byTables = query.groupByTables();

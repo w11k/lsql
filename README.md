@@ -1,1 +1,1 @@
-# Literate SQL - A Java JDBC Library
+# Literate SQL - A Java Database Library

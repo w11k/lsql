@@ -6,7 +6,7 @@
 
   <groupId>com.w11k.lsql</groupId>
   <artifactId>lsql-parent</artifactId>
-  <version>0.0.21</version>
+  <version>0.0.22</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -15,6 +15,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <github.global.server>github</github.global.server>
   </properties>
 
   <dependencyManagement>
@@ -82,17 +83,14 @@
     <testResources>
       <testResource>
         <directory>src/test/java</directory>
-        <includes>
-          <include>**/*</include>
-        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
       </testResource>
     </testResources>
     <resources>
       <resource>
         <directory>src/main/java</directory>
-        <includes>
-          <include>**/*</include>
-        </includes>
       </resource>
       <resource>
         <directory>src/main/resources</directory>
@@ -116,18 +114,65 @@
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <altDeploymentRepository>
+            internal.repo::default::file://${project.build.directory}/mvn-repository
+          </altDeploymentRepository>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <version>0.8</version>
+        <configuration>
+          <message>Maven artifacts for ${project.version}</message>
+          <noJekyll>true</noJekyll>
+          <merge>true</merge>
+          <includes>
+            <include>**/*</include>
+          </includes>
+          <repositoryOwner>weiglewilczek</repositoryOwner>
+          <repositoryName>lsql</repositoryName>
+        </configuration>
+        <executions>
+          <execution>
+            <configuration>
+              <message>Maven artifacts for ${project.version}</message>
+              <outputDirectory>${project.build.directory}/mvn-repository</outputDirectory>
+              <branch>refs/heads/mvn-repository</branch>
+            </configuration>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>deploy</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
   <distributionManagement>
     <repository>
-      <id>repo-releases</id>
-      <url>https://github.com/weiglewilczek/mvnrepository/raw/master/releases</url>
+      <id>github</id>
+      <name>GitHub LSql Repository</name>
+      <url>https://raw.github.com/weiglewilczek/lsql/mvn-repository</url>
     </repository>
-    <snapshotRepository>
-      <id>repo-snapshots</id>
-      <url>https://github.com/weiglewilczek/mvnrepository/raw/master/snapshots</url>
-    </snapshotRepository>
   </distributionManagement>
 
 </project>

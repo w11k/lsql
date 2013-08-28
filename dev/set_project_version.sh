@@ -13,4 +13,4 @@ version_new=$1
 
 mvn versions:set -DnewVersion=$version_new -DgenerateBackupPoms=false
 
-dev/get_current_version.sh >> VERSION
+dev/get_current_version.sh > VERSION
