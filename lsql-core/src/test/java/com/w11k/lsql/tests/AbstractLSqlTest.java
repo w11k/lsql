@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.dialects.H2Dialect;
 import com.w11k.lsql.dialects.PostgresDialect;
-import com.w11k.lsql.jdbc.ConnectionFactories;
+import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.postgresql.Driver;
 import org.testng.annotations.AfterMethod;
@@ -32,17 +32,18 @@ public abstract class AbstractLSqlTest {
     @DataProvider(name = "lSqlProvider_postgresql")
     public Iterator<Object[]> createLSqlProviderForPostgres() throws SQLException {
         List<Object[]> providers = Lists.newLinkedList();
+        try {
+            BasicDataSource ds = new BasicDataSource();
+            ds.setDriverClassName(Driver.class.getName());
+            ds.setUrl("jdbc:postgresql://localhost/lsqltests?user=lsqltestsuser&password=lsqltestspass");
+            ds.setDefaultAutoCommit(false);
+            Connection connection = ds.getConnection();
 
-        BasicDataSource ds = new BasicDataSource();
-        ds.setDriverClassName(Driver.class.getName());
-        ds.setUrl("jdbc:postgresql://localhost/lsqltests?user=lsqltestsuser&password=lsqltestspass");
-        ds.setDefaultAutoCommit(false);
-        Connection connection = ds.getConnection();
-
-        providers.add(new Object[]{
-                new LSqlProvider(new LSql(new PostgresDialect(), ConnectionFactories.fromInstance(connection)))
-        });
-
+            providers.add(new Object[]{
+                    new LSqlProvider(new LSql(new PostgresDialect(), ConnectionProviders.fromInstance(connection)))
+            });
+        } catch (Exception ignored) {
+        }
         return providers.iterator();
     }
 
@@ -57,7 +58,7 @@ public abstract class AbstractLSqlTest {
         Connection connection = ds.getConnection();
 
         providers.add(new Object[]{
-                new LSqlProvider(new LSql(new H2Dialect(), ConnectionFactories.fromInstance(connection)))
+                new LSqlProvider(new LSql(new H2Dialect(), ConnectionProviders.fromInstance(connection)))
         });
 
         return providers.iterator();
@@ -79,7 +80,7 @@ public abstract class AbstractLSqlTest {
     public void afterMethod() throws Exception {
         dropCreatedTables();
         if (lSql != null) {
-            lSql.getConnectionFactory().call().close();
+            lSql.getConnectionProvider().call().close();
         }
     }
 

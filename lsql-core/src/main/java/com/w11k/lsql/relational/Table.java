@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.DeleteException;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
@@ -78,26 +79,27 @@ public class Table {
     }
 
     public Optional<Object> insert(Row row) {
-        if (getPrimaryKeyColumn().isPresent() && row.containsKey(getPrimaryKeyColumn().get())) {
-            throw new InsertException("Can not insert row because the primary key is already present. " +
-                    "Use update or insertOrUpdate instead.");
-        }
         try {
             PreparedStatement ps = PreparedStatementUtils.createInsertStatement(this, row);
             ps.executeUpdate();
 
-            // check for generated keys
-            if (!getPrimaryKeyColumn().isPresent()) {
+            // PK column not defined
+            if (!primaryKeyColumn.isPresent()) {
                 return absent();
             }
+
+            // check if row already contains the PK
+            if (row.containsKey(primaryKeyColumn.get())) {
+                return row.getOptional(primaryKeyColumn.get());
+            }
+
+            // check for generated keys
             ResultSet resultSet = ps.getGeneratedKeys();
             if (resultSet.next()) {
-                Optional<Object> pkOptional = lSql.getDialect().extractGeneratedPk(this, resultSet);
-                if (pkOptional.isPresent()) {
-                    if (primaryKeyColumn.isPresent()) {
-                        row.put(primaryKeyColumn.get(), pkOptional.get());
-                    }
-                    return pkOptional;
+                Optional<Object> generated = lSql.getDialect().extractGeneratedPk(this, resultSet);
+                if (generated.isPresent()) {
+                    row.put(primaryKeyColumn.get(), generated.get());
+                    return generated;
                 }
             }
             return absent();
@@ -106,10 +108,10 @@ public class Table {
         }
     }
 
-    public int update(Row row) {
+    public Optional<Object> update(Row row) {
         if (getPrimaryKeyColumn().isPresent() && !row.containsKey(getPrimaryKeyColumn().get())) {
             throw new UpdateException("Can not update row because the primary key column " +
-                    "'" + getPrimaryKeyColumn().get() + "' is not present");
+                    "'" + getPrimaryKeyColumn().get() + "' is not present.");
         }
         try {
             PreparedStatement ps = PreparedStatementUtils.createUpdateStatement(this, row);
@@ -117,18 +119,33 @@ public class Table {
             if (i == 0) {
                 throw new UpdateException("No rows where updated");
             }
-            return i;
+            return row.getOptional(primaryKeyColumn.get());
         } catch (Exception e) {
             throw new InsertException(e);
         }
     }
 
-    public Optional<Object> insertOrUpdate(Row row) {
-        if (row.containsKey(getPrimaryKeyColumn().get())) {
-            update(row);
-            return Optional.of(row.get(getPrimaryKeyColumn().get()));
-        } else {
+    public Optional<Object> save(Row row) {
+        if (!primaryKeyColumn.isPresent()) {
+            throw new RuntimeException("save() requires a primary key column.");
+        }
+        if (!row.containsKey(getPrimaryKeyColumn().get())) {
             return insert(row);
+        }
+
+        Object id = row.get(primaryKeyColumn.get());
+        try {
+            PreparedStatement ps = PreparedStatementUtils.createCountForIdStatement(this, id);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+            if (count == 0) {
+                return insert(row);
+            } else {
+                return update(row);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseAccessException(e);
         }
     }
 
@@ -165,21 +182,21 @@ public class Table {
             DatabaseMetaData md = con.getMetaData();
 
             // Fetch Primary Key
-            ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.identifierJavaToSql(tableName));
+            ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
                 return;
             }
             String idColumn = primaryKeys.getString(4);
-            primaryKeyColumn = of(lSql.identifierSqlToJava(idColumn));
+            primaryKeyColumn = of(lSql.getDialect().identifierSqlToJava(idColumn));
 
             // Fetch Foreign keys
-            ResultSet exportedKeys = md.getExportedKeys(null, null, lSql.identifierJavaToSql(tableName));
+            ResultSet exportedKeys = md.getExportedKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
             while (exportedKeys.next()) {
                 String sqlTableName = exportedKeys.getString(7);
-                String javaTableName = lSql.identifierSqlToJava(sqlTableName);
+                String javaTableName = lSql.getDialect().identifierSqlToJava(sqlTableName);
                 String sqlColumnName = exportedKeys.getString(8);
-                String javaColumnName = lSql.identifierSqlToJava(sqlColumnName);
+                String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
 
                 Table foreignTable = lSql.table(javaTableName);
                 Column foreignColumn = foreignTable.column(javaColumnName);

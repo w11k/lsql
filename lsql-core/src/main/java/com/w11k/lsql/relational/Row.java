@@ -1,6 +1,7 @@
 package com.w11k.lsql.relational;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -13,6 +14,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 
+/**
+ *
+ */
 public class Row extends ForwardingMap<String, Object> {
 
     public static Row fromKeyVals(Object... keyVals) {
@@ -61,6 +65,14 @@ public class Row extends ForwardingMap<String, Object> {
                     + value.getClass() + "' to '" + type + "'");
         }
         return type.cast(value);
+    }
+
+    public Optional<Object> getOptional(String key) {
+        if (containsKey(key)) {
+            return Optional.of(get(key));
+        } else {
+            return Optional.absent();
+        }
     }
 
     public int getInt(String key) {

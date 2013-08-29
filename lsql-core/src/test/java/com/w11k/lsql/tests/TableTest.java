@@ -9,6 +9,7 @@ import com.w11k.lsql.relational.Table;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.testng.Assert.*;
 
@@ -78,16 +79,6 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(optional.get(), row.get("id"));
     }
 
-    @Test(dataProvider = "lSqlProvider", expectedExceptions = InsertException.class)
-    public void insertShouldFailIfPrimaryKeyIsAlreadyPresent(LSqlProvider provider) {
-        provider.init(this);
-
-        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INT)");
-        Table table1 = lSql.table("table1");
-        Row row = new Row().addKeyVals("id", 1, "age", 1);
-        table1.insert(row);
-    }
-
     @Test(dataProvider = "lSqlProvider", expectedExceptions = UpdateException.class)
     public void updateShouldFailWhenIdNotPresent(LSqlProvider provider) throws SQLException {
         provider.init(this);
@@ -132,15 +123,16 @@ public class TableTest extends AbstractLSqlTest {
     }
 
     @Test(dataProvider = "lSqlProvider")
-    public void insertOrUpdate(LSqlProvider provider) throws SQLException {
+    public void save(LSqlProvider provider) throws SQLException {
         provider.init(this);
 
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
 
         // Insert
-        Row row = new Row().addKeyVals("name", "Max");
-        Object id = table1.insertOrUpdate(row).get();
+        Row row = Row.fromKeyVals("name", "Max");
+        Object id = table1.save(row).get();
+        assertEquals(id, row.get(table1.getPrimaryKeyColumn().get()));
 
         // Verify insert
         QueriedRow queriedRow = table1.get(id).get();
@@ -148,11 +140,39 @@ public class TableTest extends AbstractLSqlTest {
 
         // Update
         row.put("name", "John");
-        id = table1.insertOrUpdate(row).get();
+        id = table1.save(row).get();
 
         // Verify update
         queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
+    }
+
+    @Test(dataProvider = "lSqlProvider")
+    public void saveWithoutAutoIncrement(LSqlProvider provider) throws SQLException {
+        provider.init(this);
+
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT)");
+        Table table1 = lSql.table("table1");
+
+        // Insert
+        Row row = Row.fromKeyVals("id", 1, "name", "Max");
+        Object id = table1.save(row).get();
+        assertEquals(id, row.get(table1.getPrimaryKeyColumn().get()));
+
+        // Verify insert
+        QueriedRow queriedRow = table1.get(id).get();
+        assertEquals(queriedRow, row);
+
+        // Update
+        row.put("name", "John");
+        id = table1.save(row).get();
+
+        // Verify update
+        queriedRow = table1.get(id).get();
+        assertEquals(queriedRow, row);
+
+        List<QueriedRow> rows = lSql.executeRawQuery("select * from table1").asList();
+        assertEquals(rows.size(), 1);
     }
 
     @Test(dataProvider = "lSqlProvider")
