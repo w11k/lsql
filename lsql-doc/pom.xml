@@ -19,13 +19,20 @@
       </resource>
     </resources>
     <plugins>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
             <id>run grunt build</id>
-            <phase>package</phase>
+            <phase>compile</phase>
             <goals>
               <goal>run</goal>
             </goals>
@@ -38,7 +45,7 @@
                   <arg value="--template=src/template"/>
                   <arg value="--toc"/>
                   <arg value="-o"/>
-                  <arg value="${build.outputDirectory}/index.html"/>
+                  <arg value="${project.build.outputDirectory}/index.html"/>
                 </exec>
               </tasks>
             </configuration>

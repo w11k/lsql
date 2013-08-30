@@ -6,7 +6,7 @@
 
   <groupId>com.w11k.lsql</groupId>
   <artifactId>lsql-parent</artifactId>
-  <version>0.0.25</version>
+  <version>0.0.27</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -128,6 +128,9 @@
           </execution>
         </executions>
       </plugin>
+
+
+      <!--
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>2.7</version>
@@ -165,14 +168,31 @@
           </execution>
         </executions>
       </plugin>
+      -->
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh-external</artifactId>
+        <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
   </build>
 
+  <!--
   <distributionManagement>
     <repository>
       <id>github</id>
       <name>GitHub LSql Repository</name>
       <url>https://raw.github.com/weiglewilczek/lsql/mvn-repository</url>
+    </repository>
+  </distributionManagement>
+  -->
+
+  <distributionManagement>
+    <repository>
+      <id>w11k-repository</id>
+      <url>scpexe://w11k.com/srv/www/vhosts/mvn.weiglewilczek.com/www/releases</url>
     </repository>
   </distributionManagement>
 
