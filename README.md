@@ -1,3 +1,4 @@
 # Literate SQL - A Java Database Library
 
-[latest released version](https://raw.github.com/weiglewilczek/lsql/master/LATEST_RELEASED_VERSION)
+## [Homepage & Documentation](http://weiglewilczek.github.io/lsql)
+

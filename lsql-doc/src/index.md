@@ -1,9 +1,9 @@
 
-### Introduction
+## Introduction
 
 LiterateSQL (LSql) is a pragmatic Java database access library on top of JDBC.
 
-Out philosophy:
+Our philosophy:
 
 * LSql is *not* yet another object/relational mapper. We believe that functional application data
 (in particular stored in a relational model) should not be mapped to a strict classes/objects model.
@@ -14,24 +14,25 @@ whereas using well-known classes like Maps, Lists, etc. enables access to amazin
 * All data gets mapped to `java.util.Map`, `java.util.List` and `Iterable`. However, LSql provides
 subclasses to overcome the dynamic, less-types characteristics.
 
-start
+### Quick Example
 
     if (true) {
         test();
     }
 
-
 ende
 
-### Maven Repository Artifacts
+## Documentation
+
+##### Maven Repository Artifacts
 
 1
 
     <repositories>
         <repository>
-            <id>lsql-github</id>
-            <name>GitHub LSql Repository</name>
-            <url>https://raw.github.com/weiglewilczek/lsql/mvn-repository</url>
+            <id>lsql-repo</id>
+            <name>w11k Repository</name>
+            <url>http://mvn.w11k.com/releases</url>
         </repository>
     </repositories>
 
