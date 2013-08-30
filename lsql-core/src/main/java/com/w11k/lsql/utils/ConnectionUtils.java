@@ -12,7 +12,7 @@ public class ConnectionUtils {
 
     public static Connection getConnection(LSql lSql) {
         try {
-            return lSql.getConnectionFactory().call();
+            return lSql.getConnectionProvider().call();
         } catch (Exception e) {
             throw new DatabaseAccessException(e);
         }

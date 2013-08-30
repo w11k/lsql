@@ -1,15 +1,10 @@
 package com.w11k.lsql.dialects;
 
-import com.google.common.base.Optional;
 import com.w11k.lsql.converter.ByTypeConverter;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.relational.Table;
 import org.postgresql.jdbc4.Jdbc4ResultSetMetaData;
 
 import java.sql.*;
-
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.of;
 
 public class PostgresDialect extends BaseDialect {
 
@@ -53,19 +48,6 @@ public class PostgresDialect extends BaseDialect {
 
             }
         };
-    }
-
-    @Override
-    public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws Exception {
-        String pkName = table.getPrimaryKeyColumn().get();
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            String label = metaData.getColumnLabel(i);
-            if (table.getlSql().identifierSqlToJava(label).equals(pkName)) {
-                return of(table.column(pkName).getColumnConverter().getValueFromResultSet(resultSet, i));
-            }
-        }
-        return absent();
     }
 
     @Override

@@ -10,14 +10,26 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-public abstract class BaseDialect {
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
+
+public class BaseDialect {
 
     public Converter getConverter() {
         return new ByTypeConverter();
     }
 
-    public abstract Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws Exception;
-
+    public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws Exception {
+        String pkName = table.getPrimaryKeyColumn().get();
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+            String label = metaData.getColumnLabel(i);
+            if (identifierSqlToJava(label).equals(pkName)) {
+                return of(table.column(pkName).getColumnConverter().getValueFromResultSet(resultSet, i));
+            }
+        }
+        return absent();
+    }
     public CaseFormat getJavaCaseFormat() {
         return CaseFormat.LOWER_UNDERSCORE;
     }

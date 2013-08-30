@@ -82,9 +82,9 @@ public class Query implements Iterable<QueriedRow> {
                 lastUsedSqlTableName = sqlTable;
 
                 String sqlColumn = metaData.getColumnLabel(i);
-                String javaTable = lSql.identifierSqlToJava(sqlTable);
+                String javaTable = lSql.getDialect().identifierSqlToJava(sqlTable);
                 Table table = lSql.table(javaTable);
-                String javaColumn = lSql.identifierSqlToJava(sqlColumn);
+                String javaColumn = lSql.getDialect().identifierSqlToJava(sqlColumn);
                 Column column = table.column(javaColumn);
 
                 String name = javaColumn;
