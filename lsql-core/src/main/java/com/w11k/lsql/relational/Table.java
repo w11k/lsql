@@ -78,36 +78,40 @@ public class Table {
         return columns.get(columnName);
     }
 
+    /**
+     * @param row
+     * @throws InsertException
+     */
     public Optional<Object> insert(Row row) {
         try {
             PreparedStatement ps = PreparedStatementUtils.createInsertStatement(this, row);
-            ps.executeUpdate();
-
-            // PK column not defined
-            if (!primaryKeyColumn.isPresent()) {
-                return absent();
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected != 1) {
+                throw new InsertException(rowsAffected + " rows were affected by insert operation. Expected: 1");
             }
-
-            // check if row already contains the PK
-            if (row.containsKey(primaryKeyColumn.get())) {
-                return row.getOptional(primaryKeyColumn.get());
-            }
-
-            // check for generated keys
-            ResultSet resultSet = ps.getGeneratedKeys();
-            if (resultSet.next()) {
-                Optional<Object> generated = lSql.getDialect().extractGeneratedPk(this, resultSet);
-                if (generated.isPresent()) {
-                    row.put(primaryKeyColumn.get(), generated.get());
-                    return generated;
+            if (primaryKeyColumn.isPresent()) {
+                if (!row.containsKey(primaryKeyColumn.get())) {
+                    // check for generated keys
+                    ResultSet resultSet = ps.getGeneratedKeys();
+                    if (resultSet.next()) {
+                        Optional<Object> generated = lSql.getDialect().extractGeneratedPk(this, resultSet);
+                        if (generated.isPresent()) {
+                            row.put(primaryKeyColumn.get(), generated.get());
+                            return generated;
+                        }
+                    }
                 }
             }
-            return absent();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new InsertException(e);
         }
+        return absent();
     }
 
+    /**
+     * @param row
+     * @throws UpdateException
+     */
     public Optional<Object> update(Row row) {
         if (getPrimaryKeyColumn().isPresent() && !row.containsKey(getPrimaryKeyColumn().get())) {
             throw new UpdateException("Can not update row because the primary key column " +
@@ -115,37 +119,45 @@ public class Table {
         }
         try {
             PreparedStatement ps = PreparedStatementUtils.createUpdateStatement(this, row);
-            int i = ps.executeUpdate();
-            if (i == 0) {
-                throw new UpdateException("No rows where updated");
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected != 1) {
+                throw new UpdateException(rowsAffected + " rows were affected by update operation. Expected: 1");
             }
-            return row.getOptional(primaryKeyColumn.get());
-        } catch (Exception e) {
-            throw new InsertException(e);
+            return row.getOptional(getPrimaryKeyColumn().get());
+        } catch (SQLException e) {
+            throw new UpdateException(e);
         }
     }
 
+    /**
+     * @param row
+     * @throws InsertException
+     * @throws UpdateException
+     */
     public Optional<Object> save(Row row) {
         if (!primaryKeyColumn.isPresent()) {
-            throw new RuntimeException("save() requires a primary key column.");
+            throw new DatabaseAccessException("save() requires a primary key column.");
         }
         if (!row.containsKey(getPrimaryKeyColumn().get())) {
+            // Insert
             return insert(row);
-        }
-
-        Object id = row.get(primaryKeyColumn.get());
-        try {
-            PreparedStatement ps = PreparedStatementUtils.createCountForIdStatement(this, id);
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            int count = rs.getInt(1);
-            if (count == 0) {
-                return insert(row);
-            } else {
-                return update(row);
+        } else {
+            // Check if insert or update
+            Object id = row.get(primaryKeyColumn.get());
+            try {
+                PreparedStatement ps = PreparedStatementUtils.createCountForIdStatement(this, id);
+                ResultSet rs = ps.executeQuery();
+                rs.next();
+                int count = rs.getInt(1);
+                if (count == 0) {
+                    insert(row);
+                } else {
+                    update(row);
+                }
+            } catch (SQLException e) {
+                throw new DatabaseAccessException(e);
             }
-        } catch (SQLException e) {
-            throw new DatabaseAccessException(e);
+            return of(id);
         }
     }
 

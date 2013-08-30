@@ -1,7 +1,6 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.relational.QueriedRow;
 import com.w11k.lsql.relational.Row;
@@ -106,7 +105,7 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(queriedRow, row);
     }
 
-    @Test(dataProvider = "lSqlProvider", expectedExceptions = InsertException.class)
+    @Test(dataProvider = "lSqlProvider", expectedExceptions = UpdateException.class)
     public void updateWithWrongId(LSqlProvider provider) throws SQLException {
         provider.init(this);
 

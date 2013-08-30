@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -97,12 +98,12 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         Table t2 = lSql.table("table2");
         t2.column("number").setColumnConverter(new Converter() {
             @Override
-            public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+            public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
                 ps.setInt(index, ((IntWrapper) val).getI());
             }
 
             @Override
-            public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
+            public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
                 return new IntWrapper(rs.getInt(index));
             }
         });

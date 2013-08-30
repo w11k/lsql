@@ -3,6 +3,7 @@ package com.w11k.lsql.tests;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.googlecode.flyway.core.Flyway;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.dialects.H2Dialect;
 import com.w11k.lsql.dialects.PostgresDialect;
@@ -12,6 +13,7 @@ import org.postgresql.Driver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.DataProvider;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -37,6 +39,9 @@ public abstract class AbstractLSqlTest {
             ds.setDriverClassName(Driver.class.getName());
             ds.setUrl("jdbc:postgresql://localhost/lsqltests?user=lsqltestsuser&password=lsqltestspass");
             ds.setDefaultAutoCommit(false);
+
+            clear(ds);
+
             Connection connection = ds.getConnection();
 
             providers.add(new Object[]{
@@ -55,6 +60,9 @@ public abstract class AbstractLSqlTest {
         ds.setDriverClassName(Driver.class.getName());
         ds.setUrl("jdbc:h2:mem:testdb;mode=postgresql");
         ds.setDefaultAutoCommit(false);
+
+        clear(ds);
+
         Connection connection = ds.getConnection();
 
         providers.add(new Object[]{
@@ -93,12 +101,6 @@ public abstract class AbstractLSqlTest {
     }
 
     protected void dropCreatedTables() {
-        for (String createdTable : createdTables) {
-            try {
-                lSql.executeRawSql("drop table " + createdTable + ";");
-            } catch (Exception ignored) {
-            }
-        }
     }
 
     protected void prettyPrintJson(Object result) {
@@ -106,6 +108,12 @@ public abstract class AbstractLSqlTest {
         Gson g = gb.setPrettyPrinting().create();
         String s = g.toJson(result);
         System.out.println(s);
+    }
+
+    private void clear(DataSource ds) {
+        Flyway flyway = new Flyway();
+        flyway.setDataSource(ds);
+        flyway.clean();
     }
 
 }

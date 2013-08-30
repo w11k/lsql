@@ -24,7 +24,7 @@ public class ByTypeConverter implements Converter {
         init();
     }
 
-    public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
+    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
         try {
             int columnType = rs.getMetaData().getColumnType(index);
             logger.trace("SQL type in ResultSet is {}", columnType);
@@ -39,7 +39,7 @@ public class ByTypeConverter implements Converter {
         }
     }
 
-    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
         Converter converter = javaValueToSqlConverters.get(val.getClass());
         //converter = converter == null ? defaultConverter : converter;
         if (converter == null) {
@@ -65,7 +65,7 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT},
                 Integer.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setInt(index, (Integer) val);
                     }
 
@@ -77,7 +77,7 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.FLOAT},
                 Float.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setFloat(index, (Float) val);
                     }
 
@@ -89,7 +89,7 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.DOUBLE, Types.REAL, Types.DECIMAL},
                 Double.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setDouble(index, (Double) val);
                     }
 
@@ -113,7 +113,7 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR, Types.VARCHAR},
                 String.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setString(index, val.toString());
                     }
 
@@ -125,7 +125,7 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.TIMESTAMP},
                 DateTime.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
                         DateTime dt = (DateTime) val;
                         Timestamp ts = new Timestamp(dt.getMillis());
                         ps.setTimestamp(index, ts);

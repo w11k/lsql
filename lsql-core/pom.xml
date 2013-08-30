@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.w11k.lsql</groupId>
     <artifactId>lsql-parent</artifactId>
-    <version>0.0.28</version>
+    <version>0.1.1</version>
   </parent>
 
   <artifactId>lsql-core</artifactId>
@@ -47,6 +47,10 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.flyway</groupId>
+      <artifactId>flyway-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.testng</groupId>

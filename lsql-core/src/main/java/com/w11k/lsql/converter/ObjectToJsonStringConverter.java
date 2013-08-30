@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ObjectToJsonStringConverter implements Converter {
 
@@ -20,12 +21,12 @@ public class ObjectToJsonStringConverter implements Converter {
     }
 
     @Override
-    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
         String json = gson.toJson(type.cast(val));
         ps.setString(index, json);
     }
 
-    @Override public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
+    @Override public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
         String json = rs.getString(index);
         return gson.fromJson(json, type);
     }

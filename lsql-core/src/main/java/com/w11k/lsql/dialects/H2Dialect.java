@@ -8,6 +8,7 @@ import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.relational.Table;
 
 import javax.sql.rowset.serial.SerialClob;
+import java.io.IOException;
 import java.io.Reader;
 import java.sql.*;
 
@@ -23,15 +24,19 @@ public class H2Dialect extends BaseDialect {
                         new int[]{Types.CLOB},
                         String.class,
                         new Converter() {
-                            public void setValueInStatement(PreparedStatement ps, int index, Object val) throws Exception {
+                            public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
                                 ps.setClob(index, new SerialClob(val.toString().toCharArray()));
                             }
 
-                            public Object getValueFromResultSet(ResultSet rs, int index) throws Exception {
+                            public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
                                 Clob clob = rs.getClob(index);
                                 if (clob != null) {
                                     Reader reader = clob.getCharacterStream();
-                                    return CharStreams.toString(reader);
+                                    try {
+                                        return CharStreams.toString(reader);
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 } else {
                                     return null;
                                 }
@@ -46,7 +51,7 @@ public class H2Dialect extends BaseDialect {
         return CaseFormat.UPPER_UNDERSCORE;
     }
 
-    public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws Exception {
+    public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws SQLException {
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();
         if (columnCount == 0) {

@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.BaseDialect;
+import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.relational.Query;
 import com.w11k.lsql.relational.Table;
 import com.w11k.lsql.sqlfile.SqlFile;
@@ -10,6 +11,7 @@ import com.w11k.lsql.utils.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,6 +24,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Main LSql class. Normally, an application only needs to create
  * an instance once. Instances of this class are thread safe.
+ * <p/>
+ * This class will never call any transaction related methods. Hence the
+ * user is responsible to apply transaction boundaries etc. {@link Connection}
+ * instances will be obtained with the connection provider or DataSource.
  */
 public class LSql {
 
@@ -36,11 +42,7 @@ public class LSql {
     /**
      * Creates a new LSql instance.
      * <p/>
-     * LSql will call the connection provider on every database access and instances
-     * will not be cached during calls. Therefore, the provider is responsible for
-     * returning a Connection instance that is appropriate for the current context,
-     * thread, etc..
-     * LSql will not call any transaction related methods.
+     * LSql will use the {@link Callable} for obtaining connections.
      *
      * @param dialect            the database dialect
      * @param connectionProvider provider to get a Connection instance
@@ -49,6 +51,18 @@ public class LSql {
         this.dialect = dialect;
         checkNotNull(connectionProvider);
         this.connectionProvider = connectionProvider;
+    }
+
+    /**
+     * Creates a new LSql instance.
+     * <p/>
+     * LSql will use the {@link DataSource} for obtaining connections.
+     *
+     * @param dialect    the database dialect
+     * @param dataSource data source to get a Connection instance
+     */
+    public LSql(BaseDialect dialect, DataSource dataSource) {
+        this(dialect, ConnectionProviders.fromDataSource(dataSource));
     }
 
     // ----- getter/setter -----
@@ -119,7 +133,7 @@ public class LSql {
 
     /**
      * Executes the SQL SELECT string. Useful for testing and very simple
-     * queries. {@code SqlFile}s should be used for complex queries.
+     * queries. {@link SqlFile}s should be used for complex queries.
      *
      * @param sql the SQL SELECT string
      * @return the Query instance

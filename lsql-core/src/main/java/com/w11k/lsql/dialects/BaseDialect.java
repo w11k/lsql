@@ -19,7 +19,7 @@ public class BaseDialect {
         return new ByTypeConverter();
     }
 
-    public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws Exception {
+    public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws SQLException {
         String pkName = table.getPrimaryKeyColumn().get();
         ResultSetMetaData metaData = resultSet.getMetaData();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
