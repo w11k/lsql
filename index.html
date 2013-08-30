@@ -1,8 +1,9 @@
 <!doctype html>
-<html lang="en" ng-app="kts">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
   <script type="text/javascript" src="jquery.min.js"></script>
   <script type="text/javascript">
     //noinspection JSUnresolvedVariable
@@ -44,65 +45,112 @@
       });
     });
   </script>
-  <title>LiterateSQL Documentation</title>
+  <title>LSql Library</title>
 </head>
 <body>
 <div>
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
-        <a class="brand" href="#">LiterateSQL Documentation</a>
+        <a class="brand" href="#">LiterateSQL - Java SQL Database Library </a>
       </div>
     </div>
   </div>
-  <div class="container" style="margin-top:60px">
-    <div class="row">
-
-      <div id="TOC" class="span4">
-        <div class="pa-sidebar">
-          <ul class="nav nav-list">
-            <ul>
-            <li><a href="#introduction">Introduction</a></li>
-            <li><a href="#maven-repository-artifacts">Maven Repository Artifacts</a><ul>
-            <li><a href="#another-section">Another section</a></li>
-            </ul></li>
-            </ul>
+</div>
+<div class="container" style="margin-top:60px">
+  <div class="row">
+    <div id="TOC" class="span4">
+      <div class="pa-sidebar">
+        <ul class="nav nav-list">
+          <ul>
+          <li><a href="#introduction">Introduction</a><ul>
+          <li><a href="#quick-example">Quick Example</a></li>
+          </ul></li>
+          <li><a href="#download">Download</a><ul>
+          <li><a href="#maven-repository-artifacts">Maven Repository Artifacts</a></li>
+          </ul></li>
+          <li><a href="#documentation">Documentation</a><ul>
+          <li><a href="#configure-lsql">Configure LSql</a></li>
+          <li><a href="#crud-operations">CRUD Operations</a><ul>
+          <li><a href="#insert">Insert</a></li>
+          <li><a href="#read">Read</a></li>
+          <li><a href="#update">Update</a></li>
+          <li><a href="#delete">Delete</a></li>
+          </ul></li>
+          <li><a href="#queries">Queries</a><ul>
+          <li><a href="#simple-raw-queries">Simple Raw Queries</a></li>
+          <li><a href="#named-queries">Named Queries</a></li>
+          </ul></li>
+          </ul></li>
           </ul>
-        </div>
-      </div>
-
-      <div class="span8">
-        <h3 id="introduction"><a href="#TOC">Introduction</a></h3>
-        <p>LiterateSQL (LSql) is a pragmatic Java database access library on top of JDBC.</p>
-        <p>Out philosophy:</p>
-        <ul>
-        <li><p>LSql is <em>not</em> yet another object/relational mapper. We believe that functional application data (in particular stored in a relational model) should not be mapped to a strict classes/objects model. Every time a programmer creates a new class (e.g. POJO) it will be incompatible with existing API, whereas using well-known classes like Maps, Lists, etc. enables access to amazing libraries like <a href="http://code.google.com/p/guava-libraries/wiki/CollectionUtilitiesExplained">Google Guava</a>.</p></li>
-        <li><p>All data gets mapped to <code>java.util.Map</code>, <code>java.util.List</code> and <code>Iterable</code>. However, LSql provides subclasses to overcome the dynamic, less-types characteristics.</p></li>
         </ul>
-        <p>start</p>
-        <pre><code>if (true) {
-            test();
-        }</code></pre>
-        <p>ende</p>
-        <h3 id="maven-repository-artifacts"><a href="#TOC">Maven Repository Artifacts</a></h3>
-        <p>1</p>
-        <pre><code>&lt;repositories&gt;
-            &lt;repository&gt;
-                &lt;id&gt;lsql-github&lt;/id&gt;
-                &lt;name&gt;GitHub LSql Repository&lt;/name&gt;
-                &lt;url&gt;https://raw.github.com/weiglewilczek/lsql/mvn-repository&lt;/url&gt;
-            &lt;/repository&gt;
-        &lt;/repositories&gt;</code></pre>
-        <p>2</p>
-        <p><a href="https://raw.github.com/weiglewilczek/lsql/master/LATEST_RELEASED_VERSION">latest version</a></p>
-        <pre><code>&lt;dependency&gt;
-            &lt;groupId&gt;com.w11k.lsql&lt;/groupId&gt;
-            &lt;artifactId&gt;lsql-core&lt;/artifactId&gt;
-            &lt;version&gt; {{see link above for the latest version}} &lt;/version&gt;
-        &lt;/dependency&gt;</code></pre>
-        <p>3</p>
-        <h4 id="another-section"><a href="#TOC">Another section</a></h4>
       </div>
+    </div>
+    <div class="span8">
+      <h1 id="introduction"><a href="#TOC">Introduction</a></h1>
+      <p>LiterateSQL (LSql) is a pragmatic Java database access library on top of JDBC.</p>
+      <p>Our philosophy:</p>
+      <ul>
+      <li><p>LSql is <em>not</em> yet another object/relational mapper. We believe that functional application data (in particular stored in a relational model) should not be mapped to a strict classes/objects model. Every time a programmer creates a new class (e.g. POJO), it will be incompatible with existing API, whereas using well-known classes like Maps, Lists, etc. enables access to amazing libraries like <a href="http://code.google.com/p/guava-libraries/wiki/CollectionUtilitiesExplained">Google Guava</a>.</p></li>
+      <li><p>All data gets mapped to <code>java.util.Map</code>, <code>java.util.List</code> and <code>java.lang.Iterable</code>. However, LSql uses subclasses to overcome the dynamic, less-types characteristics.</p></li>
+      <li><p>It is not important to use SQL databases in a vendor-agnostic way. The RDBMS should be choosen (once) depending on the project requirements and database access libraries should not try to hide their characteristics.</p></li>
+      <li><p>Use unit tests to verify your data model, not static typing. Obviously, using an untyped datastructure like a Map imposes some challenges. E.g. a typo like <code>map.get(&quot;firstMame&quot;)</code> would lead to an error which would have been catched with static typing. However, data structures like <code>java.util.Map</code> provide ready to use methods like <code>equals(...)</code> which can be used to automatically verify the data persistence logic and help to catch typos.</p></li>
+      <li><p>Software architectures currently shift towards rich browser and stand-alone application. The main responsibility for server code will be to query and return the stored data as quickly as possible and to serialize, maybe even intentionally denormalized, views as JSON string. Traditional Java persistence frameworks, based on the concept of handling all tasks within the server process (including HTML rendering), are less suitable for those environments.</p></li>
+      </ul>
+      <h2 id="quick-example"><a href="#TOC">Quick Example</a></h2>
+      <p>Assume the following DDL:</p>
+      <pre><code>CREATE TABLE person (
+          id SERIAL PRIMARY KEY, -- auto increment primary key
+          name TEXT,
+          age INT
+      );</code></pre>
+      <p>LSql Java code:</p>
+      <pre><code>DataSource dataSource = ...;
+      LSql lsql = new LSql(new H2Dialect(), dataSource);
+      
+      // Create a new person row.
+      Row newJohn = new Row();
+      newJohn.put(&quot;name&quot;, &quot;John&quot;);
+      newJohn.put(&quot;age&quot;, 20);
+      
+      // Insert the new person
+      Table tPerson = lsql.table(&quot;person&quot;);
+      tPerson.insert(newJohn);
+      
+      // The generated ID is automatically put into the row object
+      Object generatedId = newJohn.get(&quot;id&quot;);
+      
+      // Use the ID to load the row
+      Optional&lt;QueriedRow&gt; queriedJohn = tPerson.get(generatedId);
+      assert queriedJohn.get().getString(&quot;name&quot;).equals(&quot;John&quot;);
+      assert queriedJohn.get().getInt(&quot;age&quot;) == 20;</code></pre>
+      <h1 id="download"><a href="#TOC">Download</a></h1>
+      <h2 id="maven-repository-artifacts"><a href="#TOC">Maven Repository Artifacts</a></h2>
+      <p>All released files are stored in a Maven repository:</p>
+      <pre><code>&lt;repositories&gt;
+          &lt;repository&gt;
+              &lt;id&gt;lsql-repo&lt;/id&gt;
+              &lt;name&gt;w11k Repository&lt;/name&gt;
+              &lt;url&gt;http://mvn.w11k.com/releases&lt;/url&gt;
+          &lt;/repository&gt;
+      &lt;/repositories&gt;</code></pre>
+      <p>Add the following dependency to your POM. The latest version number can always be found here:</p>
+      <p><a href="https://raw.github.com/weiglewilczek/lsql/master/LATEST_RELEASED_VERSION">Latest Released Version</a></p>
+      <pre><code>&lt;dependency&gt;
+          &lt;groupId&gt;com.w11k.lsql&lt;/groupId&gt;
+          &lt;artifactId&gt;lsql-core&lt;/artifactId&gt;
+          &lt;version&gt; {{see link above for the latest version}} &lt;/version&gt;
+      &lt;/dependency&gt;</code></pre>
+      <h1 id="documentation"><a href="#TOC">Documentation</a></h1>
+      <h2 id="configure-lsql"><a href="#TOC">Configure LSql</a></h2>
+      <h2 id="crud-operations"><a href="#TOC">CRUD Operations</a></h2>
+      <h3 id="insert"><a href="#TOC">Insert</a></h3>
+      <h3 id="read"><a href="#TOC">Read</a></h3>
+      <h3 id="update"><a href="#TOC">Update</a></h3>
+      <h3 id="delete"><a href="#TOC">Delete</a></h3>
+      <h2 id="queries"><a href="#TOC">Queries</a></h2>
+      <h3 id="simple-raw-queries"><a href="#TOC">Simple Raw Queries</a></h3>
+      <h3 id="named-queries"><a href="#TOC">Named Queries</a></h3>
     </div>
   </div>
 </div>
