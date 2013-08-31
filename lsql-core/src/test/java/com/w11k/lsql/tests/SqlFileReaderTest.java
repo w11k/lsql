@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class SqlFileReaderTest extends AbstractLSqlTest {
@@ -94,6 +95,17 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
 
         query = qInt.query("content", "text3");
         assertEquals(query.getFirstRow().getInt("age"), 60);
+    }
+
+    @Test(dataProvider = "lSqlProvider")
+    public void useNullValueInQuery(LSqlProvider provider) {
+        provider.init(this);
+        executeSqlStatement(provider);
+        SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
+        SqlFileStatement qInt = sqlFile.statement("queryWithStringArg");
+
+        Query query = qInt.query("content", null);
+        assertFalse(query.getFirstRowOptional().isPresent());
     }
 
     @Test(dataProvider = "lSqlProvider")

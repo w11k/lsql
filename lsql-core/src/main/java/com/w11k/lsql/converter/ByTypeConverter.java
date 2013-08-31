@@ -40,12 +40,15 @@ public class ByTypeConverter implements Converter {
     }
 
     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
-        Converter converter = javaValueToSqlConverters.get(val.getClass());
-        //converter = converter == null ? defaultConverter : converter;
-        if (converter == null) {
-            throw new RuntimeException("No converter found for Java type: " + val.getClass());
+        if (val == null) {
+            ps.setNull(index, Types.OTHER);
+        } else {
+            Converter converter = javaValueToSqlConverters.get(val.getClass());
+            if (converter == null) {
+                throw new RuntimeException("No converter found for Java type: " + val.getClass());
+            }
+            converter.setValueInStatement(ps, index, val);
         }
-        converter.setValueInStatement(ps, index, val);
     }
 
     protected void init() {

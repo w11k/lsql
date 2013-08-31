@@ -1,6 +1,7 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
+import com.googlecode.flyway.core.Flyway;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.dialects.H2Dialect;
 import com.w11k.lsql.relational.QueriedRow;
@@ -20,6 +21,10 @@ public class DocumentationSnippetsTest extends AbstractLSqlTest {
         dataSource.setDriverClassName(Driver.class.getName());
         dataSource.setUrl("jdbc:h2:mem:testdb;mode=postgresql");
         dataSource.setDefaultAutoCommit(true);
+
+        Flyway flyway = new Flyway();
+        flyway.setDataSource(dataSource);
+        flyway.clean();
 
         LSql lsql = new LSql(new H2Dialect(), dataSource);
 

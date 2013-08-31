@@ -1,6 +1,7 @@
 package com.w11k.lsql.relational;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
@@ -119,6 +120,14 @@ public class Query implements Iterable<QueriedRow> {
 
     public QueriedRow getFirstRow() {
         return rows.get(0);
+    }
+
+    public Optional<QueriedRow> getFirstRowOptional() {
+        if (rows.size() == 0) {
+            return Optional.absent();
+        } else {
+            return Optional.of(rows.get(0));
+        }
     }
 
     public List<QueriedRow> asList() {
