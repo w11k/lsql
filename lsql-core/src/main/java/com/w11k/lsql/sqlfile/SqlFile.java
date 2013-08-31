@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.relational.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +57,20 @@ public class SqlFile {
 
     public SqlFileStatement statement(String name) {
         return statements.get(name);
+    }
+
+    // ----- delegates -----
+
+    public Query query(String statement) {
+        return statement(statement).query();
+    }
+
+    public Query query(String statement, Object... keyVals) {
+        return statement(statement).query(keyVals);
+    }
+
+    public Query query(String statement, Map<String, Object> queryParameters) {
+        return statement(statement).query(queryParameters);
     }
 
     // ----- private -----

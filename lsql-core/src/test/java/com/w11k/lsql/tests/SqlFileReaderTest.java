@@ -21,6 +21,14 @@ import static org.testng.Assert.assertTrue;
 
 public class SqlFileReaderTest extends AbstractLSqlTest {
 
+    @Test(dataProvider = "lSqlProvider_h2")
+    public void readSqlFileForClass(LSqlProvider provider) {
+        provider.init(this);
+        SqlFile sqlFile = lSql.sqlFile(DummyService.class);
+        ImmutableMap<String, SqlFileStatement> stmts = sqlFile.getStatements();
+        assertTrue(stmts.size() == 1, "wrong number of SQL statements");
+    }
+
     @Test(dataProvider = "lSqlProvider")
     public void readSqlFile(LSqlProvider provider) {
         provider.init(this);

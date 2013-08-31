@@ -95,6 +95,11 @@ public class LSql {
         return new SqlFile(this, fileName, is);
     }
 
+    public SqlFile sqlFile(Class<?> clazz) {
+        String fileName = clazz.getSimpleName() + ".sql";
+        return sqlFileRelativeToClass(clazz, fileName);
+    }
+
     /**
      * Returns a Table instance.
      *
