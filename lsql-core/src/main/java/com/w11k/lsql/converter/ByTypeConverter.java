@@ -41,7 +41,7 @@ public class ByTypeConverter implements Converter {
 
     public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
         if (val == null) {
-            ps.setNull(index, Types.OTHER);
+            ps.setString(index, "");
         } else {
             Converter converter = javaValueToSqlConverters.get(val.getClass());
             if (converter == null) {
