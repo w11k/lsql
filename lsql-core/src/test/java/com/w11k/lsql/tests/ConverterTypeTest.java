@@ -43,7 +43,7 @@ public class ConverterTypeTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (col1 TEXT, col2 TEXT)");
         Table table1 = lSql.table("table1");
         table1.insert(Row.fromKeyVals("col1", "val1"));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
         assertEquals(row.get("col1"), "val1");
     }
 
@@ -82,7 +82,7 @@ public class ConverterTypeTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         try {
             table1.insert(Row.fromKeyVals("col", value));
-            Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
+            Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
             Object storedValue = row.get("col");
             assertEquals(storedValue.getClass(), expected.getClass());
             assertEquals(storedValue, expected);

@@ -118,11 +118,7 @@ public class Query implements Iterable<QueriedRow> {
         return list;
     }
 
-    public QueriedRow getFirstRow() {
-        return rows.get(0);
-    }
-
-    public Optional<QueriedRow> getFirstRowOptional() {
+    public Optional<QueriedRow> getFirstRow() {
         if (rows.size() == 0) {
             return Optional.absent();
         } else {

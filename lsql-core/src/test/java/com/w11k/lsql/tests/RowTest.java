@@ -43,7 +43,7 @@ public class RowTest extends AbstractLSqlTest {
         Optional<Object> cityId = lSql.table("city").insert(Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
         lSql.table("person").insert(Row.fromKeyVals("name", "John", "zipcode", cityId.get()));
 
-        QueriedRow row = lSql.executeRawQuery("select * from person, city").getFirstRow();
+        QueriedRow row = lSql.executeRawQuery("select * from person, city").getFirstRow().get();
         assertEquals(row.getString("city.zipcode"), "53721");
         assertEquals(row.getString("city.name"), "Siegburg");
         assertEquals(row.getString("person.name"), "John");

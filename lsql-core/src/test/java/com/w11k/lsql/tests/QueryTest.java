@@ -76,7 +76,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         Query rows = lSql.executeRawQuery("SELECT * FROM table1");
-        Row row = rows.getFirstRow();
+        Row row = rows.getFirstRow().get();
         assertNotNull(row);
         assertEquals(row.getString("name"), "cus1");
         assertEquals(row.getInt("age"), 20);
@@ -91,12 +91,12 @@ public class QueryTest extends AbstractLSqlTest {
         Optional<Object> id1 = lSql.table("table1").insert(Row.fromKeyVals("name1", "value1"));
         Optional<Object> id2 = lSql.table("table2").insert(Row.fromKeyVals("name2", "value2"));
 
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
         assertEquals(row.keySet().size(), 2);
         assertEquals(row.getInt("id"), id1.get());
         assertEquals(row.getString("name1"), "value1");
 
-        row = lSql.executeRawQuery("SELECT * FROM table1, table2").getFirstRow();
+        row = lSql.executeRawQuery("SELECT * FROM table1, table2").getFirstRow().get();
         assertEquals(row.keySet().size(), 4);
         assertEquals(row.getInt("table1.id"), id1.get());
         assertEquals(row.getString("table1.name1"), "value1");

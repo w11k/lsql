@@ -50,7 +50,7 @@ public class TableTest extends AbstractLSqlTest {
         Row row = new Row().addKeyVals("name", "cus1");
         table1.insert(row);
 
-        Row insertedRow = lSql.executeRawQuery("select * from table1").getFirstRow();
+        Row insertedRow = lSql.executeRawQuery("select * from table1").getFirstRow().get();
         assertEquals(insertedRow.getString("name"), "cus1");
     }
 
@@ -62,7 +62,7 @@ public class TableTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         Object newId = table1.insert(new Row().addKeyVals("age", 1)).get();
 
-        Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).getFirstRow();
+        Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).getFirstRow().get();
         assertEquals(query.getInt("age"), 1);
     }
 

@@ -25,8 +25,8 @@ public class ConverterTest extends AbstractLSqlTest {
         lSql.table("table1").setTableConverter(javaBoolToSqlYesNoStringConverter);
         t1.insert(Row.fromKeyVals("yesno", true));
         t2.insert(Row.fromKeyVals("yesno", "true"));
-        Row row1 = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
-        Row row2 = lSql.executeRawQuery("SELECT * FROM table2").getFirstRow();
+        Row row1 = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        Row row2 = lSql.executeRawQuery("SELECT * FROM table2").getFirstRow().get();
         assertEquals(row1.get("yesno"), true);
         assertEquals(row2.get("yesno"), "true");
     }
@@ -38,7 +38,7 @@ public class ConverterTest extends AbstractLSqlTest {
         Table t1 = lSql.table("table1");
         lSql.table("table1").column("yesno1").setColumnConverter(javaBoolToSqlYesNoStringConverter);
         t1.insert(Row.fromKeyVals("yesno1", true, "yesno2", "true"));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
         assertEquals(row.get("yesno1"), true);
         assertEquals(row.get("yesno2"), "true");
     }
@@ -52,7 +52,7 @@ public class ConverterTest extends AbstractLSqlTest {
 
         Person p = new Person("John", "Doe");
         t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow();
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
         assertEquals(row.get("person"), p);
     }
 
@@ -70,7 +70,7 @@ public class ConverterTest extends AbstractLSqlTest {
         Person p = new Person("John", "Doe");
         t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
 
-        Row row = lSql.executeRawQuery("SELECT * FROM table1, table2").getFirstRow();
+        Row row = lSql.executeRawQuery("SELECT * FROM table1, table2").getFirstRow().get();
         assertEquals(row.get("table1.person"), p);
     }
 

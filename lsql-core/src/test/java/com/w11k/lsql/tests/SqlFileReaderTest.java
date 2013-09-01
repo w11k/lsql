@@ -57,7 +57,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         SqlFileStatement qInt = sqlFile.statement("queryWithIntegerArg");
         Query query = qInt.query();
-        String contentForAge60 = query.getFirstRow().getString("content");
+        String contentForAge60 = query.getFirstRow().get().getString("content");
         assertEquals(contentForAge60, "text3", "Row with age==60 has content==text3");
     }
 
@@ -88,13 +88,13 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         SqlFileStatement qInt = sqlFile.statement("queryWithStringArg");
 
         Query query = qInt.query("content", "text1");
-        assertEquals(query.getFirstRow().getInt("age"), 10);
+        assertEquals(query.getFirstRow().get().getInt("age"), 10);
 
         query = qInt.query("content", "text2");
-        assertEquals(query.getFirstRow().getInt("age"), 30);
+        assertEquals(query.getFirstRow().get().getInt("age"), 30);
 
         query = qInt.query("content", "text3");
-        assertEquals(query.getFirstRow().getInt("age"), 60);
+        assertEquals(query.getFirstRow().get().getInt("age"), 60);
     }
 
     @Test(dataProvider = "lSqlProvider")
@@ -105,7 +105,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         SqlFileStatement qInt = sqlFile.statement("queryWithStringArg");
 
         Query query = qInt.query("content", null);
-        assertFalse(query.getFirstRowOptional().isPresent());
+        assertFalse(query.getFirstRow().isPresent());
     }
 
     @Test(dataProvider = "lSqlProvider")
@@ -132,10 +132,10 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         Row r2 = Row.fromKeyVals("number", new IntWrapper(1));
         t2.insert(r2);
 
-        QueriedRow row = sqlFile.statement("queryColumnConverter").query().getFirstRow();
+        QueriedRow row = sqlFile.statement("queryColumnConverter").query().getFirstRow().get();
         assertEquals(row.get("number"), new IntWrapper(0));
 
-        row = sqlFile.statement("queryColumnConverter").query("table2.number", new IntWrapper(1)).getFirstRow();
+        row = sqlFile.statement("queryColumnConverter").query("table2.number", new IntWrapper(1)).getFirstRow().get();
         assertEquals(row, r1);
     }
 
