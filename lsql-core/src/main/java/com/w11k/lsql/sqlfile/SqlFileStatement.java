@@ -1,5 +1,6 @@
 package com.w11k.lsql.sqlfile;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
@@ -22,20 +23,28 @@ public class SqlFileStatement {
 
     class Parameter {
         String name;
+
         int valueStart;
+
         int valueEnd;
     }
 
     // column = 'value' --param
     private static final Pattern QUOTED_QUERY_ARG = Pattern.compile(
             "^.*[^\\\\]('.*')\\s*--\\s*([\\w\\.]+)\\s*$", Pattern.MULTILINE);
+
     // column = 123 --param
     private static final Pattern UNQUOTED_QUERY_ARG = Pattern.compile(
             "^.*\\s+(\\w+)\\s+--\\s*([\\w\\.]+)\\s*$", Pattern.MULTILINE);
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final LSql lSql;
+
     private final SqlFile sqlFile;
+
     private final String statementName;
+
     private final String sqlString;
 
     SqlFileStatement(LSql lSql, SqlFile sqlFile, String statementName, String sqlString) {
@@ -69,7 +78,22 @@ public class SqlFileStatement {
         sortCollectedParameters(parameters);
         String sql = createSqlStringWithPlaceholders(queryParameters, parameters);
 
-        logger.trace("SQL for {}: {}", statementName, sql);
+        if (logger.isTraceEnabled()) {
+            List<String> keyVals = Lists.newLinkedList();
+            for (String key : queryParameters.keySet()) {
+                keyVals.add(key + ": " + queryParameters.get(key));
+            }
+            logger.trace("\n" +
+                    "------------------------------------------------------------\n" +
+                    "Executing query '{}'\n" +
+                    "------------------------------------------------------------\n" +
+                    Joiner.on("\n").join(keyVals) + "\n" +
+                    "------------------------------------------------------------\n" +
+                    "{}\n" +
+                    "------------------------------------------------------------\n" +
+                    "\n",
+                    statementName, sql);
+        }
 
         // Set values
         PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sql, false);
@@ -123,7 +147,8 @@ public class SqlFileStatement {
 
     private void sortCollectedParameters(List<Parameter> parameters) {
         Collections.sort(parameters, new Comparator<Parameter>() {
-            @Override public int compare(Parameter o1, Parameter o2) {
+            @Override
+            public int compare(Parameter o1, Parameter o2) {
                 return new Integer(o1.valueStart).compareTo(o2.valueStart);
             }
         });
