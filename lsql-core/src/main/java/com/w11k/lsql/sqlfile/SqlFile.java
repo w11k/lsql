@@ -56,6 +56,9 @@ public class SqlFile {
     }
 
     public SqlFileStatement statement(String name) {
+        if (lSql.isReadSqlFilesOnEveryAccess()) {
+            parseSqlStatements();
+        }
         return statements.get(name);
     }
 
@@ -77,6 +80,7 @@ public class SqlFile {
 
     private void parseSqlStatements() {
         logger.info("Reading SQL file '" + fileName + "'");
+        statements.clear();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         try {
             String content = CharStreams.toString(reader);

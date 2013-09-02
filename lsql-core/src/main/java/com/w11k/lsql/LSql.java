@@ -39,6 +39,8 @@ public class LSql {
 
     private Callable<Connection> connectionProvider;
 
+    private boolean readSqlFilesOnEveryAccess;
+
     /**
      * Creates a new LSql instance.
      * <p/>
@@ -79,6 +81,14 @@ public class LSql {
         return connectionProvider;
     }
 
+    public boolean isReadSqlFilesOnEveryAccess() {
+        return readSqlFilesOnEveryAccess;
+    }
+
+    public void setReadSqlFilesOnEveryAccess(boolean readSqlFilesOnEveryAccess) {
+        this.readSqlFilesOnEveryAccess = readSqlFilesOnEveryAccess;
+    }
+
     // ----- public -----
 
     /**
@@ -113,14 +123,14 @@ public class LSql {
         return tables.get(tableName);
     }
 
+    // ----- execute SQL methods -----
+
     @Override
     public String toString() {
         return "LSql{" +
                 "dialect=" + dialect +
                 '}';
     }
-
-    // ----- execute SQL methods -----
 
     /**
      * Executes the SQL string. Useful for DML and DDL statements.
@@ -146,5 +156,4 @@ public class LSql {
     public Query executeRawQuery(String sql) {
         return new Query(this, sql);
     }
-
 }
