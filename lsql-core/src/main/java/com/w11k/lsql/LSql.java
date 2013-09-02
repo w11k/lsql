@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -39,7 +38,7 @@ public class LSql {
 
     private Callable<Connection> connectionProvider;
 
-    private boolean readSqlFilesOnEveryAccess;
+    private boolean readSqlFilesOnEveryAccess = false;
 
     /**
      * Creates a new LSql instance.
@@ -101,8 +100,8 @@ public class LSql {
     public SqlFile sqlFileRelativeToClass(Class clazz, String fileName) {
         String p = clazz.getPackage().getName();
         p = "/" + p.replaceAll("\\.", "/") + "/";
-        InputStream is = clazz.getResourceAsStream(p + fileName);
-        return new SqlFile(this, fileName, is);
+        String path = p + fileName;
+        return new SqlFile(this, fileName, path);
     }
 
     public SqlFile sqlFile(Class<?> clazz) {

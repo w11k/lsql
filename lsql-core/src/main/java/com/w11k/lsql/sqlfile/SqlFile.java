@@ -34,14 +34,14 @@ public class SqlFile {
 
     private final String fileName; // without .sql extension
 
-    private final InputStream inputStream;
+    private final String path;
 
     private final Map<String, SqlFileStatement> statements = Maps.newHashMap();
 
-    public SqlFile(LSql lSql, String fileName, InputStream is) {
+    public SqlFile(LSql lSql, String fileName, String path) {
         this.lSql = lSql;
         this.fileName = fileName;
-        inputStream = is;
+        this.path = path;
         parseSqlStatements();
     }
 
@@ -81,6 +81,7 @@ public class SqlFile {
     private void parseSqlStatements() {
         logger.info("Reading SQL file '" + fileName + "'");
         statements.clear();
+        InputStream inputStream = getClass().getResourceAsStream(path);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         try {
             String content = CharStreams.toString(reader);
