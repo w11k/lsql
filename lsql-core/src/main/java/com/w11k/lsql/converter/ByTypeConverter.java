@@ -135,7 +135,12 @@ public class ByTypeConverter implements Converter {
                     }
 
                     public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
-                        return new DateTime(rs.getTimestamp(index).getTime());
+                        Timestamp timestamp = rs.getTimestamp(index);
+                        if (timestamp != null) {
+                            return new DateTime(timestamp.getTime());
+                        } else {
+                            return null;
+                        }
                     }
                 });
         setConverter(
