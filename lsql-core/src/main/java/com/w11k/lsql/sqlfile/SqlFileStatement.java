@@ -69,6 +69,8 @@ public class SqlFileStatement {
         sortCollectedParameters(parameters);
         String sql = createSqlStringWithPlaceholders(queryParameters, parameters);
 
+        logger.trace("SQL for {}: {}", statementName, sql);
+
         // Set values
         PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sql, false);
         for (int i = 0; i < parameters.size(); i++) {
