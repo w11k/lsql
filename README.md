@@ -1,4 +1,4 @@
 # Literate SQL - A Java Database Library
 
-## [Homepage & Documentation](http://weiglewilczek.github.io/lsql)
+## [Homepage & Documentation](http://w11k.github.io/lsql)
 
