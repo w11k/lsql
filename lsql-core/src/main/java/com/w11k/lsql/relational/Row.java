@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
@@ -54,6 +55,10 @@ public class Row extends ForwardingMap<String, Object> {
     @Override
     public Object put(String key, Object value) {
         return super.put(key, value);
+    }
+
+    public List<String> getKeyList() {
+        return Lists.newLinkedList(keySet());
     }
 
     // ----- getter convenience -----

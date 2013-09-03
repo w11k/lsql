@@ -84,7 +84,10 @@ public class Table {
      */
     public Optional<Object> insert(Row row) {
         try {
-            PreparedStatement ps = PreparedStatementUtils.createInsertStatement(this, row);
+            List<String> columns = row.getKeyList();
+            PreparedStatement ps = PreparedStatementUtils.createInsertStatement(this, columns);
+            setValuesInPreparedStatement(ps, columns, row);
+
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
                 throw new InsertException(rowsAffected + " rows were affected by insert operation. Expected: 1");
@@ -118,7 +121,15 @@ public class Table {
                     "'" + getPrimaryKeyColumn().get() + "' is not present.");
         }
         try {
-            PreparedStatement ps = PreparedStatementUtils.createUpdateStatement(this, row);
+            List<String> columns = row.getKeyList();
+            PreparedStatement ps = PreparedStatementUtils.createUpdateStatement(this, columns);
+            setValuesInPreparedStatement(ps, columns, row);
+
+            // Set ID
+            String pkColumn = getPrimaryKeyColumn().get();
+            Object id = row.get(pkColumn);
+            column(pkColumn).getColumnConverter().setValueInStatement(ps, columns.size() + 1, id);
+
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
                 throw new UpdateException(rowsAffected + " rows were affected by update operation. Expected: 1");
@@ -145,7 +156,9 @@ public class Table {
             // Check if insert or update
             Object id = row.get(primaryKeyColumn.get());
             try {
-                PreparedStatement ps = PreparedStatementUtils.createCountForIdStatement(this, id);
+                PreparedStatement ps = PreparedStatementUtils.createCountForIdStatement(this);
+                column(getPrimaryKeyColumn().get()).getColumnConverter().setValueInStatement(ps, 1, id);
+                ps.setObject(1, id);
                 ResultSet rs = ps.executeQuery();
                 rs.next();
                 int count = rs.getInt(1);
@@ -162,7 +175,7 @@ public class Table {
     }
 
     public void delete(Object id) {
-        PreparedStatement ps = PreparedStatementUtils.createDeleteByIdString(this);
+        PreparedStatement ps = PreparedStatementUtils.createDeleteByIdStatement(this);
         try {
             column(getPrimaryKeyColumn().get()).getColumnConverter().setValueInStatement(ps, 1, id);
             ps.execute();
@@ -174,14 +187,13 @@ public class Table {
     public Optional<QueriedRow> get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
-        String insertString = PreparedStatementUtils.createSelectByIdString(this, column);
-        PreparedStatement preparedStatement = ConnectionUtils.prepareStatement(lSql, insertString, false);
+        PreparedStatement ps = PreparedStatementUtils.createSelectByIdStatement(this, column);
         try {
-            column.getColumnConverter().setValueInStatement(preparedStatement, 1, id);
+            column.getColumnConverter().setValueInStatement(ps, 1, id);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        List<QueriedRow> queriedRows = new Query(lSql, preparedStatement).asList();
+        List<QueriedRow> queriedRows = new Query(lSql, ps).asList();
         if (queriedRows.size() == 1) {
             return of(queriedRows.get(0));
         }
@@ -232,5 +244,17 @@ public class Table {
         int result = lSql.hashCode();
         result = 31 * result + tableName.hashCode();
         return result;
+    }
+
+    private PreparedStatement setValuesInPreparedStatement(PreparedStatement ps, List<String> columns, Row row) {
+        try {
+            for (int i = 0; i < columns.size(); i++) {
+                Converter converter = column(columns.get(i)).getColumnConverter();
+                converter.setValueInStatement(ps, i + 1, row.get(columns.get(i)));
+            }
+            return ps;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
