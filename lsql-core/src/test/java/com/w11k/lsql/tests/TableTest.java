@@ -2,9 +2,9 @@ package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
 import com.w11k.lsql.exceptions.UpdateException;
-import com.w11k.lsql.relational.QueriedRow;
-import com.w11k.lsql.relational.Row;
-import com.w11k.lsql.relational.Table;
+import com.w11k.lsql.QueriedRow;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;

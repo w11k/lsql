@@ -1,5 +1,7 @@
 package com.w11k.lsql.converter;
 
+import com.w11k.lsql.LSql;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +19,7 @@ public class JavaBoolToSqlStringConverter implements Converter {
         this.sqlStringValueForFalse = sqlStringValueForFalse;
     }
 
-    @Override public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+    @Override public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
         String val = rs.getString(index);
         if (val.equals(sqlStringValueForTrue)) {
             return true;
@@ -31,7 +33,7 @@ public class JavaBoolToSqlStringConverter implements Converter {
     }
 
     @Override
-    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         String yesOrNo = ((Boolean) val) ? sqlStringValueForTrue : sqlStringValueForFalse;
         ps.setString(index, yesOrNo);
     }

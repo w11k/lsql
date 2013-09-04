@@ -3,8 +3,8 @@ package com.w11k.lsql.tests;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.converter.ObjectToJsonStringConverter;
-import com.w11k.lsql.relational.Row;
-import com.w11k.lsql.relational.Table;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import com.w11k.lsql.tests.utils.Person;
 import org.testng.annotations.Test;
 

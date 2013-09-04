@@ -1,4 +1,4 @@
-package com.w11k.lsql.relational;
+package com.w11k.lsql;
 
 import com.google.common.base.Optional;
 import com.w11k.lsql.converter.Converter;

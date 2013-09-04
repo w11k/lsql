@@ -1,8 +1,8 @@
 package com.w11k.lsql.tests;
 
-import com.w11k.lsql.relational.Blob;
-import com.w11k.lsql.relational.Row;
-import com.w11k.lsql.relational.Table;
+import com.w11k.lsql.Blob;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 

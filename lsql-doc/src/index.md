@@ -1,7 +1,7 @@
 
 # Introduction
 
-LiterateSQL (LSql) is a pragmatic Java database access library on top of JDBC.
+LSql (Literate SQL) is a pragmatic Java database access library on top of JDBC.
 
 Our philosophy:
 
@@ -21,8 +21,8 @@ characteristics.
 * Use unit tests to verify your data model, not static typing. Obviously, using an untyped
 datastructure like a Map imposes some challenges. E.g. a typo like `map.get("firstMame")` would
 lead to an error which would have been catched with static typing. However, data structures like
-`java.util.Map` provide ready to use methods like `equals(...)` which can be used to automatically
-verify the data persistence logic and help to catch typos.
+`java.util.Map` already provide implementations for methods like `equals(...)` which can be
+used to automatically verify the data persistence logic and help to catch typos.
 
 * Software architectures currently shift towards rich browser and stand-alone application. The main
 responsibility for server code will be to query and return the stored data as quickly
@@ -45,22 +45,24 @@ LSql Java code:
     DataSource dataSource = ...;
     LSql lsql = new LSql(new H2Dialect(), dataSource);
 
-    // Create a new person row.
-    Row newJohn = new Row();
-    newJohn.put("name", "John");
-    newJohn.put("age", 20);
+    // Create a new person
+    Row john = new Row();
+    john.put("name", "John");
+    john.put("age", 20);
 
     // Insert the new person
-    Table tPerson = lsql.table("person");
-    tPerson.insert(newJohn);
+    Table persons = lsql.table("persons");
+    persons.insert(john);
 
     // The generated ID is automatically put into the row object
-    Object generatedId = newJohn.get("id");
+    Object newId = john.get("id");
 
-    // Use the ID to load the row
-    Optional<QueriedRow> queriedJohn = tPerson.get(generatedId);
-    assert queriedJohn.get().getString("name").equals("John");
-    assert queriedJohn.get().getInt("age") == 20;
+    // Use the ID to load the row, returns com.google.common.base.Optional
+    Optional<QueriedRow> queried = persons.get(newId);
+    QueriedRow queriedJohn = queried.get();
+
+    assert queriedJohn.getString("name").equals("John");
+    assert queriedJohn.getInt("age") == 20;
 
 # Download
 
@@ -91,6 +93,8 @@ be found here:
 
 ## Configure LSql
 
+## Row Class
+
 ## CRUD Operations
 
 ### Insert
@@ -107,5 +111,5 @@ be found here:
 
 ### Named Queries
 
-
+###
 

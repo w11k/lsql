@@ -1,12 +1,13 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.collect.ImmutableMap;
+import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
-import com.w11k.lsql.relational.QueriedRow;
-import com.w11k.lsql.relational.Query;
-import com.w11k.lsql.relational.Row;
-import com.w11k.lsql.relational.Table;
+import com.w11k.lsql.QueriedRow;
+import com.w11k.lsql.Query;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import com.w11k.lsql.sqlfile.SqlFile;
 import com.w11k.lsql.sqlfile.SqlFileStatement;
 import com.w11k.lsql.tests.utils.IntWrapper;
@@ -118,12 +119,12 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         Table t2 = lSql.table("table2");
         t2.column("number").setColumnConverter(new Converter() {
             @Override
-            public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+            public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                 ps.setInt(index, ((IntWrapper) val).getI());
             }
 
             @Override
-            public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+            public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                 return new IntWrapper(rs.getInt(index));
             }
         });

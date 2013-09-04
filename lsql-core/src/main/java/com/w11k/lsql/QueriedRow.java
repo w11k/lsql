@@ -1,4 +1,4 @@
-package com.w11k.lsql.relational;
+package com.w11k.lsql;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
@@ -14,12 +14,12 @@ public class QueriedRow extends Row {
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
-    public QueriedRow(Map<String, Query.ResultSetColumn> meta, ResultSet resultSet) {
+    public QueriedRow(LSql lSql, Map<String, Query.ResultSetColumn> meta, ResultSet resultSet) {
         try {
             for (String name : meta.keySet()) {
                 Query.ResultSetColumn resultSetColumn = meta.get(name);
                 Converter columnConverter = resultSetColumn.column.getColumnConverter();
-                Object value = columnConverter.getValueFromResultSet(resultSet, resultSetColumn.index);
+                Object value = columnConverter.getValueFromResultSet(lSql, resultSet, resultSetColumn.index);
                 values.put(name, value);
                 columns.put(name, resultSetColumn.column);
             }

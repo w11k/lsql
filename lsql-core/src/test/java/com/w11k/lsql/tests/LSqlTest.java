@@ -3,7 +3,7 @@ package com.w11k.lsql.tests;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.dialects.H2Dialect;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
-import com.w11k.lsql.utils.ConnectionUtils;
+import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.testng.annotations.Test;
 
 import java.sql.Connection;

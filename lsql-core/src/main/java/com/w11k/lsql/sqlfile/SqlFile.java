@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.relational.Query;
+import com.w11k.lsql.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

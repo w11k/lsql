@@ -1,12 +1,11 @@
-package com.w11k.lsql.relational;
+package com.w11k.lsql;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.LSql;
 import com.w11k.lsql.exceptions.QueryException;
-import com.w11k.lsql.utils.ConnectionUtils;
+import com.w11k.lsql.jdbc.ConnectionUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -96,7 +95,7 @@ public class Query implements Iterable<QueriedRow> {
                 meta.put(name, new ResultSetColumn(i, column));
             }
             while (resultSet.next()) {
-                QueriedRow row = new QueriedRow(this.meta, resultSet);
+                QueriedRow row = new QueriedRow(lSql, this.meta, resultSet);
                 rows.add(row);
             }
         } catch (SQLException e) {
@@ -131,10 +130,13 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     public Map<String, List<Row>> groupByTables() {
+        // We first store everything in a Map to remove duplicate rows
         Map<String, Map<Object, Row>> byTables = Maps.newHashMap();
+
         // For each row in query
         for (QueriedRow queriedRow : asList()) {
             Map<String, Row> rowByTables = queriedRow.groupByTables();
+
             // for each table in a row
             for (String key : rowByTables.keySet()) {
                 Row row = rowByTables.get(key);
@@ -147,15 +149,14 @@ public class Query implements Iterable<QueriedRow> {
             }
         }
 
-        return Maps.transformEntries(byTables, new Maps.EntryTransformer<String, Map<Object, Row>, List<Row>>() {
-            public List<Row> transformEntry(String key, Map<Object, Row> value) {
-                List<Row> rows = Lists.newLinkedList();
-                for (Map.Entry<Object, Row> objectRowEntry : value.entrySet()) {
-                    rows.add(objectRowEntry.getValue());
-                }
-                return rows;
-            }
-        });
+        // Transform Map of Rows to List of Rows
+        return Maps.transformEntries(
+                byTables,
+                new Maps.EntryTransformer<String, Map<Object, Row>, List<Row>>() {
+                    public List<Row> transformEntry(String key, Map<Object, Row> value) {
+                        return Lists.newLinkedList(value.values());
+                    }
+                });
     }
 
     public List<Row> joinOn(Table startTable) {

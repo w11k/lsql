@@ -1,34 +1,29 @@
 package com.w11k.lsql.converter;
 
-import com.google.gson.Gson;
+import com.w11k.lsql.LSql;
 
+import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ObjectToJsonStringConverter implements Converter {
 
-    private final Gson gson;
-    private final Class<?> type;
+    private final Type type;
 
-    public ObjectToJsonStringConverter(Class<?> type) {
-        this(null, type);
-    }
-
-    public ObjectToJsonStringConverter(Gson gson, Class<?> type) {
+    public ObjectToJsonStringConverter(Type type) {
         this.type = type;
-        this.gson = gson == null ? new Gson() : gson;
     }
 
     @Override
-    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
-        String json = gson.toJson(type.cast(val));
+    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+        String json = lSql.getGson().toJson(val);
         ps.setString(index, json);
     }
 
-    @Override public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+    @Override public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
         String json = rs.getString(index);
-        return gson.fromJson(json, type);
+        return lSql.getGson().fromJson(json, type);
     }
 
 }

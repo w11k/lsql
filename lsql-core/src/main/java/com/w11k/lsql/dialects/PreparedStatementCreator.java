@@ -1,10 +1,11 @@
-package com.w11k.lsql.utils;
+package com.w11k.lsql.dialects;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.w11k.lsql.relational.Column;
-import com.w11k.lsql.relational.Table;
+import com.w11k.lsql.Column;
+import com.w11k.lsql.Table;
+import com.w11k.lsql.jdbc.ConnectionUtils;
 
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
@@ -12,9 +13,9 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-public class PreparedStatementUtils {
+public class PreparedStatementCreator {
 
-    public static PreparedStatement createInsertStatement(final Table table, List<String> columns) {
+    public PreparedStatement createInsertStatement(final Table table, List<String> columns) {
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         StringBuilder sql = new StringBuilder();
         sql.append("insert into ").append(sqlTableName);
@@ -26,7 +27,7 @@ public class PreparedStatementUtils {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql.toString(), true);
     }
 
-    public static PreparedStatement createUpdateStatement(Table table, List<String> columns) {
+    public PreparedStatement createUpdateStatement(Table table, List<String> columns) {
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         StringBuilder sql = new StringBuilder();
         sql.append("update ").append(sqlTableName);
@@ -45,14 +46,14 @@ public class PreparedStatementUtils {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql.toString(), false);
     }
 
-    public static PreparedStatement createSelectByIdStatement(Table table, Column idColumn) {
+    public PreparedStatement createSelectByIdStatement(Table table, Column idColumn) {
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().getlSql().getDialect().identifierJavaToSql(idColumn.getColumnName());
         String sql = "select * from " + sqlTableName + " where " + sqlColumnName + "=?";
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
-    public static PreparedStatement createDeleteByIdStatement(Table table) {
+    public PreparedStatement createDeleteByIdStatement(Table table) {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().getlSql().getDialect().identifierJavaToSql(idColumn.getColumnName());
@@ -65,7 +66,7 @@ public class PreparedStatementUtils {
         return ConnectionUtils.prepareStatement(table.getlSql(), sb.toString(), false);
     }
 
-    public static PreparedStatement createCountForIdStatement(Table table) throws SQLException {
+    public PreparedStatement createCountForIdStatement(Table table) throws SQLException {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().getlSql().getDialect().identifierJavaToSql(idColumn.getColumnName());
@@ -73,7 +74,7 @@ public class PreparedStatementUtils {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
-    private static List<String> createSqlColumnNames(final Table table, List<String> columns) {
+    private List<String> createSqlColumnNames(final Table table, List<String> columns) {
         return Lists.transform(columns, new Function<String, String>() {
             @Override
             public String apply(String input) {

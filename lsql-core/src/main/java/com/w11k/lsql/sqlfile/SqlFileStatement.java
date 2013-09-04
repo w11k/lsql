@@ -7,9 +7,9 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
-import com.w11k.lsql.relational.Query;
-import com.w11k.lsql.relational.Row;
-import com.w11k.lsql.utils.ConnectionUtils;
+import com.w11k.lsql.Query;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +102,7 @@ public class SqlFileStatement {
             if (queryParameters.containsKey(p.name)) {
                 Converter converter = getConverterFor(p.name);
                 try {
-                    converter.setValueInStatement(ps, i + 1, queryParameters.get(p.name));
+                    converter.setValueInStatement(lSql, ps, i + 1, queryParameters.get(p.name));
                 } catch (Exception e) {
                     throw new QueryException(e);
                 }

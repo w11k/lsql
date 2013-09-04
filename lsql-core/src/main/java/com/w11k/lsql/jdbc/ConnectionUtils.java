@@ -1,4 +1,4 @@
-package com.w11k.lsql.utils;
+package com.w11k.lsql.jdbc;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.exceptions.DatabaseAccessException;

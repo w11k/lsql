@@ -1,11 +1,13 @@
 package com.w11k.lsql.converter;
 
 import com.google.common.collect.Maps;
+import com.w11k.lsql.*;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.sql.Blob;
 import java.util.Map;
 
 /**
@@ -24,7 +26,7 @@ public class ByTypeConverter implements Converter {
         init();
     }
 
-    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
         try {
             int columnType = rs.getMetaData().getColumnType(index);
             logger.trace("SQL type in ResultSet is {}", columnType);
@@ -33,13 +35,13 @@ public class ByTypeConverter implements Converter {
             if (converter == null) {
                 throw new RuntimeException("No converter found for SQL type: " + columnType);
             }
-            return converter.getValueFromResultSet(rs, index);
+            return converter.getValueFromResultSet(lSql, rs, index);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         if (val == null) {
             ps.setString(index, "");
         } else {
@@ -47,7 +49,7 @@ public class ByTypeConverter implements Converter {
             if (converter == null) {
                 throw new RuntimeException("No converter found for Java type: " + val.getClass());
             }
-            converter.setValueInStatement(ps, index, val);
+            converter.setValueInStatement(lSql, ps, index, val);
         }
     }
 
@@ -56,11 +58,11 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.BIT, Types.BOOLEAN},
                 Boolean.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+                    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setBoolean(index, (Boolean) val);
                     }
 
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                         return rs.getBoolean(index);
                     }
                 });
@@ -68,11 +70,11 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT},
                 Integer.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+                    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setInt(index, (Integer) val);
                     }
 
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                         return rs.getInt(index);
                     }
                 });
@@ -80,11 +82,11 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.FLOAT},
                 Float.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+                    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setFloat(index, (Float) val);
                     }
 
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                         return rs.getFloat(index);
                     }
                 });
@@ -92,11 +94,11 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.DOUBLE, Types.REAL, Types.DECIMAL},
                 Double.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+                    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setDouble(index, (Double) val);
                     }
 
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                         return rs.getDouble(index);
                     }
                 });
@@ -104,11 +106,11 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.CHAR},
                 Character.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+                    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setString(index, val.toString());
                     }
 
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                         return rs.getString(index).charAt(0);
                     }
                 });
@@ -116,11 +118,11 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR, Types.VARCHAR},
                 String.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+                    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setString(index, val.toString());
                     }
 
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                         return rs.getString(index);
                     }
                 });
@@ -128,13 +130,13 @@ public class ByTypeConverter implements Converter {
                 new int[]{Types.TIMESTAMP},
                 DateTime.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
+                    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                         DateTime dt = (DateTime) val;
                         Timestamp ts = new Timestamp(dt.getMillis());
                         ps.setTimestamp(index, ts);
                     }
 
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                         Timestamp timestamp = rs.getTimestamp(index);
                         if (timestamp != null) {
                             return new DateTime(timestamp.getTime());
@@ -145,16 +147,16 @@ public class ByTypeConverter implements Converter {
                 });
         setConverter(
                 new int[]{Types.BLOB},
-                com.w11k.lsql.relational.Blob.class,
+                com.w11k.lsql.Blob.class,
                 new Converter() {
-                    public void setValueInStatement(PreparedStatement ps, int index, Object val) throws SQLException {
-                        com.w11k.lsql.relational.Blob blob = (com.w11k.lsql.relational.Blob) val;
+                    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+                        com.w11k.lsql.Blob blob = (com.w11k.lsql.Blob) val;
                         ps.setBlob(index, blob.getInputStream());
                     }
 
-                    public Object getValueFromResultSet(ResultSet rs, int index) throws SQLException {
+                    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
                         Blob blob = rs.getBlob(index);
-                        return new com.w11k.lsql.relational.Blob(blob.getBinaryStream());
+                        return new com.w11k.lsql.Blob(blob.getBinaryStream());
                     }
                 });
 

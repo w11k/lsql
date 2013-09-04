@@ -1,13 +1,12 @@
 package com.w11k.lsql;
 
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
-import com.w11k.lsql.relational.Query;
-import com.w11k.lsql.relational.Table;
 import com.w11k.lsql.sqlfile.SqlFile;
-import com.w11k.lsql.utils.ConnectionUtils;
+import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +39,8 @@ public class LSql {
 
     private boolean readSqlFilesOnEveryAccess = false;
 
+    private Gson gson = new Gson();
+
     /**
      * Creates a new LSql instance.
      * <p/>
@@ -49,9 +50,11 @@ public class LSql {
      * @param connectionProvider provider to get a Connection instance
      */
     public LSql(BaseDialect dialect, Callable<Connection> connectionProvider) {
-        this.dialect = dialect;
         checkNotNull(connectionProvider);
+        this.dialect = dialect;
         this.connectionProvider = connectionProvider;
+
+        dialect.setlSql(this);
     }
 
     /**
@@ -88,7 +91,15 @@ public class LSql {
         this.readSqlFilesOnEveryAccess = readSqlFilesOnEveryAccess;
     }
 
-    // ----- public -----
+    public Gson getGson() {
+        return gson;
+    }
+
+    public void setGson(Gson gson) {
+        this.gson = gson;
+    }
+
+// ----- public -----
 
     /**
      * Load an SQL file relative to a class.
