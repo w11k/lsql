@@ -3,6 +3,7 @@ package com.w11k.lsql.guice;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.binder.ScopedBindingBuilder;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.sqlfile.SqlFile;
 import javassist.util.proxy.MethodFilter;
@@ -19,8 +20,8 @@ public class LSqlDaoProvider<T extends LSqlDao> implements Provider<T> {
 
     private Class<T> targetClass;
 
-    public static <A extends LSqlDao> void bind(Binder binder, Class<A> dao) {
-        binder.bind(dao).toProvider(new LSqlDaoProvider<A>(dao)).asEagerSingleton();
+    public static <A extends LSqlDao> ScopedBindingBuilder bind(Binder binder, Class<A> dao) {
+        return binder.bind(dao).toProvider(new LSqlDaoProvider<A>(dao));
     }
 
     public LSqlDaoProvider(Class<T> targetClass) {
