@@ -1,3 +1,5 @@
+/**/
+
 -- create1
 CREATE TABLE table1 (
   id      SERIAL PRIMARY KEY,
@@ -39,3 +41,11 @@ FROM table2
 WHERE
   number < 1 --table2.number
 ;
+
+-- queryRangeMarkers
+SELECT
+  *
+FROM table1
+WHERE
+  age < /*(*/ 1 /*)*/;
+

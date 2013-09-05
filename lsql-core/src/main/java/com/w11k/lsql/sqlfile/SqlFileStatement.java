@@ -4,11 +4,11 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.Query;
+import com.w11k.lsql.Row;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
-import com.w11k.lsql.Query;
-import com.w11k.lsql.Row;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +21,6 @@ import java.util.regex.Pattern;
 
 public class SqlFileStatement {
 
-    class Parameter {
-        String name;
-
-        int valueStart;
-
-        int valueEnd;
-    }
-
     // column = 'value' --param
     private static final Pattern QUOTED_QUERY_ARG = Pattern.compile(
             "^.*[^\\\\]('.*')\\s*--\\s*([\\w\\.]+)\\s*$", Pattern.MULTILINE);
@@ -36,6 +28,18 @@ public class SqlFileStatement {
     // column = 123 --param
     private static final Pattern UNQUOTED_QUERY_ARG = Pattern.compile(
             "^.*\\s+(\\w+)\\s+--\\s*([\\w\\.]+)\\s*$", Pattern.MULTILINE);
+
+    // column = /*(*/ 123 /*)*/
+    private static final Pattern RANGE_QUERY_ARG = Pattern.compile(
+            "^.*(/\\*\\(\\*/.*/\\*\\)\\*/).*$");
+
+    class Parameter {
+        String name;
+
+        int valueStart;
+
+        int valueEnd;
+    }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -73,10 +77,11 @@ public class SqlFileStatement {
         logger.debug("Executing query '{}' ({}) with parameters {}",
                 statementName, sqlFile.getFileName(), queryParameters.keySet());
 
-        List<Parameter> parameters = Lists.newLinkedList();
-        checkEndOfLineNamedParameters(parameters);
-        sortCollectedParameters(parameters);
-        String sql = createSqlStringWithPlaceholders(queryParameters, parameters);
+        List<Parameter> found = Lists.newLinkedList();
+        checkEndOfLineNamedParameters(queryParameters, found);
+        checkRangeQueryParameters(queryParameters, found);
+        sortCollectedParameters(found);
+        String sql = createSqlStringWithPlaceholders(queryParameters, found);
 
         if (logger.isTraceEnabled()) {
             List<String> keyVals = Lists.newLinkedList();
@@ -97,8 +102,8 @@ public class SqlFileStatement {
 
         // Set values
         PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sql, false);
-        for (int i = 0; i < parameters.size(); i++) {
-            Parameter p = parameters.get(i);
+        for (int i = 0; i < found.size(); i++) {
+            Parameter p = found.get(i);
             if (queryParameters.containsKey(p.name)) {
                 Converter converter = getConverterFor(p.name);
                 try {
@@ -110,7 +115,7 @@ public class SqlFileStatement {
         }
 
         // Check for unused parameters
-        for (Parameter parameter : parameters) {
+        for (Parameter parameter : found) {
             queryParameters.remove(parameter.name);
         }
         if (queryParameters.size() > 0) {
@@ -129,7 +134,38 @@ public class SqlFileStatement {
         }
     }
 
-    private void checkEndOfLineNamedParameters(List<Parameter> parameters) {
+    private void checkRangeQueryParameters(Map<String, Object> queryParameters,
+                                           List<Parameter> found) {
+
+        int previousLinesLength = 0;
+        String[] lines = sqlString.split("\n");
+        for (String line : lines) {
+            String paramName;
+            if ((paramName = queryParameterInLine(queryParameters, line)) != null) {
+                Matcher matcher = RANGE_QUERY_ARG.matcher(line);
+                if (matcher.find()) {
+                    Parameter p = new Parameter();
+                    p.name = paramName;
+                    p.valueStart = previousLinesLength + matcher.start(1);
+                    p.valueEnd = previousLinesLength + matcher.end(1);
+                    found.add(p);
+                }
+            }
+            previousLinesLength += (line + "\n").length();
+        }
+    }
+
+    private String queryParameterInLine(Map<String, Object> queryParameters, String line) {
+        for (String s : queryParameters.keySet()) {
+            if (line.contains(s)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    private void checkEndOfLineNamedParameters(Map<String, Object> queryParameters,
+                                               List<Parameter> found) {
         for (Pattern pattern : Arrays.asList(QUOTED_QUERY_ARG, UNQUOTED_QUERY_ARG)) {
             Matcher matcher = pattern.matcher(sqlString);
             while (matcher.find()) {
@@ -140,7 +176,7 @@ public class SqlFileStatement {
                 p.valueStart = matcher.start(1);
                 p.valueEnd = matcher.end(1);
 
-                parameters.add(p);
+                found.add(p);
             }
         }
     }
@@ -154,7 +190,8 @@ public class SqlFileStatement {
         });
     }
 
-    private String createSqlStringWithPlaceholders(Map<String, Object> queryParameters, List<Parameter> parameters) {
+    private String createSqlStringWithPlaceholders(Map<String, Object> queryParameters,
+                                                   List<Parameter> parameters) {
         int lastIndex = 0;
         StringBuilder sql = new StringBuilder();
         for (Parameter p : parameters) {

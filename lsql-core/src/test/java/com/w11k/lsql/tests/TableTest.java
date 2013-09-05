@@ -1,6 +1,7 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Row;
@@ -78,6 +79,18 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(optional.get(), row.get("id"));
     }
 
+    @Test(dataProvider = "lSqlProvider", expectedExceptions = InsertException.class)
+    public void insertShouldFailOnWrongKeys(LSqlProvider provider) {
+        provider.init(this);
+
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INT)");
+        Table table1 = lSql.table("table1");
+        Row row = new Row().addKeyVals("age", 1, "wrong", "value");
+        Optional<Object> optional = table1.insert(row);
+        assertTrue(optional.isPresent());
+        assertEquals(optional.get(), row.get("id"));
+    }
+
     @Test(dataProvider = "lSqlProvider", expectedExceptions = UpdateException.class)
     public void updateShouldFailWhenIdNotPresent(LSqlProvider provider) throws SQLException {
         provider.init(this);
@@ -85,6 +98,19 @@ public class TableTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
+        table1.update(row);
+    }
+
+    @Test(dataProvider = "lSqlProvider", expectedExceptions = UpdateException.class)
+    public void updateShouldFailOnWrongKeys(LSqlProvider provider) throws SQLException {
+        provider.init(this);
+
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
+        Table table1 = lSql.table("table1");
+        Row row = new Row().addKeyVals("name", "Max");
+        table1.insert(row);
+
+        row.put("wrong", "value");
         table1.update(row);
     }
 

@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -44,7 +45,6 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         provider.init(this);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         sqlFile.statement("create1").execute();
-        createdTables.add("table1");
         Table table1 = lSql.table("table1");
         table1.insert(Row.fromKeyVals("age", 10, "content", "text1")).get();
         table1.insert(Row.fromKeyVals("age", 30, "content", "text2")).get();
@@ -114,7 +114,6 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         provider.init(this);
         SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
         sqlFile.statement("create2").execute();
-        createdTables.add("table2");
 
         Table t2 = lSql.table("table2");
         t2.column("number").setColumnConverter(new Converter() {
@@ -138,6 +137,18 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
 
         row = sqlFile.statement("queryColumnConverter").query("table2.number", new IntWrapper(1)).getFirstRow().get();
         assertEquals(row, r1);
+    }
+
+    @Test(dataProvider = "lSqlProvider")
+    public void executeQueryRangeParameters(LSqlProvider provider) {
+        provider.init(this);
+        executeSqlStatement(provider);
+        SqlFile sqlFile = lSql.sqlFileRelativeToClass(getClass(), "file1.sql");
+        SqlFileStatement markers = sqlFile.statement("queryRangeMarkers");
+        System.out.println(markers.getSqlString());
+        Query query = markers.query("age", 40);
+        List<QueriedRow> result = query.asList();
+        assertEquals(result.size(), 2);
     }
 
 }

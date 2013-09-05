@@ -106,7 +106,7 @@ public class Table {
                     }
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new InsertException(e);
         }
         return absent();
@@ -139,7 +139,7 @@ public class Table {
                         rowsAffected + " rows were affected by update operation. Expected: 1");
             }
             return row.getOptional(getPrimaryKeyColumn().get());
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new UpdateException(e);
         }
     }
@@ -173,7 +173,7 @@ public class Table {
                 } else {
                     update(row);
                 }
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 throw new DatabaseAccessException(e);
             }
             return of(id);
@@ -209,7 +209,26 @@ public class Table {
         return absent();
     }
 
-    public void fetchKeys() {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Table otherTable = (Table) o;
+        return lSql == otherTable.lSql && tableName.equals(otherTable.tableName);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = lSql.hashCode();
+        result = 31 * result + tableName.hashCode();
+        return result;
+    }
+
+    private void fetchKeys() {
         Connection con = ConnectionUtils.getConnection(lSql);
         try {
             DatabaseMetaData md = con.getMetaData();
@@ -240,25 +259,6 @@ public class Table {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Table otherTable = (Table) o;
-        return lSql == otherTable.lSql && tableName.equals(otherTable.tableName);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = lSql.hashCode();
-        result = 31 * result + tableName.hashCode();
-        return result;
     }
 
     private PreparedStatement setValuesInPreparedStatement(PreparedStatement ps,

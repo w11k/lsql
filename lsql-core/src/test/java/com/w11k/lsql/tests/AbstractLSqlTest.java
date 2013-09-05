@@ -27,8 +27,6 @@ public abstract class AbstractLSqlTest {
             "create table (\\w+).*",
             Pattern.CASE_INSENSITIVE);
 
-    protected List<String> createdTables = Lists.newLinkedList();
-
     protected LSql lSql;
 
     @DataProvider(name = "lSqlProvider_postgresql")
@@ -86,7 +84,6 @@ public abstract class AbstractLSqlTest {
 
     @AfterMethod
     public void afterMethod() throws Exception {
-        dropCreatedTables();
         if (lSql != null) {
             lSql.getConnectionProvider().call().close();
         }
@@ -97,10 +94,6 @@ public abstract class AbstractLSqlTest {
         startMatcher.find();
         String tableName = startMatcher.group(1);
         lSql.executeRawSql(sql);
-        createdTables.add(tableName);
-    }
-
-    protected void dropCreatedTables() {
     }
 
     protected void prettyPrintJson(Object result) {
