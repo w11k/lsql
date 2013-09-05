@@ -15,13 +15,11 @@ public class LSqlDao {
     private ThreadLocal<String> methodNameThreadLocal = new ThreadLocal<String>() {
         @Override
         protected String initialValue() {
-            throw new IllegalStateException("Did you bind a LSqlDaoProvider for this class?");
+            throw new IllegalStateException(
+                    "Thread's method name is undefined. Make sure that a LSqlDaoProvider was " +
+                            "used to create the Dao and that the query method is annotated with QueryMethod.");
         }
     };
-
-    private String getCurrentMethodName() {
-        return methodNameThreadLocal.get();
-    }
 
     public ThreadLocal<String> getMethodNameThreadLocal() {
         return methodNameThreadLocal;
@@ -53,6 +51,10 @@ public class LSqlDao {
 
     public Query methodQuery(Map<String, Object> queryParameters) {
         return getSqlFile().query(getCurrentMethodName(), queryParameters);
+    }
+
+    private String getCurrentMethodName() {
+        return methodNameThreadLocal.get();
     }
 
 }

@@ -53,7 +53,8 @@ public class Blob {
     }
 
     @Override public String toString() {
-        return "Blob{size=" + data.length + "}";
+        int size = data != null ? data.length : 0;
+        return "Blob{size=" + size + "}";
     }
 
 }
