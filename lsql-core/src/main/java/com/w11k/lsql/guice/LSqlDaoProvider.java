@@ -12,14 +12,14 @@ import javassist.util.proxy.ProxyFactory;
 
 import java.lang.reflect.Method;
 
-public class LSqlDaoProvider<T extends AbstractLSqlDao> implements Provider<T> {
+public class LSqlDaoProvider<T extends LSqlDao> implements Provider<T> {
 
     @Inject
     private LSql lSql;
 
     private Class<T> targetClass;
 
-    public static <A extends AbstractLSqlDao> void bind(Binder binder, Class<A> dao) {
+    public static <A extends LSqlDao> void bind(Binder binder, Class<A> dao) {
         binder.bind(dao).toProvider(new LSqlDaoProvider<A>(dao)).asEagerSingleton();
     }
 

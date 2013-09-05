@@ -6,7 +6,7 @@ import com.w11k.lsql.sqlfile.SqlFile;
 
 import java.util.Map;
 
-abstract public class AbstractLSqlDao {
+public class LSqlDao {
 
     private LSql lSql;
 
