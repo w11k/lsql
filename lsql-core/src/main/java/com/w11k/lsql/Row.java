@@ -110,8 +110,9 @@ public class Row extends ForwardingMap<String, Object> {
         return Objects.toStringHelper(this).add("data", delegate()).toString();
     }
 
+
+    @SuppressWarnings("unchecked")
     public List<Row> getJoinedRows(String s) {
-        //noinspection unchecked
         return getAs(List.class, "__" + s);
     }
 
