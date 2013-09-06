@@ -11,15 +11,18 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class JavaBoolToSqlStringConverter implements Converter {
 
     private final String sqlStringValueForTrue;
+
     private final String sqlStringValueForFalse;
 
-    public JavaBoolToSqlStringConverter(String sqlStringValueForTrue, String sqlStringValueForFalse) {
+    public JavaBoolToSqlStringConverter(String sqlStringValueForTrue,
+                                        String sqlStringValueForFalse) {
         checkArgument(!sqlStringValueForTrue.equals(sqlStringValueForFalse));
         this.sqlStringValueForTrue = sqlStringValueForTrue;
         this.sqlStringValueForFalse = sqlStringValueForFalse;
     }
 
-    @Override public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
+    @Override
+    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
         String val = rs.getString(index);
         if (val.equals(sqlStringValueForTrue)) {
             return true;
@@ -33,7 +36,8 @@ public class JavaBoolToSqlStringConverter implements Converter {
     }
 
     @Override
-    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index,
+                                    Object val) throws SQLException {
         String yesOrNo = ((Boolean) val) ? sqlStringValueForTrue : sqlStringValueForFalse;
         ps.setString(index, yesOrNo);
     }

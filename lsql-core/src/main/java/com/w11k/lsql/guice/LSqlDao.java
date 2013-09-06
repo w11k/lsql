@@ -2,7 +2,7 @@ package com.w11k.lsql.guice;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Query;
-import com.w11k.lsql.sqlfile.SqlFile;
+import com.w11k.lsql.sqlfile.LSqlFile;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ public class LSqlDao {
 
     private LSql lSql;
 
-    private SqlFile sqlFile;
+    private LSqlFile lSqlFile;
 
     private ThreadLocal<String> methodNameThreadLocal = new ThreadLocal<String>() {
         @Override
@@ -33,24 +33,24 @@ public class LSqlDao {
         this.lSql = lSql;
     }
 
-    public SqlFile getSqlFile() {
-        return sqlFile;
+    public LSqlFile getlSqlFile() {
+        return lSqlFile;
     }
 
-    public void setSqlFile(SqlFile sqlFile) {
-        this.sqlFile = sqlFile;
+    public void setlSqlFile(LSqlFile lSqlFile) {
+        this.lSqlFile = lSqlFile;
     }
 
     public Query methodQuery() {
-        return getSqlFile().query(getCurrentMethodName());
+        return getlSqlFile().query(getCurrentMethodName());
     }
 
     public Query methodQuery(Object... keyVals) {
-        return getSqlFile().query(getCurrentMethodName(), keyVals);
+        return getlSqlFile().query(getCurrentMethodName(), keyVals);
     }
 
     public Query methodQuery(Map<String, Object> queryParameters) {
-        return getSqlFile().query(getCurrentMethodName(), queryParameters);
+        return getlSqlFile().query(getCurrentMethodName(), queryParameters);
     }
 
     private String getCurrentMethodName() {

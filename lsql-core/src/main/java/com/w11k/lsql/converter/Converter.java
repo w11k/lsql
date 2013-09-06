@@ -8,7 +8,8 @@ import java.sql.SQLException;
 
 public interface Converter {
 
-    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException;
+    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index,
+                                    Object val) throws SQLException;
 
     public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException;
 

@@ -7,7 +7,7 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.sqlfile.SqlFile;
+import com.w11k.lsql.sqlfile.LSqlFile;
 
 import java.lang.reflect.Field;
 
@@ -42,14 +42,14 @@ public class LSqlMemberListener implements TypeListener {
     }
 
     private <I> void checkSqlFile(final TypeEncounter<I> encounter, final Field field) {
-        if (field.getType().isAssignableFrom(SqlFile.class) &&
+        if (field.getType().isAssignableFrom(LSqlFile.class) &&
                 field.isAnnotationPresent(InjectSqlFile.class)) {
 
             encounter.register(new MembersInjector<I>() {
 
                 @Override
                 public void injectMembers(I instance) {
-                    setFieldValue(instance, field, lSql.sqlFile(instance.getClass()));
+                    setFieldValue(instance, field, lSql.readSqlFile(instance.getClass()));
                 }
             });
         }

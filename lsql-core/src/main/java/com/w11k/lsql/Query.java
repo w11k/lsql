@@ -75,7 +75,8 @@ public class Query implements Iterable<QueriedRow> {
                     Map<String, ResultSetColumn> newMeta = Maps.newHashMap();
                     for (String name : meta.keySet()) {
                         ResultSetColumn resultSetColumn = meta.get(name);
-                        newMeta.put(resultSetColumn.column.getTable().getTableName() + "." + name, resultSetColumn);
+                        newMeta.put(resultSetColumn.column.getTable().getTableName() + "." +
+                                name, resultSetColumn);
                     }
                     meta = newMeta;
                 }

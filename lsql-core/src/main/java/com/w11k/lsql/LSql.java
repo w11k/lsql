@@ -5,10 +5,8 @@ import com.google.gson.Gson;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
-import com.w11k.lsql.sqlfile.SqlFile;
 import com.w11k.lsql.jdbc.ConnectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.w11k.lsql.sqlfile.LSqlFile;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -29,13 +27,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final ConcurrentMap<String, Table> tables = Maps.newConcurrentMap();
 
     private final BaseDialect dialect;
 
-    private Callable<Connection> connectionProvider;
+    private final Callable<Connection> connectionProvider;
 
     private boolean readSqlFilesOnEveryAccess = false;
 
@@ -44,7 +40,7 @@ public class LSql {
     /**
      * Creates a new LSql instance.
      * <p/>
-     * LSql will use the {@link Callable} for obtaining connections.
+     * LSql will use the {@link Callable} for obtaining connections..
      *
      * @param dialect            the database dialect
      * @param connectionProvider provider to get a Connection instance
@@ -69,13 +65,11 @@ public class LSql {
         this(dialect, ConnectionProviders.fromDataSource(dataSource));
     }
 
-    // ----- getter/setter -----
-
     public BaseDialect getDialect() {
         return dialect;
     }
 
-    public Converter getGlobalConverter() {
+    public Converter getConverter() {
         return dialect.getConverter();
     }
 
@@ -99,25 +93,30 @@ public class LSql {
         this.gson = gson;
     }
 
-// ----- public -----
-
     /**
-     * Load an SQL file relative to a class.
+     * Loads an SQL file relative to a class.
      *
      * @param clazz    the class from which the basedir will be used
      * @param fileName the SQL file name
-     * @return the SqlFile instance
+     * @return the {@code LSqlFile} instance
      */
-    public SqlFile sqlFileRelativeToClass(Class clazz, String fileName) {
+    public LSqlFile readSqlFileRelativeToClass(Class clazz, String fileName) {
         String p = clazz.getPackage().getName();
         p = "/" + p.replaceAll("\\.", "/") + "/";
         String path = p + fileName;
-        return new SqlFile(this, fileName, path);
+        return new LSqlFile(this, fileName, path);
     }
 
-    public SqlFile sqlFile(Class<?> clazz) {
+    /**
+     * Loads a SQL file with the same name and location as the specified class.
+     * Instead of '.class', the file extension '.sql' will be used.
+     *
+     * @param clazz the class which location and name will be used to lookup the SQL file
+     * @return the {@code LSqlFile} instance
+     */
+    public LSqlFile readSqlFile(Class<?> clazz) {
         String fileName = clazz.getSimpleName() + ".sql";
-        return sqlFileRelativeToClass(clazz, fileName);
+        return readSqlFileRelativeToClass(clazz, fileName);
     }
 
     /**
@@ -133,17 +132,8 @@ public class LSql {
         return tables.get(tableName);
     }
 
-    // ----- execute SQL methods -----
-
-    @Override
-    public String toString() {
-        return "LSql{" +
-                "dialect=" + dialect +
-                '}';
-    }
-
     /**
-     * Executes the SQL string. Useful for DML and DDL statements.
+     * Executes the SQL string.
      *
      * @param sql the SQL string
      */
@@ -157,8 +147,8 @@ public class LSql {
     }
 
     /**
-     * Executes the SQL SELECT string. Useful for testing and very simple
-     * queries. {@link SqlFile}s should be used for complex queries.
+     * Executes the SQL SELECT string. Useful for testing and simple queries.
+     * {@link LSqlFile}s should be used for complex queries.
      *
      * @param sql the SQL SELECT string
      * @return the Query instance
@@ -166,4 +156,12 @@ public class LSql {
     public Query executeRawQuery(String sql) {
         return new Query(this, sql);
     }
+
+    @Override
+    public String toString() {
+        return "LSql{" +
+                "dialect=" + dialect +
+                '}';
+    }
+
 }

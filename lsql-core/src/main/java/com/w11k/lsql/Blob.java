@@ -41,8 +41,12 @@ public class Blob {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Blob blob = (Blob) o;
         return Arrays.equals(data, blob.data);
     }
@@ -52,7 +56,8 @@ public class Blob {
         return Arrays.hashCode(data);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         int size = data != null ? data.length : 0;
         return "Blob{size=" + size + "}";
     }

@@ -2,7 +2,6 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/lsql-core/src/test/java/com/w11k/lsql/tests/file1.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/lsql-core/src/test/java/com/w11k/lsql/tests/guice/TestDao.sql" dialect="PostgreSQL" />
   </component>
 </project>
 

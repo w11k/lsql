@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
 
-public class SqlFile {
+public class LSqlFile {
 
     private static final Pattern STMT_BLOCK_BEGIN = Pattern.compile(
             "^--\\s*(\\w*)\\s*$",
@@ -35,9 +35,9 @@ public class SqlFile {
 
     private final String path;
 
-    private final Map<String, SqlFileStatement> statements = Maps.newHashMap();
+    private final Map<String, LSqlFileStatement> statements = Maps.newHashMap();
 
-    public SqlFile(LSql lSql, String fileName, String path) {
+    public LSqlFile(LSql lSql, String fileName, String path) {
         this.lSql = lSql;
         this.fileName = fileName;
         this.path = path;
@@ -50,11 +50,11 @@ public class SqlFile {
 
     // ----- public -----
 
-    public ImmutableMap<String, SqlFileStatement> getStatements() {
+    public ImmutableMap<String, LSqlFileStatement> getStatements() {
         return copyOf(statements);
     }
 
-    public SqlFileStatement statement(String name) {
+    public LSqlFileStatement statement(String name) {
         if (lSql.isReadSqlFilesOnEveryAccess()) {
             parseSqlStatements();
         }
@@ -91,12 +91,13 @@ public class SqlFile {
                 String sub = content.substring(startMatcher.end());
                 Matcher endMatcher = STMT_BLOCK_END.matcher(sub);
                 if (!endMatcher.find()) {
-                    throw new IllegalStateException("Could not find the end of the SQL expression '" +
-                            name + "'. Did you add ';' at the end?");
+                    throw new IllegalStateException(
+                            "Could not find the end of the SQL expression '" +
+                                    name + "'. Did you add ';' at the end?");
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
                 logger.debug("Found SQL statement '{}'", name);
-                statements.put(name, new SqlFileStatement(lSql, this, name, sub));
+                statements.put(name, new LSqlFileStatement(lSql, this, name, sub));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

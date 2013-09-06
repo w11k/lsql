@@ -3,9 +3,9 @@ package com.w11k.lsql.dialects;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.ByTypeConverter;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.Table;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

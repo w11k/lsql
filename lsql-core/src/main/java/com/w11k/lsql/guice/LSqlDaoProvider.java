@@ -7,7 +7,7 @@ import com.google.inject.Provider;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.sqlfile.SqlFile;
+import com.w11k.lsql.sqlfile.LSqlFile;
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
@@ -18,10 +18,6 @@ import java.lang.reflect.Method;
 
 public class LSqlDaoProvider<T extends LSqlDao> implements Provider<T> {
 
-    public static <A extends LSqlDao> ScopedBindingBuilder bind(Binder binder, Class<A> dao) {
-        return binder.bind(dao).toProvider(new LSqlDaoProvider<A>(dao));
-    }
-
     @Inject
     private Injector injector;
 
@@ -29,6 +25,10 @@ public class LSqlDaoProvider<T extends LSqlDao> implements Provider<T> {
     private LSql lSql;
 
     private Class<T> targetClass;
+
+    public static <A extends LSqlDao> ScopedBindingBuilder bind(Binder binder, Class<A> dao) {
+        return binder.bind(dao).toProvider(new LSqlDaoProvider<A>(dao));
+    }
 
     public LSqlDaoProvider(Class<T> targetClass) {
         this.targetClass = targetClass;
@@ -62,8 +62,8 @@ public class LSqlDaoProvider<T extends LSqlDao> implements Provider<T> {
         try {
             dao = targetClass.cast(c.newInstance());
             dao.setlSql(lSql);
-            SqlFile sqlFile = lSql.sqlFile(targetClass);
-            dao.setSqlFile(sqlFile);
+            LSqlFile lSqlFile = lSql.readSqlFile(targetClass);
+            dao.setlSqlFile(lSqlFile);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
@@ -88,9 +88,8 @@ public class LSqlDaoProvider<T extends LSqlDao> implements Provider<T> {
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
-
-
             }
         }
     }
+
 }

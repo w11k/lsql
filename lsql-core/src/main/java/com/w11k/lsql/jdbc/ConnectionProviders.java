@@ -8,7 +8,7 @@ public final class ConnectionProviders {
 
     /**
      * Creates a connection provider that always return the same {@code Connection}
-     * instance. Useful for tests.
+     * instance. Mostly useful for tests.
      *
      * @param connectionInstance The connection instance to use
      * @return the provider

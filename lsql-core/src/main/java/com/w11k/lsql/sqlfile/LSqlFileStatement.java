@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SqlFileStatement {
+public class LSqlFileStatement {
 
     // column = 'value' --param
     private static final Pattern QUOTED_QUERY_ARG = Pattern.compile(
@@ -45,15 +45,15 @@ public class SqlFileStatement {
 
     private final LSql lSql;
 
-    private final SqlFile sqlFile;
+    private final LSqlFile lSqlFile;
 
     private final String statementName;
 
     private final String sqlString;
 
-    SqlFileStatement(LSql lSql, SqlFile sqlFile, String statementName, String sqlString) {
+    LSqlFileStatement(LSql lSql, LSqlFile lSqlFile, String statementName, String sqlString) {
         this.lSql = lSql;
-        this.sqlFile = sqlFile;
+        this.lSqlFile = lSqlFile;
         this.statementName = statementName;
         this.sqlString = sqlString;
     }
@@ -75,7 +75,7 @@ public class SqlFileStatement {
     public Query query(Map<String, Object> queryParameters) {
 
         logger.debug("Executing query '{}' ({}) with parameters {}",
-                statementName, sqlFile.getFileName(), queryParameters.keySet());
+                statementName, lSqlFile.getFileName(), queryParameters.keySet());
 
         List<Parameter> found = Lists.newLinkedList();
         checkEndOfLineNamedParameters(queryParameters, found);
@@ -208,7 +208,7 @@ public class SqlFileStatement {
     private Converter getConverterFor(String paramName) {
         String[] split = paramName.split("\\.");
         if (split.length != 2) {
-            return lSql.getGlobalConverter();
+            return lSql.getConverter();
         }
         String tableName = split[0];
         String columnName = split[1];

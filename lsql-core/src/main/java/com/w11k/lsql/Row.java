@@ -20,13 +20,13 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class Row extends ForwardingMap<String, Object> {
 
+    private final Map<String, Object> data;
+
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
         r.addKeyVals(keyVals);
         return r;
     }
-
-    private final Map<String, Object> data;
 
     public Row() {
         this(Maps.<String, Object>newHashMap());
@@ -36,10 +36,9 @@ public class Row extends ForwardingMap<String, Object> {
         this.data = newHashMap(data);
     }
 
-    // ----- public methods -----
-
     public Row addKeyVals(Object... keyVals) {
-        checkArgument(keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
+        checkArgument(
+                keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
 
         Iterable<List<Object>> partition = Iterables.partition(newArrayList(keyVals), 2);
         for (List<Object> objects : partition) {
@@ -51,7 +50,6 @@ public class Row extends ForwardingMap<String, Object> {
         return this;
     }
 
-
     @Override
     public Object put(String key, Object value) {
         return super.put(key, value);
@@ -61,13 +59,12 @@ public class Row extends ForwardingMap<String, Object> {
         return Lists.newLinkedList(keySet());
     }
 
-    // ----- getter convenience -----
-
     public <A> A getAs(Class<A> type, String key) {
         Object value = get(key);
         if (!type.isAssignableFrom(value.getClass())) {
-            throw new ClassCastException("Cannot cast value '" + value + "' of type '"
-                    + value.getClass() + "' to '" + type + "'");
+            throw new ClassCastException(
+                    "Cannot cast value '" + value + "' of type '" + value.getClass() + "' to '" +
+                            type + "'");
         }
         return type.cast(value);
     }
@@ -117,8 +114,6 @@ public class Row extends ForwardingMap<String, Object> {
         //noinspection unchecked
         return getAs(List.class, "__" + s);
     }
-
-    // ----- interface ForwardingMap -----
 
     @Override
     protected Map<String, Object> delegate() {

@@ -16,12 +16,14 @@ public class ObjectToJsonStringConverter implements Converter {
     }
 
     @Override
-    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index,
+                                    Object val) throws SQLException {
         String json = lSql.getGson().toJson(val);
         ps.setString(index, json);
     }
 
-    @Override public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
+    @Override
+    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
         String json = rs.getString(index);
         return lSql.getGson().fromJson(json, type);
     }

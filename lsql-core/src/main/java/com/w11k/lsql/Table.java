@@ -44,7 +44,7 @@ public class Table {
     // ----- getter/setter -----
 
     public Converter getTableConverter() {
-        return tableConverter.or(lSql.getGlobalConverter());
+        return tableConverter.or(lSql.getConverter());
     }
 
     public void setTableConverter(Converter tableConverter) {
@@ -130,8 +130,8 @@ public class Table {
             // Set ID
             String pkColumn = getPrimaryKeyColumn().get();
             Object id = row.get(pkColumn);
-            column(pkColumn).getColumnConverter().setValueInStatement(lSql, ps, columns
-                    .size() + 1, id);
+            column(pkColumn).getColumnConverter()
+                    .setValueInStatement(lSql, ps, columns.size() + 1, id);
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
@@ -228,14 +228,19 @@ public class Table {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "Table{tableName='" + tableName + "'}";
+    }
+
     private void fetchKeys() {
         Connection con = ConnectionUtils.getConnection(lSql);
         try {
             DatabaseMetaData md = con.getMetaData();
 
             // Fetch Primary Key
-            ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.getDialect()
-                    .identifierJavaToSql(tableName));
+            ResultSet primaryKeys = md.getPrimaryKeys(null, null,
+                    lSql.getDialect().identifierJavaToSql(tableName));
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
                 return;
@@ -244,8 +249,8 @@ public class Table {
             primaryKeyColumn = of(lSql.getDialect().identifierSqlToJava(idColumn));
 
             // Fetch Foreign keys
-            ResultSet exportedKeys = md.getExportedKeys(null, null, lSql.getDialect()
-                    .identifierJavaToSql(tableName));
+            ResultSet exportedKeys = md.getExportedKeys(null, null,
+                    lSql.getDialect().identifierJavaToSql(tableName));
             while (exportedKeys.next()) {
                 String sqlTableName = exportedKeys.getString(7);
                 String javaTableName = lSql.getDialect().identifierSqlToJava(sqlTableName);
