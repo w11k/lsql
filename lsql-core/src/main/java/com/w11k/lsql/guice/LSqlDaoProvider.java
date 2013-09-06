@@ -18,13 +18,13 @@ import java.lang.reflect.Method;
 
 public class LSqlDaoProvider<T extends LSqlDao> implements Provider<T> {
 
+    private final Class<T> targetClass;
+
     @Inject
     private Injector injector;
 
     @Inject
     private LSql lSql;
-
-    private Class<T> targetClass;
 
     public static <A extends LSqlDao> ScopedBindingBuilder bind(Binder binder, Class<A> dao) {
         return binder.bind(dao).toProvider(new LSqlDaoProvider<A>(dao));

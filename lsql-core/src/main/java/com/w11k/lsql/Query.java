@@ -20,9 +20,9 @@ public class Query implements Iterable<QueriedRow> {
 
     public class ResultSetColumn {
 
-        public int index;
+        final public int index;
 
-        public Column column;
+        final public Column column;
 
         public ResultSetColumn(int index, Column column) {
             this.index = index;

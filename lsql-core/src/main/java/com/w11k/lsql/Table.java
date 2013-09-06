@@ -29,9 +29,9 @@ public class Table {
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
-    private Optional<String> primaryKeyColumn = Optional.absent();
+    final private Map<Table, Column> exportedForeignKeyTables = Maps.newHashMap();
 
-    private Map<Table, Column> exportedForeignKeyTables = Maps.newHashMap();
+    private Optional<String> primaryKeyColumn = Optional.absent();
 
     private Optional<Converter> tableConverter = Optional.absent();
 

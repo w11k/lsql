@@ -12,7 +12,7 @@ public class LSqlDao {
 
     private LSqlFile lSqlFile;
 
-    private ThreadLocal<String> methodNameThreadLocal = new ThreadLocal<String>() {
+    private final ThreadLocal<String> methodNameThreadLocal = new ThreadLocal<String>() {
         @Override
         protected String initialValue() {
             throw new IllegalStateException(

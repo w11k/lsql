@@ -21,6 +21,14 @@ import java.util.regex.Pattern;
 
 public class LSqlFileStatement {
 
+    class Parameter {
+        String name;
+
+        int valueStart;
+
+        int valueEnd;
+    }
+
     // column = 'value' --param
     private static final Pattern QUOTED_QUERY_ARG = Pattern.compile(
             "^.*[^\\\\]('.*')\\s*--\\s*([\\w\\.]+)\\s*$", Pattern.MULTILINE);
@@ -32,14 +40,6 @@ public class LSqlFileStatement {
     // column = /*(*/ 123 /*)*/
     private static final Pattern RANGE_QUERY_ARG = Pattern.compile(
             "^.*(/\\*\\(\\*/.*/\\*\\)\\*/).*$");
-
-    class Parameter {
-        String name;
-
-        int valueStart;
-
-        int valueEnd;
-    }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -78,7 +78,7 @@ public class LSqlFileStatement {
                 statementName, lSqlFile.getFileName(), queryParameters.keySet());
 
         List<Parameter> found = Lists.newLinkedList();
-        checkEndOfLineNamedParameters(queryParameters, found);
+        checkEndOfLineNamedParameters(found);
         checkRangeQueryParameters(queryParameters, found);
         sortCollectedParameters(found);
         String sql = createSqlStringWithPlaceholders(queryParameters, found);
@@ -164,8 +164,7 @@ public class LSqlFileStatement {
         return null;
     }
 
-    private void checkEndOfLineNamedParameters(Map<String, Object> queryParameters,
-                                               List<Parameter> found) {
+    private void checkEndOfLineNamedParameters(List<Parameter> found) {
         for (Pattern pattern : Arrays.asList(QUOTED_QUERY_ARG, UNQUOTED_QUERY_ARG)) {
             Matcher matcher = pattern.matcher(sqlString);
             while (matcher.find()) {

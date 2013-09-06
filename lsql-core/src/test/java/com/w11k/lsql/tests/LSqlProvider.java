@@ -4,7 +4,7 @@ import com.w11k.lsql.LSql;
 
 public class LSqlProvider {
 
-    private LSql lSql;
+    private final LSql lSql;
 
     public LSqlProvider(LSql lSql) {
         this.lSql = lSql;
