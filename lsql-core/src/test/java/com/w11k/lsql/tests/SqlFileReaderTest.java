@@ -51,6 +51,13 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("age", 60, "content", "text3")).get();
     }
 
+    @Test(dataProvider = "lSqlProvider_h2", expectedExceptions = IllegalArgumentException.class)
+    public void exceptionOnWrongStatementName(LSqlProvider provider) {
+        provider.init(this);
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
+        lSqlFile.statement("ERRO");
+    }
+
     @Test(dataProvider = "lSqlProvider")
     public void executeSqlStatementWithParameters(LSqlProvider provider) {
         provider.init(this);

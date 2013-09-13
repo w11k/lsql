@@ -42,15 +42,15 @@ public class LSqlDao {
     }
 
     public Query methodQuery() {
-        return getlSqlFile().query(getCurrentMethodName());
+        return getlSqlFile().statement(getCurrentMethodName()).query();
     }
 
     public Query methodQuery(Object... keyVals) {
-        return getlSqlFile().query(getCurrentMethodName(), keyVals);
+        return getlSqlFile().statement(getCurrentMethodName()).query(keyVals);
     }
 
     public Query methodQuery(Map<String, Object> queryParameters) {
-        return getlSqlFile().query(getCurrentMethodName(), queryParameters);
+        return getlSqlFile().statement(getCurrentMethodName()).query(queryParameters);
     }
 
     public void methodStatement() {

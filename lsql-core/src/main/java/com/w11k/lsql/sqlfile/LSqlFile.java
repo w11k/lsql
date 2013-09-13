@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,21 +57,10 @@ public class LSqlFile {
         if (lSql.isReadSqlFilesOnEveryAccess()) {
             parseSqlStatements();
         }
+        if (!statements.containsKey(name)) {
+            throw new IllegalArgumentException("No statement with name '" + name + "' found.");
+        }
         return statements.get(name);
-    }
-
-    // ----- delegates -----
-
-    public Query query(String statement) {
-        return statement(statement).query();
-    }
-
-    public Query query(String statement, Object... keyVals) {
-        return statement(statement).query(keyVals);
-    }
-
-    public Query query(String statement, Map<String, Object> queryParameters) {
-        return statement(statement).query(queryParameters);
     }
 
     // ----- private -----
