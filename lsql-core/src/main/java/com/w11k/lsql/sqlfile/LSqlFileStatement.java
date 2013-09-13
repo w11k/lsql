@@ -67,13 +67,32 @@ public class LSqlFileStatement {
     }
 
     public Query query(Object... keyVals) {
-        Row r = new Row();
-        r.addKeyVals(keyVals);
-        return query(r);
+        return query(Row.fromKeyVals(keyVals));
     }
 
     public Query query(Map<String, Object> queryParameters) {
+        PreparedStatement ps = createPreparedStatement(queryParameters);
+        return new Query(lSql, ps);
+    }
 
+    public void execute() {
+        execute(Maps.<String, Object>newHashMap());
+    }
+
+    public void execute(Object... keyVals) {
+        execute(Row.fromKeyVals(keyVals));
+    }
+
+    public void execute(Map<String, Object> queryParameters) {
+        PreparedStatement ps = createPreparedStatement(queryParameters);
+        try {
+            ps.execute();
+        } catch (SQLException e) {
+            throw new DatabaseAccessException(e);
+        }
+    }
+
+    private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) {
         logger.debug("Executing query '{}' ({}) with parameters {}",
                 statementName, lSqlFile.getFileName(), queryParameters.keySet());
 
@@ -90,7 +109,7 @@ public class LSqlFileStatement {
             }
             logger.trace("\n" +
                     "------------------------------------------------------------\n" +
-                    "Executing query '{}'\n" +
+                    "Executing '{}'\n" +
                     "------------------------------------------------------------\n" +
                     Joiner.on("\n").join(keyVals) + "\n" +
                     "------------------------------------------------------------\n" +
@@ -121,17 +140,7 @@ public class LSqlFileStatement {
         if (queryParameters.size() > 0) {
             throw new QueryException("Unused query parameters: " + queryParameters.keySet());
         }
-
-        return new Query(lSql, ps);
-    }
-
-    public void execute() {
-        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlString, false);
-        try {
-            ps.execute();
-        } catch (SQLException e) {
-            throw new DatabaseAccessException(e);
-        }
+        return ps;
     }
 
     private void checkRangeQueryParameters(Map<String, Object> queryParameters,

@@ -13,6 +13,10 @@ CREATE TABLE table2 (
   number INT
 );
 
+-- deleteYoung
+DELETE FROM table1
+WHERE age < /*(*/ 5 /*)*/;
+
 -- getAll
 SELECT
   *

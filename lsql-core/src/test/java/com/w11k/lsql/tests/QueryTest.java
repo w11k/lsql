@@ -144,19 +144,6 @@ public class QueryTest extends AbstractLSqlTest {
         }
     }
 
-    @Test(dataProvider = "lSqlProvider_h2")
-    public void queriedRowToObject(LSqlProvider provider) {
-        provider.init(this);
-
-        createTable("CREATE TABLE table1 (name TEXT, age INT)");
-        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        QueriedRow row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
-        Table1Pojo pojo = row.toObject(Table1Pojo.class);
-        assertEquals(pojo.getName(), "cus1");
-        assertEquals(pojo.getAge(), 20);
-    }
-
-
     private void setupCompanyEmployeeContact() {
         createTable("CREATE TABLE company (id SERIAL PRIMARY KEY, name TEXT);");
         createTable("CREATE TABLE customer (id SERIAL PRIMARY KEY, name TEXT, company_id INT REFERENCES company (id));");

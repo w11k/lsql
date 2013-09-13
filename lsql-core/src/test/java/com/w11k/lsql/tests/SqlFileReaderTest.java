@@ -52,6 +52,22 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     }
 
     @Test(dataProvider = "lSqlProvider")
+    public void executeSqlStatementWithParameters(LSqlProvider provider) {
+        provider.init(this);
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
+        lSqlFile.statement("create1").execute();
+        Table table1 = lSql.table("table1");
+        table1.insert(Row.fromKeyVals("age", 1, "content", "text1")).get();
+        table1.insert(Row.fromKeyVals("age", 3, "content", "text2")).get();
+        table1.insert(Row.fromKeyVals("age", 6, "content", "text3")).get();
+
+        assertEquals(lSql.executeRawQuery("select * from table1").asList().size(), 3);
+        LSqlFileStatement deleteYoung = lSqlFile.statement("deleteYoung");
+        deleteYoung.execute("age", 2);
+        assertEquals(lSql.executeRawQuery("select * from table1").asList().size(), 2);
+    }
+
+    @Test(dataProvider = "lSqlProvider")
     public void executeQueryWithoutChangingParameters(LSqlProvider provider) {
         provider.init(this);
         executeSqlStatement(provider);

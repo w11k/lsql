@@ -53,6 +53,18 @@ public class LSqlDao {
         return getlSqlFile().query(getCurrentMethodName(), queryParameters);
     }
 
+    public void methodStatement() {
+        getlSqlFile().statement(getCurrentMethodName()).execute();
+    }
+
+    public void methodStatement(Object... keyVals) {
+        getlSqlFile().statement(getCurrentMethodName()).execute(keyVals);
+    }
+
+    public void methodStatement(Map<String, Object> queryParameters) {
+        getlSqlFile().statement(getCurrentMethodName()).execute(queryParameters);
+    }
+
     private String getCurrentMethodName() {
         return methodNameThreadLocal.get();
     }
