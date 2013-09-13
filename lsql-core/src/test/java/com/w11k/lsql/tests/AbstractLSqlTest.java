@@ -1,8 +1,6 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.googlecode.flyway.core.Flyway;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.dialects.H2Dialect;
@@ -94,13 +92,6 @@ public abstract class AbstractLSqlTest {
         startMatcher.find();
         String tableName = startMatcher.group(1);
         lSql.executeRawSql(sql);
-    }
-
-    protected void prettyPrintJson(Object result) {
-        GsonBuilder gb = new GsonBuilder();
-        Gson g = gb.setPrettyPrinting().create();
-        String s = g.toJson(result);
-        System.out.println(s);
     }
 
     private void clear(DataSource ds) {
