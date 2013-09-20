@@ -11,6 +11,7 @@ public class DialectsFactory {
     public Object[] createDialectTests() {
         List<Object> tests = Lists.newLinkedList();
 
+        tests.add(new H2Test());
         tests.add(new PostgresqlTest());
 
 

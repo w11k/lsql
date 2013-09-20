@@ -1,9 +1,6 @@
 package com.w11k.lsql.tests.dialects;
 
-import com.w11k.lsql.LSql;
-import com.w11k.lsql.QueriedRow;
-import com.w11k.lsql.Row;
-import com.w11k.lsql.Table;
+import com.w11k.lsql.*;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.tests.TestUtils;
@@ -14,16 +11,14 @@ import org.testng.annotations.Test;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 
 public abstract class AbstractDialectTests {
 
     protected LSql lSql;
-
-    public abstract DataSource createDataSource() throws SQLException;
-
-    public abstract BaseDialect createDialect();
 
     @BeforeMethod
     public void beforeMethod() throws SQLException {
@@ -41,8 +36,14 @@ public abstract class AbstractDialectTests {
     }
 
     @Test
+    public void run() throws SQLException {
+        insertGetDelete();
+        join();
+        blob();
+    }
+
     public void insertGetDelete() throws SQLException {
-        createTestTable();
+        setupTestTable();
 
         Table table1 = lSql.table("table1");
 
@@ -74,10 +75,88 @@ public abstract class AbstractDialectTests {
         assertEquals(tableSize, 1);
     }
 
+    public void join() {
+        setupCompanyEmployeeContactTables();
+
+        lSql.executeRawSql("INSERT INTO company (name) VALUES ('Company1');\n" +
+                "INSERT INTO company (name) VALUES ('Company2');\n" +
+
+                "INSERT INTO customer (name, company_id) VALUES ('Company1-Customer1', 1);\n" +
+                "INSERT INTO customer (name, company_id) VALUES ('Company1-Customer2', 1);\n" +
+
+                "INSERT INTO employee (name, company_id) VALUES ('Company1-Employee1', 1);\n" +
+                "INSERT INTO employee (name, company_id) VALUES ('Company1-Employee2', 1);\n" +
+                "INSERT INTO employee (name, company_id) VALUES ('Company2-Employee1', 2);\n" +
+                "INSERT INTO employee (name, company_id) VALUES ('Company2-Employee2', 2);\n" +
+
+                "INSERT INTO contact (name, employee_id) VALUES ('Company1-Employee1-Contact1', 1);\n" +
+                "INSERT INTO contact (name, employee_id) VALUES ('Company1-Employee1-Contact2', 1);\n" +
+                "INSERT INTO contact (name, employee_id) VALUES ('Company1-Employee2-Contact1', 2);\n" +
+                "INSERT INTO contact (name, employee_id) VALUES ('Company1-Employee2-Contact2', 2);\n" +
+
+                "INSERT INTO contact (name, employee_id) VALUES ('Company2-Employee1-Contact1', 3);\n" +
+                "INSERT INTO contact (name, employee_id) VALUES ('Company2-Employee1-Contact2', 3);\n" +
+                "INSERT INTO contact (name, employee_id) VALUES ('Company2-Employee2-Contact1', 4);\n" +
+                "INSERT INTO contact (name, employee_id) VALUES ('Company2-Employee2-Contact2', 4);\n");
+
+        // Test groupByTable
+        Query query = lSql.executeRawQuery("SELECT * FROM company, employee, contact");
+        Map<String, List<Row>> byTables = query.groupByTables();
+        assertEquals(byTables.get("company").size(), 2);
+        assertEquals(byTables.get("employee").size(), 4);
+        assertEquals(byTables.get("contact").size(), 8);
+
+        // Test join
+        Table company = lSql.table("company");
+        query = lSql.executeRawQuery("SELECT * FROM company, customer, employee, contact " +
+                "WHERE " +
+                "employee.company_id = company.id " +
+                "AND customer.company_id = company.id " +
+                "AND contact.employee_id = employee.id " +
+                "AND company.id = 1;");
+
+        List<Row> rows = query.joinOn(company);
+        assertEquals(rows.size(), 1);
+        Row company1 = rows.get(0);
+
+        List<Row> customers = company1.getJoinedRows("customer");
+        assertEquals(customers.size(), 2);
+
+        List<Row> employees = company1.getJoinedRows("employee");
+        assertEquals(employees.size(), 2);
+        for (Row employee : employees) {
+            assertEquals(employee.getJoinedRows("contact").size(), 2);
+        }
+    }
+
+    public void blob() {
+        byte[] data = "123456789".getBytes();
+        Blob blob = new Blob(data);
+        TestUtils.testType(lSql, getBlobColumnType(), blob, blob);
+    }
+
+
+    public abstract DataSource createDataSource() throws SQLException;
+
+    public abstract BaseDialect createDialect();
+
     /**
      * Create a table like
      * CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INTEGER)
      */
-    protected abstract void createTestTable();
+    protected abstract void setupTestTable();
+
+    /**
+     * CREATE TABLE company (id SERIAL PRIMARY KEY, name TEXT);
+     * CREATE TABLE customer (id SERIAL PRIMARY KEY, name TEXT, company_id INT REFERENCES company (id));
+     * CREATE TABLE employee (id SERIAL PRIMARY KEY, name TEXT, company_id INT REFERENCES company (id));
+     * CREATE TABLE contact (id SERIAL PRIMARY KEY, name TEXT, employee_id INT REFERENCES employee (id));
+     */
+    protected abstract void setupCompanyEmployeeContactTables();
+
+    /**
+     * BLOB, bytea, ...
+     */
+    protected abstract String getBlobColumnType();
 
 }

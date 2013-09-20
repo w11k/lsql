@@ -1,26 +1,26 @@
 package com.w11k.lsql.tests.dialects;
 
 import com.w11k.lsql.dialects.BaseDialect;
-import com.w11k.lsql.dialects.PostgresDialect;
+import com.w11k.lsql.dialects.H2Dialect;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
-public class PostgresqlTest extends AbstractDialectTests {
+public class H2Test extends AbstractDialectTests {
 
     @Override
     public DataSource createDataSource() throws SQLException {
         BasicDataSource ds = new BasicDataSource();
-        ds.setDriverClassName(org.postgresql.Driver.class.getName());
-        ds.setUrl("jdbc:postgresql://localhost/lsqltests?user=lsqltestsuser&password=lsqltestspass");
+        ds.setDriverClassName(org.h2.Driver.class.getName());
+        ds.setUrl("jdbc:h2:mem:testdb;mode=postgresql");
         ds.setDefaultAutoCommit(false);
         return ds;
     }
 
     @Override
     public BaseDialect createDialect() {
-        return new PostgresDialect();
+        return new H2Dialect();
     }
 
     @Override
@@ -38,6 +38,6 @@ public class PostgresqlTest extends AbstractDialectTests {
 
     @Override
     protected String getBlobColumnType() {
-        return "bytea";
+        return "BLOB";
     }
 }
