@@ -1,17 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="95565755">
-    <data-source source="LOCAL" name="LSqlTests" product="PostgreSQL" version="9.1.9" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.2 JDBC4 (build 1003)" uuid="a2430d54-6a93-4baa-add5-f5ca8ac18e1c">
-      <identifier-quote-string>&quot;</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost/lsqltests?user=lsqltestsuser&amp;password=lsqltestspass</jdbc-url>
-      <libraries>
-        <library>
-          <url>jar://$M2_REPO$/org/postgresql/postgresql/9.2-1003-jdbc4/postgresql-9.2-1003-jdbc4.jar!/</url>
-        </library>
-      </libraries>
-    </data-source>
-  </component>
-</project>
+<project version="4" />
 
