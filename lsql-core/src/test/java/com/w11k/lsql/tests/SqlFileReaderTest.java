@@ -24,25 +24,22 @@ import static org.testng.Assert.assertTrue;
 
 public class SqlFileReaderTest extends AbstractLSqlTest {
 
-    @Test(dataProvider = "lSqlProvider_h2")
-    public void readSqlFileForClass(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void readSqlFileForClass() {
         LSqlFile lSqlFile = lSql.readSqlFile(DummyService.class);
         ImmutableMap<String, LSqlFileStatement> stmts = lSqlFile.getStatements();
         assertTrue(stmts.size() == 1, "wrong number of SQL statements");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void readSqlFile(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void readSqlFile() {
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         ImmutableMap<String, LSqlFileStatement> stmts = lSqlFile.getStatements();
         assertTrue(stmts.size() > 0, "wrong number of SQL statements in file1.sql");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void executeSqlStatement(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void executeSqlStatement() {
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         lSqlFile.statement("create1").execute();
         Table table1 = lSql.table("table1");
@@ -51,16 +48,14 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("age", 60, "content", "text3")).get();
     }
 
-    @Test(dataProvider = "lSqlProvider_h2", expectedExceptions = IllegalArgumentException.class)
-    public void exceptionOnWrongStatementName(LSqlProvider provider) {
-        provider.init(this);
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void exceptionOnWrongStatementName() {
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         lSqlFile.statement("ERRO");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void executeSqlStatementWithParameters(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void executeSqlStatementWithParameters() {
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         lSqlFile.statement("create1").execute();
         Table table1 = lSql.table("table1");
@@ -74,10 +69,9 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         assertEquals(lSql.executeRawQuery("select * from table1").asList().size(), 2);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void executeQueryWithoutChangingParameters(LSqlProvider provider) {
-        provider.init(this);
-        executeSqlStatement(provider);
+    @Test
+    public void executeQueryWithoutChangingParameters() {
+        executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         LSqlFileStatement qInt = lSqlFile.statement("queryWithIntegerArg");
         Query query = qInt.query();
@@ -85,29 +79,26 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         assertEquals(contentForAge60, "text3", "Row with age==60 has content==text3");
     }
 
-    @Test(dataProvider = "lSqlProvider", expectedExceptions = QueryException.class)
-    public void executeQueryWithUnusedParameter(LSqlProvider provider) {
-        provider.init(this);
-        executeSqlStatement(provider);
+    @Test(expectedExceptions = QueryException.class)
+    public void executeQueryWithUnusedParameter() {
+        executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         LSqlFileStatement qInt = lSqlFile.statement("queryWithIntegerArg");
         qInt.query("WRONG", 1);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void executeQueryWithChangedUnquotedParameter(LSqlProvider provider) {
-        provider.init(this);
-        executeSqlStatement(provider);
+    @Test
+    public void executeQueryWithChangedUnquotedParameter() {
+        executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         LSqlFileStatement qInt = lSqlFile.statement("queryWithIntegerArg");
         Query query = qInt.query("age", 20);
         assertEquals(query.asList().size(), 2, "query should return 2 rows with age>20");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void executeQueryWithChangedQuotedParameter(LSqlProvider provider) {
-        provider.init(this);
-        executeSqlStatement(provider);
+    @Test
+    public void executeQueryWithChangedQuotedParameter() {
+        executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         LSqlFileStatement qInt = lSqlFile.statement("queryWithStringArg");
 
@@ -121,10 +112,9 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         assertEquals(query.getFirstRow().get().getInt("age"), 60);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void useNullValueInQuery(LSqlProvider provider) {
-        provider.init(this);
-        executeSqlStatement(provider);
+    @Test
+    public void useNullValueInQuery() {
+        executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         LSqlFileStatement qInt = lSqlFile.statement("queryWithStringArg");
 
@@ -132,9 +122,8 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         assertFalse(query.getFirstRow().isPresent());
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void parametersInQueryUseCustomColumnConverter(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void parametersInQueryUseCustomColumnConverter() {
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         lSqlFile.statement("create2").execute();
 
@@ -162,10 +151,9 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         assertEquals(row, r1);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void executeQueryRangeParameters(LSqlProvider provider) {
-        provider.init(this);
-        executeSqlStatement(provider);
+    @Test
+    public void executeQueryRangeParameters() {
+        executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         LSqlFileStatement markers = lSqlFile.statement("queryRangeMarkers");
         System.out.println(markers.getSqlString());

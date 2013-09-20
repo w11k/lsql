@@ -14,10 +14,8 @@ public class ConverterTest extends AbstractLSqlTest {
 
     private final Converter javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlStringConverter("yes", "no");
 
-    @Test(dataProvider = "lSqlProvider")
-    public void converterForTable(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void converterForTable() {
         createTable("CREATE TABLE table1 (yesno TEXT)");
         createTable("CREATE TABLE table2 (yesno TEXT)");
         Table t1 = lSql.table("table1");
@@ -31,9 +29,8 @@ public class ConverterTest extends AbstractLSqlTest {
         assertEquals(row2.get("yesno"), "true");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void converterForColumnValue(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void converterForColumnValue() {
         createTable("CREATE TABLE table1 (yesno1 TEXT, yesno2 TEXT)");
         Table t1 = lSql.table("table1");
         lSql.table("table1").column("yesno1").setColumnConverter(javaBoolToSqlYesNoStringConverter);
@@ -43,9 +40,8 @@ public class ConverterTest extends AbstractLSqlTest {
         assertEquals(row.get("yesno2"), "true");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void jsonConverter(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void jsonConverter() {
         createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
         Table t1 = lSql.table("table1");
         t1.column("person").setColumnConverter(new ObjectToJsonStringConverter(Person.class));
@@ -56,9 +52,8 @@ public class ConverterTest extends AbstractLSqlTest {
         assertEquals(row.get("person"), p);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void converterForColumnWithMultipleTablesQuery(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void converterForColumnWithMultipleTablesQuery() {
         createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
         createTable("CREATE TABLE table2 (sometext TEXT, person TEXT)");
 

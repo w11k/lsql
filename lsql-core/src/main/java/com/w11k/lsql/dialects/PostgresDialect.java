@@ -64,4 +64,5 @@ public class PostgresDialect extends BaseDialect {
         Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
         return postgresMetaData.getBaseTableName(columnIndex);
     }
+
 }

@@ -15,20 +15,16 @@ import static org.testng.Assert.*;
 
 public class QueryTest extends AbstractLSqlTest {
 
-    @Test(dataProvider = "lSqlProvider")
-    public void query(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void query() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         Query rows = lSql.executeRawQuery("SELECT * FROM table1");
         assertNotNull(rows);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void queryIterator(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void queryIterator() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
@@ -40,10 +36,8 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(sum, 50);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void queryList(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void queryList() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
@@ -51,10 +45,8 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(rows.size(), 2);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void queryMap(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void queryMap() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
@@ -69,10 +61,8 @@ public class QueryTest extends AbstractLSqlTest {
         assertTrue(ages.contains(30));
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void queryGetFirstRow(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void queryGetFirstRow() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         Query rows = lSql.executeRawQuery("SELECT * FROM table1");
@@ -82,10 +72,8 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(row.getInt("age"), 20);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void testTablePrefix(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void testTablePrefix() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name1 TEXT)");
         createTable("CREATE TABLE table2 (id SERIAL PRIMARY KEY, name2 TEXT)");
         Optional<Object> id1 = lSql.table("table1").insert(Row.fromKeyVals("name1", "value1"));
@@ -104,9 +92,8 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(row.getString("table2.name2"), "value2");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void groupByTable(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void groupByTable() {
         setupCompanyEmployeeContact();
 
         Query query = lSql.executeRawQuery("SELECT * FROM company, employee, contact");
@@ -116,9 +103,8 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(byTables.get("contact").size(), 8);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void join(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void join() {
         setupCompanyEmployeeContact();
 
         Table company = lSql.table("company");

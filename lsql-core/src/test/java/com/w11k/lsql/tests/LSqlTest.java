@@ -14,9 +14,8 @@ import static org.testng.Assert.assertNotNull;
 
 public class LSqlTest extends AbstractLSqlTest {
 
-    @Test(dataProvider = "lSqlProvider")
-    public void getConnectionFromConnectionFactory(LSqlProvider provider) throws SQLException {
-        provider.init(this);
+    @Test
+    public void getConnectionFromConnectionFactory() throws SQLException {
         assertNotNull(ConnectionUtils.getConnection(lSql));
     }
 
@@ -31,16 +30,14 @@ public class LSqlTest extends AbstractLSqlTest {
         ConnectionUtils.getConnection(l);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void execute(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void execute() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
     }
 
-    @Test(dataProvider = "lSqlProvider", expectedExceptions = RuntimeException.class)
-    public void executeShouldThrowRuntimeExceptionOnWrongStatement(LSqlProvider provider) {
-        provider.init(this);
+    @Test(expectedExceptions = RuntimeException.class)
+    public void executeShouldThrowRuntimeExceptionOnWrongStatement() {
         lSql.executeRawSql("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO tableX (name, age) VALUES ('cus1', 20)");
     }

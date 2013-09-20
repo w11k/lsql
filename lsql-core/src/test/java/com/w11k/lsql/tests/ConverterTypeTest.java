@@ -12,34 +12,29 @@ import static org.testng.Assert.assertEquals;
 
 public class ConverterTypeTest extends AbstractLSqlTest {
 
-    @Test(dataProvider = "lSqlProvider")
-    public void testBoolean(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void testBoolean() {
         testType("BOOL", false);
         testType("BOOL", true);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void testInt(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void testInt() {
         testType("INT", 5);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void testFloat(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void testFloat() {
         testType("FLOAT", 123f, 123d);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void testText(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void testText() {
         testType("TEXT", "foo");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void converterCanHandleClobNullValue(LSqlProvider provider) throws SQLException {
-        provider.init(this);
+    @Test
+    public void converterCanHandleClobNullValue() throws SQLException {
         createTable("CREATE TABLE table1 (col1 TEXT, col2 TEXT)");
         Table table1 = lSql.table("table1");
         table1.insert(Row.fromKeyVals("col1", "val1"));
@@ -47,28 +42,24 @@ public class ConverterTypeTest extends AbstractLSqlTest {
         assertEquals(row.get("col1"), "val1");
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void testChar(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void testChar() {
         testType("CHAR", 'a');
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void testDate(LSqlProvider provider) {
-        provider.init(this);
+    @Test
+    public void testDate() {
         testType("TIMESTAMP", DateTime.now());
     }
 
     @Test(dataProvider = "lSqlProvider_h2")
-    public void testBlobH2(LSqlProvider provider) {
-        provider.init(this);
+    public void testBlobH2() {
         byte[] data = "123456789".getBytes();
         testType("BLOB", new Blob(data));
     }
 
     @Test(dataProvider = "lSqlProvider_postgresql")
-    public void testBlobPostgres(LSqlProvider provider) {
-        provider.init(this);
+    public void testBlobPostgres() {
         byte[] data = "123456789".getBytes();
         testType("bytea", new Blob(data));
     }

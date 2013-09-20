@@ -19,7 +19,8 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(r.get("b"), "val");
     }
 
-    @Test public void constructorCreatesDefensiveCopy() {
+    @Test
+    public void constructorCreatesDefensiveCopy() {
         Row row1 = new Row().addKeyVals("key1", "value1");
         Row row2 = new Row(row1);
 
@@ -33,17 +34,16 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(r.getInt("a"), 1);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void groupByTable(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void groupByTable() {
         createTable("CREATE TABLE city (id SERIAL PRIMARY KEY, zipcode TEXT, name TEXT)");
         createTable("CREATE TABLE person (id SERIAL PRIMARY KEY, name TEXT, zipcode INTEGER REFERENCES city (id))");
 
-        Optional<Object> cityId = lSql.table("city").insert(Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
+        Optional<Object> cityId = lSql.table("city").insert(Row
+                .fromKeyVals("zipcode", "53721", "name", "Siegburg"));
         lSql.table("person").insert(Row.fromKeyVals("name", "John", "zipcode", cityId.get()));
 
-        QueriedRow row = lSql.executeRawQuery("select * from person, city").getFirstRow().get();
+        QueriedRow row = lSql.executeRawQuery("SELECT * FROM person, city").getFirstRow().get();
         assertEquals(row.getString("city.zipcode"), "53721");
         assertEquals(row.getString("city.name"), "Siegburg");
         assertEquals(row.getString("person.name"), "John");

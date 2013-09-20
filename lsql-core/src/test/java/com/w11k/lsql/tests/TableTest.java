@@ -15,10 +15,8 @@ import static org.testng.Assert.*;
 
 public class TableTest extends AbstractLSqlTest {
 
-    @Test(dataProvider = "lSqlProvider")
-    public void getById(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void getById() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
         Table table1 = lSql.table("table1");
 
@@ -31,20 +29,16 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(table1.get(3).get().getInt("age"), 3);
     }
 
-    @Test(dataProvider = "lSqlProvider_h2")
-    public void getByIdReturnAbsentOnWrongId(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void getByIdReturnAbsentOnWrongId() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
         Table table1 = lSql.table("table1");
 
         assertFalse(table1.get(999).isPresent());
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void insertRow(LSqlProvider provider) throws SQLException {
-        provider.init(this);
-
+    @Test
+    public void insertRow() throws SQLException {
         createTable("CREATE TABLE table1 (name TEXT)");
         Table table1 = lSql.table("table1");
 
@@ -55,10 +49,8 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(insertedRow.getString("name"), "cus1");
     }
 
-    @Test(dataProvider = "lSqlProvider_h2")
-    public void insertShouldReturnGeneratedKey(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void insertShouldReturnGeneratedKey() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INT)");
         Table table1 = lSql.table("table1");
         Object newId = table1.insert(new Row().addKeyVals("age", 1)).get();
@@ -68,10 +60,8 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(query.getInt("age"), 1);
     }
 
-    @Test(dataProvider = "lSqlProvider_h2")
-    public void insertShouldPutIdIntoRowObject(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test
+    public void insertShouldPutIdIntoRowObject() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INT)");
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("age", 1);
@@ -80,10 +70,8 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(optional.get(), row.get("id"));
     }
 
-    @Test(dataProvider = "lSqlProvider_h2", expectedExceptions = InsertException.class)
-    public void insertShouldFailOnWrongKeys(LSqlProvider provider) {
-        provider.init(this);
-
+    @Test(expectedExceptions = InsertException.class)
+    public void insertShouldFailOnWrongKeys() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("age", 1, "wrong", "value");
@@ -92,20 +80,16 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(optional.get(), row.get("id"));
     }
 
-    @Test(dataProvider = "lSqlProvider", expectedExceptions = UpdateException.class)
-    public void updateShouldFailWhenIdNotPresent(LSqlProvider provider) throws SQLException {
-        provider.init(this);
-
+    @Test(expectedExceptions = UpdateException.class)
+    public void updateShouldFailWhenIdNotPresent() throws SQLException {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
         table1.update(row);
     }
 
-    @Test(dataProvider = "lSqlProvider", expectedExceptions = UpdateException.class)
-    public void updateShouldFailOnWrongKeys(LSqlProvider provider) throws SQLException {
-        provider.init(this);
-
+    @Test(expectedExceptions = UpdateException.class)
+    public void updateShouldFailOnWrongKeys() throws SQLException {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("id", 1, "name", "Max");
@@ -115,10 +99,8 @@ public class TableTest extends AbstractLSqlTest {
         table1.update(row);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void updateById(LSqlProvider provider) throws SQLException {
-        provider.init(this);
-
+    @Test
+    public void updateById() throws SQLException {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("id", 1, "name", "Max");
@@ -132,10 +114,8 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(queriedRow, row);
     }
 
-    @Test(dataProvider = "lSqlProvider_h2", expectedExceptions = UpdateException.class)
-    public void updateWithWrongId(LSqlProvider provider) throws SQLException {
-        provider.init(this);
-
+    @Test(expectedExceptions = UpdateException.class)
+    public void updateWithWrongId() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
@@ -148,10 +128,8 @@ public class TableTest extends AbstractLSqlTest {
         table1.update(row);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void save(LSqlProvider provider) throws SQLException {
-        provider.init(this);
-
+    @Test
+    public void save() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
 
@@ -173,10 +151,8 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(queriedRow, row);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void saveWithoutAutoIncrement(LSqlProvider provider) throws SQLException {
-        provider.init(this);
-
+    @Test
+    public void saveWithoutAutoIncrement() throws SQLException {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
 
@@ -201,9 +177,8 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(rows.size(), 1);
     }
 
-    @Test(dataProvider = "lSqlProvider")
-    public void delete(LSqlProvider provider) throws SQLException {
-        provider.init(this);
+    @Test
+    public void delete() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
 
