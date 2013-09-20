@@ -149,7 +149,7 @@ public class Table {
      * @throws InsertException
      * @throws UpdateException
      */
-    public Optional<Object> save(Row row) {
+    public Optional<?> save(Row row) {
         if (!primaryKeyColumn.isPresent()) {
             throw new DatabaseAccessException("save() requires a primary key column.");
         }

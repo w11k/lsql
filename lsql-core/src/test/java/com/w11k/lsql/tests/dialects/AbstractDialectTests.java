@@ -4,15 +4,23 @@ import com.w11k.lsql.*;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.tests.TestUtils;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.testng.ITestResult;
+import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.testng.Assert.assertEquals;
 
@@ -20,16 +28,33 @@ public abstract class AbstractDialectTests {
 
     protected LSql lSql;
 
+    protected Properties properties;
+
+    protected DataSource dataSource;
+
+    private boolean initOk = false;
+
     @BeforeMethod
     public void beforeMethod() throws SQLException {
-        DataSource dataSource = createDataSource();
-        TestUtils.clear(dataSource);
-        Connection con = dataSource.getConnection();
-        this.lSql = new LSql(createDialect(), ConnectionProviders.fromInstance(con));
+        try {
+            properties = readProperties();
+            dataSource = createDataSource();
+            TestUtils.clear(dataSource);
+            Connection con = dataSource.getConnection();
+            this.lSql = new LSql(createDialect(), ConnectionProviders.fromInstance(con));
+            this.initOk = true;
+        } catch (Exception e) {
+            Reporter.getCurrentTestResult().setAttribute("warn", "Can not test dialect.");
+            Reporter.getCurrentTestResult().setStatus(ITestResult.SKIP);
+            e.printStackTrace();
+        }
     }
 
     @AfterMethod
     public void afterMethod() throws Exception {
+        if (!initOk) {
+            return;
+        }
         if (lSql != null) {
             lSql.getConnectionProvider().call().close();
         }
@@ -37,9 +62,12 @@ public abstract class AbstractDialectTests {
 
     @Test
     public void run() throws SQLException {
+        if (!initOk) {
+            return;
+        }
         insertGetDelete();
-        join();
         blob();
+        join();
     }
 
     public void insertGetDelete() throws SQLException {
@@ -58,14 +86,14 @@ public abstract class AbstractDialectTests {
         assertEquals(tableSize, 2);
 
         QueriedRow queried1 = table1.get(id1).get();
-        assertEquals(queried1.getInt("id"), id1);
-        assertEquals(queried1.getInt("age"), 10);
-        assertEquals(row1.getInt("id"), id1);
+        assertEquals(queried1.get("id"), id1);
+        assertEquals(queried1.get("age"), 10);
+        assertEquals(row1.get("id"), id1);
 
         QueriedRow queried2 = table1.get(id2).get();
-        assertEquals(queried2.getInt("id"), id2);
+        assertEquals(queried2.get("id"), id2);
         assertEquals(queried2.getInt("age"), 20);
-        assertEquals(row2.getInt("id"), id2);
+        assertEquals(row2.get("id"), id2);
 
         // Delete
         table1.delete(id2);
@@ -81,23 +109,23 @@ public abstract class AbstractDialectTests {
         lSql.executeRawSql("INSERT INTO company (name) VALUES ('Company1');\n" +
                 "INSERT INTO company (name) VALUES ('Company2');\n" +
 
-                "INSERT INTO customer (name, company_id) VALUES ('Company1-Customer1', 1);\n" +
-                "INSERT INTO customer (name, company_id) VALUES ('Company1-Customer2', 1);\n" +
+                "INSERT INTO customer (name, customer_company_fk) VALUES ('Company1-Customer1', 1);\n" +
+                "INSERT INTO customer (name, customer_company_fk) VALUES ('Company1-Customer2', 1);\n" +
 
-                "INSERT INTO employee (name, company_id) VALUES ('Company1-Employee1', 1);\n" +
-                "INSERT INTO employee (name, company_id) VALUES ('Company1-Employee2', 1);\n" +
-                "INSERT INTO employee (name, company_id) VALUES ('Company2-Employee1', 2);\n" +
-                "INSERT INTO employee (name, company_id) VALUES ('Company2-Employee2', 2);\n" +
+                "INSERT INTO employee (name, employee_company_fk) VALUES ('Company1-Employee1', 1);\n" +
+                "INSERT INTO employee (name, employee_company_fk) VALUES ('Company1-Employee2', 1);\n" +
+                "INSERT INTO employee (name, employee_company_fk) VALUES ('Company2-Employee1', 2);\n" +
+                "INSERT INTO employee (name, employee_company_fk) VALUES ('Company2-Employee2', 2);\n" +
 
-                "INSERT INTO contact (name, employee_id) VALUES ('Company1-Employee1-Contact1', 1);\n" +
-                "INSERT INTO contact (name, employee_id) VALUES ('Company1-Employee1-Contact2', 1);\n" +
-                "INSERT INTO contact (name, employee_id) VALUES ('Company1-Employee2-Contact1', 2);\n" +
-                "INSERT INTO contact (name, employee_id) VALUES ('Company1-Employee2-Contact2', 2);\n" +
+                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company1-Employee1-Contact1', 1);\n" +
+                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company1-Employee1-Contact2', 1);\n" +
+                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company1-Employee2-Contact1', 2);\n" +
+                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company1-Employee2-Contact2', 2);\n" +
 
-                "INSERT INTO contact (name, employee_id) VALUES ('Company2-Employee1-Contact1', 3);\n" +
-                "INSERT INTO contact (name, employee_id) VALUES ('Company2-Employee1-Contact2', 3);\n" +
-                "INSERT INTO contact (name, employee_id) VALUES ('Company2-Employee2-Contact1', 4);\n" +
-                "INSERT INTO contact (name, employee_id) VALUES ('Company2-Employee2-Contact2', 4);\n");
+                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company2-Employee1-Contact1', 3);\n" +
+                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company2-Employee1-Contact2', 3);\n" +
+                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company2-Employee2-Contact1', 4);\n" +
+                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company2-Employee2-Contact2', 4);\n");
 
         // Test groupByTable
         Query query = lSql.executeRawQuery("SELECT * FROM company, employee, contact");
@@ -110,10 +138,10 @@ public abstract class AbstractDialectTests {
         Table company = lSql.table("company");
         query = lSql.executeRawQuery("SELECT * FROM company, customer, employee, contact " +
                 "WHERE " +
-                "employee.company_id = company.id " +
-                "AND customer.company_id = company.id " +
-                "AND contact.employee_id = employee.id " +
-                "AND company.id = 1;");
+                "employee.employee_company_fk = company.company_pk " +
+                "AND customer.customer_company_fk = company.company_pk " +
+                "AND contact.contact_employee_fk = employee.employee_pk " +
+                "AND company.company_pk = 1;");
 
         List<Row> rows = query.joinOn(company);
         assertEquals(rows.size(), 1);
@@ -135,28 +163,64 @@ public abstract class AbstractDialectTests {
         TestUtils.testType(lSql, getBlobColumnType(), blob, blob);
     }
 
+    protected String getHostname() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    public abstract DataSource createDataSource() throws SQLException;
+    protected Properties readProperties() {
+        Properties p = new Properties();
+        String className = getClass().getSimpleName();
+        String fileName = className + "_" + getHostname() + ".dblocal";
+        InputStream inputStream = getClass().getResourceAsStream(fileName);
+        if (inputStream == null) {
+            throw new RuntimeException(
+                    "File '" + getClass().getPackage().getName().replace('.', '/') + "/" +
+                            fileName + "' not found");
+        }
+        try {
+            p.load(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return p;
+    }
 
-    public abstract BaseDialect createDialect();
+    protected String getDatabaseUrl() {
+        return properties.getProperty("url");
+    }
 
-    /**
-     * Create a table like
-     * CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INTEGER)
-     */
+    protected String getDatabaseDriver() {
+        return properties.getProperty("driver");
+    }
+
+    protected String getDatabaseUser() {
+        return properties.getProperty("user");
+    }
+
+    protected String getDatabasePassword() {
+        return properties.getProperty("password");
+    }
+
+    protected DataSource createDataSource() throws SQLException {
+        BasicDataSource ds = new BasicDataSource();
+        ds.setDriverClassName(getDatabaseDriver());
+        ds.setUrl(getDatabaseUrl());
+        ds.setUsername(getDatabaseUser());
+        ds.setPassword(getDatabasePassword());
+        ds.setDefaultAutoCommit(false);
+        return ds;
+    }
+
+    protected abstract BaseDialect createDialect();
+
     protected abstract void setupTestTable();
 
-    /**
-     * CREATE TABLE company (id SERIAL PRIMARY KEY, name TEXT);
-     * CREATE TABLE customer (id SERIAL PRIMARY KEY, name TEXT, company_id INT REFERENCES company (id));
-     * CREATE TABLE employee (id SERIAL PRIMARY KEY, name TEXT, company_id INT REFERENCES company (id));
-     * CREATE TABLE contact (id SERIAL PRIMARY KEY, name TEXT, employee_id INT REFERENCES employee (id));
-     */
     protected abstract void setupCompanyEmployeeContactTables();
 
-    /**
-     * BLOB, bytea, ...
-     */
     protected abstract String getBlobColumnType();
 
 }
