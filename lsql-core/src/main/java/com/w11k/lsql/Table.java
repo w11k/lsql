@@ -1,7 +1,10 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
@@ -12,6 +15,7 @@ import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +126,13 @@ public class Table {
                     "'" + getPrimaryKeyColumn().get() + "' is not present.");
         }
         try {
-            List<String> columns = row.getKeyList();
+            List<String> columns = Lists.newLinkedList(Iterables.filter(row.getKeyList(), new Predicate<String>() {
+                @Override
+                public boolean apply(@Nullable String s) {
+                    return !getPrimaryKeyColumn().get().equals(s);
+                }
+            }));
+
             PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                     .createUpdateStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
