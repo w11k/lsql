@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 
 public class RowTest extends AbstractLSqlTest {
 
@@ -32,6 +33,14 @@ public class RowTest extends AbstractLSqlTest {
     public void getAsThrowsClassCastExceptionOnWrongType() {
         Row r = new Row().addKeyVals("a", "1");
         assertEquals(r.getInt("a"), 1);
+    }
+
+    @Test
+    public void testNull() {
+        Row row = new Row();
+        assertNull(row.getDouble("x"));
+        row.addKeyVals("x", 1d);
+        assertEquals(1d, row.getDouble("x"));
     }
 
     @Test
