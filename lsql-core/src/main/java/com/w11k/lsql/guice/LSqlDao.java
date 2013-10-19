@@ -3,6 +3,7 @@ package com.w11k.lsql.guice;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.sqlfile.LSqlFile;
+import com.w11k.lsql.sqlfile.LSqlFileStatement;
 
 import java.util.Map;
 
@@ -39,6 +40,10 @@ public class LSqlDao {
 
     public void setlSqlFile(LSqlFile lSqlFile) {
         this.lSqlFile = lSqlFile;
+    }
+
+    public LSqlFileStatement statement(String name) {
+        return getlSqlFile().statement(name);
     }
 
     public Query methodQuery() {
