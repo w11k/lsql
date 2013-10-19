@@ -67,9 +67,7 @@ public class Query implements Iterable<QueriedRow> {
                 String sqlTable = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, i);
 
                 if (sqlTable == null || sqlTable.equals("")) {
-                    String c = metaData.getColumnName(i);
-                    throw new IllegalStateException(
-                            "Driver/Dialect returned an empty table name for column '" + c + "'");
+                    sqlTable = "_";
                 }
 
                 if (!useTablePrefix
