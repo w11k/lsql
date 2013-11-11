@@ -34,7 +34,12 @@ public class ByTypeConverter implements Converter {
             if (converter == null) {
                 throw new RuntimeException("No converter found for SQL type: " + columnType);
             }
-            return converter.getValueFromResultSet(lSql, rs, index);
+            Object value = converter.getValueFromResultSet(lSql, rs, index);
+            if (rs.wasNull()) {
+                return null;
+            } else {
+                return value;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -43,7 +48,7 @@ public class ByTypeConverter implements Converter {
     public void setValueInStatement(LSql lSql, PreparedStatement ps, int index,
                                     Object val) throws SQLException {
         if (val == null) {
-            ps.setString(index, "");
+            ps.setObject(index, null);
         } else {
             Converter converter = javaValueToSqlConverters.get(val.getClass());
             if (converter == null) {

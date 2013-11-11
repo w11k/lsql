@@ -23,6 +23,15 @@ public class ConverterTypeTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void testNullInt() {
+        createTable("CREATE TABLE table1 (col1 INT NULL)");
+        Table table1 = lSql.table("table1");
+        table1.insert(Row.fromKeyVals("col1", null));
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        assertEquals(row.get("col1"), null);
+    }
+
+    @Test
     public void testFloat() {
         TestUtils.testType(lSql, "FLOAT", 123f, 123d);
     }
