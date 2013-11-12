@@ -1,17 +1,13 @@
 package com.w11k.lsql.tests.guice;
 
-import com.w11k.lsql.Query;
 import com.w11k.lsql.guice.LSqlDao;
-import com.w11k.lsql.guice.QueryMethod;
-
-import static org.testng.Assert.assertEquals;
+import com.w11k.lsql.sqlfile.LSqlFileStatement;
 
 public class TestDao extends LSqlDao {
 
-    @QueryMethod
-    public void query1() {
-        Query query = methodQuery();
-        assertEquals(query.asList().size(), 1);
+    public LSqlFileStatement getStatement() {
+        return statement("query1");
     }
 
 }
+

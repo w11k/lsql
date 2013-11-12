@@ -7,7 +7,7 @@ public class LSqlModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        LSqlMemberListener listener = new LSqlMemberListener();
+        LSqlDaoListener listener = new LSqlDaoListener();
         requestInjection(listener);
         bindListener(Matchers.any(), listener);
     }

@@ -2,7 +2,6 @@ package com.w11k.lsql.tests.guice;
 
 import com.google.inject.AbstractModule;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.guice.LSqlDaoProvider;
 import com.w11k.lsql.guice.LSqlModule;
 
 public class TestModule extends AbstractModule {
@@ -15,9 +14,8 @@ public class TestModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(LSql.class).toInstance(lSql);
         install(new LSqlModule());
-        LSqlDaoProvider.bind(binder(), TestDao.class);
+        bind(LSql.class).toInstance(lSql);
     }
 
 }
