@@ -9,6 +9,9 @@ import com.w11k.lsql.exceptions.DeleteException;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
+import com.w11k.lsql.validation.AbstractValidationError;
+import com.w11k.lsql.validation.KeyError;
+import com.w11k.lsql.validation.TypeError;
 
 import java.sql.*;
 import java.util.List;
@@ -201,6 +204,33 @@ public class Table {
 
     public LinkedRow newLinkedRow() {
         return new LinkedRow(this);
+    }
+
+    public Map<String, AbstractValidationError> validate(Row row) {
+        Map<String, AbstractValidationError> validationErrors = Maps.newHashMap();
+        for (String key : row.keySet()) {
+            Object value = row.get(key);
+            Optional<? extends AbstractValidationError> error = validate(key, value);
+            if (error.isPresent()) {
+                validationErrors.put(key, error.get());
+            }
+        }
+        return validationErrors;
+    }
+
+    public Optional<? extends AbstractValidationError> validate(String javaColumnName, Object value) {
+        if (!getColumns().containsKey(javaColumnName)) {
+            return of(new KeyError(getTableName(), javaColumnName));
+        }
+
+        Converter converter = column(javaColumnName).getConverter();
+        Class<?> targetType = converter.getSupportedJavaClass();
+        if (!targetType.isAssignableFrom(value.getClass())) {
+            return of(new TypeError(getTableName(), javaColumnName, converter
+                    .getSupportedJavaClass().getSimpleName(), value.getClass().getSimpleName()));
+        }
+
+        return absent();
     }
 
     @Override

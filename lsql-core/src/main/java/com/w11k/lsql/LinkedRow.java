@@ -1,7 +1,7 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.validation.AbstractValidationError;
 
 public class LinkedRow extends Row {
 
@@ -21,20 +21,10 @@ public class LinkedRow extends Row {
 
     @Override
     public Object put(String key, Object value) {
-        if (!table.get().getColumns().containsKey(key)) {
-            throw new IllegalArgumentException(
-                    "Column '" + key + "' does not exist in table '" +
-                            table.get().getTableName() + "'.");
+        Optional<? extends AbstractValidationError> validate = table.get().validate(key, value);
+        if (validate.isPresent()) {
+            validate.get().throwError();
         }
-
-        Converter converter = table.get().column(key).getConverter();
-        Class<?> targetType = converter.getSupportedJavaClass();
-        if (!targetType.isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Column '" + key + "' in table '" +
-                    table.get().getTableName() + "' requires a value of type '" + targetType.getName() +
-                    "', got '" + value.getClass().getName() + "' instead.");
-        }
-
         return super.put(key, value);
     }
 
