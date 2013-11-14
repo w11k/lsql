@@ -83,4 +83,12 @@ public class LinkedRowTest extends AbstractLSqlTest {
         row.put("wrong", 1);
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void putShouldFailOnWrongColumnValue() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
+        Table table1 = lSql.table("table1");
+        LinkedRow row = table1.newLinkedRow();
+        row.put("age", "1");
+    }
+
 }

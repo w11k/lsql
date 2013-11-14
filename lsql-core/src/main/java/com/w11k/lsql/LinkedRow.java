@@ -1,6 +1,7 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.converter.Converter;
 
 public class LinkedRow extends Row {
 
@@ -25,6 +26,15 @@ public class LinkedRow extends Row {
                     "Column '" + key + "' does not exist in table '" +
                             table.get().getTableName() + "'.");
         }
+
+        Converter converter = table.get().column(key).getConverter();
+        Class<?> targetType = converter.getSupportedJavaClass();
+        if (!targetType.isAssignableFrom(value.getClass())) {
+            throw new IllegalArgumentException("Column '" + key + "' in table '" +
+                    table.get().getTableName() + "' requires a value of type '" + targetType.getName() +
+                    "', got '" + value.getClass().getName() + "' instead.");
+        }
+
         return super.put(key, value);
     }
 
