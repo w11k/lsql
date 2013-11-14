@@ -90,4 +90,15 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(row.getString("table2.name2"), "value2");
     }
 
+    @Test
+    public void canUseCalculatedColumns() {
+        createTable("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+        Query rows = lSql.executeRawQuery("SELECT count(*) as c FROM table1");
+        Row row = rows.getFirstRow().get();
+        assertEquals(row.getInt("c"), 2);
+    }
+
+
 }

@@ -2,6 +2,8 @@ package com.w11k.lsql;
 
 import com.w11k.lsql.converter.Converter;
 
+import javax.annotation.Nullable;
+
 public class Column {
 
     private final String columnName;
@@ -10,7 +12,7 @@ public class Column {
 
     private Converter converter;
 
-    public Column(Table table, String columnName, Converter converter) {
+    public Column(@Nullable Table table, String columnName, Converter converter) {
         this.table = table;
         this.columnName = columnName;
         this.converter = converter;

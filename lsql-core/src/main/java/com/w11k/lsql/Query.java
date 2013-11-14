@@ -90,7 +90,15 @@ public class Query implements Iterable<QueriedRow> {
                 String javaTable = lSql.getDialect().identifierSqlToJava(sqlTable);
                 Table table = lSql.table(javaTable);
                 String javaColumn = lSql.getDialect().identifierSqlToJava(sqlColumn);
-                Column column = table.column(javaColumn);
+
+                // This column might not be backed by a table, e.g. count(*)
+                Column column;
+                if (table.getColumns().containsKey(javaColumn)) {
+                    column = table.column(javaColumn);
+                } else {
+                    column = new Column(null, javaColumn, lSql.getDialect().getConverterRegistry()
+                            .getConverterForSqlType(metaData.getColumnType(i)));
+                }
 
                 String name = javaColumn;
                 if (useTablePrefix) {
@@ -104,7 +112,8 @@ public class Query implements Iterable<QueriedRow> {
                 // If all columns in the query are from the same table,
                 // store the table reference
                 if (!useTablePrefix) {
-                    row.setTable(lSql.table(lSql.getDialect().identifierSqlToJava(lastUsedSqlTableName)));
+                    row.setTable(lSql.table(lSql.getDialect()
+                            .identifierSqlToJava(lastUsedSqlTableName)));
                 }
                 rows.add(row);
             }
