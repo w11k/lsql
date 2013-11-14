@@ -1,13 +1,9 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.collect.ImmutableMap;
-import com.w11k.lsql.LSql;
+import com.w11k.lsql.*;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
-import com.w11k.lsql.QueriedRow;
-import com.w11k.lsql.Query;
-import com.w11k.lsql.Row;
-import com.w11k.lsql.Table;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.sqlfile.LSqlFileStatement;
 import com.w11k.lsql.tests.utils.IntWrapper;
@@ -18,9 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class SqlFileReaderTest extends AbstractLSqlTest {
 
@@ -63,10 +57,10 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("age", 3, "content", "text2")).get();
         table1.insert(Row.fromKeyVals("age", 6, "content", "text3")).get();
 
-        assertEquals(lSql.executeRawQuery("select * from table1").asList().size(), 3);
+        assertEquals(lSql.executeRawQuery("SELECT * FROM table1").asList().size(), 3);
         LSqlFileStatement deleteYoung = lSqlFile.statement("deleteYoung");
         deleteYoung.execute("age", 2);
-        assertEquals(lSql.executeRawQuery("select * from table1").asList().size(), 2);
+        assertEquals(lSql.executeRawQuery("SELECT * FROM table1").asList().size(), 2);
     }
 
     @Test
@@ -104,14 +98,13 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         lSqlFile.statement("create2").execute();
 
         Table t2 = lSql.table("table2");
-        t2.column("number").setColumnConverter(new Converter() {
-            @Override
-            public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+        t2.column("number").setConverter(new Converter() {
+            public void setValue(LSql lSql, PreparedStatement ps, int index,
+                                 Object val) throws SQLException {
                 ps.setInt(index, ((IntWrapper) val).getI());
             }
 
-            @Override
-            public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
+            public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
                 return new IntWrapper(rs.getInt(index));
             }
         });
@@ -123,7 +116,8 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         QueriedRow row = lSqlFile.statement("queryColumnConverter").query().getFirstRow().get();
         assertEquals(row.get("number"), new IntWrapper(0));
 
-        row = lSqlFile.statement("queryColumnConverter").query("table2.number", new IntWrapper(1)).getFirstRow().get();
+        row = lSqlFile.statement("queryColumnConverter").query("table2.number", new IntWrapper(1))
+                .getFirstRow().get();
         assertEquals(row, r1);
     }
 

@@ -29,8 +29,6 @@ public class Table {
 
     private Optional<String> primaryKeyColumn = Optional.absent();
 
-    private Optional<Converter> tableConverter = Optional.absent();
-
     public Table(LSql lSql, String tableName) {
         this.lSql = lSql;
         this.tableName = tableName;
@@ -38,14 +36,6 @@ public class Table {
     }
 
     // ----- getter/setter -----
-
-    public Converter getTableConverter() {
-        return tableConverter.or(lSql.getConverter());
-    }
-
-    public void setTableConverter(Converter tableConverter) {
-        this.tableConverter = Optional.fromNullable(tableConverter);
-    }
 
     public LSql getlSql() {
         return lSql;
@@ -67,7 +57,7 @@ public class Table {
         return ImmutableMap.copyOf(columns);
     }
 
-// ----- public -----
+    // ----- public -----
 
     public Column column(String columnName) {
         if (!columns.containsKey(columnName)) {
@@ -131,8 +121,7 @@ public class Table {
             // Set ID
             String pkColumn = getPrimaryKeyColumn().get();
             Object id = row.get(pkColumn);
-            column(pkColumn).getColumnConverter()
-                    .setValueInStatement(lSql, ps, columns.size() + 1, id);
+            column(pkColumn).getConverter().setValueInStatement(lSql, ps, columns.size() + 1, id);
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
@@ -162,7 +151,7 @@ public class Table {
             try {
                 PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                         .createCountForIdStatement(this);
-                column(getPrimaryKeyColumn().get()).getColumnConverter()
+                column(getPrimaryKeyColumn().get()).getConverter()
                         .setValueInStatement(lSql, ps, 1, id);
                 ps.setObject(1, id);
                 ResultSet rs = ps.executeQuery();
@@ -184,8 +173,7 @@ public class Table {
         PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                 .createDeleteByIdStatement(this);
         try {
-            column(getPrimaryKeyColumn().get()).getColumnConverter()
-                    .setValueInStatement(lSql, ps, 1, id);
+            column(getPrimaryKeyColumn().get()).getConverter().setValueInStatement(lSql, ps, 1, id);
             ps.execute();
         } catch (Exception e) {
             throw new DeleteException(e);
@@ -198,7 +186,7 @@ public class Table {
         PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                 .createSelectByIdStatement(this, column);
         try {
-            column.getColumnConverter().setValueInStatement(lSql, ps, 1, id);
+            column.getConverter().setValueInStatement(lSql, ps, 1, id);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -269,7 +257,9 @@ public class Table {
                 String sqlColumnName = columnsMetaData.getString(4);
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
                 int dataType = columnsMetaData.getInt(5);
-                columns.put(javaColumnName, new Column(this, javaColumnName, dataType));
+                Converter converter = lSql.getDialect().getConverterRegistry()
+                        .getConverterForSqlType(dataType);
+                columns.put(javaColumnName, new Column(this, javaColumnName, converter));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -280,7 +270,7 @@ public class Table {
                                                            List<String> columns, Row row) {
         try {
             for (int i = 0; i < columns.size(); i++) {
-                Converter converter = column(columns.get(i)).getColumnConverter();
+                Converter converter = column(columns.get(i)).getConverter();
                 converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)));
             }
             return ps;

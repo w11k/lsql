@@ -1,6 +1,5 @@
 package com.w11k.lsql;
 
-import com.google.common.base.Optional;
 import com.w11k.lsql.converter.Converter;
 
 public class Column {
@@ -9,20 +8,12 @@ public class Column {
 
     private final Table table;
 
-    private Optional<Converter> columnConverter = Optional.absent();
+    private Converter converter;
 
-    public Column(Table table, String columnName, int dataType) {
+    public Column(Table table, String columnName, Converter converter) {
         this.table = table;
         this.columnName = columnName;
-        // TODO dataType
-    }
-
-    public Converter getColumnConverter() {
-        return columnConverter.or(table.getTableConverter());
-    }
-
-    public void setColumnConverter(Converter columnConverter) {
-        this.columnConverter = Optional.fromNullable(columnConverter);
+        this.converter = converter;
     }
 
     public String getColumnName() {
@@ -33,4 +24,11 @@ public class Column {
         return table;
     }
 
+    public Converter getConverter() {
+        return converter;
+    }
+
+    public void setConverter(Converter converter) {
+        this.converter = converter;
+    }
 }

@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.converter.ByTypeConverter;
+import com.w11k.lsql.converter.ByTypeConverterRegistry;
 import com.w11k.lsql.converter.Converter;
 
 import javax.sql.rowset.serial.SerialClob;
@@ -16,38 +16,50 @@ import java.sql.*;
 public class SqlServerDialect extends BaseDialect {
 
     @Override
-    public Converter getConverter() {
-        return new ByTypeConverter() {
+    public ByTypeConverterRegistry getConverterRegistry() {
+        return new ByTypeConverterRegistry() {
             @Override
             protected void init() {
                 super.init();
-                setConverter(
-                        new int[]{Types.NUMERIC},
-                        Double.class,
+                addConverter(
                         new Converter() {
-                            public void setValueInStatement(LSql lSql, PreparedStatement ps,
-                                                            int index,
-                                                            Object val) throws SQLException {
+                            public int[] getSupportedSqlTypes() {
+                                return new int[]{Types.NUMERIC};
+                            }
+
+                            public Class<?> getSupportedJavaClass() {
+                                return Double.class;
+                            }
+
+                            public void setValue(LSql lSql, PreparedStatement ps,
+                                                 int index,
+                                                 Object val) throws SQLException {
                                 ps.setDouble(index, (Double) val);
                             }
 
-                            public Object getValueFromResultSet(LSql lSql, ResultSet rs,
-                                                                int index) throws SQLException {
+                            public Object getValue(LSql lSql, ResultSet rs,
+                                                   int index) throws SQLException {
                                 return rs.getDouble(index);
                             }
                         });
-                setConverter(
-                        new int[]{Types.CLOB},
-                        String.class,
+                addConverter(
                         new Converter() {
-                            public void setValueInStatement(LSql lSql, PreparedStatement ps,
-                                                            int index,
-                                                            Object val) throws SQLException {
+                            public int[] getSupportedSqlTypes() {
+                                return new int[]{Types.CLOB};
+                            }
+
+                            public Class<?> getSupportedJavaClass() {
+                                return String.class;
+                            }
+
+                            public void setValue(LSql lSql, PreparedStatement ps,
+                                                 int index,
+                                                 Object val) throws SQLException {
                                 ps.setClob(index, new SerialClob(val.toString().toCharArray()));
                             }
 
-                            public Object getValueFromResultSet(LSql lSql, ResultSet rs,
-                                                                int index) throws SQLException {
+                            public Object getValue(LSql lSql, ResultSet rs,
+                                                   int index) throws SQLException {
                                 Clob clob = rs.getClob(index);
                                 if (clob != null) {
                                     Reader reader = clob.getCharacterStream();
@@ -61,19 +73,25 @@ public class SqlServerDialect extends BaseDialect {
                                 }
                             }
                         });
-                setConverter(
-                        new int[]{Types.VARBINARY, Types.BINARY},
-                        com.w11k.lsql.Blob.class,
+                addConverter(
                         new Converter() {
-                            public void setValueInStatement(LSql lSql, PreparedStatement ps,
-                                                            int index,
-                                                            Object val) throws SQLException {
+                            public int[] getSupportedSqlTypes() {
+                                return new int[]{Types.VARBINARY, Types.BINARY};
+                            }
+
+                            public Class<?> getSupportedJavaClass() {
+                                return com.w11k.lsql.Blob.class;
+                            }
+
+                            public void setValue(LSql lSql, PreparedStatement ps,
+                                                 int index,
+                                                 Object val) throws SQLException {
                                 com.w11k.lsql.Blob blob = (com.w11k.lsql.Blob) val;
                                 ps.setBytes(index, blob.getData());
                             }
 
-                            public Object getValueFromResultSet(LSql lSql, ResultSet rs,
-                                                                int index) throws SQLException {
+                            public Object getValue(LSql lSql, ResultSet rs,
+                                                   int index) throws SQLException {
                                 return new com.w11k.lsql.Blob(rs.getBytes(index));
                             }
                         });
@@ -98,7 +116,7 @@ public class SqlServerDialect extends BaseDialect {
         }
 
         Optional<Object> id = Optional.of(table.column(table.getPrimaryKeyColumn().get())
-                .getColumnConverter().getValueFromResultSet(getlSql(), resultSet, 1));
+                .getConverter().getValueFromResultSet(getlSql(), resultSet, 1));
 
         // Weird behaviour in SQL Server. Generated INT PRIMARY KEYS are returned
         // as NUMERIC. Hence we convert double to int because we assume that nobody would

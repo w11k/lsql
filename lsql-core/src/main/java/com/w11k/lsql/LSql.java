@@ -2,7 +2,6 @@ package com.w11k.lsql;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.jdbc.ConnectionUtils;
@@ -67,10 +66,6 @@ public class LSql {
 
     public BaseDialect getDialect() {
         return dialect;
-    }
-
-    public Converter getConverter() {
-        return dialect.getConverter();
     }
 
     public Callable<Connection> getConnectionProvider() {

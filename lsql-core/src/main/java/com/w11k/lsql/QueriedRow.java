@@ -18,9 +18,12 @@ public class QueriedRow extends Row {
         try {
             for (String name : meta.keySet()) {
                 Query.ResultSetColumn resultSetColumn = meta.get(name);
-                Converter columnConverter = resultSetColumn.column.getColumnConverter();
-                Object value = columnConverter
-                        .getValueFromResultSet(lSql, resultSet, resultSetColumn.index);
+                Converter converter = resultSetColumn.column.getConverter();
+                Object value = converter.getValueFromResultSet(lSql, resultSet, resultSetColumn.index);
+                if (resultSet.wasNull()) {
+                    value = null;
+                }
+
                 values.put(name, value);
                 columns.put(name, resultSetColumn.column);
             }

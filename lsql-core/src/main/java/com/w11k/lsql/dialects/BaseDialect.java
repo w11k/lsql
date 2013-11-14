@@ -4,8 +4,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.converter.ByTypeConverter;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.converter.ByTypeConverterRegistry;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -28,8 +27,8 @@ public class BaseDialect {
         this.lSql = lSql;
     }
 
-    public Converter getConverter() {
-        return new ByTypeConverter();
+    public ByTypeConverterRegistry getConverterRegistry() {
+        return new ByTypeConverterRegistry();
     }
 
     public PreparedStatementCreator getPreparedStatementCreator() {
@@ -68,7 +67,7 @@ public class BaseDialect {
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             String label = metaData.getColumnLabel(i);
             if (identifierSqlToJava(label).equals(pkName)) {
-                return of(table.column(pkName).getColumnConverter()
+                return of(table.column(pkName).getConverter()
                         .getValueFromResultSet(getlSql(), resultSet, i));
             }
         }

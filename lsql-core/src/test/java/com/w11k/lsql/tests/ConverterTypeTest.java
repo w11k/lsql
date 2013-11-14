@@ -32,8 +32,8 @@ public class ConverterTypeTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void testFloat() {
-        TestUtils.testType(lSql, "FLOAT", 123f, 123d);
+    public void testDouble() {
+        TestUtils.testType(lSql, "DOUBLE", 123d, 123d);
     }
 
     @Test

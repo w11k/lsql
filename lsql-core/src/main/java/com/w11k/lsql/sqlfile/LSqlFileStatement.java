@@ -15,7 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,9 +117,14 @@ public class LSqlFileStatement {
         for (int i = 0; i < found.size(); i++) {
             Parameter p = found.get(i);
             if (queryParameters.containsKey(p.name)) {
-                Converter converter = getConverterFor(p.name);
+                Object value = queryParameters.get(p.name);
                 try {
-                    converter.setValueInStatement(lSql, ps, i + 1, queryParameters.get(p.name));
+                    if (value != null) {
+                        Converter converter = getConverterFor(p.name, value);
+                        converter.setValueInStatement(lSql, ps, i + 1, value);
+                    } else {
+                        ps.setObject(i + 1, null);
+                    }
                 } catch (Exception e) {
                     throw new QueryException(e);
                 }
@@ -189,14 +197,19 @@ public class LSqlFileStatement {
         return sql.toString();
     }
 
-    private Converter getConverterFor(String paramName) {
+    private Converter getConverterFor(String paramName, Object value) {
         String[] split = paramName.split("\\.");
-        if (split.length != 2) {
-            return lSql.getConverter();
+        if (split.length == 1) {
+            // No table prefix
+            return lSql.getDialect().getConverterRegistry().getConverterForJavaValue(value);
+        } else if (split.length == 2) {
+            // With table prefix
+            String tableName = split[0];
+            String columnName = split[1];
+            return lSql.table(tableName).column(columnName).getConverter();
+        } else {
+            throw new RuntimeException("Invalid query parameter: " + paramName);
         }
-        String tableName = split[0];
-        String columnName = split[1];
-        return lSql.table(tableName).column(columnName).getColumnConverter();
     }
 
 }

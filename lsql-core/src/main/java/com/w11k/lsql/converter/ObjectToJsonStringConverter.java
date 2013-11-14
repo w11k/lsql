@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ObjectToJsonStringConverter implements Converter {
+public class ObjectToJsonStringConverter extends Converter {
 
     private final Type type;
 
@@ -16,14 +16,14 @@ public class ObjectToJsonStringConverter implements Converter {
     }
 
     @Override
-    public void setValueInStatement(LSql lSql, PreparedStatement ps, int index,
+    public void setValue(LSql lSql, PreparedStatement ps, int index,
                                     Object val) throws SQLException {
         String json = lSql.getGson().toJson(val);
         ps.setString(index, json);
     }
 
     @Override
-    public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
+    public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
         String json = rs.getString(index);
         return lSql.getGson().fromJson(json, type);
     }
