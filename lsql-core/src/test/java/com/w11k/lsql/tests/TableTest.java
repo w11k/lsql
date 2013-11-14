@@ -217,7 +217,7 @@ public class TableTest extends AbstractLSqlTest {
 
     @Test
     public void validate() throws SQLException {
-        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT, field1 INT, field2 INT)");
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, field1 INT, field2 INT)");
         Table table1 = lSql.table("table1");
 
         Row r = Row.fromKeyVals(
