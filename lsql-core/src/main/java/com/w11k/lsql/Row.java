@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,8 @@ public class Row extends ForwardingMap<String, Object> {
 
     private final Map<String, Object> data;
 
+    private final Map<String, List<Row>> joinedRows;
+
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
         r.addKeyVals(keyVals);
@@ -34,6 +37,7 @@ public class Row extends ForwardingMap<String, Object> {
 
     public Row(Map<String, Object> data) {
         this.data = newHashMap(data);
+        this.joinedRows = Maps.newLinkedHashMap();
     }
 
     public Row addKeyVals(Object... keyVals) {
@@ -108,15 +112,17 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(byte[].class, key);
     }
 
+    public List<Row> getJoinedRows(String joinedTabledName) {
+        return joinedRows.get(joinedTabledName);
+    }
+
+    public void addJoinedRows(String tableName, LinkedList<Row> joinedForeignRows) {
+        joinedRows.put(tableName, joinedForeignRows);
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this).add("data", delegate()).toString();
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public List<Row> getJoinedRows(String s) {
-        return getAs(List.class, "__" + s);
     }
 
     @Override

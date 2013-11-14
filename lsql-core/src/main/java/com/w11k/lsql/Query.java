@@ -187,7 +187,7 @@ public class Query implements Iterable<QueriedRow> {
             if (fullResult.containsKey(foreignTable.getTableName())) {
                 // prepare an empty List in the current row
                 LinkedList<Row> joinedForeignRows = Lists.newLinkedList();
-                row.put("__" + foreignTable.getTableName(), joinedForeignRows);
+                row.addJoinedRows(foreignTable.getTableName(), joinedForeignRows);
 
                 // for each row in the foreign table
                 List<Row> foreignRows = fullResult.get(foreignTable.getTableName());

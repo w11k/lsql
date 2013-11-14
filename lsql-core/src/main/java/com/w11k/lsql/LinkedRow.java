@@ -2,8 +2,6 @@ package com.w11k.lsql;
 
 import com.google.common.base.Optional;
 
-import javax.annotation.Nullable;
-
 public class LinkedRow extends Row {
 
     private Optional<Table> table;
@@ -21,9 +19,13 @@ public class LinkedRow extends Row {
     }
 
     @Override
-    public Object get(@Nullable Object key) {
-        // TODO check
-        return super.get(key);
+    public Object put(String key, Object value) {
+        if (!table.get().getColumns().containsKey(key)) {
+            throw new IllegalArgumentException(
+                    "Column '" + key + "' does not exist in table '" +
+                            table.get().getTableName() + "'.");
+        }
+        return super.put(key, value);
     }
 
     public Optional<?> save() {
