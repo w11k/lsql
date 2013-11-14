@@ -1,7 +1,6 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
-import com.google.gson.GsonBuilder;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
@@ -231,9 +230,6 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(validate.size(), 2);
         assertEquals(validate.get("field2").getClass(), TypeError.class);
         assertEquals(validate.get("field3").getClass(), KeyError.class);
-
-        String s = new GsonBuilder().setPrettyPrinting().create().toJson(validate);
-        System.out.println(s);
     }
 
 }
