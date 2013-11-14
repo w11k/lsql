@@ -22,34 +22,17 @@ SELECT
   *
 FROM table1;
 
--- queryWithIntegerArg
+-- queryRangeMarkers
 SELECT
   *
 FROM table1
 WHERE
-  age > 50 --age
-;
-
--- queryWithStringArg
-SELECT
-  *
-FROM table1
-WHERE
-  content = 'text1' --content
-;
+  age < /*(*/ 15 /*)*/;
 
 -- queryColumnConverter
 SELECT
   *
 FROM table2
 WHERE
-  number < 1 --table2.number
+  table2.number < /*(*/ 1 /*)*/
 ;
-
--- queryRangeMarkers
-SELECT
-  *
-FROM table1
-WHERE
-  age < /*(*/ 1 /*)*/;
-

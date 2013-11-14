@@ -73,52 +73,28 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     public void executeQueryWithoutChangingParameters() {
         executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement qInt = lSqlFile.statement("queryWithIntegerArg");
+        LSqlFileStatement qInt = lSqlFile.statement("queryRangeMarkers");
         Query query = qInt.query();
-        String contentForAge60 = query.getFirstRow().get().getString("content");
-        assertEquals(contentForAge60, "text3", "Row with age==60 has content==text3");
+        assertEquals(query.asList().size(), 1);
+        String firstRow = query.getFirstRow().get().getString("content");
+        assertEquals(firstRow, "text1");
     }
 
     @Test(expectedExceptions = QueryException.class)
     public void executeQueryWithUnusedParameter() {
         executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement qInt = lSqlFile.statement("queryWithIntegerArg");
+        LSqlFileStatement qInt = lSqlFile.statement("queryRangeMarkers");
         qInt.query("WRONG", 1);
-    }
-
-    @Test
-    public void executeQueryWithChangedUnquotedParameter() {
-        executeSqlStatement();
-        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement qInt = lSqlFile.statement("queryWithIntegerArg");
-        Query query = qInt.query("age", 20);
-        assertEquals(query.asList().size(), 2, "query should return 2 rows with age>20");
-    }
-
-    @Test
-    public void executeQueryWithChangedQuotedParameter() {
-        executeSqlStatement();
-        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement qInt = lSqlFile.statement("queryWithStringArg");
-
-        Query query = qInt.query("content", "text1");
-        assertEquals(query.getFirstRow().get().getInt("age"), 10);
-
-        query = qInt.query("content", "text2");
-        assertEquals(query.getFirstRow().get().getInt("age"), 30);
-
-        query = qInt.query("content", "text3");
-        assertEquals(query.getFirstRow().get().getInt("age"), 60);
     }
 
     @Test
     public void useNullValueInQuery() {
         executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement qInt = lSqlFile.statement("queryWithStringArg");
+        LSqlFileStatement qInt = lSqlFile.statement("queryRangeMarkers");
 
-        Query query = qInt.query("content", null);
+        Query query = qInt.query("age", null);
         assertFalse(query.getFirstRow().isPresent());
     }
 

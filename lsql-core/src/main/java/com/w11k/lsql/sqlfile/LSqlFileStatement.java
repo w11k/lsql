@@ -29,14 +29,6 @@ public class LSqlFileStatement {
         int valueEnd;
     }
 
-    // column = 'value' --param
-    private static final Pattern QUOTED_QUERY_ARG = Pattern.compile(
-            "^.*[^\\\\]('.*')\\s*--\\s*([\\w\\.]+)\\s*$", Pattern.MULTILINE);
-
-    // column = 123 --param
-    private static final Pattern UNQUOTED_QUERY_ARG = Pattern.compile(
-            "^.*\\s+(\\w+)\\s+--\\s*([\\w\\.]+)\\s*$", Pattern.MULTILINE);
-
     // column = /*(*/ 123 /*)*/
     private static final Pattern RANGE_QUERY_ARG = Pattern.compile(
             "^.*(/\\*\\(\\*/.*/\\*\\)\\*/).*$");
@@ -96,9 +88,7 @@ public class LSqlFileStatement {
         logger.debug("Executing query '{}' ({}) with parameters {}",
                 statementName, lSqlFile.getFileName(), queryParameters.keySet());
 
-        List<Parameter> found = Lists.newLinkedList();
-        checkEndOfLineNamedParameters(found);
-        checkRangeQueryParameters(queryParameters, found);
+        List<Parameter> found = checkQueryParameters(queryParameters);
         sortCollectedParameters(found);
         String sql = createSqlStringWithPlaceholders(queryParameters, found);
 
@@ -143,8 +133,8 @@ public class LSqlFileStatement {
         return ps;
     }
 
-    private void checkRangeQueryParameters(Map<String, Object> queryParameters,
-                                           List<Parameter> found) {
+    private List<Parameter> checkQueryParameters(Map<String, Object> queryParameters) {
+        List<Parameter> found = Lists.newLinkedList();
 
         int previousLinesLength = 0;
         String[] lines = sqlString.split("\n");
@@ -162,6 +152,8 @@ public class LSqlFileStatement {
             }
             previousLinesLength += (line + "\n").length();
         }
+
+        return found;
     }
 
     private String queryParameterInLine(Map<String, Object> queryParameters, String line) {
@@ -171,22 +163,6 @@ public class LSqlFileStatement {
             }
         }
         return null;
-    }
-
-    private void checkEndOfLineNamedParameters(List<Parameter> found) {
-        for (Pattern pattern : Arrays.asList(QUOTED_QUERY_ARG, UNQUOTED_QUERY_ARG)) {
-            Matcher matcher = pattern.matcher(sqlString);
-            while (matcher.find()) {
-                String paramName = matcher.group(2);
-
-                Parameter p = new Parameter();
-                p.name = paramName;
-                p.valueStart = matcher.start(1);
-                p.valueEnd = matcher.end(1);
-
-                found.add(p);
-            }
-        }
     }
 
     private void sortCollectedParameters(List<Parameter> parameters) {

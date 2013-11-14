@@ -58,7 +58,8 @@ public class LSqlFile {
             parseSqlStatements();
         }
         if (!statements.containsKey(name)) {
-            throw new IllegalArgumentException("No statement with name '" + name + "' found.");
+            throw new IllegalArgumentException("No statement with name '" + name +
+                    "' found in file '" + path + "'.");
         }
         return statements.get(name);
     }

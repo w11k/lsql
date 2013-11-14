@@ -1,5 +1,6 @@
 package com.w11k.lsql.guice;
 
+import com.google.inject.Inject;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.sqlfile.LSqlFile;
@@ -7,6 +8,7 @@ import com.w11k.lsql.sqlfile.LSqlFileStatement;
 
 public class LSqlDao {
 
+    @Inject
     private LSql lSql;
 
     private LSqlFile lSqlFile;
@@ -20,7 +22,11 @@ public class LSqlDao {
     }
 
     public LSqlFile getlSqlFile() {
-        return lSqlFile;
+        if (lSqlFile != null) {
+            return lSqlFile;
+        } else {
+            return lSql.readSqlFile(getClass());
+        }
     }
 
     public void setlSqlFile(LSqlFile lSqlFile) {
