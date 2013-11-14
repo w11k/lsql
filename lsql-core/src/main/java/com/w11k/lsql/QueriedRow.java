@@ -8,18 +8,20 @@ import com.w11k.lsql.exceptions.QueryException;
 import java.sql.ResultSet;
 import java.util.Map;
 
-public class QueriedRow extends Row {
+public class QueriedRow extends LinkedRow {
 
     private final Map<String, Object> values = Maps.newHashMap();
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
     public QueriedRow(LSql lSql, Map<String, Query.ResultSetColumn> meta, ResultSet resultSet) {
+        super(null);
         try {
             for (String name : meta.keySet()) {
                 Query.ResultSetColumn resultSetColumn = meta.get(name);
                 Converter converter = resultSetColumn.column.getConverter();
-                Object value = converter.getValueFromResultSet(lSql, resultSet, resultSetColumn.index);
+                Object value = converter
+                        .getValueFromResultSet(lSql, resultSet, resultSetColumn.index);
                 if (resultSet.wasNull()) {
                     value = null;
                 }
@@ -32,13 +34,13 @@ public class QueriedRow extends Row {
         }
     }
 
-    public Map<String, Row> groupByTables() {
-        Map<String, Row> byTables = Maps.newHashMap();
+    public Map<String, LinkedRow> groupByTables() {
+        Map<String, LinkedRow> byTables = Maps.newHashMap();
         for (String key : columns.keySet()) {
             Column column = columns.get(key);
             String tableName = column.getTable().getTableName();
             if (!byTables.containsKey(tableName)) {
-                byTables.put(tableName, new Row());
+                byTables.put(tableName, new LinkedRow(column.getTable()));
             }
             Row row = byTables.get(tableName);
             row.put(column.getColumnName(), get(key));

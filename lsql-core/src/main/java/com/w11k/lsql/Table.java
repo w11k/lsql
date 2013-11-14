@@ -192,9 +192,15 @@ public class Table {
         }
         List<QueriedRow> queriedRows = new Query(lSql, ps).asList();
         if (queriedRows.size() == 1) {
-            return of(queriedRows.get(0));
+            QueriedRow row = queriedRows.get(0);
+            row.setTable(this);
+            return of(row);
         }
         return absent();
+    }
+
+    public LinkedRow newLinkedRow() {
+        return new LinkedRow(this);
     }
 
     @Override

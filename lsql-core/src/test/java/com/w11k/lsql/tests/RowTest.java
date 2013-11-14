@@ -1,6 +1,7 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Row;
 import org.testng.annotations.Test;
@@ -56,7 +57,7 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(row.getString("person.name"), "John");
         assertEquals(row.getInt("person.zipcode"), cityId.get());
 
-        Map<String, Row> byTables = row.groupByTables();
+        Map<String, LinkedRow> byTables = row.groupByTables();
         assertEquals(byTables.get("city").getString("name"), "Siegburg");
         assertEquals(byTables.get("city").getString("zipcode"), "53721");
         assertEquals(byTables.get("person").getString("name"), "John");

@@ -101,6 +101,11 @@ public class Query implements Iterable<QueriedRow> {
             }
             while (resultSet.next()) {
                 QueriedRow row = new QueriedRow(lSql, this.meta, resultSet);
+                // If all columns in the query are from the same table,
+                // store the table reference
+                if (!useTablePrefix) {
+                    row.setTable(lSql.table(lSql.getDialect().identifierSqlToJava(lastUsedSqlTableName)));
+                }
                 rows.add(row);
             }
         } catch (SQLException e) {
@@ -140,7 +145,7 @@ public class Query implements Iterable<QueriedRow> {
 
         // For each row in query
         for (QueriedRow queriedRow : asList()) {
-            Map<String, Row> rowByTables = queriedRow.groupByTables();
+            Map<String, LinkedRow> rowByTables = queriedRow.groupByTables();
 
             // for each table in a row
             for (String key : rowByTables.keySet()) {
