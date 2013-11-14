@@ -9,8 +9,6 @@ import com.w11k.lsql.exceptions.DeleteException;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.List;
@@ -20,8 +18,6 @@ import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
 public class Table {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final LSql lSql;
 
@@ -38,7 +34,7 @@ public class Table {
     public Table(LSql lSql, String tableName) {
         this.lSql = lSql;
         this.tableName = tableName;
-        fetchKeys();
+        fetchMeta();
     }
 
     // ----- getter/setter -----
@@ -67,17 +63,21 @@ public class Table {
         return ImmutableMap.copyOf(exportedForeignKeyTables);
     }
 
-    // ----- public -----
+    public Map<String, Column> getColumns() {
+        return ImmutableMap.copyOf(columns);
+    }
+
+// ----- public -----
 
     public Column column(String columnName) {
         if (!columns.containsKey(columnName)) {
-            columns.put(columnName, new Column(this, columnName));
+            throw new RuntimeException(
+                    "Column '" + columnName + "' does not exist in table '" + tableName + "'.");
         }
         return columns.get(columnName);
     }
 
     /**
-     * @param row
      * @throws InsertException
      */
     public Optional<Object> insert(Row row) {
@@ -113,7 +113,6 @@ public class Table {
     }
 
     /**
-     * @param row
      * @throws UpdateException
      */
     public Optional<Object> update(Row row) {
@@ -147,7 +146,6 @@ public class Table {
     }
 
     /**
-     * @param row
      * @throws InsertException
      * @throws UpdateException
      */
@@ -235,7 +233,7 @@ public class Table {
         return "Table{tableName='" + tableName + "'}";
     }
 
-    private void fetchKeys() {
+    private void fetchMeta() {
         Connection con = ConnectionUtils.getConnection(lSql);
         try {
             DatabaseMetaData md = con.getMetaData();
@@ -245,10 +243,10 @@ public class Table {
                     lSql.getDialect().identifierJavaToSql(tableName));
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
-                return;
+            } else {
+                String idColumn = primaryKeys.getString(4);
+                primaryKeyColumn = of(lSql.getDialect().identifierSqlToJava(idColumn));
             }
-            String idColumn = primaryKeys.getString(4);
-            primaryKeyColumn = of(lSql.getDialect().identifierSqlToJava(idColumn));
 
             // Fetch Foreign keys
             ResultSet exportedKeys = md.getExportedKeys(null, null,
@@ -262,6 +260,16 @@ public class Table {
                 Table foreignTable = lSql.table(javaTableName);
                 Column foreignColumn = foreignTable.column(javaColumnName);
                 exportedForeignKeyTables.put(foreignTable, foreignColumn);
+            }
+
+            // Fetch all columns
+            ResultSet columnsMetaData = md.getColumns(
+                    null, null, lSql.getDialect().identifierJavaToSql(tableName), null);
+            while (columnsMetaData.next()) {
+                String sqlColumnName = columnsMetaData.getString(4);
+                String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
+                int dataType = columnsMetaData.getInt(5);
+                columns.put(javaColumnName, new Column(this, javaColumnName, dataType));
             }
         } catch (SQLException e) {
             e.printStackTrace();

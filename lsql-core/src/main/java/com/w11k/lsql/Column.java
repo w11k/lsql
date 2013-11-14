@@ -11,9 +11,10 @@ public class Column {
 
     private Optional<Converter> columnConverter = Optional.absent();
 
-    public Column(Table table, String columnName) {
+    public Column(Table table, String columnName, int dataType) {
         this.table = table;
         this.columnName = columnName;
+        // TODO dataType
     }
 
     public Converter getColumnConverter() {

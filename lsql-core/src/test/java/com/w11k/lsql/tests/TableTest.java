@@ -201,4 +201,16 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(tableSize, 1);
     }
 
+    @Test
+    public void fetchColumns() throws SQLException {
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT, age INT)");
+        Table table1 = lSql.table("table1");
+        assertEquals(table1.getColumns().size(), 3);
+        assertTrue(table1.getColumns().containsKey("id"));
+        assertTrue(table1.getColumns().containsKey("name"));
+        assertTrue(table1.getColumns().containsKey("age"));
+    }
+
+
+
 }

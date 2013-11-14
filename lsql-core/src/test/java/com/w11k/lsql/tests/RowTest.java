@@ -7,9 +7,7 @@ import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.*;
 
 public class RowTest extends AbstractLSqlTest {
 
@@ -48,8 +46,8 @@ public class RowTest extends AbstractLSqlTest {
         createTable("CREATE TABLE city (id SERIAL PRIMARY KEY, zipcode TEXT, name TEXT)");
         createTable("CREATE TABLE person (id SERIAL PRIMARY KEY, name TEXT, zipcode INTEGER REFERENCES city (id))");
 
-        Optional<Object> cityId = lSql.table("city").insert(Row
-                .fromKeyVals("zipcode", "53721", "name", "Siegburg"));
+        Optional<Object> cityId = lSql.table("city").insert(
+                Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
         lSql.table("person").insert(Row.fromKeyVals("name", "John", "zipcode", cityId.get()));
 
         QueriedRow row = lSql.executeRawQuery("SELECT * FROM person, city").getFirstRow().get();
