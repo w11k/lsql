@@ -34,10 +34,16 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(r.getInt("a"), 1);
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void getAsThrowsExceptionOnWrongKey() {
+        Row r = new Row().addKeyVals("a", "1");
+        assertEquals(r.getInt("x"), 1);
+    }
+
     @Test
     public void testNull() {
         Row row = new Row();
-        assertNull(row.getDouble("x"));
+        assertNull(row.get("x"));
         row.addKeyVals("x", 1d);
         assertEquals(1d, row.getDouble("x"));
     }

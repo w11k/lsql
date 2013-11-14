@@ -62,7 +62,7 @@ public class Row extends ForwardingMap<String, Object> {
     public <A> A getAs(Class<A> type, String key) {
         Object value = get(key);
         if (value == null) {
-            return null;
+            throw new IllegalArgumentException("No entry for key '" + key + "'.");
         }
         if (!type.isAssignableFrom(value.getClass())) {
             throw new ClassCastException(

@@ -75,4 +75,12 @@ public class LinkedRowTest extends AbstractLSqlTest {
         assertTrue(byTables.get("table2").getTable().isPresent());
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void putShouldFailOnWrongColumnName() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
+        Table table1 = lSql.table("table1");
+        LinkedRow row = table1.newLinkedRow();
+        row.put("wrong", 1);
+    }
+
 }
