@@ -64,7 +64,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         Query rows = lSql.executeRawQuery("SELECT * FROM table1");
-        Row row = rows.getFirstRow().get();
+        QueriedRow row = rows.getFirstRow().get();
         assertNotNull(row);
         assertEquals(row.getString("name"), "cus1");
         assertEquals(row.getInt("age"), 20);
@@ -98,6 +98,33 @@ public class QueryTest extends AbstractLSqlTest {
         Query rows = lSql.executeRawQuery("SELECT count(*) as c FROM table1");
         Row row = rows.getFirstRow().get();
         assertEquals(row.getInt("c"), 2);
+    }
+
+    @Test
+    public void canUseCalculatedColumnsTogetherWithNormalColumnsOneTable() {
+        createTable("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+        Query rows = lSql.executeRawQuery("SELECT name, age, count(*) as c FROM table1");
+        Row row = rows.getFirstRow().get();
+        assertEquals(row.getString("name"), "cus1");
+        assertEquals(row.getInt("age"), 20);
+        assertEquals(row.getInt("c"), 1);
+    }
+
+    @Test
+    public void canUseCalculatedColumnsTogetherWithNormalColumnsTwoTable() {
+        createTable("CREATE TABLE table1 (name TEXT, age INT)");
+        createTable("CREATE TABLE table2 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+        lSql.executeRawSql("INSERT INTO table2 (name, age) VALUES ('cus2', 30)");
+        Query rows = lSql.executeRawQuery("SELECT *, count(*) as c FROM table1, table2");
+
+        Row row = rows.getFirstRow().get();
+        assertEquals(row.getString("table1.name"), "cus1");
+        assertEquals(row.getString("table2.name"), "cus2");
+        assertEquals(row.getInt("table1.age"), 20);
+        assertEquals(row.getInt("table2.age"), 30);
+        assertEquals(row.getInt("c"), 1);
     }
 
 

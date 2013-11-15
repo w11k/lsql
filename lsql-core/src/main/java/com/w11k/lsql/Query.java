@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 
@@ -11,13 +12,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
 
 public class Query implements Iterable<QueriedRow> {
 
+    /*
     public class ResultSetColumn {
 
         final public int index;
@@ -29,6 +31,7 @@ public class Query implements Iterable<QueriedRow> {
             this.column = column;
         }
     }
+    */
 
     private final LSql lSql;
 
@@ -36,7 +39,7 @@ public class Query implements Iterable<QueriedRow> {
 
     private List<QueriedRow> rows;
 
-    private Map<String, ResultSetColumn> meta = Maps.newHashMap();
+    //private Map<String, ResultSetColumn> meta = Maps.newHashMap();
 
     public Query(LSql lSql, PreparedStatement preparedStatement) {
         this.lSql = lSql;
@@ -45,82 +48,11 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     public Query(LSql lSql, String sql) {
-        this.lSql = lSql;
-        this.preparedStatement = ConnectionUtils.prepareStatement(lSql, sql, false);
-        run();
+        this(lSql, ConnectionUtils.prepareStatement(lSql, sql, false));
     }
 
     public LSql getlSql() {
         return lSql;
-    }
-
-    public Query run() {
-        rows = Lists.newLinkedList();
-        try {
-            final ResultSet resultSet = preparedStatement.executeQuery();
-            ResultSetMetaData metaData = resultSet.getMetaData();
-
-            boolean useTablePrefix = false;
-            String lastUsedSqlTableName = null;
-            for (int i = 1; i <= metaData.getColumnCount(); i++) {
-
-                String sqlTable = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, i);
-
-                if (sqlTable == null || sqlTable.equals("")) {
-                    sqlTable = "_";
-                }
-
-                if (!useTablePrefix
-                        && lastUsedSqlTableName != null
-                        && !lastUsedSqlTableName.equals(sqlTable)) {
-                    // More than 1 table used in query. Switch to table prefix mode.
-                    useTablePrefix = true;
-                    // Rename the already processed columns
-                    Map<String, ResultSetColumn> newMeta = Maps.newHashMap();
-                    for (String name : meta.keySet()) {
-                        ResultSetColumn resultSetColumn = meta.get(name);
-                        newMeta.put(resultSetColumn.column.getTable().getTableName() + "." +
-                                name, resultSetColumn);
-                    }
-                    meta = newMeta;
-                }
-                lastUsedSqlTableName = sqlTable;
-
-                String sqlColumn = metaData.getColumnLabel(i);
-                String javaTable = lSql.getDialect().identifierSqlToJava(sqlTable);
-                Table table = lSql.table(javaTable);
-                String javaColumn = lSql.getDialect().identifierSqlToJava(sqlColumn);
-
-                // This column might not be backed by a table, e.g. count(*)
-                Column column;
-                if (table.getColumns().containsKey(javaColumn)) {
-                    column = table.column(javaColumn);
-                } else {
-                    column = new Column(null, javaColumn, lSql.getDialect().getConverterRegistry()
-                            .getConverterForSqlType(metaData.getColumnType(i)));
-                }
-
-                String name = javaColumn;
-                if (useTablePrefix) {
-                    name = javaTable + "." + name;
-                }
-
-                meta.put(name, new ResultSetColumn(i, column));
-            }
-            while (resultSet.next()) {
-                QueriedRow row = new QueriedRow(lSql, this.meta, resultSet);
-                // If all columns in the query are from the same table,
-                // store the table reference
-                if (!useTablePrefix) {
-                    row.setTable(lSql.table(lSql.getDialect()
-                            .identifierSqlToJava(lastUsedSqlTableName)));
-                }
-                rows.add(row);
-            }
-        } catch (SQLException e) {
-            throw new QueryException(e);
-        }
-        return this;
     }
 
     @Override
@@ -138,9 +70,9 @@ public class Query implements Iterable<QueriedRow> {
 
     public Optional<QueriedRow> getFirstRow() {
         if (rows.size() == 0) {
-            return Optional.absent();
+            return absent();
         } else {
-            return Optional.of(rows.get(0));
+            return of(rows.get(0));
         }
     }
 
@@ -185,6 +117,71 @@ public class Query implements Iterable<QueriedRow> {
             joinRow(row, startTable, byTables);
         }
         return startRows;
+    }
+
+    private void run() {
+        List<QueriedRow> newRows = Lists.newLinkedList();
+        try {
+            Map<Integer, Column> columns = Maps.newHashMap();
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            Set<Table> foundTables = Sets.newHashSet();
+
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                // Identify table
+                String sqlTableName = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, i);
+                Optional<Table> table;
+                if (sqlTableName == null || "".equals(sqlTableName)) {
+                    table = absent();
+                } else {
+                    String javaTable = lSql.getDialect().identifierSqlToJava(sqlTableName);
+                    table = of(lSql.table(javaTable));
+                    foundTables.add(table.get());
+                }
+
+                // Get Column instance
+                String sqlColumn = metaData.getColumnLabel(i);
+                String javaColumn = lSql.getDialect().identifierSqlToJava(sqlColumn);
+                Column column;
+                if (table.isPresent()) {
+                    column = table.get().column(javaColumn);
+                } else {
+                    column = new Column(
+                            Optional.<Table>absent(),
+                            javaColumn,
+                            lSql.getDialect().getConverterRegistry()
+                                    .getConverterForSqlType(metaData.getColumnType(i)));
+                }
+                columns.put(i, column);
+            }
+
+            // Read all rows
+            while (resultSet.next()) {
+                Map<String, Object> rowData = Maps.newHashMap();
+                Map<String, Column> columnByName = Maps.newHashMap();
+
+                for (Integer columnIndex : columns.keySet()) {
+                    Column column = columns.get(columnIndex);
+                    String key;
+                    if (foundTables.size() <= 1) {
+                        key = column.getColumnName();
+                    } else {
+                        key = column.getColumnNameWithPrefix();
+                    }
+                    Object value = column.getConverter().getValueFromResultSet(lSql, resultSet, columnIndex);
+                    rowData.put(key, value);
+                    columnByName.put(key, column);
+                }
+                QueriedRow row = new QueriedRow(rowData, columnByName);
+                if (foundTables.size() == 1) {
+                    row.setTable(foundTables.iterator().next());
+                }
+                newRows.add(row);
+            }
+            this.rows = newRows;
+        } catch (SQLException e) {
+            throw new QueryException(e);
+        }
     }
 
     private Row joinRow(Row row, Table tableOfRow, Map<String, List<Row>> fullResult) {

@@ -301,7 +301,7 @@ public class Table {
                 int dataType = columnsMetaData.getInt(5);
                 Converter converter = lSql.getDialect().getConverterRegistry()
                         .getConverterForSqlType(dataType);
-                columns.put(javaColumnName, new Column(this, javaColumnName, converter));
+                columns.put(javaColumnName, new Column(of(this), javaColumnName, converter));
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -43,12 +43,12 @@ public class LinkedRowTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void queryWithOnlyTableShouldLinkRowToTable() {
+    public void queryWithOnlyOneTableShouldLinkRowToTable() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
         lSql.table("table1").insert(Row.fromKeyVals("id", 1, "age", 1));
         Query query = lSql.executeRawQuery("SELECT * FROM table1;");
         QueriedRow row = query.getFirstRow().get();
-        assertTrue(row.getTable().isPresent());
+        assertTrue(row.hasLinkedTable());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class LinkedRowTest extends AbstractLSqlTest {
         lSql.table("table2").insert(Row.fromKeyVals("id", 1, "age", 1));
         Query query = lSql.executeRawQuery("SELECT * FROM table1, table2;");
         QueriedRow row = query.getFirstRow().get();
-        assertFalse(row.getTable().isPresent());
+        assertFalse(row.hasLinkedTable());
     }
 
     @Test
@@ -71,8 +71,8 @@ public class LinkedRowTest extends AbstractLSqlTest {
         Query query = lSql.executeRawQuery("SELECT * FROM table1, table2;");
         QueriedRow row = query.getFirstRow().get();
         Map<String, LinkedRow> byTables = row.groupByTables();
-        assertTrue(byTables.get("table1").getTable().isPresent());
-        assertTrue(byTables.get("table2").getTable().isPresent());
+        assertTrue(byTables.get("table1").getTable() != null);
+        assertTrue(byTables.get("table2").getTable() != null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

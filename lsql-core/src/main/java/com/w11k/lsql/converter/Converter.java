@@ -18,7 +18,11 @@ public abstract class Converter {
     }
 
     public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
-        return getValue(lSql, rs, index);
+        Object value = getValue(lSql, rs, index);
+        if (rs.wasNull()) {
+            return null;
+        }
+        return value;
     }
 
     public int[] getSupportedSqlTypes() {
@@ -29,10 +33,10 @@ public abstract class Converter {
         throw new RuntimeException("This converter does not specify the supported Java class.");
     }
 
-    public abstract void setValue(LSql lSql, PreparedStatement ps, int index,
+    protected abstract void setValue(LSql lSql, PreparedStatement ps, int index,
                                   Object val) throws SQLException;
 
-    public abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
+    protected abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
 
     protected int getSqlTypeForNullValues() {
         return getSupportedSqlTypes()[0];
