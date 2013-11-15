@@ -21,12 +21,12 @@ public class LinkedRowTest extends AbstractLSqlTest {
         assertTrue(row1Id.isPresent());
         assertEquals(row1Id.get(), 1);
 
-        QueriedRow queriedRow1 = table1.get(1).get();
+        LinkedRow queriedRow1 = table1.get(1).get();
         assertEquals(queriedRow1.getInt("age"), 1);
 
         queriedRow1.put("age", 99);
         queriedRow1.save();
-        QueriedRow queriedRow1b = table1.get(1).get();
+        LinkedRow queriedRow1b = table1.get(1).get();
         assertEquals(queriedRow1b.getInt("age"), 99);
     }
 

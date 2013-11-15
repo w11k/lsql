@@ -85,12 +85,12 @@ public abstract class AbstractDialectTests {
         int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
         assertEquals(tableSize, 2);
 
-        QueriedRow queried1 = table1.get(id1).get();
+        LinkedRow queried1 = table1.get(id1).get();
         assertEquals(queried1.get("id"), id1);
         assertEquals(queried1.get("age"), 10);
         assertEquals(row1.get("id"), id1);
 
-        QueriedRow queried2 = table1.get(id2).get();
+        LinkedRow queried2 = table1.get(id2).get();
         assertEquals(queried2.get("id"), id2);
         assertEquals(queried2.getInt("age"), 20);
         assertEquals(row2.get("id"), id2);

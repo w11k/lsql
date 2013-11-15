@@ -2,11 +2,8 @@ package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
 import com.googlecode.flyway.core.Flyway;
-import com.w11k.lsql.LSql;
+import com.w11k.lsql.*;
 import com.w11k.lsql.dialects.H2Dialect;
-import com.w11k.lsql.QueriedRow;
-import com.w11k.lsql.Row;
-import com.w11k.lsql.Table;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.h2.Driver;
 import org.testng.annotations.Test;
@@ -43,8 +40,8 @@ public class DocumentationSnippetsTest extends AbstractLSqlTest {
         Object newId = john.get("id");
 
         // Use the ID to load the row, returns com.google.common.base.Optional
-        Optional<QueriedRow> queried = persons.get(newId);
-        QueriedRow queriedJohn = queried.get();
+        Optional<LinkedRow> queried = persons.get(newId);
+        LinkedRow queriedJohn = queried.get();
 
         assert queriedJohn.getString("name").equals("John");
         assert queriedJohn.getInt("age") == 20;

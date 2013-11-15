@@ -183,7 +183,7 @@ public class Table {
         }
     }
 
-    public Optional<QueriedRow> get(Object id) {
+    public Optional<LinkedRow> get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
@@ -195,7 +195,7 @@ public class Table {
         }
         List<QueriedRow> queriedRows = new Query(lSql, ps).asList();
         if (queriedRows.size() == 1) {
-            QueriedRow row = queriedRows.get(0);
+            LinkedRow row = queriedRows.get(0);
             row.setTable(this);
             return of(row);
         }

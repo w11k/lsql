@@ -1,6 +1,7 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
@@ -109,7 +110,7 @@ public class TableTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("id", 1, "name", "Max");
         table1.insert(row);
-        QueriedRow queriedRow = table1.get(1).get();
+        LinkedRow queriedRow = table1.get(1).get();
         assertEquals(queriedRow, row);
 
         row.put("name", "John");
@@ -124,7 +125,7 @@ public class TableTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
         Object id = table1.insert(row).get();
-        QueriedRow queriedRow = table1.get(id).get();
+        LinkedRow queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
 
         row.put("id", 999);
@@ -143,7 +144,7 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(id, row.get(table1.getPrimaryKeyColumn().get()));
 
         // Verify insert
-        QueriedRow queriedRow = table1.get(id).get();
+        LinkedRow queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
 
         // Update
@@ -166,7 +167,7 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(id, row.get(table1.getPrimaryKeyColumn().get()));
 
         // Verify insert
-        QueriedRow queriedRow = table1.get(id).get();
+        LinkedRow queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
 
         // Update
