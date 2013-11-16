@@ -23,7 +23,7 @@ public class Row extends ForwardingMap<String, Object> {
 
     private final Map<String, Object> data;
 
-    private final Map<String, List<Row>> joinedRows;
+    //private final Map<String, List<Row>> joinedRows;
 
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
@@ -37,7 +37,7 @@ public class Row extends ForwardingMap<String, Object> {
 
     public Row(Map<String, Object> data) {
         this.data = newHashMap(data);
-        this.joinedRows = Maps.newLinkedHashMap();
+        //this.joinedRows = Maps.newLinkedHashMap();
     }
 
     public Row addKeyVals(Object... keyVals) {
@@ -112,12 +112,15 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(byte[].class, key);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Row> getJoinedRows(String joinedTabledName) {
-        return joinedRows.get(joinedTabledName);
+        //return joinedRows.get(joinedTabledName);
+        return getAs(List.class, "__" + joinedTabledName);
     }
 
     public void addJoinedRows(String tableName, LinkedList<Row> joinedForeignRows) {
-        joinedRows.put(tableName, joinedForeignRows);
+        //joinedRows.put(tableName, joinedForeignRows);
+        data.put("__" + tableName, joinedForeignRows);
     }
 
     public Row copy() {
