@@ -12,7 +12,6 @@
       <entry name="!?*.flex" />
       <entry name="!?*.kt" />
       <entry name="!?*.clj" />
-      <entry name="*" />
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="false">
@@ -23,15 +22,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="lsql (1)" />
         <module name="lsql-core" />
-        <module name="lsql-parent" />
-        <module name="mtypes" />
-        <module name="vertxtest" />
+        <module name="lsql-doc" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="lsql" target="1.6" />
       <module name="lsql-core" target="1.6" />
       <module name="lsql-parent" target="1.6" />
     </bytecodeTargetLevel>

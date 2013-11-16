@@ -112,6 +112,18 @@ public class QueryTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void rowIsNotLinkedToTableWhenCalculatedColumnsAreInTheResultSet() {
+        createTable("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+        Query rows = lSql.executeRawQuery("SELECT name, age, count(*) as c FROM table1");
+        QueriedRow row = rows.getFirstRow().get();
+        assertEquals(row.getString("name"), "cus1");
+        assertEquals(row.getInt("age"), 20);
+        assertEquals(row.getInt("c"), 1);
+        assertFalse(row.hasLinkedTable());
+    }
+
+    @Test
     public void canUseCalculatedColumnsTogetherWithNormalColumnsTwoTable() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         createTable("CREATE TABLE table2 (name TEXT, age INT)");

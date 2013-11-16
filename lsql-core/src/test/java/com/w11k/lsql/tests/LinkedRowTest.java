@@ -76,19 +76,10 @@ public class LinkedRowTest extends AbstractLSqlTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void putShouldFailOnWrongColumnName() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        Table table1 = lSql.table("table1");
-        LinkedRow row = table1.newLinkedRow();
-        row.put("wrong", 1);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void putShouldFailOnWrongColumnValue() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        Table table1 = lSql.table("table1");
-        LinkedRow row = table1.newLinkedRow();
-        row.put("age", "1");
+    public void linkedRowPutThrowsExceptionOnTooLongString() {
+        createTable("CREATE TABLE table1 (name VARCHAR(5))");
+        LinkedRow row = lSql.table("table1").newLinkedRow();
+        row.put("name", "123456");
     }
 
 }

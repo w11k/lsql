@@ -126,6 +126,7 @@ public class Query implements Iterable<QueriedRow> {
             ResultSet resultSet = preparedStatement.executeQuery();
             ResultSetMetaData metaData = resultSet.getMetaData();
             Set<Table> foundTables = Sets.newHashSet();
+            boolean hasFunctionColumns = false;
 
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 // Identify table
@@ -133,6 +134,7 @@ public class Query implements Iterable<QueriedRow> {
                 Optional<Table> table;
                 if (sqlTableName == null || "".equals(sqlTableName)) {
                     table = absent();
+                    hasFunctionColumns = true;
                 } else {
                     String javaTable = lSql.getDialect().identifierSqlToJava(sqlTableName);
                     table = of(lSql.table(javaTable));
@@ -150,7 +152,8 @@ public class Query implements Iterable<QueriedRow> {
                             Optional.<Table>absent(),
                             javaColumn,
                             lSql.getDialect().getConverterRegistry()
-                                    .getConverterForSqlType(metaData.getColumnType(i)));
+                                    .getConverterForSqlType(metaData.getColumnType(i)),
+                            -1);
                 }
                 columns.put(i, column);
             }
@@ -173,7 +176,7 @@ public class Query implements Iterable<QueriedRow> {
                     columnByName.put(key, column);
                 }
                 QueriedRow row = new QueriedRow(rowData, columnByName);
-                if (foundTables.size() == 1) {
+                if (foundTables.size() == 1 && !hasFunctionColumns) {
                     row.setTable(foundTables.iterator().next());
                 }
                 newRows.add(row);

@@ -11,7 +11,6 @@ import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
-import com.w11k.lsql.validation.TypeError;
 
 import java.sql.*;
 import java.util.List;
@@ -228,15 +227,7 @@ public class Table {
         if (!getColumns().containsKey(javaColumnName)) {
             return of(new KeyError(getTableName(), javaColumnName));
         }
-
-        Converter converter = column(javaColumnName).getConverter();
-        Class<?> targetType = converter.getSupportedJavaClass();
-        if (!targetType.isAssignableFrom(value.getClass())) {
-            return of(new TypeError(getTableName(), javaColumnName, converter
-                    .getSupportedJavaClass().getSimpleName(), value.getClass().getSimpleName()));
-        }
-
-        return absent();
+        return column(javaColumnName).validateValue(value);
     }
 
     @Override
@@ -297,11 +288,12 @@ public class Table {
                     null, null, lSql.getDialect().identifierJavaToSql(tableName), null);
             while (columnsMetaData.next()) {
                 String sqlColumnName = columnsMetaData.getString(4);
+                int columnSize = columnsMetaData.getInt(7);
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
                 int dataType = columnsMetaData.getInt(5);
                 Converter converter = lSql.getDialect().getConverterRegistry()
                         .getConverterForSqlType(dataType);
-                columns.put(javaColumnName, new Column(of(this), javaColumnName, converter));
+                columns.put(javaColumnName, new Column(of(this), javaColumnName, converter, columnSize));
             }
         } catch (SQLException e) {
             e.printStackTrace();
