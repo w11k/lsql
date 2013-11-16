@@ -139,5 +139,39 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(row.getInt("c"), 1);
     }
 
+    @Test
+    public void canChangeAQueriedRowBasedOnOneTable() {
+        createTable("CREATE TABLE table1 (name1 TEXT, age1 INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name1, age1) VALUES ('cus1', 20)");
+        Query rows = lSql.executeRawQuery("SELECT * FROM table1");
+
+        Row row = rows.getFirstRow().get();
+        row.put("name1", "should not fail");
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void canNotChangeAQueriedRowBasedOnMoreThanOneTable() {
+        createTable("CREATE TABLE table1 (name1 TEXT, age1 INT)");
+        createTable("CREATE TABLE table2 (name2 TEXT, age2 INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name1, age1) VALUES ('cus1', 20)");
+        lSql.executeRawSql("INSERT INTO table2 (name2, age2) VALUES ('cus2', 30)");
+        Query rows = lSql.executeRawQuery("SELECT * FROM table1, table2");
+
+        Row row = rows.getFirstRow().get();
+        row.put("name1", "should fail");
+    }
+
+    @Test
+    public void canChangeAQueriedRowBasedOnMoreThanOneTableAfterCopy() {
+        createTable("CREATE TABLE table1 (name1 TEXT, age1 INT)");
+        createTable("CREATE TABLE table2 (name2 TEXT, age2 INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name1, age1) VALUES ('cus1', 20)");
+        lSql.executeRawSql("INSERT INTO table2 (name2, age2) VALUES ('cus2', 30)");
+        Query rows = lSql.executeRawQuery("SELECT * FROM table1, table2");
+
+        Row row = rows.getFirstRow().get().copy();
+        row.put("name1", "should fail");
+    }
+
 
 }

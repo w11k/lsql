@@ -14,11 +14,20 @@ public class QueriedRow extends LinkedRow {
         this.columns = columnByName;
     }
 
+
+    @Override
+    public Object put(String key, Object value) {
+        failIfTableIsMissing();
+        return super.put(key, value);
+    }
+
+    @Override
     public Optional<?> save() {
         failIfTableIsMissing();
         return super.save();
     }
 
+    @Override
     public void delete() {
         failIfTableIsMissing();
         super.delete();

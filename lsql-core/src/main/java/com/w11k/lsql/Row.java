@@ -120,6 +120,10 @@ public class Row extends ForwardingMap<String, Object> {
         joinedRows.put(tableName, joinedForeignRows);
     }
 
+    public Row copy() {
+        return new Row(data);
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this).add("data", delegate()).toString();
