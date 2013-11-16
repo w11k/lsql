@@ -211,6 +211,12 @@ public class Table {
         return linkedRow;
     }
 
+    public LinkedRow newLinkedRow(Object... keyVals) {
+        LinkedRow linkedRow = new LinkedRow(this);
+        linkedRow.addKeyVals(keyVals);
+        return linkedRow;
+    }
+
     public Map<String, AbstractValidationError> validate(Row row) {
         Map<String, AbstractValidationError> validationErrors = Maps.newHashMap();
         for (String key : row.keySet()) {
