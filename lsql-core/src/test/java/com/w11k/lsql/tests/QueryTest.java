@@ -2,12 +2,14 @@ package com.w11k.lsql.tests;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -88,6 +90,20 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(row.getString("table1.name1"), "value1");
         assertEquals(row.getInt("table2.id"), id2.get());
         assertEquals(row.getString("table2.name2"), "value2");
+    }
+
+    @Test
+    public void groupRowsByTables() {
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name1 TEXT)");
+        createTable("CREATE TABLE table2 (id SERIAL PRIMARY KEY, name2 TEXT)");
+        lSql.table("table1").insert(Row.fromKeyVals("name1", "value1"));
+        lSql.table("table2").insert(Row.fromKeyVals("name2", "value2"));
+
+        List<Map<String,LinkedRow>> maps = lSql.executeRawQuery(
+                "SELECT * FROM table1, table2").groupRowsByTables();
+        assertEquals(maps.size(), 1);
+        assertEquals(maps.get(0).get("table1").get("name1"), "value1");
+        assertEquals(maps.get(0).get("table2").get("name2"), "value2");
     }
 
     @Test
