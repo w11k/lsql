@@ -16,6 +16,11 @@ public class ObjectToJsonStringConverter extends Converter {
     }
 
     @Override
+    public Class<?> getSupportedJavaClass() {
+        return type.getClass();
+    }
+
+    @Override
     public void setValue(LSql lSql, PreparedStatement ps, int index,
                                     Object val) throws SQLException {
         String json = lSql.getGson().toJson(val);
