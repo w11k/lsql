@@ -25,6 +25,10 @@ public abstract class Converter {
         return value;
     }
 
+    public boolean isValueValid(Object value) {
+        return getSupportedJavaClass().isAssignableFrom(value.getClass());
+    }
+
     public int[] getSupportedSqlTypes() {
         throw new RuntimeException("This converter does not specify the supported SQL types.");
     }

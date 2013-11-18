@@ -26,18 +26,6 @@ public class ConverterTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void jsonConverter() {
-        createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
-        Table t1 = lSql.table("table1");
-        t1.column("person").setConverter(new ObjectToJsonStringConverter(Person.class));
-
-        Person p = new Person("John", "Doe");
-        t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
-        assertEquals(row.get("person"), p);
-    }
-
-    @Test
     public void converterForColumnWithMultipleTablesQuery() {
         createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
         createTable("CREATE TABLE table2 (sometext TEXT, person TEXT)");

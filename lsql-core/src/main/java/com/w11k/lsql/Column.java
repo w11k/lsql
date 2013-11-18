@@ -62,7 +62,7 @@ public class Column {
 
     public Optional<? extends AbstractValidationError> validateValue(Object value) {
         Class<?> targetType = converter.getSupportedJavaClass();
-        if (!targetType.isAssignableFrom(value.getClass())) {
+        if (!converter.isValueValid(value)) {
             return of(new TypeError(getTable().getTableName(), columnName, converter
                     .getSupportedJavaClass().getSimpleName(), value.getClass().getSimpleName()));
         }

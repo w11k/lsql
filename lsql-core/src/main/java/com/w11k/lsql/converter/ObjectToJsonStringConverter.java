@@ -1,5 +1,6 @@
 package com.w11k.lsql.converter;
 
+import com.google.gson.reflect.TypeToken;
 import com.w11k.lsql.LSql;
 
 import java.lang.reflect.Type;
@@ -11,13 +12,21 @@ public class ObjectToJsonStringConverter extends Converter {
 
     private final Type type;
 
-    public ObjectToJsonStringConverter(Type type) {
-        this.type = type;
+    private final Class<?> clazz;
+
+    public ObjectToJsonStringConverter(Class<?> clazz) {
+        this.type = clazz;
+        this.clazz = clazz;
+    }
+
+    public ObjectToJsonStringConverter(TypeToken typeToken) {
+        this.type = typeToken.getType();
+        this.clazz = typeToken.getRawType();
     }
 
     @Override
     public Class<?> getSupportedJavaClass() {
-        return type.getClass();
+        return clazz.getClass();
     }
 
     @Override
