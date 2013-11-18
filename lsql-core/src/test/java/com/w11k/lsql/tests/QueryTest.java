@@ -100,7 +100,7 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.table("table2").insert(Row.fromKeyVals("name2", "value2"));
 
         List<Map<String,LinkedRow>> maps = lSql.executeRawQuery(
-                "SELECT * FROM table1, table2").groupRowsByTables();
+                "SELECT * FROM table1, table2").groupEachRowByTables();
         assertEquals(maps.size(), 1);
         assertEquals(maps.get(0).get("table1").get("name1"), "value1");
         assertEquals(maps.get(0).get("table2").get("name2"), "value2");

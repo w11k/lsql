@@ -110,7 +110,7 @@ public class Query implements Iterable<QueriedRow> {
                 });
     }
 
-    public List<Map<String, LinkedRow>> groupRowsByTables() {
+    public List<Map<String, LinkedRow>> groupEachRowByTables() {
         List<Map<String, LinkedRow>> grouped = Lists.newLinkedList();
         for (QueriedRow row : rows) {
             grouped.add(row.groupByTables());
