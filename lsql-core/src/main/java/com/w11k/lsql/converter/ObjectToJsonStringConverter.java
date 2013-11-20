@@ -26,7 +26,7 @@ public class ObjectToJsonStringConverter extends Converter {
 
     @Override
     public Class<?> getSupportedJavaClass() {
-        return clazz.getClass();
+        return clazz;
     }
 
     @Override

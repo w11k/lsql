@@ -21,12 +21,11 @@ public class LSqlDao {
         this.lSql = lSql;
     }
 
-    public LSqlFile getlSqlFile() {
-        if (lSqlFile != null) {
-            return lSqlFile;
-        } else {
-            return lSql.readSqlFile(getClass());
+    public synchronized LSqlFile getlSqlFile() {
+        if (lSqlFile == null) {
+            this.lSqlFile = lSql.readSqlFile(getClass());
         }
+        return lSqlFile;
     }
 
     public void setlSqlFile(LSqlFile lSqlFile) {

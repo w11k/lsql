@@ -61,6 +61,25 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
         assertEquals(row.get("data"), list);
     }
 
+    @Test
+    public void listOfMapStringStringInALinkedRow() {
+        createTable("CREATE TABLE table1 (id serial primary key, data TEXT)");
+        Table t1 = lSql.table("table1");
+        t1.column("data").setConverter(new ObjectToJsonStringConverter(
+                new TypeToken<List<Map<String, String>>>() { }));
+
+        List<Map<String, String>> list = Lists.newLinkedList();
+        Map<String, String> e = Maps.newHashMap();
+        e.put("a", "1");
+        e.put("b", "2");
+        list.add(e);
+        list.add(e);
+        t1.newLinkedRow("data", list).save();
+
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        assertEquals(row.get("data"), list);
+    }
+
 
 
 }
