@@ -27,6 +27,10 @@ public class LinkedRow extends Row {
         this.table = table;
     }
 
+    public Object getId() {
+        return get(table.getPrimaryKeyColumn().get());
+    }
+
     @Override
     public Object put(String key, Object value) {
         Optional<? extends AbstractValidationError> validate = table.validate(key, value);
