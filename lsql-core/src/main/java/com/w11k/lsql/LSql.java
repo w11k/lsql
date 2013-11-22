@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.w11k.lsql.dialects.BaseDialect;
+import com.w11k.lsql.gson.GsonFactory;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.sqlfile.LSqlFile;
@@ -34,7 +35,7 @@ public class LSql {
 
     private boolean readSqlFilesOnEveryAccess = false;
 
-    private Gson gson = new Gson();
+    private Gson gson = createGsonInstance();
 
     /**
      * Creates a new LSql instance.
@@ -82,10 +83,6 @@ public class LSql {
 
     public Gson getGson() {
         return gson;
-    }
-
-    public void setGson(Gson gson) {
-        this.gson = gson;
     }
 
     /**
@@ -157,6 +154,10 @@ public class LSql {
         return "LSql{" +
                 "dialect=" + dialect +
                 '}';
+    }
+
+    protected Gson createGsonInstance() {
+        return new GsonFactory().createInstance();
     }
 
 }

@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 public class ObjectToJsonStringConverter extends Converter {
 
@@ -27,6 +28,11 @@ public class ObjectToJsonStringConverter extends Converter {
     @Override
     public Class<?> getSupportedJavaClass() {
         return clazz;
+    }
+
+    @Override
+    public int[] getSupportedSqlTypes() {
+        return new int[]{Types.VARCHAR};
     }
 
     @Override
