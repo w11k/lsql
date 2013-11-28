@@ -19,6 +19,8 @@ public class BaseDialect {
 
     private PreparedStatementCreator preparedStatementCreator = new PreparedStatementCreator();
 
+    private ByTypeConverterRegistry converterRegistry = new ByTypeConverterRegistry();
+
     public LSql getlSql() {
         return lSql;
     }
@@ -28,7 +30,7 @@ public class BaseDialect {
     }
 
     public ByTypeConverterRegistry getConverterRegistry() {
-        return new ByTypeConverterRegistry();
+        return converterRegistry;
     }
 
     public PreparedStatementCreator getPreparedStatementCreator() {
