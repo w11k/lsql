@@ -217,6 +217,12 @@ public class TableTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void fetchMetaWithRecursiveFkTable() {
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, ref INT REFERENCES table1(id))");
+        lSql.table("table1");
+    }
+
+    @Test
     public void validate() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, field1 INT, field2 INT)");
         Table table1 = lSql.table("table1");

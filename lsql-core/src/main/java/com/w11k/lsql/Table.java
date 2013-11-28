@@ -284,9 +284,12 @@ public class Table {
                 String sqlColumnName = exportedKeys.getString(8);
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
 
-                Table foreignTable = lSql.table(javaTableName);
-                Column foreignColumn = foreignTable.column(javaColumnName);
-                exportedForeignKeyTables.put(foreignTable, foreignColumn);
+                // Ignore references to same table
+                if (!javaTableName.equals(tableName)) {
+                    Table foreignTable = lSql.table(javaTableName);
+                    Column foreignColumn = foreignTable.column(javaColumnName);
+                    exportedForeignKeyTables.put(foreignTable, foreignColumn);
+                }
             }
 
             // Fetch all columns
