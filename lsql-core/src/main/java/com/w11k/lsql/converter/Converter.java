@@ -26,6 +26,9 @@ public abstract class Converter {
     }
 
     public boolean isValueValid(Object value) {
+        if (value == null) {
+            return isNullValid();
+        }
         return getSupportedJavaClass().isAssignableFrom(value.getClass());
     }
 
@@ -35,6 +38,10 @@ public abstract class Converter {
 
     public Class<?> getSupportedJavaClass() {
         throw new RuntimeException("This converter does not specify the supported Java class.");
+    }
+
+    private boolean isNullValid() {
+        return true;
     }
 
     protected abstract void setValue(LSql lSql, PreparedStatement ps, int index,
