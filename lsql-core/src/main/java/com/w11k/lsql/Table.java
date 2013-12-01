@@ -27,7 +27,7 @@ public class Table {
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
-    final private Map<Table, Column> exportedForeignKeyTables = Maps.newHashMap();
+    final private Map<Table, Column> dependentTables = Maps.newHashMap();
 
     private Optional<String> primaryKeyColumn = Optional.absent();
 
@@ -51,8 +51,8 @@ public class Table {
         return primaryKeyColumn;
     }
 
-    public Map<Table, Column> getExportedForeignKeyTables() {
-        return ImmutableMap.copyOf(exportedForeignKeyTables);
+    public Map<Table, Column> getDependentTables() {
+        return ImmutableMap.copyOf(dependentTables);
     }
 
     public Map<String, Column> getColumns() {
@@ -266,8 +266,7 @@ public class Table {
             DatabaseMetaData md = con.getMetaData();
 
             // Fetch Primary Key
-            ResultSet primaryKeys = md.getPrimaryKeys(null, null,
-                    lSql.getDialect().identifierJavaToSql(tableName));
+            ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
             } else {
@@ -276,8 +275,7 @@ public class Table {
             }
 
             // Fetch Foreign keys
-            ResultSet exportedKeys = md.getExportedKeys(null, null,
-                    lSql.getDialect().identifierJavaToSql(tableName));
+            ResultSet exportedKeys = md.getExportedKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
             while (exportedKeys.next()) {
                 String sqlTableName = exportedKeys.getString(7);
                 String javaTableName = lSql.getDialect().identifierSqlToJava(sqlTableName);
@@ -288,20 +286,19 @@ public class Table {
                 if (!javaTableName.equals(tableName)) {
                     Table foreignTable = lSql.table(javaTableName);
                     Column foreignColumn = foreignTable.column(javaColumnName);
-                    exportedForeignKeyTables.put(foreignTable, foreignColumn);
+                    dependentTables.put(foreignTable, foreignColumn);
                 }
             }
 
             // Fetch all columns
-            ResultSet columnsMetaData = md.getColumns(
-                    null, null, lSql.getDialect().identifierJavaToSql(tableName), null);
+            ResultSet columnsMetaData = md.getColumns(null, null, lSql.getDialect()
+                    .identifierJavaToSql(tableName), null);
             while (columnsMetaData.next()) {
                 String sqlColumnName = columnsMetaData.getString(4);
                 int columnSize = columnsMetaData.getInt(7);
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
                 int dataType = columnsMetaData.getInt(5);
-                Converter converter = lSql.getDialect().getConverterRegistry()
-                        .getConverterForSqlType(dataType);
+                Converter converter = lSql.getDialect().getConverterRegistry().getConverterForSqlType(dataType);
                 columns.put(javaColumnName, new Column(of(this), javaColumnName, converter, columnSize));
             }
         } catch (SQLException e) {

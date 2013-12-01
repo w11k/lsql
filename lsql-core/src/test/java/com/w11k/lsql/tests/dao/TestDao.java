@@ -1,4 +1,4 @@
-package com.w11k.lsql.tests.guice;
+package com.w11k.lsql.tests.dao;
 
 import com.w11k.lsql.guice.LSqlDao;
 import com.w11k.lsql.sqlfile.LSqlFileStatement;

@@ -150,15 +150,18 @@ public class Query implements Iterable<QueriedRow> {
                 }
 
                 // Get Column instance
-                String sqlColumn = metaData.getColumnLabel(i);
+                String sqlColumn = metaData.getColumnName(i);
                 String javaColumn = lSql.getDialect().identifierSqlToJava(sqlColumn);
+                String sqlColumnLabel = metaData.getColumnLabel(i);
+                String javaColumnLabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
+
                 Column column;
                 if (table.isPresent()) {
                     column = table.get().column(javaColumn);
                 } else {
                     column = new Column(
                             Optional.<Table>absent(),
-                            javaColumn,
+                            javaColumnLabel,
                             lSql.getDialect().getConverterRegistry()
                                     .getConverterForSqlType(metaData.getColumnType(i)),
                             -1);
@@ -196,7 +199,7 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     private Row joinRow(Row row, Table tableOfRow, Map<String, List<Row>> fullResult) {
-        Map<Table, Column> foreignTables = tableOfRow.getExportedForeignKeyTables();
+        Map<Table, Column> foreignTables = tableOfRow.getDependentTables();
 
         // for each foreign table
         for (Table foreignTable : foreignTables.keySet()) {
