@@ -24,27 +24,11 @@ import static com.google.common.base.Optional.of;
 
 public class Query implements Iterable<QueriedRow> {
 
-    /*
-    public class ResultSetColumn {
-
-        final public int index;
-
-        final public Column column;
-
-        public ResultSetColumn(int index, Column column) {
-            this.index = index;
-            this.column = column;
-        }
-    }
-    */
-
     private final LSql lSql;
 
     private final PreparedStatement preparedStatement;
 
     private List<QueriedRow> rows;
-
-    //private Map<String, ResultSetColumn> meta = Maps.newHashMap();
 
     public Query(LSql lSql, PreparedStatement preparedStatement) {
         this.lSql = lSql;
@@ -85,51 +69,27 @@ public class Query implements Iterable<QueriedRow> {
         return Lists.newLinkedList(rows);
     }
 
-    public Map<String, Map<Object, Row>> groupByTables() {
-        Map<String, Map<Object, Row>> byTables = Maps.newHashMap();
+    public Map<String, Map<Object, LinkedRow>> groupByTables() {
+        Map<String, Map<Object, LinkedRow>> byTables = Maps.newHashMap();
 
-        // For each row in query
-        for (QueriedRow queriedRow : asList()) {
-
-/*
-
-            Map<String, LinkedRow> rowByTables = queriedRow.groupByTables();
-
-            // for each table in a row
-            for (String key : rowByTables.keySet()) {
-                Row row = rowByTables.get(key);
-                if (!byTables.containsKey(key)) {
-                    byTables.put(key, Maps.<Object, Row>newLinkedHashMap());
+        for (QueriedRow row : asList()) {
+            Map<String, Map<Object, LinkedRow>> grouped = row.groupByTables();
+            for (String table : grouped.keySet()) {
+                if (!byTables.containsKey(table)) {
+                    byTables.put(table, Maps.<Object, LinkedRow>newLinkedHashMap());
                 }
-                String pkColumn = lSql.table(key).getPrimaryKeyColumn().get();
-                Object pkValue = row.get(pkColumn);
-                byTables.get(key).put(pkValue, row);
+                for (Object rowForTableId : grouped.get(table).keySet()) {
+                    LinkedRow value = grouped.get(table).get(rowForTableId);
+                    if (!byTables.get(table).containsKey(rowForTableId)) {
+                        byTables.get(table).put(rowForTableId, value);
+                    } else {
+                        byTables.get(table).get(rowForTableId).putAll(value);
+                    }
+                }
             }
-*/
-
         }
-
         return byTables;
     }
-
-    /*
-    public List<Map<String, LinkedRow>> groupEachRowByTables() {
-        List<Map<String, LinkedRow>> grouped = Lists.newLinkedList();
-        for (QueriedRow row : rows) {
-            grouped.add(row.groupByTables());
-        }
-        return grouped;
-    }
-
-    public List<Row> joinOn(Table startTable) {
-        Map<String, List<Row>> byTables = groupByTables();
-        List<Row> startRows = byTables.get(startTable.getTableName());
-        for (Row row : startRows) {
-            joinRow(row, startTable, byTables);
-        }
-        return startRows;
-    }
-    */
 
     private void run() {
         try {
@@ -172,8 +132,8 @@ public class Query implements Iterable<QueriedRow> {
                 headers.put(i, column);
 
                 // Count table PK occurrences
+                tablePkCounter.putIfAbsent(column.getTableName().or(""), new AtomicInteger());
                 if (column.isPkColumn()) {
-                    tablePkCounter.putIfAbsent(column.getTable().getTableName(), new AtomicInteger());
                     tablePkCounter.get(column.getTable().getTableName()).incrementAndGet();
                 }
             }
@@ -187,7 +147,7 @@ public class Query implements Iterable<QueriedRow> {
                 if (foundTables.size() >= 2) {
                     if (column.hasCorrespondingTable()) {
                         int counter = tablePkCounter.get(column.getTable().getTableName()).get();
-                        if (counter == 1) {
+                        if (counter <= 1) {
                             columnName = column.getTable().getTableName() + "." + columnName;
                         } else {
                             tableCounter.putIfAbsent(column.getTable().getTableName(), new AtomicInteger());
@@ -215,7 +175,7 @@ public class Query implements Iterable<QueriedRow> {
                     rowData.put(columnName, value);
                     columnsByName.put(columnName, column);
                 }
-                QueriedRow row = new QueriedRow(lSql, rowData, columnsByName);
+                QueriedRow row = new QueriedRow(rowData, columnsByName);
                 if (foundTables.size() == 1 && !hasFunctionColumns) {
                     row.setTable(foundTables.iterator().next());
                 }
@@ -226,35 +186,5 @@ public class Query implements Iterable<QueriedRow> {
             throw new QueryException(e);
         }
     }
-
-    /*
-    private Row joinRow(Row row, Table tableOfRow, Map<String, List<Row>> fullResult) {
-        Map<Table, Column> foreignTables = tableOfRow.getDependentTables();
-
-        // for each foreign table
-        for (Table foreignTable : foreignTables.keySet()) {
-            // check if the result contains rows for the foreign table
-            if (fullResult.containsKey(foreignTable.getTableName())) {
-                // prepare an empty List in the current row
-                LinkedList<Row> joinedForeignRows = Lists.newLinkedList();
-                row.addJoinedRows(foreignTable.getTableName(), joinedForeignRows);
-
-                // for each row in the foreign table
-                List<Row> foreignRows = fullResult.get(foreignTable.getTableName());
-                for (Row foreignRow : foreignRows) {
-                    // check if they join PK==FK
-                    if (row.get(tableOfRow.getPrimaryKeyColumn().get()).equals(
-                            foreignRow.get(foreignTables.get(foreignTable).getColumnName()))) {
-
-                        joinRow(foreignRow, foreignTable, fullResult);
-                        joinedForeignRows.add(foreignRow);
-                    }
-                }
-            }
-        }
-        return row;
-    }
-    */
-
 
 }

@@ -2,12 +2,14 @@ package com.w11k.lsql.tests;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -91,7 +93,7 @@ public class QueryTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void testTableCounter() {
+    public void testTableCounterAndGroupByTables() {
         createTable("CREATE TABLE table2 (id SERIAL PRIMARY KEY, name2 TEXT)");
         createTable("CREATE TABLE table1 (" +
                 "id SERIAL PRIMARY KEY, " +
@@ -105,10 +107,11 @@ public class QueryTest extends AbstractLSqlTest {
                 "table2b", id2b.get()
         ));
 
-        QueriedRow row = lSql.executeRawQuery("SELECT * FROM table1 " +
+        Query query = lSql.executeRawQuery("SELECT * FROM table1 " +
                 "JOIN table2 t2a ON t2a.id = table2a " +
-                "JOIN table2 t2b ON t2b.id = table2b;").getFirstRow().get();
+                "JOIN table2 t2b ON t2b.id = table2b;");
 
+        QueriedRow row = query.getFirstRow().get();
         assertEquals(row.get("table1.id"), id1.get());
         assertEquals(row.get("table1.table2a"), id2a.get());
         assertEquals(row.get("table1.table2b"), id2b.get());
@@ -116,22 +119,12 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(row.get("table2.1.name2"), "value2a");
         assertEquals(row.get("table2.2.id"), id2b.get());
         assertEquals(row.get("table2.2.name2"), "value2b");
-    }
 
-    @Test
-    public void groupRowsByTables() {
-        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name1 TEXT)");
-        createTable("CREATE TABLE table2 (id SERIAL PRIMARY KEY, name2 TEXT)");
-        lSql.table("table1").insert(Row.fromKeyVals("name1", "value1"));
-        lSql.table("table2").insert(Row.fromKeyVals("name2", "value2"));
-
-        /*
-        List<Map<String, LinkedRow>> maps = lSql.executeRawQuery(
-                "SELECT * FROM table1, table2").groupEachRowByTables();
-        assertEquals(maps.size(), 1);
-        assertEquals(maps.get(0).get("table1").get("name1"), "value1");
-        assertEquals(maps.get(0).get("table2").get("name2"), "value2");
-        */
+        Map<String, Map<Object, LinkedRow>> grouped = query.groupByTables();
+        assertEquals(grouped.get("table1").get(id1.get()).get("table2a"), id2a.get());
+        assertEquals(grouped.get("table1").get(id1.get()).get("table2b"), id2b.get());
+        assertEquals(grouped.get("table2").get(id2a.get()).get("name2"), "value2a");
+        assertEquals(grouped.get("table2").get(id2b.get()).get("name2"), "value2b");
     }
 
     @Test

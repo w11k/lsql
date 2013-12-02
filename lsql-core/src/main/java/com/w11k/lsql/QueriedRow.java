@@ -1,5 +1,7 @@
 package com.w11k.lsql;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 
@@ -7,14 +9,11 @@ import java.util.Map;
 
 public class QueriedRow extends LinkedRow {
 
-    private final LSql lSql;
-
     private final Map<String, Column> columns;
 
-    public QueriedRow(LSql lSql, Map<String, Object> rowData, Map<String, Column> columnsByName) {
+    public QueriedRow(Map<String, Object> rowData, Map<String, Column> columnsByName) {
         super(null, rowData);
         this.columns = columnsByName;
-        this.lSql = lSql;
     }
 
     @Override
@@ -42,21 +41,39 @@ public class QueriedRow extends LinkedRow {
     /**
      * Group this row by table origin. Calculated values (e.g. 'count(*)') are stored with an empty table name ''.
      */
-    public Map<String, LinkedRow> groupByTables() {
-        Map<String, LinkedRow> byTables = Maps.newHashMap();
+    public Map<String, Map<Object, LinkedRow>> groupByTables() {
+        Map<String, Map<String, LinkedRow>> byTables = Maps.newHashMap();
 
         for (String key : keySet()) {
             Column column = columns.get(key);
+            String tableName = "";
             if (column.hasCorrespondingTable()) {
-                String tableName = column.getTable().getTableName();
-                if (!byTables.containsKey(tableName)) {
-                    byTables.put(tableName, new LinkedRow(column.getTable()));
-                }
-                Row row = byTables.get(tableName);
-                row.put(column.getColumnName(), get(key));
+                tableName = column.getTable().getTableName();
             }
+            String tableIndex = "1";
+            if (CharMatcher.anyOf(".").countIn(key) == 2) {
+                tableIndex = key.substring(tableName.length() + 1, key.lastIndexOf('.'));
+            }
+            if (!byTables.containsKey(tableName)) {
+                byTables.put(tableName, Maps.<String, LinkedRow>newLinkedHashMap());
+            }
+            if (!byTables.get(tableName).containsKey(tableIndex)) {
+                byTables.get(tableName).put(tableIndex, column.getTable().newLinkedRow());
+            }
+            byTables.get(tableName).get(tableIndex).put(column.getColumnName(), get(key));
         }
-        return byTables;
+
+        return Maps
+                .transformValues(byTables, new Function<Map<String, LinkedRow>, Map<Object, LinkedRow>>() {
+                    public Map<Object, LinkedRow> apply(Map<String, LinkedRow> input) {
+                        Map<Object, LinkedRow> entry = Maps.newLinkedHashMap();
+                        for (String key : input.keySet()) {
+                            LinkedRow row = input.get(key);
+                            entry.put(row.getId(), row);
+                        }
+                        return entry;
+                    }
+                });
     }
 
     private void failIfTableIsMissing() {

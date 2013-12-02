@@ -53,7 +53,9 @@ public class Column {
     }
 
     public boolean isPkColumn() {
-        return table.isPresent() && table.get().getPrimaryKeyColumn().get().equals(columnName);
+        return table.isPresent()
+                && table.get().getPrimaryKeyColumn().isPresent()
+                && table.get().getPrimaryKeyColumn().get().equals(columnName);
     }
 
     public Converter getConverter() {
@@ -108,5 +110,13 @@ public class Column {
         int result = table.hashCode();
         result = 31 * result + columnName.hashCode();
         return result;
+    }
+
+    public Optional<String> getTableName() {
+        if (table.isPresent()) {
+            return of(table.get().getTableName());
+        } else {
+            return absent();
+        }
     }
 }

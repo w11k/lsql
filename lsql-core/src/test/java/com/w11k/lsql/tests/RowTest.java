@@ -53,8 +53,7 @@ public class RowTest extends AbstractLSqlTest {
         createTable("CREATE TABLE city (id SERIAL PRIMARY KEY, zipcode TEXT, name TEXT)");
         createTable("CREATE TABLE person (id SERIAL PRIMARY KEY, name TEXT, zipcode INTEGER REFERENCES city (id))");
 
-        Optional<Object> cityId = lSql.table("city").insert(
-                Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
+        Optional<Object> cityId = lSql.table("city").insert(Row.fromKeyVals("zipcode", "53721", "name", "Siegburg"));
         lSql.table("person").insert(Row.fromKeyVals("name", "John", "zipcode", cityId.get()));
 
         QueriedRow row = lSql.executeRawQuery("SELECT * FROM person, city").getFirstRow().get();
@@ -63,26 +62,11 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(row.getString("person.name"), "John");
         assertEquals(row.getInt("person.zipcode"), cityId.get());
 
-        Map<String, LinkedRow> byTables = row.groupByTables();
-        assertEquals(byTables.get("city").getString("name"), "Siegburg");
-        assertEquals(byTables.get("city").getString("zipcode"), "53721");
-        assertEquals(byTables.get("person").getString("name"), "John");
-        assertEquals(byTables.get("person").getInt("zipcode"), cityId.get());
-    }
-
-    @Test
-    public void groupByTableWithCalculatedValues() {
-        /*
-        createTable("CREATE TABLE table1 (name TEXT, age INT)");
-        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Query rows = lSql.executeRawQuery("SELECT name, age, count(*) as c FROM table1");
-        Map<String, LinkedRow> byTables = rows.getFirstRow().get().groupByTables();
-
-        assertEquals(byTables.size(), 1);
-        assertEquals(byTables.get("table1").size(), 2);
-        assertEquals(byTables.get("table1").getString("name"), "cus1");
-        assertEquals(byTables.get("table1").getInt("age"), 20);
-        */
+        Map<String, Map<Object, LinkedRow>> byTables = row.groupByTables();
+        assertEquals(byTables.get("city").get(1).getString("name"), "Siegburg");
+        assertEquals(byTables.get("city").get(1).getString("zipcode"), "53721");
+        assertEquals(byTables.get("person").get(1).getString("name"), "John");
+        assertEquals(byTables.get("person").get(1).getInt("zipcode"), cityId.get());
     }
 
 }
