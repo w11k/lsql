@@ -127,6 +127,14 @@ public class Row extends ForwardingMap<String, Object> {
         return new Row(data);
     }
 
+    public Row extractMap(String... keys) {
+        Row extracted = new Row();
+        for (String key : keys) {
+            extracted.put(key, get(key));
+        }
+        return extracted;
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this).add("data", delegate()).toString();

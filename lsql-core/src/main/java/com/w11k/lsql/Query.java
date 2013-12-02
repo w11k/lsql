@@ -12,7 +12,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
@@ -80,12 +85,14 @@ public class Query implements Iterable<QueriedRow> {
         return Lists.newLinkedList(rows);
     }
 
-    public Map<String, List<Row>> groupByTables() {
-        // We first store everything in a Map to remove duplicate rows
+    public Map<String, Map<Object, Row>> groupByTables() {
         Map<String, Map<Object, Row>> byTables = Maps.newHashMap();
 
         // For each row in query
         for (QueriedRow queriedRow : asList()) {
+
+/*
+
             Map<String, LinkedRow> rowByTables = queriedRow.groupByTables();
 
             // for each table in a row
@@ -98,18 +105,14 @@ public class Query implements Iterable<QueriedRow> {
                 Object pkValue = row.get(pkColumn);
                 byTables.get(key).put(pkValue, row);
             }
+*/
+
         }
 
-        // Transform Map of Rows to List of Rows
-        return Maps.transformEntries(
-                byTables,
-                new Maps.EntryTransformer<String, Map<Object, Row>, List<Row>>() {
-                    public List<Row> transformEntry(String key, Map<Object, Row> value) {
-                        return Lists.newLinkedList(value.values());
-                    }
-                });
+        return byTables;
     }
 
+    /*
     public List<Map<String, LinkedRow>> groupEachRowByTables() {
         List<Map<String, LinkedRow>> grouped = Lists.newLinkedList();
         for (QueriedRow row : rows) {
@@ -126,11 +129,13 @@ public class Query implements Iterable<QueriedRow> {
         }
         return startRows;
     }
+    */
 
     private void run() {
-        List<QueriedRow> newRows = Lists.newLinkedList();
         try {
-            Map<Integer, Column> columns = Maps.newHashMap();
+            Map<Integer, Column> headers = Maps.newHashMap();
+            ConcurrentMap<String, AtomicInteger> tablePkCounter = Maps.newConcurrentMap();
+
             ResultSet resultSet = preparedStatement.executeQuery();
             ResultSetMetaData metaData = resultSet.getMetaData();
             Set<Table> foundTables = Sets.newHashSet();
@@ -154,7 +159,6 @@ public class Query implements Iterable<QueriedRow> {
                 String javaColumn = lSql.getDialect().identifierSqlToJava(sqlColumn);
                 String sqlColumnLabel = metaData.getColumnLabel(i);
                 String javaColumnLabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
-
                 Column column;
                 if (table.isPresent()) {
                     column = table.get().column(javaColumn);
@@ -162,31 +166,56 @@ public class Query implements Iterable<QueriedRow> {
                     column = new Column(
                             Optional.<Table>absent(),
                             javaColumnLabel,
-                            lSql.getDialect().getConverterRegistry()
-                                    .getConverterForSqlType(metaData.getColumnType(i)),
+                            lSql.getDialect().getConverterRegistry().getConverterForSqlType(metaData.getColumnType(i)),
                             -1);
                 }
-                columns.put(i, column);
+                headers.put(i, column);
+
+                // Count table PK occurrences
+                if (column.isPkColumn()) {
+                    tablePkCounter.putIfAbsent(column.getTable().getTableName(), new AtomicInteger());
+                    tablePkCounter.get(column.getTable().getTableName()).incrementAndGet();
+                }
+            }
+
+            // Calculate column key name
+            ConcurrentMap<String, AtomicInteger> tableCounter = Maps.newConcurrentMap();
+            Map<Integer, String> columnNames = Maps.newHashMap();
+            for (Integer i : headers.keySet()) {
+                Column column = headers.get(i);
+                String columnName = column.getColumnName();
+                if (foundTables.size() >= 2) {
+                    if (column.hasCorrespondingTable()) {
+                        int counter = tablePkCounter.get(column.getTable().getTableName()).get();
+                        if (counter == 1) {
+                            columnName = column.getTable().getTableName() + "." + columnName;
+                        } else {
+                            tableCounter.putIfAbsent(column.getTable().getTableName(), new AtomicInteger());
+                            if (column.isPkColumn()) {
+                                tableCounter.get(column.getTable().getTableName()).incrementAndGet();
+                            }
+                            int c = tableCounter.get(column.getTable().getTableName()).get();
+                            columnName = column.getTable().getTableName() + "." + c + "." + columnName;
+                        }
+                    }
+                }
+                columnNames.put(i, columnName);
             }
 
             // Read all rows
+            List<QueriedRow> newRows = Lists.newLinkedList();
             while (resultSet.next()) {
                 Map<String, Object> rowData = Maps.newHashMap();
-                Map<String, Column> columnByName = Maps.newHashMap();
+                Map<String, Column> columnsByName = Maps.newHashMap();
 
-                for (Integer columnIndex : columns.keySet()) {
-                    Column column = columns.get(columnIndex);
-                    String key;
-                    if (foundTables.size() <= 1) {
-                        key = column.getColumnName();
-                    } else {
-                        key = column.getColumnNameWithPrefix();
-                    }
+                for (Integer columnIndex : headers.keySet()) {
+                    Column column = headers.get(columnIndex);
+                    String columnName = columnNames.get(columnIndex);
                     Object value = column.getConverter().getValueFromResultSet(lSql, resultSet, columnIndex);
-                    rowData.put(key, value);
-                    columnByName.put(key, column);
+                    rowData.put(columnName, value);
+                    columnsByName.put(columnName, column);
                 }
-                QueriedRow row = new QueriedRow(rowData, columnByName);
+                QueriedRow row = new QueriedRow(lSql, rowData, columnsByName);
                 if (foundTables.size() == 1 && !hasFunctionColumns) {
                     row.setTable(foundTables.iterator().next());
                 }
@@ -198,6 +227,7 @@ public class Query implements Iterable<QueriedRow> {
         }
     }
 
+    /*
     private Row joinRow(Row row, Table tableOfRow, Map<String, List<Row>> fullResult) {
         Map<Table, Column> foreignTables = tableOfRow.getDependentTables();
 
@@ -224,6 +254,7 @@ public class Query implements Iterable<QueriedRow> {
         }
         return row;
     }
+    */
 
 
 }

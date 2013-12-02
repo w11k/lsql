@@ -7,13 +7,15 @@ import java.util.Map;
 
 public class QueriedRow extends LinkedRow {
 
+    private final LSql lSql;
+
     private final Map<String, Column> columns;
 
-    public QueriedRow(Map<String, Object> rowData, Map<String, Column> columnByName) {
+    public QueriedRow(LSql lSql, Map<String, Object> rowData, Map<String, Column> columnsByName) {
         super(null, rowData);
-        this.columns = columnByName;
+        this.columns = columnsByName;
+        this.lSql = lSql;
     }
-
 
     @Override
     public Object put(String key, Object value) {
@@ -38,11 +40,12 @@ public class QueriedRow extends LinkedRow {
     }
 
     /**
-     * Group this row by table origin. Calculated values (e.g. 'count(*)') are removed.
+     * Group this row by table origin. Calculated values (e.g. 'count(*)') are stored with an empty table name ''.
      */
     public Map<String, LinkedRow> groupByTables() {
         Map<String, LinkedRow> byTables = Maps.newHashMap();
-        for (String key : columns.keySet()) {
+
+        for (String key : keySet()) {
             Column column = columns.get(key);
             if (column.hasCorrespondingTable()) {
                 String tableName = column.getTable().getTableName();

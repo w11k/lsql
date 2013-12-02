@@ -52,6 +52,10 @@ public class Column {
         return table.isPresent();
     }
 
+    public boolean isPkColumn() {
+        return table.isPresent() && table.get().getPrimaryKeyColumn().get().equals(columnName);
+    }
+
     public Converter getConverter() {
         return converter;
     }
@@ -69,12 +73,40 @@ public class Column {
 
         if (columnSize != -1 && String.class.isAssignableFrom(targetType)) {
             String string = (String) value;
-            if (string.length() > columnSize) {
+            if (string != null && string.length() > columnSize) {
                 return of(new StringTooLongError(
                         getTable().getTableName(), columnName, columnSize, string.length()));
             }
         }
 
         return absent();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Column column = (Column) o;
+
+        if (!columnName.equals(column.columnName)) {
+            return false;
+        }
+        if (!table.equals(column.table)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = table.hashCode();
+        result = 31 * result + columnName.hashCode();
+        return result;
     }
 }

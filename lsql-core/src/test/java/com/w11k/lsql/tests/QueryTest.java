@@ -2,14 +2,12 @@ package com.w11k.lsql.tests;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -93,17 +91,47 @@ public class QueryTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void testTableCounter() {
+        createTable("CREATE TABLE table2 (id SERIAL PRIMARY KEY, name2 TEXT)");
+        createTable("CREATE TABLE table1 (" +
+                "id SERIAL PRIMARY KEY, " +
+                "table2a INT REFERENCES table2 (id), " +
+                "table2b INT REFERENCES table2 (id))");
+
+        Optional<Object> id2a = lSql.table("table2").insert(Row.fromKeyVals("name2", "value2a"));
+        Optional<Object> id2b = lSql.table("table2").insert(Row.fromKeyVals("name2", "value2b"));
+        Optional<Object> id1 = lSql.table("table1").insert(Row.fromKeyVals(
+                "table2a", id2a.get(),
+                "table2b", id2b.get()
+        ));
+
+        QueriedRow row = lSql.executeRawQuery("SELECT * FROM table1 " +
+                "JOIN table2 t2a ON t2a.id = table2a " +
+                "JOIN table2 t2b ON t2b.id = table2b;").getFirstRow().get();
+
+        assertEquals(row.get("table1.id"), id1.get());
+        assertEquals(row.get("table1.table2a"), id2a.get());
+        assertEquals(row.get("table1.table2b"), id2b.get());
+        assertEquals(row.get("table2.1.id"), id2a.get());
+        assertEquals(row.get("table2.1.name2"), "value2a");
+        assertEquals(row.get("table2.2.id"), id2b.get());
+        assertEquals(row.get("table2.2.name2"), "value2b");
+    }
+
+    @Test
     public void groupRowsByTables() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name1 TEXT)");
         createTable("CREATE TABLE table2 (id SERIAL PRIMARY KEY, name2 TEXT)");
         lSql.table("table1").insert(Row.fromKeyVals("name1", "value1"));
         lSql.table("table2").insert(Row.fromKeyVals("name2", "value2"));
 
-        List<Map<String,LinkedRow>> maps = lSql.executeRawQuery(
+        /*
+        List<Map<String, LinkedRow>> maps = lSql.executeRawQuery(
                 "SELECT * FROM table1, table2").groupEachRowByTables();
         assertEquals(maps.size(), 1);
         assertEquals(maps.get(0).get("table1").get("name1"), "value1");
         assertEquals(maps.get(0).get("table2").get("name2"), "value2");
+        */
     }
 
     @Test
@@ -111,7 +139,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Query rows = lSql.executeRawQuery("SELECT count(*) as c FROM table1");
+        Query rows = lSql.executeRawQuery("SELECT count(*) AS c FROM table1");
         Row row = rows.getFirstRow().get();
         assertEquals(row.getInt("c"), 2);
     }
@@ -120,7 +148,7 @@ public class QueryTest extends AbstractLSqlTest {
     public void canUseCalculatedColumnsTogetherWithNormalColumnsOneTable() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Query rows = lSql.executeRawQuery("SELECT name, age, count(*) as c FROM table1");
+        Query rows = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1");
         Row row = rows.getFirstRow().get();
         assertEquals(row.getString("name"), "cus1");
         assertEquals(row.getInt("age"), 20);
@@ -131,7 +159,7 @@ public class QueryTest extends AbstractLSqlTest {
     public void rowIsNotLinkedToTableWhenCalculatedColumnsAreInTheResultSet() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Query rows = lSql.executeRawQuery("SELECT name, age, count(*) as c FROM table1");
+        Query rows = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1");
         QueriedRow row = rows.getFirstRow().get();
         assertEquals(row.getString("name"), "cus1");
         assertEquals(row.getInt("age"), 20);
@@ -145,7 +173,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table2 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table2 (name, age) VALUES ('cus2', 30)");
-        Query rows = lSql.executeRawQuery("SELECT *, count(*) as c FROM table1, table2");
+        Query rows = lSql.executeRawQuery("SELECT *, count(*) AS c FROM table1, table2");
 
         Row row = rows.getFirstRow().get();
         assertEquals(row.getString("table1.name"), "cus1");
