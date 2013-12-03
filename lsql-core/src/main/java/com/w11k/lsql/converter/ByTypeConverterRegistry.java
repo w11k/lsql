@@ -137,7 +137,7 @@ public class ByTypeConverterRegistry {
         addConverter(
                 new Converter() {
                     public int[] getSupportedSqlTypes() {
-                        return new int[]{Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR, Types.VARCHAR};
+                        return new int[]{Types.VARCHAR, Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR};
                     }
 
                     public Class<?> getSupportedJavaClass() {
