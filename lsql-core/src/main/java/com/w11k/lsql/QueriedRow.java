@@ -68,8 +68,10 @@ public class QueriedRow extends LinkedRow {
                     public Map<Object, LinkedRow> apply(Map<String, LinkedRow> input) {
                         Map<Object, LinkedRow> entry = Maps.newLinkedHashMap();
                         for (String key : input.keySet()) {
-                            LinkedRow row = input.get(key);
-                            entry.put(row.getId(), row);
+                            if (key != null) {
+                                LinkedRow row = input.get(key);
+                                entry.put(row.getId(), row);
+                            }
                         }
                         return entry;
                     }
