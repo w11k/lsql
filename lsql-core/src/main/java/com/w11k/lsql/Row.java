@@ -68,6 +68,9 @@ public class Row extends ForwardingMap<String, Object> {
             throw new IllegalArgumentException("No entry for key '" + key + "'.");
         }
         Object value = get(key);
+        if (value == null) {
+            return null;
+        }
         if (!type.isAssignableFrom(value.getClass())) {
             throw new ClassCastException(
                     "Cannot cast value '" + value + "' of type '" + value.getClass() + "' to '" +

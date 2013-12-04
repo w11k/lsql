@@ -27,7 +27,7 @@ public class Table {
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
-    final private Map<Table, Column> dependentTables = Maps.newHashMap();
+    //final private Map<Table, Column> dependentTables = Maps.newHashMap();
 
     private Optional<String> primaryKeyColumn = Optional.absent();
 
@@ -51,9 +51,9 @@ public class Table {
         return primaryKeyColumn;
     }
 
-    public Map<Table, Column> getDependentTables() {
-        return ImmutableMap.copyOf(dependentTables);
-    }
+    //public Map<Table, Column> getDependentTables() {
+    //    return ImmutableMap.copyOf(dependentTables);
+    //}
 
     public Map<String, Column> getColumns() {
         return ImmutableMap.copyOf(columns);
@@ -123,7 +123,8 @@ public class Table {
             // Set ID
             String pkColumn = getPrimaryKeyColumn().get();
             Object id = row.get(pkColumn);
-            column(pkColumn).getConverter().setValueInStatement(lSql, ps, columns.size() + 1, id);
+            Column column = column(pkColumn);
+            column.getConverter().setValueInStatement(lSql, ps, columns.size() + 1, id, column.getSqlType());
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
@@ -153,8 +154,8 @@ public class Table {
             try {
                 PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                         .createCountForIdStatement(this);
-                column(getPrimaryKeyColumn().get()).getConverter()
-                        .setValueInStatement(lSql, ps, 1, id);
+                Column column = column(getPrimaryKeyColumn().get());
+                column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
                 ps.setObject(1, id);
                 ResultSet rs = ps.executeQuery();
                 rs.next();
@@ -175,7 +176,8 @@ public class Table {
         PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                 .createDeleteByIdStatement(this);
         try {
-            column(getPrimaryKeyColumn().get()).getConverter().setValueInStatement(lSql, ps, 1, id);
+            Column column = column(getPrimaryKeyColumn().get());
+            column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
             ps.execute();
         } catch (Exception e) {
             throw new DeleteException(e);
@@ -188,7 +190,7 @@ public class Table {
         PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                 .createSelectByIdStatement(this, column);
         try {
-            column.getConverter().setValueInStatement(lSql, ps, 1, id);
+            column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -203,12 +205,6 @@ public class Table {
 
     public LinkedRow newLinkedRow() {
         return new LinkedRow(this);
-    }
-
-    public LinkedRow newLinkedRow(Map<String, Object> data) {
-        LinkedRow linkedRow = new LinkedRow(this);
-        linkedRow.putAll(data);
-        return linkedRow;
     }
 
     public LinkedRow newLinkedRow(Object... keyVals) {
@@ -274,6 +270,7 @@ public class Table {
                 primaryKeyColumn = of(lSql.getDialect().identifierSqlToJava(idColumn));
             }
 
+            /*
             // Fetch Foreign keys
             ResultSet exportedKeys = md.getExportedKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
             while (exportedKeys.next()) {
@@ -289,6 +286,7 @@ public class Table {
                     dependentTables.put(foreignTable, foreignColumn);
                 }
             }
+            */
 
             // Fetch all columns
             ResultSet columnsMetaData = md.getColumns(null, null, lSql.getDialect()
@@ -299,7 +297,7 @@ public class Table {
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
                 int dataType = columnsMetaData.getInt(5);
                 Converter converter = lSql.getDialect().getConverterRegistry().getConverterForSqlType(dataType);
-                columns.put(javaColumnName, new Column(of(this), javaColumnName, converter, columnSize));
+                columns.put(javaColumnName, new Column(of(this), javaColumnName, dataType, converter, columnSize));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -311,7 +309,8 @@ public class Table {
         try {
             for (int i = 0; i < columns.size(); i++) {
                 Converter converter = column(columns.get(i)).getConverter();
-                converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)));
+                Column column = column(columns.get(i));
+                converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)), column.getSqlType());
             }
             return ps;
         } catch (Exception e) {

@@ -49,6 +49,13 @@ public class RowTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void testNullValues() {
+        Row row = new Row();
+        row.put("string", null);
+        assertNull(row.getString("string"));
+    }
+
+    @Test
     public void groupByTable() {
         createTable("CREATE TABLE city (id SERIAL PRIMARY KEY, zipcode TEXT, name TEXT)");
         createTable("CREATE TABLE person (id SERIAL PRIMARY KEY, name TEXT, zipcode INTEGER REFERENCES city (id))");

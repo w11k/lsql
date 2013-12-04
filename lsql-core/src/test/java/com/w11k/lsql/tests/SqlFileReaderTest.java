@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import static org.testng.Assert.*;
@@ -84,12 +85,14 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
 
     @Test
     public void useNullValueInQuery() {
-        executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement qInt = lSqlFile.statement("queryRangeMarkers");
+        lSqlFile.statement("create1").execute();
+        Table table1 = lSql.table("table1");
+        table1.insert(Row.fromKeyVals("age", null, "content", "text1"));
+        LSqlFileStatement qInt = lSqlFile.statement("convertOperatorForNullValues");
 
         Query query = qInt.query("age", null);
-        assertFalse(query.getFirstRow().isPresent());
+        assertTrue(query.getFirstRow().isPresent());
     }
 
     @Test
@@ -106,6 +109,10 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
 
             public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
                 return new IntWrapper(rs.getInt(index));
+            }
+
+            public int getSqlTypeForNullValues() {
+                return Types.INTEGER;
             }
         });
         Row r1 = Row.fromKeyVals("number", new IntWrapper(0));

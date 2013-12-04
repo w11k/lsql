@@ -17,17 +17,21 @@ public class Column {
 
     private final int columnSize;
 
+    private final int sqlType;
+
     private Converter converter;
 
     /**
      * @param table      The corresponding table. Optional.absent(), if this column is based on a function (e.g. count).
      * @param columnName The name of the column.
+     * @param sqlType    The java.sql.Types value
      * @param converter  Converter instance used to convert between SQL and Java values.
      * @param columnSize The maximum column size. -1 if not applicable.
      */
-    public Column(Optional<Table> table, String columnName, Converter converter, int columnSize) {
+    public Column(Optional<Table> table, String columnName, int sqlType, Converter converter, int columnSize) {
         this.table = table;
         this.columnName = columnName;
+        this.sqlType = sqlType;
         this.converter = converter;
         this.columnSize = columnSize;
     }
@@ -58,6 +62,10 @@ public class Column {
                 && table.get().getPrimaryKeyColumn().get().equals(columnName);
     }
 
+    public int getSqlType() {
+        return sqlType;
+    }
+
     public Converter getConverter() {
         return converter;
     }
@@ -82,6 +90,14 @@ public class Column {
         }
 
         return absent();
+    }
+
+    public Optional<String> getTableName() {
+        if (table.isPresent()) {
+            return of(table.get().getTableName());
+        } else {
+            return absent();
+        }
     }
 
     @Override
@@ -112,11 +128,5 @@ public class Column {
         return result;
     }
 
-    public Optional<String> getTableName() {
-        if (table.isPresent()) {
-            return of(table.get().getTableName());
-        } else {
-            return absent();
-        }
-    }
+
 }

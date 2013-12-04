@@ -36,3 +36,9 @@ FROM table2
 WHERE
   table2.number < /*(*/ 1 /*)*/
 ;
+
+--convertOperatorForNullValues
+SELECT
+  *
+FROM table1
+WHERE age = /*(*/ 2 /*)*/;

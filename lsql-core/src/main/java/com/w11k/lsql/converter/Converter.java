@@ -9,11 +9,11 @@ import java.sql.SQLException;
 public abstract class Converter {
 
     public void setValueInStatement(LSql lSql, PreparedStatement ps, int index,
-                                    Object val) throws SQLException {
+                                    Object val, int sqlTypeForNullValue) throws SQLException {
         if (val != null) {
             setValue(lSql, ps, index, val);
         } else {
-            ps.setNull(index, getSqlTypeForNullValues());
+            ps.setNull(index, sqlTypeForNullValue);
         }
     }
 
@@ -44,14 +44,13 @@ public abstract class Converter {
         return true;
     }
 
-    protected abstract void setValue(LSql lSql, PreparedStatement ps, int index,
-                                  Object val) throws SQLException;
-
-    protected abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
-
-    protected int getSqlTypeForNullValues() {
+    public int getSqlTypeForNullValues() {
         return getSupportedSqlTypes()[0];
     }
 
+    protected abstract void setValue(LSql lSql, PreparedStatement ps, int index,
+                                     Object val) throws SQLException;
+
+    protected abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
 
 }

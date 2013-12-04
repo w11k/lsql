@@ -30,11 +30,22 @@ public class LSqlFileStatement {
         int valueStart;
 
         int valueEnd;
+
+        boolean usesEqualOperator = false;
+
+        int operatorStart;
+
+        int operatorEnd;
     }
 
     // column = /*(*/ 123 /*)*/
     private static final Pattern RANGE_QUERY_ARG = Pattern.compile(
             "^.*(/\\*\\(\\*/.*/\\*\\)\\*/).*$");
+
+    // column =
+    private static final Pattern EQUAL_OPERATOR_QUERY = Pattern.compile(
+            "^.*(=)\\s"
+    );
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -121,7 +132,7 @@ public class LSqlFileStatement {
                 try {
                     if (value != null) {
                         Converter converter = getConverterFor(p.name, value);
-                        converter.setValueInStatement(lSql, ps, i + 1, value);
+                        converter.setValueInStatement(lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
                     } else {
                         ps.setObject(i + 1, null);
                     }
@@ -155,6 +166,7 @@ public class LSqlFileStatement {
                     p.name = paramName;
                     p.valueStart = previousLinesLength + matcher.start(1);
                     p.valueEnd = previousLinesLength + matcher.end(1);
+                    checkForEqualOperator(line, p, previousLinesLength, matcher.start(1));
                     found.add(p);
                 }
             }
@@ -162,6 +174,17 @@ public class LSqlFileStatement {
         }
 
         return found;
+    }
+
+    private void checkForEqualOperator(String line, Parameter p, int previousLinesLength, int valueStartInLine) {
+        String lineBeforeValue = line.substring(0, valueStartInLine);
+        System.out.println("lineBeforeValue = '" + lineBeforeValue + "'");
+        Matcher matcher = EQUAL_OPERATOR_QUERY.matcher(lineBeforeValue);
+        if (matcher.find()) {
+            p.usesEqualOperator = true;
+            p.operatorStart = previousLinesLength + matcher.start(1);
+            p.operatorEnd = previousLinesLength + matcher.end(1);
+        }
     }
 
     private String queryParameterInLine(Map<String, Object> queryParameters, String line) {
@@ -188,9 +211,16 @@ public class LSqlFileStatement {
         StringBuilder sql = new StringBuilder();
         for (Parameter p : parameters) {
             if (queryParameters.containsKey(p.name)) {
-                sql.append(sqlString.substring(lastIndex, p.valueStart));
-                sql.append("?");
-                lastIndex = p.valueEnd;
+                if (p.usesEqualOperator && queryParameters.get(p.name) == null) {
+                    sql.append(sqlString.substring(lastIndex, p.operatorStart));
+                    sql.append("is null");
+                    lastIndex = p.valueEnd;
+                    queryParameters.remove(p.name);
+                } else {
+                    sql.append(sqlString.substring(lastIndex, p.valueStart));
+                    sql.append("?");
+                    lastIndex = p.valueEnd;
+                }
             }
         }
         sql.append(sqlString.substring(lastIndex, sqlString.length()));
