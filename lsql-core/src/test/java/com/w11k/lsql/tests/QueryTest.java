@@ -214,7 +214,7 @@ public class QueryTest extends AbstractLSqlTest {
     public void asRawList() {
         createTable("CREATE TABLE table1 (name1 TEXT, age1 INT)");
         lSql.executeRawSql("INSERT INTO table1 (name1, age1) VALUES ('cus1', 20)");
-        Query query = lSql.executeRawQuery("SELECT name1 as a, age1 as b FROM table1");
+        Query query = lSql.executeRawQuery("SELECT name1 AS a, age1 AS b FROM table1");
         List<Row> list = query.asRawList();
         assertEquals(list.get(0).getString("a"), "cus1");
         assertEquals(list.get(0).getInt("b"), 20);
@@ -224,7 +224,7 @@ public class QueryTest extends AbstractLSqlTest {
     public void asRawListFailsOnDublicateKeys() {
         createTable("CREATE TABLE table1 (name1 TEXT, age1 INT)");
         lSql.executeRawSql("INSERT INTO table1 (name1, age1) VALUES ('cus1', 20)");
-        Query query = lSql.executeRawQuery("SELECT name1 as a, age1 as a FROM table1");
+        Query query = lSql.executeRawQuery("SELECT name1 AS a, age1 AS a FROM table1");
         query.asRawList();
     }
 

@@ -75,12 +75,12 @@ public class Column {
     }
 
     public Optional<? extends AbstractValidationError> validateValue(Object value) {
-        Class<?> targetType = converter.getSupportedJavaClass();
         if (!converter.isValueValid(value)) {
             return of(new TypeError(getTable().getTableName(), columnName, converter
                     .getSupportedJavaClass().getSimpleName(), value.getClass().getSimpleName()));
         }
 
+        Class<?> targetType = converter.getSupportedJavaClass();
         if (columnSize != -1 && String.class.isAssignableFrom(targetType)) {
             String string = (String) value;
             if (string != null && string.length() > columnSize) {

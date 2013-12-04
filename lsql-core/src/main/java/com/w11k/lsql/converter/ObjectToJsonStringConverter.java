@@ -1,9 +1,9 @@
 package com.w11k.lsql.converter;
 
-import com.google.gson.reflect.TypeToken;
 import com.w11k.lsql.LSql;
+import org.codehaus.jackson.type.TypeReference;
 
-import java.lang.reflect.Type;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,23 +11,20 @@ import java.sql.Types;
 
 public class ObjectToJsonStringConverter extends Converter {
 
-    private final Type type;
+    private Class<?> clazz;
+    private TypeReference typeReference;
 
-    private final Class<?> clazz;
-
-    public ObjectToJsonStringConverter(Class<?> clazz) {
-        this.type = clazz;
+    public <A> ObjectToJsonStringConverter(Class<A> clazz) {
         this.clazz = clazz;
     }
 
-    public ObjectToJsonStringConverter(TypeToken typeToken) {
-        this.type = typeToken.getType();
-        this.clazz = typeToken.getRawType();
+    public ObjectToJsonStringConverter(TypeReference typeReference) {
+        this.typeReference = typeReference;
     }
 
     @Override
     public Class<?> getSupportedJavaClass() {
-        return clazz;
+        return clazz == null ? typeReference.getType().getClass() : clazz;
     }
 
     @Override
@@ -36,16 +33,35 @@ public class ObjectToJsonStringConverter extends Converter {
     }
 
     @Override
+    public boolean isValueValid(Object value) {
+        // TODO
+        return true;
+    }
+
+    @Override
     public void setValue(LSql lSql, PreparedStatement ps, int index,
-                                    Object val) throws SQLException {
-        String json = lSql.getGson().toJson(val);
-        ps.setString(index, json);
+                         Object val) throws SQLException {
+        try {
+            String json = lSql.getJsonMapper().writer().writeValueAsString(val);
+            ps.setString(index, json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
     public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
         String json = rs.getString(index);
-        return lSql.getGson().fromJson(json, type);
+        try {
+            if (typeReference != null) {
+                return lSql.getJsonMapper().readValue(json, typeReference);
+            } else {
+                return lSql.getJsonMapper().readValue(json, clazz);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

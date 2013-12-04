@@ -1,15 +1,21 @@
 package com.w11k.lsql.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.ObjectWriter;
+
+import java.io.IOException;
 
 public class DebugUtils {
 
     public static void prettyPrintJson(Object result) {
-        GsonBuilder gb = new GsonBuilder();
-        Gson g = gb.setPrettyPrinting().create();
-        String s = g.toJson(result);
-        System.out.println(s);
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+        try {
+            String out = writer.writeValueAsString(result);
+            System.out.println(out);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

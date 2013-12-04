@@ -1,12 +1,11 @@
 package com.w11k.lsql;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import com.w11k.lsql.dialects.BaseDialect;
-import com.w11k.lsql.gson.GsonFactory;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.sqlfile.LSqlFile;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -35,7 +34,8 @@ public class LSql {
 
     private boolean readSqlFilesOnEveryAccess = false;
 
-    private Gson gson = createGsonInstance();
+    //private Gson gson = createGsonInstance();
+    private ObjectMapper jsonMapper = createJsonMapperInstance();
 
     /**
      * Creates a new LSql instance.
@@ -81,8 +81,14 @@ public class LSql {
         this.readSqlFilesOnEveryAccess = readSqlFilesOnEveryAccess;
     }
 
+    /*
     public Gson getGson() {
         return gson;
+    }
+    */
+
+    public ObjectMapper getJsonMapper() {
+        return jsonMapper;
     }
 
     /**
@@ -156,8 +162,14 @@ public class LSql {
                 '}';
     }
 
+    /*
     protected Gson createGsonInstance() {
         return new GsonFactory().createInstance();
+    }
+    */
+
+    protected ObjectMapper createJsonMapperInstance() {
+        return new ObjectMapper();
     }
 
 }

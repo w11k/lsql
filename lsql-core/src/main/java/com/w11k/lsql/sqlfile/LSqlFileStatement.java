@@ -178,7 +178,6 @@ public class LSqlFileStatement {
 
     private void checkForEqualOperator(String line, Parameter p, int previousLinesLength, int valueStartInLine) {
         String lineBeforeValue = line.substring(0, valueStartInLine);
-        System.out.println("lineBeforeValue = '" + lineBeforeValue + "'");
         Matcher matcher = EQUAL_OPERATOR_QUERY.matcher(lineBeforeValue);
         if (matcher.find()) {
             p.usesEqualOperator = true;
