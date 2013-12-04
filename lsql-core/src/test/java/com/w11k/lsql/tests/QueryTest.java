@@ -128,6 +128,28 @@ public class QueryTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void groupByTablesWithNullValues() {
+        createTable("CREATE TABLE table2 (id SERIAL PRIMARY KEY, name2 TEXT)");
+        createTable("CREATE TABLE table1 (" +
+                "id SERIAL PRIMARY KEY, " +
+                "table2a INT REFERENCES table2 (id), " +
+                "table2b INT REFERENCES table2 (id))");
+
+        Optional<Object> id2a = lSql.table("table2").insert(Row.fromKeyVals("name2", "value2a"));
+        lSql.table("table1").insert(Row.fromKeyVals(
+                "table2a", id2a.get()
+        ));
+
+        Query query = lSql.executeRawQuery("SELECT * FROM table1 " +
+                "JOIN table2 t2a ON t2a.id = table2a " +
+                "LEFT OUTER JOIN table2 t2b ON t2b.id = table2b;");
+
+        Map<String, Map<Object, LinkedRow>> grouped = query.groupByTables();
+        assertEquals(grouped.get("table1").size(), 1);
+        assertEquals(grouped.get("table2").size(), 1);
+    }
+
+    @Test
     public void canUseCalculatedColumns() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
