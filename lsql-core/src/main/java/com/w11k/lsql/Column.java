@@ -22,7 +22,8 @@ public class Column {
     private Converter converter;
 
     /**
-     * @param table      The corresponding table. Optional.absent(), if this column is based on a function (e.g. count).
+     * @param table      The corresponding table. Optional.absent(), if this column is
+     *                   based on a function (e.g. count) or used for a raw list.
      * @param columnName The name of the column.
      * @param sqlType    The java.sql.Types value
      * @param converter  Converter instance used to convert between SQL and Java values.
@@ -40,16 +41,16 @@ public class Column {
         return columnName;
     }
 
-    public String getColumnNameWithPrefix() {
-        if (table.isPresent()) {
-            return table.get().getTableName() + "." + columnName;
-        } else {
-            return columnName;
-        }
+    public Optional<Table> getTable() {
+        return table;
     }
 
-    public Table getTable() {
-        return table.get();
+    public Optional<String> getTableName() {
+        if (table.isPresent()) {
+            return of(table.get().getTableName());
+        } else {
+            return absent();
+        }
     }
 
     public boolean hasCorrespondingTable() {
@@ -76,7 +77,7 @@ public class Column {
 
     public Optional<? extends AbstractValidationError> validateValue(Object value) {
         if (!converter.isValueValid(value)) {
-            return of(new TypeError(getTable().getTableName(), columnName, converter
+            return of(new TypeError(getTableName().get(), columnName, converter
                     .getSupportedJavaClass().getSimpleName(), value.getClass().getSimpleName()));
         }
 
@@ -85,19 +86,11 @@ public class Column {
             String string = (String) value;
             if (string != null && string.length() > columnSize) {
                 return of(new StringTooLongError(
-                        getTable().getTableName(), columnName, columnSize, string.length()));
+                        getTableName().get(), columnName, columnSize, string.length()));
             }
         }
 
         return absent();
-    }
-
-    public Optional<String> getTableName() {
-        if (table.isPresent()) {
-            return of(table.get().getTableName());
-        } else {
-            return absent();
-        }
     }
 
     @Override
@@ -109,16 +102,12 @@ public class Column {
             return false;
         }
 
-        Column column = (Column) o;
-
-        if (!columnName.equals(column.columnName)) {
-            return false;
-        }
-        if (!table.equals(column.table)) {
+        Column that = (Column) o;
+        if (!columnName.equals(that.columnName)) {
             return false;
         }
 
-        return true;
+        return table.equals(that.table);
     }
 
     @Override

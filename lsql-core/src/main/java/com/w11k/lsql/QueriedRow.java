@@ -5,13 +5,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 
+import java.util.List;
 import java.util.Map;
 
 public class QueriedRow extends LinkedRow {
 
-    private final Map<String, Column> columns;
+    private final List<Query.ResultSetColumn> columns;
 
-    public QueriedRow(Map<String, Object> rowData, Map<String, Column> columnsByName) {
+    public QueriedRow(Map<String, Object> rowData, List<Query.ResultSetColumn> columnsByName) {
         super(null, rowData);
         this.columns = columnsByName;
     }
@@ -44,23 +45,21 @@ public class QueriedRow extends LinkedRow {
     public Map<String, Map<Object, LinkedRow>> groupByTables() {
         Map<String, Map<String, LinkedRow>> byTables = Maps.newHashMap();
 
-        for (String key : keySet()) {
-            Column column = columns.get(key);
-            String tableName = "";
-            if (column.hasCorrespondingTable()) {
-                tableName = column.getTable().getTableName();
-            }
+
+        for (Query.ResultSetColumn rsc : columns) {
+            Column column = rsc.column;
+            String tableName = column.getTableName().or("");
             String tableIndex = "1";
-            if (CharMatcher.anyOf(".").countIn(key) == 2) {
-                tableIndex = key.substring(tableName.length() + 1, key.lastIndexOf('.'));
+            if (CharMatcher.anyOf(".").countIn(rsc.nameInRow) == 2) {
+                tableIndex = rsc.nameInRow.substring(tableName.length() + 1, rsc.nameInRow.lastIndexOf('.'));
             }
             if (!byTables.containsKey(tableName)) {
                 byTables.put(tableName, Maps.<String, LinkedRow>newLinkedHashMap());
             }
             if (!byTables.get(tableName).containsKey(tableIndex)) {
-                byTables.get(tableName).put(tableIndex, column.getTable().newLinkedRow());
+                byTables.get(tableName).put(tableIndex, column.getTable().get().newLinkedRow());
             }
-            byTables.get(tableName).get(tableIndex).put(column.getColumnName(), get(key));
+            byTables.get(tableName).get(tableIndex).put(column.getColumnName(), get(rsc.nameInRow));
         }
 
         return Maps

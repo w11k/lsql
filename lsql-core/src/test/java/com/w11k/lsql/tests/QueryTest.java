@@ -107,7 +107,7 @@ public class QueryTest extends AbstractLSqlTest {
                 "table2b", id2b.get()
         ));
 
-        Query query = lSql.executeRawQuery("SELECT * FROM table1 " +
+        Query query = lSql.executeRawQuery("SELECT table1.*, t2a.id, t2a.name2, t2b.id, t2b.name2 FROM table1 " +
                 "JOIN table2 t2a ON t2a.id = table2a " +
                 "JOIN table2 t2b ON t2b.id = table2b;");
 
@@ -165,8 +165,8 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         Query rows = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1");
         Row row = rows.getFirstRow().get();
-        assertEquals(row.getString("name"), "cus1");
-        assertEquals(row.getInt("age"), 20);
+        assertEquals(row.getString("table1.name"), "cus1");
+        assertEquals(row.getInt("table1.age"), 20);
         assertEquals(row.getInt("c"), 1);
     }
 
@@ -176,8 +176,8 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         Query rows = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1");
         QueriedRow row = rows.getFirstRow().get();
-        assertEquals(row.getString("name"), "cus1");
-        assertEquals(row.getInt("age"), 20);
+        assertEquals(row.getString("table1.name"), "cus1");
+        assertEquals(row.getInt("table1.age"), 20);
         assertEquals(row.getInt("c"), 1);
         assertFalse(row.hasLinkedTable());
     }

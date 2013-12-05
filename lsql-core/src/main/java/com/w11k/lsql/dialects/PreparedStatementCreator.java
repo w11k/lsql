@@ -51,7 +51,7 @@ public class PreparedStatementCreator {
     public PreparedStatement createSelectByIdStatement(Table table, Column idColumn) {
         String sqlTableName = table.getlSql().getDialect()
                 .identifierJavaToSql(table.getTableName());
-        String sqlColumnName = idColumn.getTable().getlSql().getDialect()
+        String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()
                 .identifierJavaToSql(idColumn.getColumnName());
         String sql = "select * from " + sqlTableName + " where " + sqlColumnName + "=?";
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
@@ -61,7 +61,7 @@ public class PreparedStatementCreator {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect()
                 .identifierJavaToSql(table.getTableName());
-        String sqlColumnName = idColumn.getTable().getlSql().getDialect()
+        String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()
                 .identifierJavaToSql(idColumn.getColumnName());
         StringBuilder sb = new StringBuilder();
         sb.append("delete from ");
@@ -76,7 +76,7 @@ public class PreparedStatementCreator {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect()
                 .identifierJavaToSql(table.getTableName());
-        String sqlColumnName = idColumn.getTable().getlSql().getDialect()
+        String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()
                 .identifierJavaToSql(idColumn.getColumnName());
         String sql = "select count(" + sqlColumnName + ") from " + sqlTableName + " where " +
                 sqlColumnName + "=?";
