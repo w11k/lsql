@@ -40,6 +40,10 @@ public class LinkedRow extends Row {
         return super.put(key, value);
     }
 
+    public Optional<?> insert() {
+        return table.insert(this);
+    }
+
     public Optional<?> save() {
         return table.save(this);
     }

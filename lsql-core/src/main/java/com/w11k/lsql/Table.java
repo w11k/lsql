@@ -207,6 +207,10 @@ public class Table {
         return new LinkedRow(this);
     }
 
+    public LinkedRow newLinkedRow(Map<String, Object> data) {
+        return new LinkedRow(this, data);
+    }
+
     public LinkedRow newLinkedRow(Object... keyVals) {
         LinkedRow linkedRow = new LinkedRow(this);
         linkedRow.addKeyVals(keyVals);
