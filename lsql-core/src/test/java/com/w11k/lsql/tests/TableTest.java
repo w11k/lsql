@@ -199,7 +199,7 @@ public class TableTest extends AbstractLSqlTest {
         table1.insert(new Row().addKeyVals("name", "Phil"));
 
         // Delete
-        table1.delete(id);
+        table1.delete(row);
 
         // Verify delete
         tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();

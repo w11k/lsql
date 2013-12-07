@@ -94,7 +94,7 @@ public abstract class AbstractDialectTests {
         assertEquals(row2.get("id"), id2);
 
         // Delete
-        table1.delete(id2);
+        table1.delete(row2);
 
         // Verify delete
         tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();

@@ -31,6 +31,22 @@ public class LinkedRow extends Row {
         return get(table.getPrimaryKeyColumn().get());
     }
 
+    /**
+     * Convenience method to set the expected revision.
+     *
+     * @param revision Revision to use for DML statements.
+     */
+    public void setRevision(Object revision) {
+        put(table.getRevisionColumn().get().getColumnName(), revision);
+    }
+
+    /**
+     * @return The revision of this LinkedRow.
+     */
+    public Object getRevision() {
+        return get(table.getRevisionColumn().get().getColumnName());
+    }
+
     @Override
     public Object put(String key, Object value) {
         Optional<? extends AbstractValidationError> validate = table.validate(key, value);
@@ -53,7 +69,7 @@ public class LinkedRow extends Row {
         if (id == null) {
             throw new IllegalStateException("Can not delete this LinkedRow because the ID is not present.");
         }
-        table.delete(id);
+        table.delete(this);
     }
 
 

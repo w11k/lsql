@@ -2,6 +2,7 @@ package com.w11k.lsql.tests;
 
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.exceptions.DeleteException;
 import com.w11k.lsql.exceptions.UpdateException;
 import org.testng.annotations.Test;
 
@@ -52,6 +53,20 @@ public class RevisionSupportTest extends AbstractLSqlTest {
 
         row.put("revision", r1 + 1);
         table1.save(row);
+    }
+
+    @Test(expectedExceptions = DeleteException.class)
+    public void deleteFailsOnWrongRevision() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT, revision INT DEFAULT 0)");
+        Table table1 = lSql.table("table1");
+        table1.enableRevisionSupport();
+
+        Row row = Row.fromKeyVals("id", 1, "age", 1);
+        table1.insert(row);
+        int r1 = row.getInt("revision");
+
+        row.put("revision", r1 + 1);
+        table1.delete(row);
     }
 
 }

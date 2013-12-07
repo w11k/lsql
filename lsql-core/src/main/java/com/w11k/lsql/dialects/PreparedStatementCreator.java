@@ -79,17 +79,20 @@ public class PreparedStatementCreator {
 
     public PreparedStatement createDeleteByIdStatement(Table table) {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
-        String sqlTableName = table.getlSql().getDialect()
-                .identifierJavaToSql(table.getTableName());
-        String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()
-                .identifierJavaToSql(idColumn.getColumnName());
-        StringBuilder sb = new StringBuilder();
-        sb.append("delete from ");
-        sb.append(sqlTableName);
-        sb.append(" where ");
-        sb.append(sqlColumnName);
-        sb.append("=?;");
-        return ConnectionUtils.prepareStatement(table.getlSql(), sb.toString(), false);
+        String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
+        String sqlIdName = idColumn.getTable().get().getlSql().getDialect().identifierJavaToSql(idColumn.getColumnName());
+
+        String sql = "DELETE FROM ";
+        sql += sqlTableName;
+        sql += " WHERE ";
+        sql += sqlIdName + "=?";
+        if (table.getRevisionColumn().isPresent()) {
+            String sqlRevisionName = getRevisionColumnSqlIdentifier(table);
+            sql += " AND " + sqlRevisionName + "=?";
+        }
+        sql += ";";
+
+        return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
     public PreparedStatement createCountForIdStatement(Table table) throws SQLException {

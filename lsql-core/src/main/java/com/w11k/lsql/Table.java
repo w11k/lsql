@@ -149,11 +149,7 @@ public class Table {
                 col.getConverter().setValueInStatement(lSql, ps, columns.size() + 2, revision, col.getSqlType());
             }
 
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected != 1) {
-                throw new UpdateException(rowsAffected +
-                        " rows were affected by update operation (expected 1). Either the ID or the revision (if enabled) is wrong.");
-            }
+            executeUpdate(ps);
 
             // Set new revision
             applyNewRevision(row, id);
@@ -161,6 +157,14 @@ public class Table {
             //return row.getOptional(getPrimaryKeyColumn().get());
         } catch (Exception e) {
             throw new UpdateException(e);
+        }
+    }
+
+    private void executeUpdate(PreparedStatement ps) throws SQLException {
+        int rowsAffected = ps.executeUpdate();
+        if (rowsAffected != 1) {
+            throw new UpdateException(rowsAffected +
+                    " rows were affected by update operation (expected 1). Either the ID or the revision (if enabled) is wrong.");
         }
     }
 
@@ -200,13 +204,34 @@ public class Table {
         }
     }
 
+    /**
+     * Deletes the row with the given ID.
+     * <p/>
+     * If revision support is enabled, the delete will fail.
+     *
+     * @param id The row's ID to delete.
+     */
     public void delete(Object id) {
-        PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
-                .createDeleteByIdStatement(this);
+        Row row = new Row();
+        row.put(primaryKeyColumn.get(), id);
+        delete(row);
+    }
+
+    public void delete(Row row) {
+        PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createDeleteByIdStatement(this);
         try {
             Column column = column(getPrimaryKeyColumn().get());
+            Object id = row.get(getPrimaryKeyColumn().get());
             column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
-            ps.execute();
+            if (revisionColumn.isPresent()) {
+                Column revCol = revisionColumn.get();
+                Object revVal = row.get(revCol.getColumnName());
+                if (revVal == null) {
+                    throw new IllegalStateException("Row must contain a revision.");
+                }
+                revCol.getConverter().setValueInStatement(lSql, ps, 2, revVal, revCol.getSqlType());
+            }
+            executeUpdate(ps);
         } catch (Exception e) {
             throw new DeleteException(e);
         }
