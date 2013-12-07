@@ -42,7 +42,7 @@ public abstract class AbstractDialectTests {
             this.lSql = new LSql(createDialect(), ConnectionProviders.fromInstance(con));
             this.initOk = true;
         } catch (Exception e) {
-            Reporter.getCurrentTestResult().setAttribute("warn", "Can not test dialect.");
+            //Reporter.getCurrentTestResult().setAttribute("warn", "Can not test dialect.");
             Reporter.getCurrentTestResult().setStatus(ITestResult.SKIP);
             e.printStackTrace();
         }

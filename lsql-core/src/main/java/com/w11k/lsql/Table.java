@@ -27,17 +27,15 @@ public class Table {
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
-    //final private Map<Table, Column> dependentTables = Maps.newHashMap();
+    private Optional<String> primaryKeyColumn = absent();
 
-    private Optional<String> primaryKeyColumn = Optional.absent();
+    private Optional<Column> revisionColumn = absent();
 
     public Table(LSql lSql, String tableName) {
         this.lSql = lSql;
         this.tableName = tableName;
         fetchMeta();
     }
-
-    // ----- getter/setter -----
 
     public LSql getlSql() {
         return lSql;
@@ -51,15 +49,9 @@ public class Table {
         return primaryKeyColumn;
     }
 
-    //public Map<Table, Column> getDependentTables() {
-    //    return ImmutableMap.copyOf(dependentTables);
-    //}
-
     public Map<String, Column> getColumns() {
         return ImmutableMap.copyOf(columns);
     }
-
-    // ----- public -----
 
     public Column column(String columnName) {
         if (!columns.containsKey(columnName)) {
@@ -70,33 +62,55 @@ public class Table {
     }
 
     /**
+     * Convenience method. Same as <code>enableRevisionSupport("revision").</code>
+     */
+    public void enableRevisionSupport() {
+        enableRevisionSupport("revision");
+    }
+
+    public void enableRevisionSupport(String revisionColumnName) {
+        Column col = column(revisionColumnName);
+        revisionColumn = of(col);
+    }
+
+    public Optional<Column> getRevisionColumn() {
+        return revisionColumn;
+    }
+
+    /**
      * @throws InsertException
      */
     public Optional<Object> insert(Row row) {
         try {
             List<String> columns = row.getKeyList();
-            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
-                    .createInsertStatement(this, columns);
+            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createInsertStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
-                throw new InsertException(
-                        rowsAffected + " rows were affected by insert operation. Expected: 1");
+                throw new InsertException(rowsAffected + " rows were affected by insert operation. Expected: 1");
             }
             if (primaryKeyColumn.isPresent()) {
+                Object id = null;
                 if (!row.containsKey(primaryKeyColumn.get())) {
                     // check for generated keys
                     ResultSet resultSet = ps.getGeneratedKeys();
                     if (resultSet.next()) {
-                        Optional<Object> generated = lSql.getDialect()
-                                .extractGeneratedPk(this, resultSet);
+                        Optional<Object> generated = lSql.getDialect().extractGeneratedPk(this, resultSet);
                         if (generated.isPresent()) {
-                            row.put(primaryKeyColumn.get(), generated.get());
+                            id = generated.get();
+                            row.put(primaryKeyColumn.get(), id);
                             return generated;
                         }
                     }
+                } else {
+                    id = row.get(primaryKeyColumn.get());
                 }
+
+                // Set new revision
+                applyNewRevision(row, id);
+
+                return of(id);
             }
         } catch (Exception e) {
             throw new InsertException(e);
@@ -107,7 +121,7 @@ public class Table {
     /**
      * @throws UpdateException
      */
-    public Optional<Object> update(Row row) {
+    public void update(Row row) {
         if (getPrimaryKeyColumn().isPresent() && !row.containsKey(getPrimaryKeyColumn().get())) {
             throw new UpdateException("Can not update row because the primary key column " +
                     "'" + getPrimaryKeyColumn().get() + "' is not present.");
@@ -115,9 +129,11 @@ public class Table {
         try {
             List<String> columns = row.getKeyList();
             columns.remove(getPrimaryKeyColumn().get());
+            if (revisionColumn.isPresent()) {
+                columns.remove(getRevisionColumn().get().getColumnName());
+            }
 
-            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
-                    .createUpdateStatement(this, columns);
+            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createUpdateStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
 
             // Set ID
@@ -126,12 +142,23 @@ public class Table {
             Column column = column(pkColumn);
             column.getConverter().setValueInStatement(lSql, ps, columns.size() + 1, id, column.getSqlType());
 
+            // Set Revision
+            if (revisionColumn.isPresent()) {
+                Column col = revisionColumn.get();
+                Object revision = row.get(col.getColumnName());
+                col.getConverter().setValueInStatement(lSql, ps, columns.size() + 2, revision, col.getSqlType());
+            }
+
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
-                throw new UpdateException(
-                        rowsAffected + " rows were affected by update operation. Expected: 1");
+                throw new UpdateException(rowsAffected +
+                        " rows were affected by update operation (expected 1). Either the ID or the revision (if enabled) is wrong.");
             }
-            return row.getOptional(getPrimaryKeyColumn().get());
+
+            // Set new revision
+            applyNewRevision(row, id);
+
+            //return row.getOptional(getPrimaryKeyColumn().get());
         } catch (Exception e) {
             throw new UpdateException(e);
         }
@@ -152,8 +179,7 @@ public class Table {
             // Check if insert or update
             Object id = row.get(primaryKeyColumn.get());
             try {
-                PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
-                        .createCountForIdStatement(this);
+                PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createCountForIdStatement(this);
                 Column column = column(getPrimaryKeyColumn().get());
                 column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
                 ps.setObject(1, id);
@@ -165,6 +191,8 @@ public class Table {
                 } else {
                     update(row);
                 }
+            } catch (DatabaseAccessException dae) {
+                throw dae;
             } catch (Exception e) {
                 throw new DatabaseAccessException(e);
             }
@@ -260,6 +288,22 @@ public class Table {
         return "Table{tableName='" + tableName + "'}";
     }
 
+    private void applyNewRevision(Row row, Object id) throws SQLException {
+        if (revisionColumn.isPresent()) {
+            Object revision = queryRevision(id);
+            row.put(revisionColumn.get().getColumnName(), revision);
+        }
+    }
+
+    private Object queryRevision(Object id) throws SQLException {
+        Column revCol = revisionColumn.get();
+        PreparedStatement revQuery = lSql.getDialect().getPreparedStatementCreator().createRevisionQueryStatement(this, id);
+        revCol.getConverter().setValueInStatement(lSql, revQuery, 1, id, revCol.getSqlType());
+        ResultSet resultSet = revQuery.executeQuery();
+        resultSet.next();
+        return resultSet.getObject(1);
+    }
+
     private void fetchMeta() {
         Connection con = ConnectionUtils.getConnection(lSql);
         try {
@@ -273,24 +317,6 @@ public class Table {
                 String idColumn = primaryKeys.getString(4);
                 primaryKeyColumn = of(lSql.getDialect().identifierSqlToJava(idColumn));
             }
-
-            /*
-            // Fetch Foreign keys
-            ResultSet exportedKeys = md.getExportedKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
-            while (exportedKeys.next()) {
-                String sqlTableName = exportedKeys.getString(7);
-                String javaTableName = lSql.getDialect().identifierSqlToJava(sqlTableName);
-                String sqlColumnName = exportedKeys.getString(8);
-                String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
-
-                // Ignore references to same table
-                if (!javaTableName.equals(tableName)) {
-                    Table foreignTable = lSql.table(javaTableName);
-                    Column foreignColumn = foreignTable.column(javaColumnName);
-                    dependentTables.put(foreignTable, foreignColumn);
-                }
-            }
-            */
 
             // Fetch all columns
             ResultSet columnsMetaData = md.getColumns(null, null, lSql.getDialect()
