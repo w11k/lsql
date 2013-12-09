@@ -228,8 +228,8 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table2 (name2, age2) VALUES ('cus2', 30)");
         Query rows = lSql.executeRawQuery("SELECT * FROM table1, table2");
 
-        Row row = rows.getFirstRow().get().copy();
-        row.put("name1", "should fail");
+        Row row = new Row(rows.getFirstRow().get());
+        row.put("name1", "should not fail");
     }
 
     @Test

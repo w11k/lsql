@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -115,6 +114,7 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(byte[].class, key);
     }
 
+    /*
     @SuppressWarnings("unchecked")
     public List<Row> getJoinedRows(String joinedTabledName) {
         //return joinedRows.get(joinedTabledName);
@@ -125,12 +125,9 @@ public class Row extends ForwardingMap<String, Object> {
         //joinedRows.put(tableName, joinedForeignRows);
         data.put("__" + tableName, joinedForeignRows);
     }
+    */
 
-    public Row copy() {
-        return new Row(data);
-    }
-
-    public Row extractMap(String... keys) {
+    public Row extractNewMap(String... keys) {
         Row extracted = new Row();
         for (String key : keys) {
             extracted.put(key, get(key));

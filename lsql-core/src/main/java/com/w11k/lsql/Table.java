@@ -160,14 +160,6 @@ public class Table {
         }
     }
 
-    private void executeUpdate(PreparedStatement ps) throws SQLException {
-        int rowsAffected = ps.executeUpdate();
-        if (rowsAffected != 1) {
-            throw new UpdateException(rowsAffected +
-                    " rows were affected by update operation (expected 1). Either the ID or the revision (if enabled) is wrong.");
-        }
-    }
-
     /**
      * @throws InsertException
      * @throws UpdateException
@@ -260,14 +252,27 @@ public class Table {
         return new LinkedRow(this);
     }
 
-    public LinkedRow newLinkedRow(Map<String, Object> data) {
-        return new LinkedRow(this, data);
+    /**
+     * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
+     */
+    public LinkedRow newLinkedRow(Object... keyVals) {
+        return newLinkedRow(Row.fromKeyVals(keyVals));
     }
 
-    public LinkedRow newLinkedRow(Object... keyVals) {
-        LinkedRow linkedRow = new LinkedRow(this);
-        linkedRow.addKeyVals(keyVals);
-        return linkedRow;
+    /**
+     * Creates a new LinkedRow and adds {@code data}.
+     * <p/>
+     * If data contains the primary column or revision column value, they are removed.
+     *
+     * @param data content to be added
+     * @return the new LinkedRow attached to this table.
+     */
+    public LinkedRow newLinkedRow(Map<String, Object> data) {
+        data.remove(getPrimaryKeyColumn().get());
+        if (revisionColumn.isPresent()) {
+            data.remove(revisionColumn.get().getColumnName());
+        }
+        return new LinkedRow(this, data);
     }
 
     public Map<String, AbstractValidationError> validate(Row row) {
@@ -311,6 +316,14 @@ public class Table {
     @Override
     public String toString() {
         return "Table{tableName='" + tableName + "'}";
+    }
+
+    private void executeUpdate(PreparedStatement ps) throws SQLException {
+        int rowsAffected = ps.executeUpdate();
+        if (rowsAffected != 1) {
+            throw new UpdateException(rowsAffected +
+                    " rows were affected by update operation (expected 1). Either the ID or the revision (if enabled) is wrong.");
+        }
     }
 
     private void applyNewRevision(Row row, Object id) throws SQLException {
