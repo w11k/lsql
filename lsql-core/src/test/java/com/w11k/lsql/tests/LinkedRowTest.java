@@ -85,7 +85,7 @@ public class LinkedRowTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void newLinkedRowCopiedDataWithoutIdAndRevisionColumn() {
+    public void newLinkedRowCopiesDataWithIdAndRevisionColumn() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT, revision INT DEFAULT 0)");
         Table table1 = lSql.table("table1");
         table1.enableRevisionSupport();
@@ -95,8 +95,26 @@ public class LinkedRowTest extends AbstractLSqlTest {
         assertTrue(row.containsKey("revision"));
 
         LinkedRow copy = table1.newLinkedRow(row);
-        assertFalse(copy.containsKey("id"));
-        assertFalse(copy.containsKey("revision"));
+        assertTrue(copy.containsKey("id"));
+        assertTrue(copy.containsKey("revision"));
+    }
+
+    @Test
+    public void removeIdAndRevision() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT, revision INT DEFAULT 0)");
+        Table table1 = lSql.table("table1");
+        table1.enableRevisionSupport();
+
+        LinkedRow row = table1.newLinkedRow(
+                "id", 1,
+                "age", 1,
+                "revision", 1
+        );
+
+        row.removeIdAndRevision();
+        assertFalse(row.containsKey("id"));
+        assertTrue(row.containsKey("age"));
+        assertFalse(row.containsKey("revision"));
     }
 
 }

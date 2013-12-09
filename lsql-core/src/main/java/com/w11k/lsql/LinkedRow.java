@@ -32,6 +32,13 @@ public class LinkedRow extends Row {
     }
 
     /**
+     * @return The revision of this LinkedRow.
+     */
+    public Object getRevision() {
+        return get(table.getRevisionColumn().get().getColumnName());
+    }
+
+    /**
      * Convenience method to set the expected revision.
      *
      * @param revision Revision to use for DML statements.
@@ -41,10 +48,13 @@ public class LinkedRow extends Row {
     }
 
     /**
-     * @return The revision of this LinkedRow.
+     * Removes the primary column and revision column value, if existent.
      */
-    public Object getRevision() {
-        return get(table.getRevisionColumn().get().getColumnName());
+    public void removeIdAndRevision() {
+        remove(table.getPrimaryKeyColumn().get());
+        if (table.getRevisionColumn().isPresent()) {
+            remove(table.getRevisionColumn().get().getColumnName());
+        }
     }
 
     @Override

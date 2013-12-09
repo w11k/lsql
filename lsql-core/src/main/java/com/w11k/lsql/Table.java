@@ -261,17 +261,11 @@ public class Table {
 
     /**
      * Creates a new LinkedRow and adds {@code data}.
-     * <p/>
-     * If data contains the primary column or revision column value, they are removed.
      *
      * @param data content to be added
      * @return the new LinkedRow attached to this table.
      */
     public LinkedRow newLinkedRow(Map<String, Object> data) {
-        data.remove(getPrimaryKeyColumn().get());
-        if (revisionColumn.isPresent()) {
-            data.remove(revisionColumn.get().getColumnName());
-        }
         return new LinkedRow(this, data);
     }
 
