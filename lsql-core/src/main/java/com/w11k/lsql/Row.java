@@ -2,10 +2,7 @@ package com.w11k.lsql;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.collect.ForwardingMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
@@ -79,17 +76,6 @@ public class Row extends ForwardingMap<String, Object> {
         return type.cast(value);
     }
 
-    private <A> A convertWithJackson(Class<A> expectedType, Object value) {
-        ObjectMapper mapper = getObjectMapper();
-        String valString = "\"" + value + "\"";
-        try {
-            JsonNode rootNode = mapper.readValue(valString, JsonNode.class);
-            return mapper.treeToValue(rootNode, expectedType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public Optional<Object> getOptional(String key) {
         if (containsKey(key)) {
             return Optional.of(get(key));
@@ -146,6 +132,17 @@ public class Row extends ForwardingMap<String, Object> {
     @Override
     protected Map<String, Object> delegate() {
         return data;
+    }
+
+    private <A> A convertWithJackson(Class<A> expectedType, Object value) {
+        ObjectMapper mapper = getObjectMapper();
+        String valString = "\"" + value + "\"";
+        try {
+            JsonNode rootNode = mapper.readValue(valString, JsonNode.class);
+            return mapper.treeToValue(rootNode, expectedType);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
