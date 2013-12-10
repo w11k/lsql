@@ -54,9 +54,6 @@ public class LSqlFile {
     }
 
     public LSqlFileStatement statement(String name) {
-        if (lSql.isReadSqlFilesOnEveryAccess()) {
-            parseSqlStatements();
-        }
         if (!statements.containsKey(name)) {
             throw new IllegalArgumentException("No statement with name '" + name +
                     "' found in file '" + path + "'.");

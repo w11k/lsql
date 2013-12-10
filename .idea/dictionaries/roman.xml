@@ -2,6 +2,7 @@
   <dictionary name="roman">
     <words>
       <w>jdbc</w>
+      <w>lsql</w>
     </words>
   </dictionary>
 </component>

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/lsql.iml" filepath="$PROJECT_DIR$/lsql.iml" />
       <module fileurl="file://$PROJECT_DIR$/lsql-core/lsql-core.iml" filepath="$PROJECT_DIR$/lsql-core/lsql-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/lsql-doc/lsql-doc.iml" filepath="$PROJECT_DIR$/lsql-doc/lsql-doc.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lsql-parent.iml" filepath="$PROJECT_DIR$/lsql-parent.iml" />
     </modules>
   </component>
 </project>

@@ -22,8 +22,6 @@ public class Row extends ForwardingMap<String, Object> {
 
     private final Map<String, Object> data;
 
-    //private final Map<String, List<Row>> joinedRows;
-
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
         r.addKeyVals(keyVals);
@@ -36,11 +34,11 @@ public class Row extends ForwardingMap<String, Object> {
 
     public Row(Map<String, Object> data) {
         this.data = newHashMap(data);
-        //this.joinedRows = Maps.newLinkedHashMap();
     }
 
     public Row addKeyVals(Object... keyVals) {
         checkArgument(
+                keyVals.length == 0 ||
                 keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
 
         Iterable<List<Object>> partition = Iterables.partition(newArrayList(keyVals), 2);
@@ -113,19 +111,6 @@ public class Row extends ForwardingMap<String, Object> {
     public byte[] getByteArray(String key) {
         return getAs(byte[].class, key);
     }
-
-    /*
-    @SuppressWarnings("unchecked")
-    public List<Row> getJoinedRows(String joinedTabledName) {
-        //return joinedRows.get(joinedTabledName);
-        return getAs(List.class, "__" + joinedTabledName);
-    }
-
-    public void addJoinedRows(String tableName, LinkedList<Row> joinedForeignRows) {
-        //joinedRows.put(tableName, joinedForeignRows);
-        data.put("__" + tableName, joinedForeignRows);
-    }
-    */
 
     public Row extractNewMap(String... keys) {
         Row extracted = new Row();

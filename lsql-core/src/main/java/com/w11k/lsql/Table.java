@@ -53,7 +53,12 @@ public class Table {
         return ImmutableMap.copyOf(columns);
     }
 
-    public Column column(String columnName) {
+    /**
+     * @param columnName the name of the column
+     *
+     * @return the column instance
+     */
+    public synchronized Column column(String columnName) {
         if (!columns.containsKey(columnName)) {
             throw new RuntimeException(
                     "Column '" + columnName + "' does not exist in table '" + tableName + "'.");
@@ -62,12 +67,21 @@ public class Table {
     }
 
     /**
-     * Convenience method. Same as <code>enableRevisionSupport("revision").</code>
+     * Convenience method. Same as {@code enableRevisionSupport(revision).}
      */
     public void enableRevisionSupport() {
         enableRevisionSupport("revision");
     }
 
+    /**
+     * Enables revision support and optimistic locking with the given column. LSql increases the revision column
+     * on
+     * every update operation. Hence the column must support the SQL operation "SET column=column+1".
+     * Additionally,
+     * every {@link com.w11k.lsql.Table#update(Row)} operation uses a WHERE constraint with the expected revision.
+     *
+     * @param revisionColumnName the revision column
+     */
     public void enableRevisionSupport(String revisionColumnName) {
         Column col = column(revisionColumnName);
         revisionColumn = of(col);
@@ -78,12 +92,22 @@ public class Table {
     }
 
     /**
+     * Inserts the given {@link Row}. If a primary key was generated during the INSERT operation, the key will be
+     * put into the passed row and additionally be returned.
+     * <p/>
+     * If revision support is enabled (see {@link com.w11k.lsql.Table#enableRevisionSupport()}), the revision
+     * value
+     * will be queried after the insert operation and be put into the passed row.
+     *
+     * @param row the values to be inserted
+     *
      * @throws InsertException
      */
     public Optional<Object> insert(Row row) {
         try {
             List<String> columns = row.getKeyList();
-            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createInsertStatement(this, columns);
+            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
+                    .createInsertStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
 
             int rowsAffected = ps.executeUpdate();
@@ -119,6 +143,17 @@ public class Table {
     }
 
     /**
+     * Updates a database row with the values in the passed {@link Row}. If you want to set {@code null} values,
+     * you need to explicitly add null entries for the columns.
+     * <p/>
+     * If revision support is enabled (see {@link com.w11k.lsql.Table#enableRevisionSupport()}), the revision
+     * value
+     * will be queried after the update operation and be put into the passed row.
+     *
+     * @param row The values used to update the database. The row instance must contain a primary key value and,
+     *            if
+     *            revision support is enabled, a revision value.
+     *
      * @throws UpdateException
      */
     public void update(Row row) {
@@ -133,7 +168,8 @@ public class Table {
                 columns.remove(getRevisionColumn().get().getColumnName());
             }
 
-            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createUpdateStatement(this, columns);
+            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
+                    .createUpdateStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
 
             // Set ID
@@ -161,6 +197,12 @@ public class Table {
     }
 
     /**
+     * Saves the {@link Row} instance.
+     * <p/>
+     * If the passed row does not contain a primary key value, {@link #insert(Row)} will be called. If the passed
+     * row contains a primary key value, it will be checked if this key is already existent in the database. If it
+     * is, {@link #update(com.w11k.lsql.Row)} will be called, {@link #insert(com.w11k.lsql.Row)} otherwise.
+     *
      * @throws InsertException
      * @throws UpdateException
      */
@@ -175,7 +217,8 @@ public class Table {
             // Check if insert or update
             Object id = row.get(primaryKeyColumn.get());
             try {
-                PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createCountForIdStatement(this);
+                PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
+                        .createCountForIdStatement(this);
                 Column column = column(getPrimaryKeyColumn().get());
                 column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
                 ps.setObject(1, id);
@@ -197,11 +240,11 @@ public class Table {
     }
 
     /**
-     * Deletes the row with the given ID.
+     * Deletes the row with the given primary key value.
      * <p/>
-     * If revision support is enabled, the delete will fail.
+     * If revision support is enabled, the operation will fail. Use {@link #delete(com.w11k.lsql.Row)} instead.
      *
-     * @param id The row's ID to delete.
+     * @param id delete the row with this primary key value
      */
     public void delete(Object id) {
         Row row = new Row();
@@ -209,6 +252,12 @@ public class Table {
         delete(row);
     }
 
+    /**
+     * Deletes the row that matches the primary key value and, if enabled, the revision value in the passed {@link
+     * Row} instance.
+     *
+     * @throws com.w11k.lsql.exceptions.DeleteException
+     */
     public void delete(Row row) {
         PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createDeleteByIdStatement(this);
         try {
@@ -229,6 +278,14 @@ public class Table {
         }
     }
 
+    /**
+     * Loads the row with the given primary key value.
+     *
+     * @param id the primary key
+     *
+     * @return a {@link com.google.common.base.Present} with a {@link Row} instance if the passed primary key
+     * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
+     */
     public Optional<LinkedRow> get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
@@ -248,6 +305,9 @@ public class Table {
         return absent();
     }
 
+    /**
+     * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
+     */
     public LinkedRow newLinkedRow() {
         return new LinkedRow(this);
     }
@@ -260,15 +320,28 @@ public class Table {
     }
 
     /**
-     * Creates a new LinkedRow and adds {@code data}.
+     * Creates and returns a new {@link LinkedRow} linked to this table and adds {@code data}.
+     * <p/>
+     * A {@link LinkedRow} will call {@link #validate(String, Object)} on every
+     * {@link LinkedRow#put(String, Object)} operation.
      *
      * @param data content to be added
-     * @return the new LinkedRow attached to this table.
      */
     public LinkedRow newLinkedRow(Map<String, Object> data) {
         return new LinkedRow(this, data);
     }
 
+    /**
+     * Validates the passed {@link Row} instance. The validation will check
+     * <ul>
+     * <li>if all entries in the row instance match a database column ({@link com.w11k.lsql.validation.KeyError}),</li>
+     * <li>if all entries have the correct type ({@link com.w11k.lsql.validation.TypeError}) and </li>
+     * <li>if the String values are too long ({@link com.w11k.lsql.validation.StringTooLongError}).</li>
+     * </ul>
+     *
+     * @return A {@link java.util.Map} with potential validation errors. The keys match the column names
+     * and the values are subclasses of {@link com.w11k.lsql.validation.AbstractValidationError}.
+     */
     public Map<String, AbstractValidationError> validate(Row row) {
         Map<String, AbstractValidationError> validationErrors = Maps.newHashMap();
         for (String key : row.keySet()) {
@@ -281,6 +354,9 @@ public class Table {
         return validationErrors;
     }
 
+    /**
+     * Same as {@link #validate(Row)} but limited to the passed column and value.
+     */
     public Optional<? extends AbstractValidationError> validate(String javaColumnName, Object value) {
         if (!getColumns().containsKey(javaColumnName)) {
             return of(new KeyError(getTableName(), javaColumnName));
@@ -329,7 +405,8 @@ public class Table {
 
     private Object queryRevision(Object id) throws SQLException {
         Column revCol = revisionColumn.get();
-        PreparedStatement revQuery = lSql.getDialect().getPreparedStatementCreator().createRevisionQueryStatement(this, id);
+        PreparedStatement revQuery =
+                lSql.getDialect().getPreparedStatementCreator().createRevisionQueryStatement(this, id);
         revCol.getConverter().setValueInStatement(lSql, revQuery, 1, id, revCol.getSqlType());
         ResultSet resultSet = revQuery.executeQuery();
         resultSet.next();
@@ -342,7 +419,8 @@ public class Table {
             DatabaseMetaData md = con.getMetaData();
 
             // Fetch Primary Key
-            ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
+            ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.getDialect()
+                    .identifierJavaToSql(tableName));
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
             } else {
@@ -379,4 +457,6 @@ public class Table {
             throw new RuntimeException(e);
         }
     }
+
+
 }

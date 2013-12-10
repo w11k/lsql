@@ -11,8 +11,8 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -26,21 +26,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
-    private final ConcurrentMap<String, Table> tables = Maps.newConcurrentMap();
+    private final Map<String, Table> tables = Maps.newLinkedHashMap();
 
     private final BaseDialect dialect;
 
     private final Callable<Connection> connectionProvider;
 
-    private boolean readSqlFilesOnEveryAccess = false;
-
-    //private Gson gson = createGsonInstance();
     private ObjectMapper jsonMapper = createJsonMapperInstance();
 
     /**
      * Creates a new LSql instance.
      * <p/>
-     * LSql will use the {@link Callable} for obtaining connections..
+     * LSql will use the {@link Callable} for obtaining connections.
      *
      * @param dialect            the database dialect
      * @param connectionProvider provider to get a Connection instance
@@ -73,20 +70,6 @@ public class LSql {
         return connectionProvider;
     }
 
-    public boolean isReadSqlFilesOnEveryAccess() {
-        return readSqlFilesOnEveryAccess;
-    }
-
-    public void setReadSqlFilesOnEveryAccess(boolean readSqlFilesOnEveryAccess) {
-        this.readSqlFilesOnEveryAccess = readSqlFilesOnEveryAccess;
-    }
-
-    /*
-    public Gson getGson() {
-        return gson;
-    }
-    */
-
     public ObjectMapper getJsonMapper() {
         return jsonMapper;
     }
@@ -109,7 +92,7 @@ public class LSql {
      * Loads a SQL file with the same name and location as the specified class.
      * Instead of '.class', the file extension '.sql' will be used.
      *
-     * @param clazz the class which location and name will be used to lookup the SQL file
+     * @param clazz the class which location and name will be used for the lookup
      * @return the {@code LSqlFile} instance
      */
     public LSqlFile readSqlFile(Class<?> clazz) {
@@ -145,7 +128,7 @@ public class LSql {
     }
 
     /**
-     * Executes the SQL SELECT string. Useful for testing and simple queries.
+     * Executes the SQL SELECT string. Useful for simple queries.
      * {@link LSqlFile}s should be used for complex queries.
      *
      * @param sql the SQL SELECT string
@@ -161,12 +144,6 @@ public class LSql {
                 "dialect=" + dialect +
                 '}';
     }
-
-    /*
-    protected Gson createGsonInstance() {
-        return new GsonFactory().createInstance();
-    }
-    */
 
     protected ObjectMapper createJsonMapperInstance() {
         return new ObjectMapper();

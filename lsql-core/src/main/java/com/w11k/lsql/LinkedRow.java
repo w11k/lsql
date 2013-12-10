@@ -27,12 +27,15 @@ public class LinkedRow extends Row {
         this.table = table;
     }
 
+    /**
+     * @return the primary key value
+     */
     public Object getId() {
         return get(table.getPrimaryKeyColumn().get());
     }
 
     /**
-     * @return The revision of this LinkedRow.
+     * @return the revision value
      */
     public Object getRevision() {
         return get(table.getRevisionColumn().get().getColumnName());
@@ -57,6 +60,10 @@ public class LinkedRow extends Row {
         }
     }
 
+    /**
+     * Puts the given key/value pair into this instance and calls
+     * {@link com.w11k.lsql.Table#validate(String, Object)}.
+     */
     @Override
     public Object put(String key, Object value) {
         Optional<? extends AbstractValidationError> validate = table.validate(key, value);
@@ -66,18 +73,27 @@ public class LinkedRow extends Row {
         return super.put(key, value);
     }
 
+    /**
+     * Delegates to {@link Table#insert(Row)}.
+     */
     public Optional<?> insert() {
         return table.insert(this);
     }
 
+    /**
+     * Delegates to {@link Table#save(Row)}.
+     */
     public Optional<?> save() {
         return table.save(this);
     }
 
+    /**
+     * Delegates to {@link Table#delete(Row)}.
+     */
     public void delete() {
         Object id = get(table.getPrimaryKeyColumn().get());
         if (id == null) {
-            throw new IllegalStateException("Can not delete this LinkedRow because the ID is not present.");
+            throw new IllegalStateException("Can not delete this LinkedRow because the primary key value is not present.");
         }
         table.delete(this);
     }
