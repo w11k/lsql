@@ -42,7 +42,7 @@ public class ObjectToJsonStringConverter extends Converter {
     public void setValue(LSql lSql, PreparedStatement ps, int index,
                          Object val) throws SQLException {
         try {
-            String json = lSql.getJsonMapper().writer().writeValueAsString(val);
+            String json = lSql.getObjectMapper().writer().writeValueAsString(val);
             ps.setString(index, json);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -55,9 +55,9 @@ public class ObjectToJsonStringConverter extends Converter {
         String json = rs.getString(index);
         try {
             if (typeReference != null) {
-                return lSql.getJsonMapper().readValue(json, typeReference);
+                return lSql.getObjectMapper().readValue(json, typeReference);
             } else {
-                return lSql.getJsonMapper().readValue(json, clazz);
+                return lSql.getObjectMapper().readValue(json, clazz);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

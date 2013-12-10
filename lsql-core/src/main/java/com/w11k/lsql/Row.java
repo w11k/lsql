@@ -6,8 +6,11 @@ import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +42,7 @@ public class Row extends ForwardingMap<String, Object> {
     public Row addKeyVals(Object... keyVals) {
         checkArgument(
                 keyVals.length == 0 ||
-                keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
+                        keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
 
         Iterable<List<Object>> partition = Iterables.partition(newArrayList(keyVals), 2);
         for (List<Object> objects : partition) {
@@ -69,11 +72,22 @@ public class Row extends ForwardingMap<String, Object> {
             return null;
         }
         if (!type.isAssignableFrom(value.getClass())) {
-            throw new ClassCastException(
-                    "Cannot cast value '" + value + "' of type '" + value.getClass() + "' to '" +
-                            type + "'");
+            A converted = convertWithJackson(type, value);
+            put(key, converted);
+            return converted;
         }
         return type.cast(value);
+    }
+
+    private <A> A convertWithJackson(Class<A> expectedType, Object value) {
+        ObjectMapper mapper = getObjectMapper();
+        String valString = "\"" + value + "\"";
+        try {
+            JsonNode rootNode = mapper.readValue(valString, JsonNode.class);
+            return mapper.treeToValue(rootNode, expectedType);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Optional<Object> getOptional(String key) {
@@ -123,6 +137,10 @@ public class Row extends ForwardingMap<String, Object> {
     @Override
     public String toString() {
         return Objects.toStringHelper(this).add("data", delegate()).toString();
+    }
+
+    protected ObjectMapper getObjectMapper() {
+        return new ObjectMapper();
     }
 
     @Override

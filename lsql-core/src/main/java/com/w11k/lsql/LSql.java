@@ -32,7 +32,7 @@ public class LSql {
 
     private final Callable<Connection> connectionProvider;
 
-    private ObjectMapper jsonMapper = createJsonMapperInstance();
+    private ObjectMapper objectMapper = createJsonMapperInstance();
 
     /**
      * Creates a new LSql instance.
@@ -70,8 +70,8 @@ public class LSql {
         return connectionProvider;
     }
 
-    public ObjectMapper getJsonMapper() {
-        return jsonMapper;
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     /**

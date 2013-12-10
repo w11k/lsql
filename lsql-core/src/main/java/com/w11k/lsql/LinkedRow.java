@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.validation.AbstractValidationError;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.util.Map;
 
@@ -98,5 +99,9 @@ public class LinkedRow extends Row {
         table.delete(this);
     }
 
+    @Override
+    protected ObjectMapper getObjectMapper() {
+        return table.getlSql().getObjectMapper();
+    }
 
 }

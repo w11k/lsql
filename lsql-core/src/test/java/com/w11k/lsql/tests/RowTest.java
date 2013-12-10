@@ -4,6 +4,8 @@ import com.google.common.base.Optional;
 import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Row;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -26,12 +28,6 @@ public class RowTest extends AbstractLSqlTest {
 
         row1.put("key2", "value2");
         assertFalse(row2.containsKey("key2"));
-    }
-
-    @Test(expectedExceptions = ClassCastException.class)
-    public void getAsThrowsClassCastExceptionOnWrongType() {
-        Row r = new Row().addKeyVals("a", "1");
-        assertEquals(r.getInt("a"), 1);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -74,6 +70,31 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(byTables.get("city").get(1).getString("zipcode"), "53721");
         assertEquals(byTables.get("person").get(1).getString("name"), "John");
         assertEquals(byTables.get("person").get(1).getInt("zipcode"), cityId.get());
+    }
+
+    @Test
+    public void aConversionRemembersTheResult() {
+        Row r = new Row().addKeyVals("a", "1");
+        assertEquals(r.get("a"), "1");
+        assertEquals(r.getInt("a"), 1);
+        assertEquals(r.get("a"), 1);
+    }
+
+    @Test
+    public void stringToIntConversion() {
+        Row r = new Row().addKeyVals("a", "1");
+        assertEquals(r.getInt("a"), 1);
+    }
+
+    @Test
+    public void stringToDateTimeConversion() {
+        LocalDateTime dt = new DateTime().toLocalDateTime();
+        Row r = Row.fromKeyVals(
+                "dateTime", dt.toString()
+        );
+
+        LocalDateTime dateTime = r.getDateTime("dateTime").toLocalDateTime();
+        assertEquals(dt, dateTime);
     }
 
 }
