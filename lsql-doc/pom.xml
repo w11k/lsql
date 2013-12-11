@@ -72,7 +72,7 @@
           <includes>
             <include>**/*</include>
           </includes>
-          <repositoryOwner>weiglewilczek</repositoryOwner>
+          <repositoryOwner>w11k</repositoryOwner>
           <repositoryName>lsql</repositoryName>
         </configuration>
         <executions>

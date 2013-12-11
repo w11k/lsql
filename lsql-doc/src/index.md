@@ -18,12 +18,6 @@ uses subclasses to overcome the dynamic, less-types characteristics.
 depending on the project requirements and database access libraries should not try to hide their
 characteristics.
 
-* Use unit tests to verify your data model, not static typing. Obviously, using an untyped
-datastructure like a Map imposes some challenges. E.g. a typo like `map.get("firstMame")` would
-lead to an error which would have been catched with static typing. However, data structures like
-`java.util.Map` already provide implementations for methods like `equals(...)` which can be
-used to automatically verify the data persistence logic and help to catch typos.
-
 * Software architectures currently shift towards rich browser and stand-alone application. The main
 responsibility for server code will be to query and return the stored data as quickly
 as possible and to serialize, maybe even intentionally denormalized, views as JSON string. Traditional

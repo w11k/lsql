@@ -4,9 +4,11 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.dialects.H2Dialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -130,6 +132,17 @@ public abstract class AbstractLSqlTest {
         //startMatcher.find();
         //String tableName = startMatcher.group(1);
         lSql.executeRawSql(sql);
+    }
+
+    public void debugPrint(Object obj) {
+        ObjectMapper mapper = new ObjectMapper();
+        String result = null;
+        try {
+            result = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(result);
     }
 
  }
