@@ -127,7 +127,7 @@ public class Query implements Iterable<QueriedRow> {
         return r;
     }
 
-    private Column getColumn(ResultSetMetaData metaData, int position) throws SQLException {
+    private Column getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
         String sqlColumnName = metaData.getColumnLabel(position);
         String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
         Converter converter = getConverter(metaData, position);
@@ -155,7 +155,7 @@ public class Query implements Iterable<QueriedRow> {
         Set<String> processedColumnLabels = Sets.newLinkedHashSet(); // used to find duplicates
         List<ResultSetColumn> columnList = Lists.newLinkedList();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            Column column = getColumn(metaData, i);
+            Column column = getColumnForResultSetColumn(metaData, i);
             if (processedColumnLabels.contains(column.getColumnName())) {
                 throw new IllegalStateException("Dublicate column '" + column.getColumnName() + "' in query.");
             }
@@ -187,7 +187,7 @@ public class Query implements Iterable<QueriedRow> {
         Set<Optional<Table>> foundTables = Sets.newHashSet();
 
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            Column column = getColumn(metaData, i);
+            Column column = getColumnForResultSetColumn(metaData, i);
             foundTables.add(column.getTable());
 
             ResultSetColumn rsc = new ResultSetColumn();
