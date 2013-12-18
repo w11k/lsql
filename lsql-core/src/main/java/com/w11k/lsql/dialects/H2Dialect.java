@@ -23,8 +23,8 @@ public class H2Dialect extends BaseDialect {
                     }
 
                     @Override
-                    public Class<?> getSupportedJavaClass() {
-                        return String.class;
+                    public Optional<Class<String>> getSupportedJavaClass() {
+                        return Optional.of(String.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps,

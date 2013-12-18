@@ -3,8 +3,7 @@ package com.w11k.lsql.dialects;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.google.common.io.CharStreams;
-import com.w11k.lsql.LSql;
-import com.w11k.lsql.Table;
+import com.w11k.lsql.*;
 import com.w11k.lsql.converter.Converter;
 
 import javax.sql.rowset.serial.SerialClob;
@@ -21,8 +20,8 @@ public class SqlServerDialect extends BaseDialect {
                         return new int[]{Types.NUMERIC};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return Double.class;
+                    public Optional<Class<Double>> getSupportedJavaClass() {
+                        return Optional.of(Double.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps,
@@ -42,8 +41,8 @@ public class SqlServerDialect extends BaseDialect {
                         return new int[]{Types.CLOB};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return String.class;
+                    public Optional<Class<String>> getSupportedJavaClass() {
+                        return Optional.of(String.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps,
@@ -73,8 +72,8 @@ public class SqlServerDialect extends BaseDialect {
                         return new int[]{Types.VARBINARY, Types.BINARY};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return com.w11k.lsql.Blob.class;
+                    public Optional<Class<com.w11k.lsql.Blob>> getSupportedJavaClass() {
+                        return Optional.of(com.w11k.lsql.Blob.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps,

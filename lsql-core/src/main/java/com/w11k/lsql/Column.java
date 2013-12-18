@@ -78,10 +78,10 @@ public class Column {
     public Optional<? extends AbstractValidationError> validateValue(Object value) {
         if (!converter.isValueValid(value)) {
             return of(new TypeError(getTableName().get(), columnName, converter
-                    .getSupportedJavaClass().getSimpleName(), value.getClass().getSimpleName()));
+                    .getSupportedJavaClass().get().getSimpleName(), value.getClass().getSimpleName()));
         }
 
-        Class<?> targetType = converter.getSupportedJavaClass();
+        Class<?> targetType = converter.getSupportedJavaClass().get();
         if (columnSize != -1 && String.class.isAssignableFrom(targetType)) {
             String string = (String) value;
             if (string != null && string.length() > columnSize) {

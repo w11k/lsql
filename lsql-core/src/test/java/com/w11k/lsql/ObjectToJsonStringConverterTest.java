@@ -19,8 +19,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void pojo() {
         createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("person").setConverter(new ObjectToJsonStringConverter(new TypeReference<Person>() {
-        }));
+        t1.column("person").setConverter(new ObjectToJsonStringConverter(Person.class));
 
         Person p = new Person("John", "Doe");
         t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
@@ -32,7 +31,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfString() {
         createTable("CREATE TABLE table1 (data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(new TypeReference<List<String>>() {
+        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class, new TypeReference<List<String>>() {
         }));
 
         List<String> list = Lists.newLinkedList();
@@ -48,7 +47,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfMapStringString() {
         createTable("CREATE TABLE table1 (data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(new TypeReference<List<Map<String, String>>>() {
+        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
         }));
 
         List<Map<String, String>> list = Lists.newLinkedList();
@@ -67,7 +66,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfMapStringStringInALinkedRow() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(
+        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class,
                 new TypeReference<List<Map<String, String>>>() {
                 }));
 

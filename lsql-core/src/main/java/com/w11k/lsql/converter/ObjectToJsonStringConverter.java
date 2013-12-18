@@ -1,5 +1,6 @@
 package com.w11k.lsql.converter;
 
+import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import org.codehaus.jackson.type.TypeReference;
 
@@ -18,13 +19,14 @@ public class ObjectToJsonStringConverter extends Converter {
         this.clazz = clazz;
     }
 
-    public ObjectToJsonStringConverter(TypeReference typeReference) {
+    public <A> ObjectToJsonStringConverter(Class<A> clazz, TypeReference typeReference) {
+        this.clazz = clazz;
         this.typeReference = typeReference;
     }
 
     @Override
-    public Class<?> getSupportedJavaClass() {
-        return clazz == null ? typeReference.getType().getClass() : clazz;
+    public Optional<? extends Class<?>> getSupportedJavaClass() {
+        return Optional.of(clazz);
     }
 
     @Override
@@ -33,9 +35,13 @@ public class ObjectToJsonStringConverter extends Converter {
     }
 
     @Override
+    public boolean convertWithJacksonOnWrongType() {
+        return false;
+    }
+
+    @Override
     public boolean isValueValid(Object value) {
-        // TODO
-        return true;
+        return getSupportedJavaClass().get().isAssignableFrom(value.getClass());
     }
 
     @Override

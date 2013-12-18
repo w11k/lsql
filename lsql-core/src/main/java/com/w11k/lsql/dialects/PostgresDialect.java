@@ -1,5 +1,6 @@
 package com.w11k.lsql.dialects;
 
+import com.google.common.base.Optional;
 import com.w11k.lsql.Blob;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
@@ -18,8 +19,8 @@ public class PostgresDialect extends BaseDialect {
                     }
 
                     @Override
-                    public Class<?> getSupportedJavaClass() {
-                        return Boolean.class;
+                    public Optional<Class<Boolean>> getSupportedJavaClass() {
+                        return Optional.of(Boolean.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps,
@@ -47,8 +48,8 @@ public class PostgresDialect extends BaseDialect {
                     }
 
                     @Override
-                    public Class<?> getSupportedJavaClass() {
-                        return com.w11k.lsql.Blob.class;
+                    public Optional<Class<Blob>> getSupportedJavaClass() {
+                        return Optional.of(Blob.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps,

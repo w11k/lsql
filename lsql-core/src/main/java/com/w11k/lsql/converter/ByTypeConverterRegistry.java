@@ -1,10 +1,12 @@
 package com.w11k.lsql.converter;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.LSql;
+import com.w11k.lsql.*;
 import org.joda.time.DateTime;
 
 import java.sql.*;
+import java.sql.Blob;
 import java.util.Map;
 
 public class ByTypeConverterRegistry {
@@ -30,7 +32,7 @@ public class ByTypeConverterRegistry {
         for (int sqlType : converter.getSupportedSqlTypes()) {
             sqlValueToJavaConverters.put(sqlType, converter);
         }
-        javaValueToSqlConverters.put(converter.getSupportedJavaClass(), converter);
+        javaValueToSqlConverters.put(converter.getSupportedJavaClass().get(), converter);
     }
 
     protected void init() {
@@ -40,8 +42,8 @@ public class ByTypeConverterRegistry {
                         return new int[]{Types.BIT, Types.BOOLEAN};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return Boolean.class;
+                    public Optional<Class<Boolean>> getSupportedJavaClass() {
+                        return Optional.of(Boolean.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps, int index,
@@ -60,8 +62,8 @@ public class ByTypeConverterRegistry {
                         return new int[]{Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return Integer.class;
+                    public Optional<Class<Integer>> getSupportedJavaClass() {
+                        return Optional.of(Integer.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps, int index,
@@ -80,8 +82,8 @@ public class ByTypeConverterRegistry {
                         return new int[]{Types.FLOAT};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return Float.class;
+                    public Optional<Class<Float>> getSupportedJavaClass() {
+                        return Optional.of(Float.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps, int index,
@@ -100,8 +102,8 @@ public class ByTypeConverterRegistry {
                         return new int[]{Types.DOUBLE, Types.REAL, Types.DECIMAL};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return Double.class;
+                    public Optional<Class<Double>> getSupportedJavaClass() {
+                        return Optional.of(Double.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps, int index,
@@ -120,8 +122,8 @@ public class ByTypeConverterRegistry {
                         return new int[]{Types.CHAR};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return Character.class;
+                    public Optional<Class<Character>> getSupportedJavaClass() {
+                        return Optional.of(Character.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps, int index,
@@ -140,8 +142,8 @@ public class ByTypeConverterRegistry {
                         return new int[]{Types.VARCHAR, Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return String.class;
+                    public Optional<Class<String>> getSupportedJavaClass() {
+                        return Optional.of(String.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps, int index,
@@ -160,8 +162,8 @@ public class ByTypeConverterRegistry {
                         return new int[]{Types.TIMESTAMP};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return DateTime.class;
+                    public Optional<Class<DateTime>> getSupportedJavaClass() {
+                        return Optional.of(DateTime.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps, int index,
@@ -187,8 +189,8 @@ public class ByTypeConverterRegistry {
                         return new int[]{Types.BLOB};
                     }
 
-                    public Class<?> getSupportedJavaClass() {
-                        return com.w11k.lsql.Blob.class;
+                    public Optional<Class<com.w11k.lsql.Blob>> getSupportedJavaClass() {
+                        return Optional.of(com.w11k.lsql.Blob.class);
                     }
 
                     public void setValue(LSql lSql, PreparedStatement ps, int index,

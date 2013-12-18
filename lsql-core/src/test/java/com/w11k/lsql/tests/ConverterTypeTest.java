@@ -57,7 +57,14 @@ public class ConverterTypeTest extends AbstractLSqlTest {
 
     @Test
     public void testDate() {
-        testType("TIMESTAMP", DateTime.now());
+        DateTime now = DateTime.now();
+        testType("TIMESTAMP", now);
+
+        createTable("CREATE TABLE table1 (datetime TIMESTAMP)");
+        Table table1 = lSql.table("table1");
+        table1.insert(Row.fromKeyVals("datetime", now.toString()));
+        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        assertEquals(row.get("datetime"), now);
     }
 
     private void testType(String sqlTypeName, Object value) {
