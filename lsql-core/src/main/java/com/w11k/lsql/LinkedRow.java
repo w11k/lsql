@@ -78,7 +78,7 @@ public class LinkedRow extends Row {
     /**
      * Puts all known entries into this {@link LinkedRow}. Tries to convert values with wrong type.
      */
-    public void putAllKnown(Row from) {
+    public LinkedRow putAllKnown(Row from) {
         for (String key : from.keySet()) {
             if (table.getColumns().containsKey(key)) {
                 Object val = from.get(key);
@@ -92,6 +92,7 @@ public class LinkedRow extends Row {
                 put(key, val);
             }
         }
+        return this;
     }
 
     /**
