@@ -60,8 +60,7 @@ public class Table {
      */
     public synchronized Column column(String columnName) {
         if (!columns.containsKey(columnName)) {
-            throw new RuntimeException(
-                    "Column '" + columnName + "' does not exist in table '" + tableName + "'.");
+            return null;
         }
         return columns.get(columnName);
     }

@@ -128,16 +128,17 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     private Column getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
-        String sqlColumnName = metaData.getColumnLabel(position);
+        String sqlColumnName = metaData.getColumnName(position);
         String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
         Converter converter = getConverter(metaData, position);
         Optional<Table> table = getTable(metaData, position);
         Column column;
-        if (table.isPresent()) {
+
+        if (table.isPresent() && table.get().column(javaColumnName) != null) {
             column = table.get().column(javaColumnName);
         } else {
             column = new Column(
-                    Optional.<Table>absent(),
+                    table,
                     javaColumnName,
                     metaData.getColumnType(position),
                     converter,

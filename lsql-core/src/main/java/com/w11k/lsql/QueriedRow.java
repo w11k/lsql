@@ -40,11 +40,11 @@ public class QueriedRow extends LinkedRow {
     }
 
     /**
-     * Group this row by table origin. Calculated values (e.g. 'count(*)') are stored with an empty table name ''.
+     * Group this row by table origin. Calculated values (e.g. 'count(*)') are stored with an empty table name ''
+     * and unknown column names are dropped.
      */
     public Map<String, Map<Object, LinkedRow>> groupByTables() {
         Map<String, Map<String, LinkedRow>> byTables = Maps.newHashMap();
-
 
         for (Query.ResultSetColumn rsc : columns) {
             Column column = rsc.column;
@@ -59,22 +59,23 @@ public class QueriedRow extends LinkedRow {
             if (!byTables.get(tableName).containsKey(tableIndex)) {
                 byTables.get(tableName).put(tableIndex, column.getTable().get().newLinkedRow());
             }
-            byTables.get(tableName).get(tableIndex).put(column.getColumnName(), get(rsc.nameInRow));
+            if (column.getTable().isPresent() && column.getTable().get().column(column.getColumnName()) != null) {
+                byTables.get(tableName).get(tableIndex).put(column.getColumnName(), get(rsc.nameInRow));
+            }
         }
 
-        return Maps
-                .transformValues(byTables, new Function<Map<String, LinkedRow>, Map<Object, LinkedRow>>() {
-                    public Map<Object, LinkedRow> apply(Map<String, LinkedRow> input) {
-                        Map<Object, LinkedRow> entry = Maps.newLinkedHashMap();
-                        for (String key : input.keySet()) {
-                            LinkedRow row = input.get(key);
-                            if (row.getId() != null) {
-                                entry.put(row.getId(), row);
-                            }
-                        }
-                        return entry;
+        return Maps.transformValues(byTables, new Function<Map<String, LinkedRow>, Map<Object, LinkedRow>>() {
+            public Map<Object, LinkedRow> apply(Map<String, LinkedRow> input) {
+                Map<Object, LinkedRow> entry = Maps.newLinkedHashMap();
+                for (String key : input.keySet()) {
+                    LinkedRow row = input.get(key);
+                    if (row.getId() != null) {
+                        entry.put(row.getId(), row);
                     }
-                });
+                }
+                return entry;
+            }
+        });
     }
 
     private void failIfTableIsMissing() {
