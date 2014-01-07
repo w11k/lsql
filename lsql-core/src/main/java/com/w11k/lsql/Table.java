@@ -452,7 +452,7 @@ public class Table {
                 converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)), column.getSqlType());
             }
             return ps;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
