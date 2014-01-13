@@ -104,11 +104,11 @@ public class Query implements Iterable<QueriedRow> {
         return byTables;
     }
 
-    public List<QueriedRow> asRawList() {
+    public List<Row> asRawList() {
         try {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<ResultSetColumn> columns = createRawResultSetColumnList(resultSet.getMetaData());
-            List<QueriedRow> rows = Lists.newLinkedList();
+            List<Row> rows = Lists.newLinkedList();
             while (resultSet.next()) {
                 rows.add(extractRow(resultSet, columns));
             }
@@ -118,13 +118,13 @@ public class Query implements Iterable<QueriedRow> {
         }
     }
 
-    private QueriedRow extractRow(ResultSet resultSet, List<ResultSetColumn> resultSetColumns) throws SQLException {
+    private Row extractRow(ResultSet resultSet, List<ResultSetColumn> resultSetColumns) throws SQLException {
         Row r = new Row();
         for (ResultSetColumn rsc : resultSetColumns) {
             Object val = rsc.column.getConverter().getValueFromResultSet(lSql, resultSet, rsc.position);
             r.put(rsc.nameInRow, val);
         }
-        return new QueriedRow(r, resultSetColumns);
+        return r;
     }
 
     private Column getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {

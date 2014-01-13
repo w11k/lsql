@@ -237,7 +237,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name1 TEXT, age1 INT)");
         lSql.executeRawSql("INSERT INTO table1 (name1, age1) VALUES ('cus1', 20)");
         Query query = lSql.executeRawQuery("SELECT name1 AS a, age1 AS b FROM table1");
-        List<QueriedRow> list = query.asRawList();
+        List<Row> list = query.asRawList();
         assertEquals(list.get(0).getString("a"), "cus1");
         assertEquals(list.get(0).getInt("b"), 20);
     }
