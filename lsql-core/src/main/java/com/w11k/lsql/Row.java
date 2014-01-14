@@ -108,8 +108,12 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(String.class, key);
     }
 
+    public Blob getBlob(String key) {
+        return getAs(Blob.class, key);
+    }
+
     public byte[] getByteArray(String key) {
-        return getAs(byte[].class, key);
+        return getBlob(key).getData();
     }
 
     public Row extractNewMap(String... keys) {
