@@ -3,6 +3,7 @@ package com.w11k.lsql.tests.dialects;
 import com.w11k.lsql.*;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
+import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.tests.TestUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.ITestResult;
@@ -18,6 +19,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 
 import static org.testng.Assert.assertEquals;
@@ -42,7 +44,6 @@ public abstract class AbstractDialectTests {
             this.lSql = new LSql(createDialect(), ConnectionProviders.fromInstance(con));
             this.initOk = true;
         } catch (Exception e) {
-            //Reporter.getCurrentTestResult().setAttribute("warn", "Can not test dialect.");
             Reporter.getCurrentTestResult().setStatus(ITestResult.SKIP);
             e.printStackTrace();
         }
@@ -65,7 +66,7 @@ public abstract class AbstractDialectTests {
         }
         insertGetDelete();
         blob();
-        join();
+        columnAliasBehaviour();
     }
 
     public void insertGetDelete() throws SQLException {
@@ -80,7 +81,7 @@ public abstract class AbstractDialectTests {
         Object id2 = table1.insert(row2).get();
 
         // Verify insert
-        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
+        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asRawList().size();
         assertEquals(tableSize, 2);
 
         LinkedRow queried1 = table1.get(id1).get();
@@ -97,64 +98,8 @@ public abstract class AbstractDialectTests {
         table1.delete(row2);
 
         // Verify delete
-        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
+        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asRawList().size();
         assertEquals(tableSize, 1);
-    }
-
-    public void join() {
-        /*
-        setupCompanyEmployeeContactTables();
-
-        lSql.executeRawSql("INSERT INTO company (name) VALUES ('Company1');\n" +
-                "INSERT INTO company (name) VALUES ('Company2');\n" +
-
-                "INSERT INTO customer (name, customer_company_fk) VALUES ('Company1-Customer1', 1);\n" +
-                "INSERT INTO customer (name, customer_company_fk) VALUES ('Company1-Customer2', 1);\n" +
-
-                "INSERT INTO employee (name, employee_company_fk) VALUES ('Company1-Employee1', 1);\n" +
-                "INSERT INTO employee (name, employee_company_fk) VALUES ('Company1-Employee2', 1);\n" +
-                "INSERT INTO employee (name, employee_company_fk) VALUES ('Company2-Employee1', 2);\n" +
-                "INSERT INTO employee (name, employee_company_fk) VALUES ('Company2-Employee2', 2);\n" +
-
-                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company1-Employee1-Contact1', 1);\n" +
-                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company1-Employee1-Contact2', 1);\n" +
-                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company1-Employee2-Contact1', 2);\n" +
-                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company1-Employee2-Contact2', 2);\n" +
-
-                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company2-Employee1-Contact1', 3);\n" +
-                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company2-Employee1-Contact2', 3);\n" +
-                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company2-Employee2-Contact1', 4);\n" +
-                "INSERT INTO contact (name, contact_employee_fk) VALUES ('Company2-Employee2-Contact2', 4);\n");
-
-        // Test groupByTable
-        Query query = lSql.executeRawQuery("SELECT * FROM company, employee, contact");
-        Map<String, List<Row>> byTables = query.groupByTables();
-        assertEquals(byTables.get("company").size(), 2);
-        assertEquals(byTables.get("employee").size(), 4);
-        assertEquals(byTables.get("contact").size(), 8);
-
-        // Test join
-        Table company = lSql.table("company");
-        query = lSql.executeRawQuery("SELECT * FROM company, customer, employee, contact " +
-                "WHERE " +
-                "employee.employee_company_fk = company.company_pk " +
-                "AND customer.customer_company_fk = company.company_pk " +
-                "AND contact.contact_employee_fk = employee.employee_pk " +
-                "AND company.company_pk = 1;");
-
-        List<Row> rows = query.joinOn(company);
-        assertEquals(rows.size(), 1);
-        Row company1 = rows.get(0);
-
-        List<Row> customers = company1.getJoinedRows("customer");
-        assertEquals(customers.size(), 2);
-
-        List<Row> employees = company1.getJoinedRows("employee");
-        assertEquals(employees.size(), 2);
-        for (Row employee : employees) {
-            assertEquals(employee.getJoinedRows("contact").size(), 2);
-        }
-        */
     }
 
     public void blob() {
@@ -162,6 +107,8 @@ public abstract class AbstractDialectTests {
         Blob blob = new Blob(data);
         TestUtils.testType(lSql, getBlobColumnType(), blob, blob);
     }
+
+    protected abstract void validateColumnAliasBehaviour(QueriedRow queriedRow);
 
     protected String getHostname() {
         try {
@@ -219,8 +166,17 @@ public abstract class AbstractDialectTests {
 
     protected abstract void setupTestTable();
 
-    protected abstract void setupCompanyEmployeeContactTables();
-
     protected abstract String getBlobColumnType();
+
+    private void columnAliasBehaviour() {
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "statements.sql");
+        lSqlFile.statement("create2").execute();
+        lSqlFile.statement("insert2").execute();
+
+        List<QueriedRow> list = lSqlFile.statement("columnAliasBehaviour").query().asRawList();
+        assertEquals(list.size(), 1);
+        QueriedRow queriedRow = list.get(0);
+        validateColumnAliasBehaviour(queriedRow);
+    }
 
 }

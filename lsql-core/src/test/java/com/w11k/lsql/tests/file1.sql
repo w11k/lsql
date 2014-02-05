@@ -42,3 +42,11 @@ SELECT
   *
 FROM table1
 WHERE age = /*(*/ 2 /*)*/;
+
+
+--executeQueryWithAlias
+SELECT
+  table1.id as i,
+  table1.age as a,
+  table1.content as c
+FROM table1;

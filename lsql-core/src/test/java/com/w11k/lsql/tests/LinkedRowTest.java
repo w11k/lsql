@@ -1,10 +1,10 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.*;
+import com.w11k.lsql.LinkedRow;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import org.testng.annotations.Test;
-
-import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -40,41 +40,6 @@ public class LinkedRowTest extends AbstractLSqlTest {
         assertEquals(table1.get(1).get().getInt("age"), 1);
         row1.delete();
         assertFalse(table1.get(1).isPresent());
-    }
-
-    @Test
-    public void queryWithOnlyOneTableShouldLinkRowToTable() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        lSql.table("table1").insert(Row.fromKeyVals("id", 1, "age", 1));
-        Query query = lSql.executeRawQuery("SELECT * FROM table1;");
-        QueriedRow row = query.getFirstRow().get();
-        assertTrue(row.hasLinkedTable());
-    }
-
-    @Test
-    public void queryWithTwoTablesShouldNotLinkRowToTable() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        createTable("CREATE TABLE table2 (id INTEGER PRIMARY KEY, age INT)");
-        lSql.table("table1").insert(Row.fromKeyVals("id", 1, "age", 1));
-        lSql.table("table2").insert(Row.fromKeyVals("id", 1, "age", 1));
-        Query query = lSql.executeRawQuery("SELECT * FROM table1, table2;");
-        QueriedRow row = query.getFirstRow().get();
-        assertFalse(row.hasLinkedTable());
-    }
-
-    @Test
-    public void queryWithTwoTablesAndGroupByTablesShouldLinkRowToTable() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        createTable("CREATE TABLE table2 (id INTEGER PRIMARY KEY, age INT)");
-        lSql.table("table1").insert(Row.fromKeyVals("id", 1, "age", 1));
-        lSql.table("table2").insert(Row.fromKeyVals("id", 1, "age", 2));
-        Query query = lSql.executeRawQuery("SELECT * FROM table1, table2;");
-        QueriedRow row = query.getFirstRow().get();
-        Map<String, Map<Object, LinkedRow>> byTables = row.groupByTables();
-        assertEquals(byTables.get("table1").size(), 1);
-        assertEquals(byTables.get("table2").size(), 1);
-        assertNotNull(byTables.get("table1").get(1).getTable());
-        assertNotNull(byTables.get("table2").get(1).getTable());
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

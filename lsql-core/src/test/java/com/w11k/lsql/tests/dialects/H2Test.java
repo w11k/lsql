@@ -1,7 +1,14 @@
 package com.w11k.lsql.tests.dialects;
 
+import com.w11k.lsql.QueriedRow;
+import com.w11k.lsql.ResultSetColumn;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.dialects.H2Dialect;
+
+import java.util.List;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class H2Test extends AbstractDialectTests {
 
@@ -16,21 +23,17 @@ public class H2Test extends AbstractDialectTests {
     }
 
     @Override
-    protected void setupCompanyEmployeeContactTables() {
-        lSql.executeRawSql("CREATE TABLE company (company_pk SERIAL PRIMARY KEY, name TEXT);");
-
-        lSql.executeRawSql("CREATE TABLE customer (customer_pk SERIAL PRIMARY KEY, name TEXT, " +
-                "customer_company_fk INT REFERENCES company (company_pk));");
-
-        lSql.executeRawSql("CREATE TABLE employee (employee_pk SERIAL PRIMARY KEY, name TEXT, " +
-                "employee_company_fk INT REFERENCES company (company_pk));");
-
-        lSql.executeRawSql("CREATE TABLE contact (contact_pk SERIAL PRIMARY KEY, name TEXT, " +
-                "contact_employee_fk INT REFERENCES employee (employee_pk));");
+    protected String getBlobColumnType() {
+        return "BLOB";
     }
 
     @Override
-    protected String getBlobColumnType() {
-        return "BLOB";
+    protected void validateColumnAliasBehaviour(QueriedRow queriedRow) {
+        List<ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
+        assertEquals(resultSetColumns.size(), 2);
+        ResultSetColumn col = resultSetColumns.get(0);
+        assertEquals(col.getPosition(), 1);
+        assertEquals(col.getName(), "a");
+        assertFalse(col.getColumn().getTable().isPresent());
     }
 }

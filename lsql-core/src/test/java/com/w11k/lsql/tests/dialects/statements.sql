@@ -1,12 +1,15 @@
---join
-SELECT
-  *
-FROM company
-  JOIN customer ON customer.customer_company_fk = company.company_pk
-  JOIN employee ON employee.employee_company_fk = company.company_pk
-  JOIN contact c1
-    ON c1.contact_pk = employee.contact1
-  JOIN contact c2
-    ON c2.contact_pk = employee.contact2
-;
 
+-- create2
+CREATE TABLE table2 (
+  age     INT,
+  content TEXT
+);
+
+--insert2
+insert into table2 (age, content) values (10, 'test');
+
+--columnAliasBehaviour
+SELECT
+  table2.age as a,
+  table2.content as c
+FROM table2;
