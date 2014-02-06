@@ -59,10 +59,10 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("age", 3, "content", "text2")).get();
         table1.insert(Row.fromKeyVals("age", 6, "content", "text3")).get();
 
-        assertEquals(lSql.executeRawQuery("SELECT * FROM table1").asRawList().size(), 3);
+        assertEquals(lSql.executeRawQuery("SELECT * FROM table1").asList().size(), 3);
         LSqlFileStatement deleteYoung = lSqlFile.statement("deleteYoung");
         deleteYoung.execute("age", 2);
-        assertEquals(lSql.executeRawQuery("SELECT * FROM table1").asRawList().size(), 2);
+        assertEquals(lSql.executeRawQuery("SELECT * FROM table1").asList().size(), 2);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         LSqlFileStatement qInt = lSqlFile.statement("queryRangeMarkers");
         Query query = qInt.query();
-        assertEquals(query.asRawList().size(), 1);
+        assertEquals(query.asList().size(), 1);
         String firstRow = query.getFirstRow().get().getString("content");
         assertEquals(firstRow, "text1");
     }
@@ -135,7 +135,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
         LSqlFileStatement markers = lSqlFile.statement("queryRangeMarkers");
         Query query = markers.query("age", 40);
-        List<QueriedRow> result = query.asRawList();
+        List<QueriedRow> result = query.asList();
         assertEquals(result.size(), 2);
     }
 

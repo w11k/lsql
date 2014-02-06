@@ -178,7 +178,7 @@ public class TableTest extends AbstractLSqlTest {
         queriedRow = table1.get(id).get();
         assertEquals(queriedRow, row);
 
-        List<QueriedRow> rows = lSql.executeRawQuery("SELECT * FROM table1").asRawList();
+        List<QueriedRow> rows = lSql.executeRawQuery("SELECT * FROM table1").asList();
         assertEquals(rows.size(), 1);
     }
 
@@ -192,7 +192,7 @@ public class TableTest extends AbstractLSqlTest {
         Object id = table1.insert(row).get();
 
         // Verify insert
-        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asRawList().size();
+        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
         assertEquals(tableSize, 1);
 
         // Insert 2nd row
@@ -202,7 +202,7 @@ public class TableTest extends AbstractLSqlTest {
         table1.delete(row);
 
         // Verify delete
-        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asRawList().size();
+        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
         assertEquals(tableSize, 1);
     }
 

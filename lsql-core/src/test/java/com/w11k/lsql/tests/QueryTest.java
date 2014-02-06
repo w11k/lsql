@@ -38,7 +38,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
-        List<QueriedRow> rows = lSql.executeRawQuery("SELECT * FROM table1").asRawList();
+        List<QueriedRow> rows = lSql.executeRawQuery("SELECT * FROM table1").asList();
         assertEquals(rows.size(), 2);
     }
 
@@ -97,7 +97,7 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table2 (name, age) VALUES ('cus2', 30)");
         Query query = lSql.executeRawQuery("SELECT *, count(*) AS c FROM table1, table2");
-        query.asRawList();
+        query.asList();
     }
 
 }

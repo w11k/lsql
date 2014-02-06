@@ -81,7 +81,7 @@ public abstract class AbstractDialectTests {
         Object id2 = table1.insert(row2).get();
 
         // Verify insert
-        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asRawList().size();
+        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
         assertEquals(tableSize, 2);
 
         LinkedRow queried1 = table1.get(id1).get();
@@ -98,7 +98,7 @@ public abstract class AbstractDialectTests {
         table1.delete(row2);
 
         // Verify delete
-        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asRawList().size();
+        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
         assertEquals(tableSize, 1);
     }
 
@@ -171,7 +171,7 @@ public abstract class AbstractDialectTests {
         lSqlFile.statement("create2").execute();
         lSqlFile.statement("insert2").execute();
 
-        List<QueriedRow> list = lSqlFile.statement("columnAliasBehaviour").query().asRawList();
+        List<QueriedRow> list = lSqlFile.statement("columnAliasBehaviour").query().asList();
         assertEquals(list.size(), 1);
         QueriedRow queriedRow = list.get(0);
 

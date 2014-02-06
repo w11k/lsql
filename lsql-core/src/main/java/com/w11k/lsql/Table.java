@@ -295,7 +295,7 @@ public class Table {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        List<QueriedRow> queriedRows = new Query(lSql, ps).asRawList();
+        List<QueriedRow> queriedRows = new Query(lSql, ps).asList();
         if (queriedRows.size() == 1) {
             LinkedRow row = newLinkedRow(queriedRows.get(0));
             row.setTable(this);

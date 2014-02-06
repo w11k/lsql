@@ -43,7 +43,7 @@ public class Query implements Iterable<QueriedRow> {
 
     @Override
     public Iterator<QueriedRow> iterator() {
-        return asRawList().iterator();
+        return asList().iterator();
     }
 
     public <T> List<T> map(Function<QueriedRow, T> rowHandler) {
@@ -55,7 +55,7 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     public Optional<QueriedRow> getFirstRow() {
-        List<QueriedRow> queriedRows = asRawList();
+        List<QueriedRow> queriedRows = asList();
         if (queriedRows.size() == 0) {
             return absent();
         } else {
@@ -63,7 +63,7 @@ public class Query implements Iterable<QueriedRow> {
         }
     }
 
-    public List<QueriedRow> asRawList() {
+    public List<QueriedRow> asList() {
         try {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<ResultSetColumn> columns = createRawResultSetColumnList(resultSet.getMetaData());
