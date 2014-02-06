@@ -96,12 +96,10 @@ public class Query implements Iterable<QueriedRow> {
 
         if (!table.isPresent()) {
             // Check aliases in query
-            System.out.println("table missing");
         }
 
         if (table.isPresent() && table.get().column(javaColumnName) == null) {
             // Check aliases in query
-            System.out.println("column missing");
         }
 
         if (table.isPresent() && table.get().column(javaColumnName) != null) {
