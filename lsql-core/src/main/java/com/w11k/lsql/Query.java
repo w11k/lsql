@@ -15,11 +15,14 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
 public class Query implements Iterable<QueriedRow> {
+
+    private static final Pattern AS_STATEMENT = Pattern.compile("\\w(\\w\\d)");
 
     private final LSql lSql;
 
@@ -86,14 +89,26 @@ public class Query implements Iterable<QueriedRow> {
     private Column getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
         String sqlColumnName = metaData.getColumnName(position);
         String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
+        String sqlColumnLabel = metaData.getColumnLabel(position);
+        String javaColumnabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
         Optional<Table> table = getTable(metaData, position);
         Column column;
+
+        if (!table.isPresent()) {
+            // Check aliases in query
+            System.out.println("table missing");
+        }
+
+        if (table.isPresent() && table.get().column(javaColumnName) == null) {
+            // Check aliases in query
+            System.out.println("column missing");
+        }
 
         if (table.isPresent() && table.get().column(javaColumnName) != null) {
             column = table.get().column(javaColumnName);
         } else if (table.isPresent() && table.get().column(javaColumnName) == null) {
-            throw new IllegalStateException("");
-        } else {
+            throw new RuntimeException();
+        }  else {
             Converter converter = getConverter(metaData, position);
             column = new Column(
                     table,

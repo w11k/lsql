@@ -1,15 +1,15 @@
 
 -- create2
 CREATE TABLE table2 (
-  age     INT,
-  content TEXT
+  field_a int,
+  field_b varchar (50)
 );
 
 --insert2
-insert into table2 (age, content) values (10, 'test');
+insert into table2 (field_a, field_b) values (10, 'test');
 
 --columnAliasBehaviour
 SELECT
-  table2.age as a,
-  table2.content as c
+  table2.field_a as a,
+  table2.field_b as b
 FROM table2;

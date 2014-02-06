@@ -21,8 +21,4 @@ public class PostgresqlTest extends AbstractDialectTests {
         return "bytea";
     }
 
-    @Override
-    protected void validateColumnAliasBehaviour(QueriedRow queriedRow) {
-        throw new RuntimeException();
-    }
 }

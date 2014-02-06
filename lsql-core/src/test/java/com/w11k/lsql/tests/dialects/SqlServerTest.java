@@ -1,6 +1,5 @@
 package com.w11k.lsql.tests.dialects;
 
-import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.dialects.SqlServerDialect;
 
@@ -21,8 +20,4 @@ public class SqlServerTest extends AbstractDialectTests {
         return "VARBINARY(10)";
     }
 
-    @Override
-    protected void validateColumnAliasBehaviour(QueriedRow queriedRow) {
-        throw new RuntimeException();
-    }
 }
