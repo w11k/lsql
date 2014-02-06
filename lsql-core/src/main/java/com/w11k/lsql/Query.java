@@ -106,9 +106,12 @@ public class Query implements Iterable<QueriedRow> {
 
         if (table.isPresent() && table.get().column(javaColumnName) != null) {
             column = table.get().column(javaColumnName);
-        } else if (table.isPresent() && table.get().column(javaColumnName) == null) {
-            throw new RuntimeException();
-        }  else {
+        }
+        // TODO: check is required for alias support
+        //else if (table.isPresent() && table.get().column(javaColumnName) == null) {
+        //    throw new RuntimeException();
+        //}
+        else {
             Converter converter = getConverter(metaData, position);
             column = new Column(
                     table,
