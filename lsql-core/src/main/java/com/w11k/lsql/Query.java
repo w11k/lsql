@@ -77,11 +77,16 @@ public class Query implements Iterable<QueriedRow> {
         }
     }
 
-    private QueriedRow extractRow(ResultSet resultSet, List<ResultSetColumn> resultSetColumns) throws SQLException {
+    private QueriedRow extractRow(ResultSet resultSet,
+                                  List<ResultSetColumn> resultSetColumns) throws SQLException {
+        
         QueriedRow r = new QueriedRow(resultSetColumns);
         for (ResultSetColumn rsc : resultSetColumns) {
-            Object val = rsc.getColumn().getConverter().getValueFromResultSet(lSql, resultSet, rsc.getPosition());
-            r.put(rsc.getName(), val);
+            Column column = rsc.getColumn();
+            if (!column.isIgnored()) {
+                Object val = column.getConverter().getValueFromResultSet(lSql, resultSet, rsc.getPosition());
+                r.put(rsc.getName(), val);
+            }
         }
         return r;
     }
@@ -90,7 +95,7 @@ public class Query implements Iterable<QueriedRow> {
         String sqlColumnName = metaData.getColumnName(position);
         String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
         String sqlColumnLabel = metaData.getColumnLabel(position);
-        String javaColumnabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
+        String javaColumnLabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
         Optional<Table> table = getTable(metaData, position);
         Column column;
 

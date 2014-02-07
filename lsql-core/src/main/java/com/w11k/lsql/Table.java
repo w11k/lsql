@@ -1,6 +1,7 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
@@ -18,6 +19,8 @@ import java.util.Map;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newLinkedList;
 
 public class Table {
 
@@ -104,7 +107,8 @@ public class Table {
      */
     public Optional<Object> insert(Row row) {
         try {
-            List<String> columns = row.getKeyList();
+            List<String> columns = createColumnList(row);
+
             PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                     .createInsertStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
@@ -161,7 +165,7 @@ public class Table {
                     "'" + getPrimaryKeyColumn().get() + "' is not present.");
         }
         try {
-            List<String> columns = row.getKeyList();
+            List<String> columns = createColumnList(row);
             columns.remove(getPrimaryKeyColumn().get());
             if (revisionColumn.isPresent()) {
                 columns.remove(getRevisionColumn().get().getColumnName());
@@ -385,6 +389,16 @@ public class Table {
     @Override
     public String toString() {
         return "Table{tableName='" + tableName + "'}";
+    }
+
+    private List<String> createColumnList(Row row) {
+        List<String> columns = row.getKeyList();
+        columns = newLinkedList(filter(columns, new Predicate<String>() {
+            public boolean apply(String input) {
+                return !column(input).isIgnored();
+            }
+        }));
+        return columns;
     }
 
     private void executeUpdate(PreparedStatement ps) throws SQLException {

@@ -21,6 +21,8 @@ public class Column {
 
     private Converter converter;
 
+    private boolean ignored = false;
+
     /**
      * @param table      The corresponding table. Optional.absent(), if this column is
      *                   based on a function (e.g. count) or used for a raw list.
@@ -53,18 +55,16 @@ public class Column {
         }
     }
 
-    public boolean hasCorrespondingTable() {
-        return table.isPresent();
-    }
-
-    public boolean isPkColumn() {
-        return table.isPresent()
-                && table.get().getPrimaryKeyColumn().isPresent()
-                && table.get().getPrimaryKeyColumn().get().equals(columnName);
-    }
-
     public int getSqlType() {
         return sqlType;
+    }
+
+    public boolean isIgnored() {
+        return ignored;
+    }
+
+    public void setIgnored(boolean ignored) {
+        this.ignored = ignored;
     }
 
     public Converter getConverter() {
