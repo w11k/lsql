@@ -34,6 +34,8 @@ public class LSql {
 
     private ObjectMapper objectMapper = createJsonMapperInstance();
 
+    private InitColumnCallback initColumnCallback = new InitColumnCallback();
+
     /**
      * Creates a new LSql instance.
      * <p/>
@@ -72,6 +74,14 @@ public class LSql {
 
     public ObjectMapper getObjectMapper() {
         return objectMapper;
+    }
+
+    public InitColumnCallback getInitColumnCallback() {
+        return initColumnCallback;
+    }
+
+    public void setInitColumnCallback(InitColumnCallback initColumnCallback) {
+        this.initColumnCallback = initColumnCallback;
     }
 
     /**

@@ -450,7 +450,9 @@ public class Table {
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
                 int dataType = columnsMetaData.getInt(5);
                 Converter converter = lSql.getDialect().getConverterRegistry().getConverterForSqlType(dataType);
-                columns.put(javaColumnName, new Column(of(this), javaColumnName, dataType, converter, columnSize));
+                Column column = new Column(of(this), javaColumnName, dataType, converter, columnSize);
+                lSql.getInitColumnCallback().onNewColumn(column);
+                columns.put(javaColumnName, column);
             }
         } catch (SQLException e) {
             e.printStackTrace();
