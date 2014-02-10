@@ -127,7 +127,6 @@ public class Table {
                         if (generated.isPresent()) {
                             id = generated.get();
                             row.put(primaryKeyColumn.get(), id);
-                            return generated;
                         }
                     }
                 } else {

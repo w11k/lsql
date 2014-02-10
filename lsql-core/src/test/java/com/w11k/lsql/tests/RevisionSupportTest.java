@@ -13,11 +13,11 @@ public class RevisionSupportTest extends AbstractLSqlTest {
 
     @Test
     public void insertSetsRevision() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT, revision INT DEFAULT 0)");
+        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INT, revision INT DEFAULT 0)");
         Table table1 = lSql.table("table1");
         table1.enableRevisionSupport();
 
-        Row row1 = Row.fromKeyVals("id", 1, "age", 1);
+        Row row1 = Row.fromKeyVals("age", 1);
         table1.insert(row1);
         assertNotNull(row1.get("revision"));
     }
