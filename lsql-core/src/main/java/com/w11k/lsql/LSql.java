@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
@@ -82,6 +83,10 @@ public class LSql {
 
     public void setInitColumnCallback(InitColumnCallback initColumnCallback) {
         this.initColumnCallback = initColumnCallback;
+    }
+
+    public Iterable<Table> getTables() {
+        return Iterables.unmodifiableIterable(tables.values());
     }
 
     /**
