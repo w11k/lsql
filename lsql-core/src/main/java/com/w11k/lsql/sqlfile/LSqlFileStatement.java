@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
@@ -131,7 +132,7 @@ public class LSqlFileStatement {
                 Object value = queryParameters.get(p.name);
                 try {
                     if (value != null) {
-                        Converter converter = getConverterFor(p.name, value);
+                        Converter converter = getConverterFor(sql, p.name, value);
                         converter.setValueInStatement(lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
                     } else {
                         ps.setObject(i + 1, null);
@@ -226,7 +227,7 @@ public class LSqlFileStatement {
         return sql.toString();
     }
 
-    private Converter getConverterFor(String paramName, Object value) {
+    private Converter getConverterFor(String sql, String paramName, Object value) {
         String[] split = paramName.split("\\.");
         if (split.length == 1) {
             // No table prefix
@@ -235,10 +236,28 @@ public class LSqlFileStatement {
             // With table prefix
             String tableName = split[0];
             String columnName = split[1];
-            return lSql.table(tableName).column(columnName).getConverter();
+            Table table = lSql.table(tableName);
+            if (table.getColumns().size() == 0) {
+                // table not found, table name must be an alias
+                tableName = getTableAliasFromSqlStatement(sql, tableName);
+                table = lSql.table(tableName);
+            }
+            return table.column(columnName).getConverter();
         } else {
             throw new RuntimeException("Invalid query parameter: " + paramName);
         }
+    }
+
+    private String getTableAliasFromSqlStatement(String sql, String tableName) {
+        Pattern tableAlias = Pattern.compile(
+                ".*[\n ]+from.*[\n ,]+(\\w+)[\n ]+" + tableName.trim() + "[\n ]+.*",
+                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+        );
+        Matcher matcher = tableAlias.matcher(sql);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return tableName;
     }
 
 }

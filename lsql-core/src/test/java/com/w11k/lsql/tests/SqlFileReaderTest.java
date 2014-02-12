@@ -139,4 +139,36 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         assertEquals(result.size(), 2);
     }
 
+    @Test
+    public void executeQueryWithAlias() {
+        executeSqlStatement();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
+        LSqlFileStatement statement = lSqlFile.statement("executeQueryWithAlias");
+        Query query = statement.query("table1.age", 0);
+        List<QueriedRow> result = query.asList();
+        assertEquals(result.size(), 3);
+    }
+
+    @Test
+    public void executeQueryWithTableAlias1() {
+        executeSqlStatement();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
+        LSqlFileStatement statement = lSqlFile.statement("executeQueryWithTableAlias1");
+        Query query = statement.query("t1.age", 0);
+        List<QueriedRow> result = query.asList();
+        assertEquals(result.size(), 3);
+    }
+
+    @Test
+    public void executeQueryWithTableAlias2() {
+        executeSqlStatement();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
+        lSqlFile.statement("create2").execute();
+        lSql.table("table2").newLinkedRow("number", 2).save();
+        LSqlFileStatement statement = lSqlFile.statement("executeQueryWithTableAlias2");
+        Query query = statement.query("t1.age", 0);
+        List<QueriedRow> result = query.asList();
+        assertEquals(result.size(), 3);
+    }
+
 }
