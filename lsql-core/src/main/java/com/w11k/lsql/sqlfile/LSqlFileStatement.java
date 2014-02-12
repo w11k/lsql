@@ -250,7 +250,7 @@ public class LSqlFileStatement {
 
     private String getTableAliasFromSqlStatement(String sql, String tableName) {
         Pattern tableAlias = Pattern.compile(
-                ".*[\n ]+from.*[\n ,]+(\\w+)[\n ]+" + tableName.trim() + "[\n ]+.*",
+                ".*[\n ,]+(\\w+)[\n ]+" + tableName.trim() + "[\n ,]+.*",
                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
         );
         Matcher matcher = tableAlias.matcher(sql);
