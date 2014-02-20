@@ -62,6 +62,10 @@ public class ConverterTypeTest extends AbstractLSqlTest {
 
     @Test
     public void testDate() {
+        char[] chars = new char[3];
+
+        chars = ['a'];
+
         DateTime now = DateTime.now();
         testType("TIMESTAMP", now);
 
