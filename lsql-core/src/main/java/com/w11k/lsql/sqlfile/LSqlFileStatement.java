@@ -132,8 +132,13 @@ public class LSqlFileStatement {
                 Object value = queryParameters.get(p.name);
                 try {
                     if (value != null) {
-                        Converter converter = getConverterFor(sql, p.name, value);
-                        converter.setValueInStatement(lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
+                        if (value instanceof QueryParameter) {
+                            ((QueryParameter) value).set(ps, i + 1);
+                        } else {
+                            Converter converter = getConverterFor(sql, p.name, value);
+                            converter.setValueInStatement(
+                                    lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
+                        }
                     } else {
                         ps.setObject(i + 1, null);
                     }

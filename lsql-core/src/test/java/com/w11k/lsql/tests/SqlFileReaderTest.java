@@ -6,13 +6,11 @@ import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.sqlfile.LSqlFileStatement;
+import com.w11k.lsql.sqlfile.QueryParameter;
 import com.w11k.lsql.tests.utils.IntWrapper;
 import org.testng.annotations.Test;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -130,13 +128,20 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void executeQueryRangeParameters() {
+    public void useFunctionCallbackAsParameter() {
         executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement markers = lSqlFile.statement("queryRangeMarkers");
-        Query query = markers.query("age", 40);
+        LSqlFileStatement markers = lSqlFile.statement("queryFunctionCallback");
+        Query query = markers.query(
+                "table1.age", new QueryParameter() {
+            @Override
+            public void set(PreparedStatement ps, int index) throws SQLException {
+                ps.setInt(index, 10);
+            }
+        }
+        );
         List<QueriedRow> result = query.asList();
-        assertEquals(result.size(), 2);
+        assertEquals(result.size(), 1);
     }
 
     @Test

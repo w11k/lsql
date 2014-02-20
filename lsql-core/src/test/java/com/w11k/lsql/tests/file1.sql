@@ -29,6 +29,13 @@ FROM table1
 WHERE
   age < /*(*/ 15 /*)*/;
 
+-- queryFunctionCallback
+SELECT
+  *
+FROM table1
+WHERE
+  table1.age IN (/*(*/ 10, 30, 60 /*)*/);
+
 -- queryColumnConverter
 SELECT
   *
