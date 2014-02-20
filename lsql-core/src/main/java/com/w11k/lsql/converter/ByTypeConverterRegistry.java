@@ -119,27 +119,7 @@ public class ByTypeConverterRegistry {
         addConverter(
                 new Converter() {
                     public int[] getSupportedSqlTypes() {
-                        return new int[]{Types.CHAR};
-                    }
-
-                    public Optional<Class<Character>> getSupportedJavaClass() {
-                        return Optional.of(Character.class);
-                    }
-
-                    public void setValue(LSql lSql, PreparedStatement ps, int index,
-                                         Object val) throws SQLException {
-                        ps.setString(index, val.toString());
-                    }
-
-                    public Object getValue(LSql lSql, ResultSet rs,
-                                           int index) throws SQLException {
-                        return rs.getString(index).charAt(0);
-                    }
-                });
-        addConverter(
-                new Converter() {
-                    public int[] getSupportedSqlTypes() {
-                        return new int[]{Types.VARCHAR, Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR};
+                        return new int[]{Types.CHAR, Types.VARCHAR, Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR};
                     }
 
                     public Optional<Class<String>> getSupportedJavaClass() {

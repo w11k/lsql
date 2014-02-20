@@ -52,7 +52,12 @@ public class ConverterTypeTest extends AbstractLSqlTest {
 
     @Test
     public void testChar() {
-        testType("CHAR", 'a');
+        testType("CHAR", "a");
+    }
+
+    @Test
+    public void testCharArray() {
+        testType("CHAR(2)", "ab");
     }
 
     @Test

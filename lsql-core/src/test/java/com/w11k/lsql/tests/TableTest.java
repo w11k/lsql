@@ -5,6 +5,7 @@ import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.validation.AbstractValidationError;
@@ -52,6 +53,15 @@ public class TableTest extends AbstractLSqlTest {
 
         Row insertedRow = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
         assertEquals(insertedRow.getString("name"), "cus1");
+    }
+
+    @Test(expectedExceptions = DatabaseAccessException.class)
+    public void insertFailsOnWrongColumnName() throws SQLException {
+        createTable("CREATE TABLE table1 (name TEXT)");
+        Table table1 = lSql.table("table1");
+
+        Row row = new Row().addKeyVals("nameTYPO", "cus1");
+        table1.insert(row);
     }
 
     @Test
@@ -189,7 +199,7 @@ public class TableTest extends AbstractLSqlTest {
 
         // Insert
         Row row = new Row().addKeyVals("name", "Max");
-        Object id = table1.insert(row).get();
+        table1.insert(row).get();
 
         // Verify insert
         int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();

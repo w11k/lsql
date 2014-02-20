@@ -394,6 +394,9 @@ public class Table {
         List<String> columns = row.getKeyList();
         columns = newLinkedList(filter(columns, new Predicate<String>() {
             public boolean apply(String input) {
+                if (column(input) == null) {
+                    throw new RuntimeException("Column " + input + " does not exist in table " + tableName);
+                }
                 return !column(input).isIgnored();
             }
         }));
