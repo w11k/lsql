@@ -14,6 +14,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -63,7 +64,7 @@ public class Query implements Iterable<QueriedRow> {
         }
     }
 
-    public List<QueriedRow> asList() {
+    public QueriedRows asList() {
         try {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<ResultSetColumn> columns = createRawResultSetColumnList(resultSet.getMetaData());
@@ -71,10 +72,14 @@ public class Query implements Iterable<QueriedRow> {
             while (resultSet.next()) {
                 rows.add(extractRow(resultSet, columns));
             }
-            return rows;
+            return new QueriedRows(rows);
         } catch (SQLException e) {
             throw new QueryException(e);
         }
+    }
+
+    public Map<Object, QueriedRows> groupByColumn(final String columnName) {
+        return asList().groupByColumn(columnName);
     }
 
     private QueriedRow extractRow(ResultSet resultSet,

@@ -1,15 +1,20 @@
-
 -- create2
 CREATE TABLE table2 (
-  field_a int,
-  field_b varchar (50)
+  field_a INT,
+  field_b VARCHAR(50)
 );
 
 --insert2
-insert into table2 (field_a, field_b) values (10, 'test');
+INSERT INTO table2 (field_a, field_b) VALUES (10, 'test');
+
+--tableAlias
+SELECT
+  t1.age
+FROM table1 t1
+WHERE t1.age > 22;
 
 --columnAliasBehaviour
 SELECT
-  table2.field_a as a,
-  table2.field_b as b
+  table2.field_a AS a,
+  table2.field_b AS b
 FROM table2;
