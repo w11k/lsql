@@ -8,8 +8,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Set;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class IdGroupedRowCreatorTest extends AbstractLSqlTest {
 
@@ -24,6 +23,28 @@ public class IdGroupedRowCreatorTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO address (id, person_id, city) VALUES (2, 1, 'city2')");
         lSql.executeRawSql("INSERT INTO address (id, person_id, city) VALUES (3, 2, 'city3')");
         lSql.executeRawSql("INSERT INTO address (id, person_id, city) VALUES (4, 2, 'city4')");
+    }
+
+    @Test
+    public void groupByOnlyKeepsColumnOfTheIdColumnTable() {
+        List<QueriedRow> persons = createQuery().groupByIds("id", "address_id");
+        assertEquals(persons.size(), 2);
+        for (QueriedRow person : persons) {
+            assertTrue(person.containsKey("id"));
+            assertTrue(person.containsKey("name"));
+            assertFalse(person.containsKey("address_id"));
+            assertFalse(person.containsKey("person_id"));
+            assertFalse(person.containsKey("city"));
+            List<QueriedRow> addresses = person.getJoined("address_ids");
+            assertEquals(addresses.size(), 2);
+            for (QueriedRow address : addresses) {
+                assertTrue(address.containsKey("address_id"));
+                assertTrue(address.containsKey("person_id"));
+                assertTrue(address.containsKey("city"));
+                //assertFalse(address.containsKey("id")); // TODO fails due to alias bug
+                //assertFalse(address.containsKey("name")); // TODO fails due to alias bug
+            }
+        }
     }
 
     @Test
@@ -60,6 +81,18 @@ public class IdGroupedRowCreatorTest extends AbstractLSqlTest {
         assertTrue(collectedAddressIds.contains(2));
         assertTrue(collectedAddressIds.contains(3));
         assertTrue(collectedAddressIds.contains(4));
+    }
+
+    /**
+     * https://github.com/w11k/lsql/issues/2
+     */
+    @Test
+    public void soeOnToString() {
+        List<QueriedRow> persons = createQuery().groupByIds("id", "address_id as addresses");
+        for (QueriedRow person : persons) {
+            String s = person.toString();
+            assertNotNull(s);
+        }
     }
 
     private Query createQuery() {

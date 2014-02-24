@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
@@ -14,6 +15,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -44,7 +46,7 @@ public class Query implements Iterable<QueriedRow> {
     public List<QueriedRow> asList() {
         try {
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<ResultSetColumn> columns = createRawResultSetColumnList(resultSet.getMetaData());
+            Map<String, ResultSetColumn> columns = createRawResultSetColums(resultSet.getMetaData());
             List<QueriedRow> rows = Lists.newLinkedList();
             while (resultSet.next()) {
                 rows.add(extractRow(resultSet, columns));
@@ -73,10 +75,10 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     private QueriedRow extractRow(ResultSet resultSet,
-                                  List<ResultSetColumn> resultSetColumns) throws SQLException {
+                                  Map<String, ResultSetColumn> resultSetColumns) throws SQLException {
 
         QueriedRow r = new QueriedRow(resultSetColumns);
-        for (ResultSetColumn rsc : resultSetColumns) {
+        for (ResultSetColumn rsc : resultSetColumns.values()) {
             Column column = rsc.getColumn();
             if (!column.isIgnored()) {
                 Object val = column.getConverter().getValueFromResultSet(lSql, resultSet, rsc.getPosition());
@@ -127,9 +129,9 @@ public class Query implements Iterable<QueriedRow> {
         return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
     }
 
-    private List<ResultSetColumn> createRawResultSetColumnList(ResultSetMetaData metaData) throws SQLException {
+    private Map<String, ResultSetColumn> createRawResultSetColums(ResultSetMetaData metaData) throws SQLException {
         Set<String> processedColumnLabels = Sets.newLinkedHashSet(); // used to find duplicates
-        List<ResultSetColumn> columnList = Lists.newLinkedList();
+        Map<String, ResultSetColumn> columnList = Maps.newLinkedHashMap();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             Column column = getColumnForResultSetColumn(metaData, i);
             if (processedColumnLabels.contains(column.getColumnName())) {
@@ -139,7 +141,7 @@ public class Query implements Iterable<QueriedRow> {
 
             String javaLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
             ResultSetColumn rsc = new ResultSetColumn(i, javaLabel, column);
-            columnList.add(rsc);
+            columnList.put(javaLabel, rsc);
         }
         return columnList;
     }

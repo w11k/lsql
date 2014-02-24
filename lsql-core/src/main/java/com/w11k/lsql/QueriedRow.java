@@ -1,16 +1,17 @@
 package com.w11k.lsql;
 
 import java.util.List;
+import java.util.Map;
 
 public class QueriedRow extends Row {
 
-    private final List<ResultSetColumn> resultSetColumns;
+    private final Map<String, ResultSetColumn> resultSetColumns;
 
-    public QueriedRow(List<ResultSetColumn> resultSetColumns) {
+    public QueriedRow(Map<String, ResultSetColumn> resultSetColumns) {
         this.resultSetColumns = resultSetColumns;
     }
 
-    public List<ResultSetColumn> getResultSetColumns() {
+    public Map<String, ResultSetColumn> getResultSetColumns() {
         return resultSetColumns;
     }
 

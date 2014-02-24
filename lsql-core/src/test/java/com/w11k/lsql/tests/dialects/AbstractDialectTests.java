@@ -20,6 +20,7 @@ import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static org.testng.Assert.assertEquals;
@@ -125,9 +126,9 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 1);
         QueriedRow queriedRow = list.get(0);
 
-        List<ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
+        Map<String, ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
         assertEquals(resultSetColumns.size(), 1);
-        ResultSetColumn col = resultSetColumns.get(0);
+        ResultSetColumn col = resultSetColumns.values().iterator().next();
         assertEquals(col.getPosition(), 1);
         assertEquals(col.getName(), "age");
 
@@ -146,9 +147,9 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 1);
         QueriedRow queriedRow = list.get(0);
 
-        List<ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
+        Map<String, ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
         assertEquals(resultSetColumns.size(), 2);
-        ResultSetColumn col = resultSetColumns.get(0);
+        ResultSetColumn col = resultSetColumns.values().iterator().next();
         assertEquals(col.getPosition(), 1);
         assertEquals(col.getName(), "a");
 
