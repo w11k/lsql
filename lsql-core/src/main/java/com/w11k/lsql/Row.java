@@ -37,9 +37,7 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     public Row addKeyVals(Object... keyVals) {
-        checkArgument(
-                keyVals.length == 0 ||
-                        keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
+        checkArgument(keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
 
         Iterable<List<Object>> partition = Iterables.partition(newArrayList(keyVals), 2);
         for (List<Object> objects : partition) {
@@ -117,7 +115,7 @@ public class Row extends ForwardingMap<String, Object> {
         return blob == null ? null : blob.getData();
     }
 
-    public Row extractNewMap(String... keys) {
+    public Row pick(String... keys) {
         Row extracted = new Row();
         for (String key : keys) {
             extracted.put(key, get(key));

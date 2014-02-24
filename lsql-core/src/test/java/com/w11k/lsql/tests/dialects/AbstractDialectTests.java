@@ -6,9 +6,9 @@ import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.tests.TestUtils;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-import org.testng.annotations.AfterMethod;
+import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public abstract class AbstractDialectTests {
 
@@ -34,43 +35,44 @@ public abstract class AbstractDialectTests {
 
     private boolean initOk = false;
 
-    @BeforeMethod
-    public void beforeMethod() throws SQLException {
+    private Exception initException;
+
+    @BeforeClass
+    public void beforeClass() throws SQLException {
         try {
             properties = readProperties();
             dataSource = createDataSource();
             TestUtils.clear(dataSource);
             Connection con = dataSource.getConnection();
             this.lSql = new LSql(createDialect(), ConnectionProviders.fromInstance(con));
+            setupTestTable();
             this.initOk = true;
         } catch (Exception e) {
-            Reporter.getCurrentTestResult().setStatus(ITestResult.SKIP);
-            e.printStackTrace();
+            initException = e;
         }
     }
 
-    @AfterMethod
-    public void afterMethod() throws Exception {
+    @AfterClass
+    public void afterClass() throws Exception {
         if (!initOk) {
             return;
         }
-        if (lSql != null) {
-            lSql.getConnectionProvider().call().close();
+        lSql.getConnectionProvider().call().commit();
+        lSql.getConnectionProvider().call().close();
+        TestUtils.clear(dataSource);
+    }
+
+    @BeforeMethod
+    public void beforeMethod() {
+        if (!initOk) {
+            return;
         }
+        lSql.executeRawSql("DELETE FROM table1;");
     }
 
     @Test
-    public void run() throws SQLException {
-        if (!initOk) {
-            return;
-        }
-        // TODO insertGetDelete();
-        // TODO blob();
-        columnAliasBehaviour();
-    }
-
     public void insertGetDelete() throws SQLException {
-        setupTestTable();
+        skipOnConfigError();
 
         Table table1 = lSql.table("table1");
 
@@ -102,10 +104,67 @@ public abstract class AbstractDialectTests {
         assertEquals(tableSize, 1);
     }
 
+    @Test
     public void blob() {
+        skipOnConfigError();
         byte[] data = "123456789".getBytes();
         Blob blob = new Blob(data);
         TestUtils.testType(lSql, getBlobColumnType(), blob, blob);
+    }
+
+    @Test
+    public void tableAliasBehaviourOnlyQuery() {
+        skipOnConfigError();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "statements.sql");
+
+        Table table1 = lSql.table("table1");
+        table1.newLinkedRow("age", 20).save();
+        table1.newLinkedRow("age", 30).save();
+
+        List<QueriedRow> list = lSqlFile.statement("tableAlias").query().asList();
+        assertEquals(list.size(), 1);
+        QueriedRow queriedRow = list.get(0);
+
+        List<ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
+        assertEquals(resultSetColumns.size(), 1);
+        ResultSetColumn col = resultSetColumns.get(0);
+        assertEquals(col.getPosition(), 1);
+        assertEquals(col.getName(), "age");
+
+        assertTrue(col.getColumn().getTable().isPresent());
+        assertEquals(col.getColumn().getTable().get().getTableName(), "table1");
+    }
+
+    @Test
+    public void columnAliasBehaviour() {
+        skipOnConfigError();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "statements.sql");
+        lSqlFile.statement("create2").execute();
+        lSqlFile.statement("insert2").execute();
+
+        List<QueriedRow> list = lSqlFile.statement("columnAliasBehaviour").query().asList();
+        assertEquals(list.size(), 1);
+        QueriedRow queriedRow = list.get(0);
+
+        List<ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
+        assertEquals(resultSetColumns.size(), 2);
+        ResultSetColumn col = resultSetColumns.get(0);
+        assertEquals(col.getPosition(), 1);
+        assertEquals(col.getName(), "a");
+
+        // TODO
+        //assertTrue(col.getColumn().getTable().isPresent());
+    }
+
+    protected void skipOnConfigError() {
+        if (!initOk) {
+            throw new SkipException("Init failed: " + initException.getMessage(), initException) {
+                @Override
+                public boolean isSkip() {
+                    return true;
+                }
+            };
+        }
     }
 
     protected String getHostname() {
@@ -165,24 +224,5 @@ public abstract class AbstractDialectTests {
     protected abstract void setupTestTable();
 
     protected abstract String getBlobColumnType();
-
-    private void columnAliasBehaviour() {
-        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "statements.sql");
-        lSqlFile.statement("create2").execute();
-        lSqlFile.statement("insert2").execute();
-
-        List<QueriedRow> list = lSqlFile.statement("columnAliasBehaviour").query().asList();
-        assertEquals(list.size(), 1);
-        QueriedRow queriedRow = list.get(0);
-
-        List<ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
-        assertEquals(resultSetColumns.size(), 2);
-        ResultSetColumn col = resultSetColumns.get(0);
-        assertEquals(col.getPosition(), 1);
-        assertEquals(col.getName(), "a");
-
-        // TODO: alias support not implemented yet
-        // assertTrue(col.getColumn().getTable().isPresent());
-    }
 
 }

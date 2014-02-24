@@ -14,4 +14,9 @@ public class QueriedRow extends Row {
         return resultSetColumns;
     }
 
+    public List<QueriedRow> getJoined(String key) {
+        //noinspection unchecked
+        return (List<QueriedRow>) get(key);
+    }
+
 }

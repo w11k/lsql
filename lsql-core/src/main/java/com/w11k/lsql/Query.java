@@ -41,28 +41,6 @@ public class Query implements Iterable<QueriedRow> {
         return lSql;
     }
 
-    @Override
-    public Iterator<QueriedRow> iterator() {
-        return asList().iterator();
-    }
-
-    public <T> List<T> map(Function<QueriedRow, T> rowHandler) {
-        List<T> list = Lists.newLinkedList();
-        for (QueriedRow row : this) {
-            list.add(rowHandler.apply(row));
-        }
-        return list;
-    }
-
-    public Optional<QueriedRow> getFirstRow() {
-        List<QueriedRow> queriedRows = asList();
-        if (queriedRows.size() == 0) {
-            return absent();
-        } else {
-            return of(queriedRows.get(0));
-        }
-    }
-
     public List<QueriedRow> asList() {
         try {
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -77,9 +55,26 @@ public class Query implements Iterable<QueriedRow> {
         }
     }
 
+    @Override
+    public Iterator<QueriedRow> iterator() {
+        return asList().iterator();
+    }
+
+    public <T> List<T> map(Function<QueriedRow, T> rowHandler) {
+        return new QueriedRows(asList()).map(rowHandler);
+    }
+
+    public Optional<QueriedRow> getFirstRow() {
+        return new QueriedRows(asList()).getFirstRow();
+    }
+
+    public List<QueriedRow> groupByIds(final String... ids) {
+        return new QueriedRows(asList()).groupByIds(ids);
+    }
+
     private QueriedRow extractRow(ResultSet resultSet,
                                   List<ResultSetColumn> resultSetColumns) throws SQLException {
-        
+
         QueriedRow r = new QueriedRow(resultSetColumns);
         for (ResultSetColumn rsc : resultSetColumns) {
             Column column = rsc.getColumn();
