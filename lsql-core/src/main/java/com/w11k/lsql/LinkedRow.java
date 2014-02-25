@@ -8,24 +8,24 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.util.Map;
 
-public class LinkedRow extends Row {
+public class LinkedRow<P extends RowPojo> extends Row {
 
-    private Table table;
+    private Table<P> table;
 
-    public LinkedRow(Table table) {
+    public LinkedRow(Table<P> table) {
         this(table, Maps.<String, Object>newLinkedHashMap());
     }
 
-    public LinkedRow(Table table, Map<String, Object> row) {
+    public LinkedRow(Table<P> table, Map<String, Object> row) {
         super(row);
         this.table = table;
     }
 
-    public Table getTable() {
+    public Table<P> getTable() {
         return table;
     }
 
-    public void setTable(Table table) {
+    public void setTable(Table<P> table) {
         this.table = table;
     }
 
@@ -78,7 +78,7 @@ public class LinkedRow extends Row {
     /**
      * Puts all known entries into this {@link LinkedRow}. Tries to convert values with wrong type.
      */
-    public LinkedRow putAllKnown(Row from) {
+    public LinkedRow<P> putAllKnown(Row from) {
         for (String key : from.keySet()) {
             if (table.getColumns().containsKey(key)) {
                 Object val = from.get(key);
@@ -118,6 +118,10 @@ public class LinkedRow extends Row {
             throw new IllegalStateException("Can not delete this LinkedRow because the primary key value is not present.");
         }
         table.delete(this);
+    }
+
+    public P toPojo() {
+        return table.rowToPojo(this);
     }
 
     @Override

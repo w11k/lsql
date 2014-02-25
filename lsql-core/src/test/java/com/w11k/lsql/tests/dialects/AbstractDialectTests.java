@@ -75,7 +75,7 @@ public abstract class AbstractDialectTests {
     public void insertGetDelete() throws SQLException {
         skipOnConfigError();
 
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
 
         // Insert
         Row row1 = new Row().addKeyVals("age", 10);

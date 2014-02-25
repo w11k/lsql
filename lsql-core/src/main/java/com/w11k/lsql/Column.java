@@ -9,9 +9,9 @@ import com.w11k.lsql.validation.TypeError;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
-public class Column {
+public class Column<P extends RowPojo> {
 
-    private final Optional<Table> table;
+    private Optional<? extends Table<P>> table;
 
     private final String columnName;
 
@@ -23,6 +23,16 @@ public class Column {
 
     private boolean ignored = false;
 
+    public static <A extends RowPojo> Column<A> create(Table<A> table,
+                                                       String columnName,
+                                                       int sqlType,
+                                                       Converter converter,
+                                                       int columnSize) {
+
+        Optional<Table<A>> tableOptional = Optional.fromNullable(table);
+        return new Column<A>(tableOptional, columnName, sqlType, converter, columnSize);
+    }
+
     /**
      * @param table      The corresponding table. Optional.absent(), if this column is
      *                   based on a function (e.g. count) or used for a raw list.
@@ -31,7 +41,7 @@ public class Column {
      * @param converter  Converter instance used to convert between SQL and Java values.
      * @param columnSize The maximum column size. -1 if not applicable.
      */
-    public Column(Optional<Table> table, String columnName, int sqlType, Converter converter, int columnSize) {
+    public Column(Optional<? extends Table<P>> table, String columnName, int sqlType, Converter converter, int columnSize) {
         this.table = table;
         this.columnName = columnName;
         this.sqlType = sqlType;
@@ -43,7 +53,7 @@ public class Column {
         return columnName;
     }
 
-    public Optional<Table> getTable() {
+    public Optional<? extends Table<P>> getTable() {
         return table;
     }
 

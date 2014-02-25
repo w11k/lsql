@@ -263,7 +263,7 @@ public class SelectStatement {
         }
     }
 
-    public Optional<Column> getColumnFromSqlStatement(String columnAliasName) {
+    public Optional<? extends Column<?>> getColumnFromSqlStatement(String columnAliasName) {
         Pattern columnAlias = Pattern.compile(
                 //".*[\n ,]+([\\w+\\.?\\w*])[\n ]+as " + usedAlias.trim() + "[\n ,]+.*",
                 "((\\w+)\\.?(\\w*)) +as +" + columnAliasName.trim() + "[\\n ,]+",

@@ -12,7 +12,12 @@ import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
@@ -22,21 +27,28 @@ import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class Table {
+public class Table<P extends RowPojo> {
+
+    public static <A extends RowPojo> Table<A> create(LSql lSql, String tableName, Class<A> rowPojoClass) {
+        return new Table<A>(lSql, tableName, rowPojoClass);
+    }
 
     private final LSql lSql;
 
     private final String tableName;
 
-    private final Map<String, Column> columns = Maps.newHashMap();
+    private final Class<P> rowPojoClass;
+
+    private final Map<String, Column<P>> columns = Maps.newHashMap();
 
     private Optional<String> primaryKeyColumn = absent();
 
     private Optional<Column> revisionColumn = absent();
 
-    public Table(LSql lSql, String tableName) {
+    public Table(LSql lSql, String tableName, Class<P> rowPojoClass) {
         this.lSql = lSql;
         this.tableName = tableName;
+        this.rowPojoClass = rowPojoClass;
         fetchMeta();
     }
 
@@ -48,11 +60,15 @@ public class Table {
         return tableName;
     }
 
+    public Class<P> getRowPojoClass() {
+        return rowPojoClass;
+    }
+
     public Optional<String> getPrimaryKeyColumn() {
         return primaryKeyColumn;
     }
 
-    public Map<String, Column> getColumns() {
+    public Map<String, Column<P>> getColumns() {
         return ImmutableMap.copyOf(columns);
     }
 
@@ -65,7 +81,7 @@ public class Table {
      *
      * @return the column instance
      */
-    public synchronized Column column(String columnName) {
+    public synchronized Column<P> column(String columnName) {
         if (!columns.containsKey(columnName)) {
             return null;
         }
@@ -207,7 +223,7 @@ public class Table {
      * <p/>
      * If the passed row does not contain a primary key value, {@link #insert(Row)} will be called. If the passed
      * row contains a primary key value, it will be checked if this key is already existent in the database. If it
-     * is, {@link #update(com.w11k.lsql.Row)} will be called, {@link #insert(com.w11k.lsql.Row)} otherwise.
+     * is, {@link #update(Row)} will be called, {@link #insert(Row)} otherwise.
      *
      * @throws InsertException
      * @throws UpdateException
@@ -248,7 +264,7 @@ public class Table {
     /**
      * Deletes the row with the given primary key value.
      * <p/>
-     * If revision support is enabled, the operation will fail. Use {@link #delete(com.w11k.lsql.Row)} instead.
+     * If revision support is enabled, the operation will fail. Use {@link #delete(Row)} instead.
      *
      * @param id delete the row with this primary key value
      */
@@ -292,7 +308,7 @@ public class Table {
      * @return a {@link com.google.common.base.Present} with a {@link Row} instance if the passed primary key
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
-    public Optional<LinkedRow> get(Object id) {
+    public Optional<LinkedRow<P>> get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
@@ -304,7 +320,7 @@ public class Table {
         }
         List<QueriedRow> queriedRows = new Query(lSql, ps, new SelectStatement(lSql, "Table.get", psString)).asList();
         if (queriedRows.size() == 1) {
-            LinkedRow row = newLinkedRow(queriedRows.get(0));
+            LinkedRow<P> row = newLinkedRow(queriedRows.get(0));
             row.setTable(this);
             return of(row);
         }
@@ -315,7 +331,7 @@ public class Table {
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
     public LinkedRow newLinkedRow() {
-        return new LinkedRow(this);
+        return new LinkedRow<P>(this);
     }
 
     /**
@@ -333,8 +349,30 @@ public class Table {
      *
      * @param data content to be added
      */
-    public LinkedRow newLinkedRow(Map<String, Object> data) {
-        return new LinkedRow(this, data);
+    public LinkedRow<P> newLinkedRow(Map<String, Object> data) {
+        return new LinkedRow<P>(this, data);
+    }
+
+    public P rowToPojo(Row row) throws IllegalAccessException, InstantiationException {
+        try {
+            P p = createRowPojoInstance();
+            p.setDelegate(row);
+            return p;
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonParseException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private P createRowPojoInstance() throws InstantiationException, IllegalAccessException {
+        Constructor<?>[] cons = rowPojoClass.getConstructors();
+
+
+
+        return rowPojoClass.newInstance();
     }
 
     /**
@@ -456,7 +494,7 @@ public class Table {
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
                 int dataType = columnsMetaData.getInt(5);
                 Converter converter = lSql.getDialect().getConverterRegistry().getConverterForSqlType(dataType);
-                Column column = new Column(of(this), javaColumnName, dataType, converter, columnSize);
+                Column<P> column = new Column<P>(of(this), javaColumnName, dataType, converter, columnSize);
                 lSql.getInitColumnCallback().onNewColumn(column);
                 columns.put(javaColumnName, column);
             }

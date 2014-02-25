@@ -20,7 +20,7 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class Row extends ForwardingMap<String, Object> {
 
-    private final Map<String, Object> data;
+    private Map<String, Object> data;
 
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
@@ -34,6 +34,10 @@ public class Row extends ForwardingMap<String, Object> {
 
     public Row(Map<String, Object> data) {
         this.data = newHashMap(data);
+    }
+
+    public void setDelegate(Map<String, Object> data) {
+        this.data = data;
     }
 
     public Row addKeyVals(Object... keyVals) {
@@ -113,6 +117,11 @@ public class Row extends ForwardingMap<String, Object> {
     public byte[] getByteArray(String key) {
         Blob blob = getBlob(key);
         return blob == null ? null : blob.getData();
+    }
+
+    public <A> List<A> getListOf(Class<A> clazz, String key) {
+        //noinspection unchecked
+        return (List<A>) get(key);
     }
 
     public Row pick(String... keys) {

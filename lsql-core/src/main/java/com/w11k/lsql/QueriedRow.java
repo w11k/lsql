@@ -5,19 +5,18 @@ import java.util.Map;
 
 public class QueriedRow extends Row {
 
-    private final Map<String, ResultSetColumn> resultSetColumns;
+    private final Map<String, ResultSetColumn<?>> resultSetColumns;
 
-    public QueriedRow(Map<String, ResultSetColumn> resultSetColumns) {
+    public QueriedRow(Map<String, ResultSetColumn<?>> resultSetColumns) {
         this.resultSetColumns = resultSetColumns;
     }
 
-    public Map<String, ResultSetColumn> getResultSetColumns() {
+    public Map<String, ResultSetColumn<?>> getResultSetColumns() {
         return resultSetColumns;
     }
 
     public List<QueriedRow> getJoined(String key) {
-        //noinspection unchecked
-        return (List<QueriedRow>) get(key);
+        return getListOf(QueriedRow.class, key);
     }
 
 }

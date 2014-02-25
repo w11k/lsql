@@ -15,7 +15,7 @@ import java.util.List;
 
 public class PreparedStatementCreator {
 
-    public PreparedStatement createRevisionQueryStatement(Table table, Object id) {
+    public PreparedStatement createRevisionQueryStatement(Table<?> table, Object id) {
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         String revCol = getRevisionColumnSqlIdentifier(table);
         String sql = "SELECT " + revCol + " FROM " + sqlTableName + " WHERE ";
@@ -24,7 +24,7 @@ public class PreparedStatementCreator {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
-    public PreparedStatement createInsertStatement(final Table table, List<String> columns) {
+    public PreparedStatement createInsertStatement(final Table<?> table, List<String> columns) {
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO ").append(sqlTableName);
@@ -36,7 +36,7 @@ public class PreparedStatementCreator {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql.toString(), true);
     }
 
-    public PreparedStatement createUpdateStatement(Table table, List<String> columns) {
+    public PreparedStatement createUpdateStatement(Table<?> table, List<String> columns) {
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         String sql = "UPDATE " + sqlTableName;
         sql += " SET ";
@@ -68,7 +68,7 @@ public class PreparedStatementCreator {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
-    public String createSelectByIdStatement(Table table, Column idColumn) {
+    public String createSelectByIdStatement(Table<?> table, Column<?> idColumn) {
         String sqlTableName = table.getlSql().getDialect()
                 .identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()
@@ -76,8 +76,8 @@ public class PreparedStatementCreator {
         return "select * from " + sqlTableName + " where " + sqlColumnName + "=?";
     }
 
-    public PreparedStatement createDeleteByIdStatement(Table table) {
-        Column idColumn = table.column(table.getPrimaryKeyColumn().get());
+    public PreparedStatement createDeleteByIdStatement(Table<?> table) {
+        Column<?> idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         String sqlIdName = idColumn.getTable().get().getlSql().getDialect().identifierJavaToSql(idColumn.getColumnName());
 
@@ -94,8 +94,8 @@ public class PreparedStatementCreator {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
-    public PreparedStatement createCountForIdStatement(Table table) throws SQLException {
-        Column idColumn = table.column(table.getPrimaryKeyColumn().get());
+    public PreparedStatement createCountForIdStatement(Table<?> table) throws SQLException {
+        Column<?> idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect()
                 .identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()
@@ -105,11 +105,11 @@ public class PreparedStatementCreator {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
-    private String getRevisionColumnSqlIdentifier(Table table) {
+    private String getRevisionColumnSqlIdentifier(Table<?> table) {
         return table.getlSql().getDialect().identifierJavaToSql(table.getRevisionColumn().get().getColumnName());
     }
 
-    private List<String> createSqlColumnNames(final Table table, List<String> columns) {
+    private List<String> createSqlColumnNames(final Table<?> table, List<String> columns) {
         return Lists.transform(columns, new Function<String, String>() {
             @Override
             public String apply(String input) {

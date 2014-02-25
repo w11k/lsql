@@ -62,7 +62,7 @@ public class BaseDialect {
         return metaData.getTableName(columnIndex);
     }
 
-    public Optional<Object> extractGeneratedPk(Table table,
+    public Optional<Object> extractGeneratedPk(Table<?> table,
                                                ResultSet resultSet) throws SQLException {
         String pkName = table.getPrimaryKeyColumn().get();
         ResultSetMetaData metaData = resultSet.getMetaData();

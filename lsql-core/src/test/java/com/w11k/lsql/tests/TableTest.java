@@ -24,7 +24,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test
     public void getById() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
 
         table1.insert(Row.fromKeyVals("id", 1, "age", 1));
         table1.insert(Row.fromKeyVals("id", 2, "age", 2));
@@ -78,7 +78,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test
     public void insertShouldPutIdIntoRowObject() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("age", 1);
         Optional<Object> optional = table1.insert(row);
         assertTrue(optional.isPresent());
@@ -88,7 +88,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test(expectedExceptions = InsertException.class)
     public void insertShouldFailOnWrongKeys() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("age", 1, "wrong", "value");
         Optional<Object> optional = table1.insert(row);
         assertTrue(optional.isPresent());
@@ -98,7 +98,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test(expectedExceptions = UpdateException.class)
     public void updateShouldFailWhenIdNotPresent() throws SQLException {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, name TEXT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
         table1.update(row);
     }
@@ -106,7 +106,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test(expectedExceptions = UpdateException.class)
     public void updateShouldFailOnWrongKeys() throws SQLException {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, name TEXT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("id", 1, "name", "Max");
         table1.insert(row);
 
@@ -117,7 +117,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test
     public void updateById() throws SQLException {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, name TEXT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("id", 1, "name", "Max");
         table1.insert(row);
         LinkedRow queriedRow = table1.get(1).get();
@@ -132,7 +132,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test(expectedExceptions = UpdateException.class)
     public void updateWithWrongId() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
         Object id = table1.insert(row).get();
         LinkedRow queriedRow = table1.get(id).get();
@@ -146,7 +146,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test
     public void save() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
 
         // Insert
         Row row = Row.fromKeyVals("name", "Max");
@@ -169,7 +169,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test
     public void saveWithoutAutoIncrement() throws SQLException {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
 
         // Insert
         Row row = Row.fromKeyVals("id", 1, "name", "Max");
@@ -195,7 +195,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test
     public void delete() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
 
         // Insert
         Row row = new Row().addKeyVals("name", "Max");
@@ -219,7 +219,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test
     public void fetchColumns() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT, age INT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
         assertEquals(table1.getColumns().size(), 3);
         assertTrue(table1.getColumns().containsKey("id"));
         assertTrue(table1.getColumns().containsKey("name"));
@@ -235,7 +235,7 @@ public class TableTest extends AbstractLSqlTest {
     @Test
     public void validate() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, field1 INT, field2 INT)");
-        Table table1 = lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
 
         Row r = Row.fromKeyVals(
                 "field1", 1,

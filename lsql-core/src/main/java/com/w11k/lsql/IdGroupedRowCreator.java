@@ -40,9 +40,9 @@ public class IdGroupedRowCreator {
      * Remove columns with a different table source. Keep column if the table is unknown.
      */
     private static void removeColumnWithDifferentTable(QueriedRow row, String column) {
-        Map<String, ResultSetColumn> rscs = row.getResultSetColumns();
-        ResultSetColumn rsc = rscs.get(column);
-        Optional<Table> expectedTable = rsc.getColumn().getTable();
+        Map<String, ResultSetColumn<?>> rscs = row.getResultSetColumns();
+        ResultSetColumn<?> rsc = rscs.get(column);
+        Optional<? extends Table<?>> expectedTable = rsc.getColumn().getTable();
         if (!expectedTable.isPresent()) {
             return;
         }
@@ -51,7 +51,7 @@ public class IdGroupedRowCreator {
                 // Remove joined entries
                 row.remove(key);
             } else {
-                Optional<Table> toCheck = rscs.get(key).getColumn().getTable();
+                Optional<? extends Table<?>> toCheck = rscs.get(key).getColumn().getTable();
                 if (toCheck.isPresent() && !expectedTable.equals(toCheck)) {
                     row.remove(key);
                 }

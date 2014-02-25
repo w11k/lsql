@@ -46,7 +46,7 @@ public class Query implements Iterable<QueriedRow> {
     public List<QueriedRow> asList() {
         try {
             ResultSet resultSet = preparedStatement.executeQuery();
-            Map<String, ResultSetColumn> columns = createRawResultSetColums(resultSet.getMetaData());
+            Map<String, ResultSetColumn<?>> columns = createRawResultSetColums(resultSet.getMetaData());
             List<QueriedRow> rows = Lists.newLinkedList();
             while (resultSet.next()) {
                 rows.add(extractRow(resultSet, columns));
@@ -75,7 +75,7 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     private QueriedRow extractRow(ResultSet resultSet,
-                                  Map<String, ResultSetColumn> resultSetColumns) throws SQLException {
+                                  Map<String, ResultSetColumn<?>> resultSetColumns) throws SQLException {
 
         QueriedRow r = new QueriedRow(resultSetColumns);
         for (ResultSetColumn rsc : resultSetColumns.values()) {
@@ -88,12 +88,12 @@ public class Query implements Iterable<QueriedRow> {
         return r;
     }
 
-    private Column getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
+    private Column<?> getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
         String sqlColumnName = metaData.getColumnName(position);
         String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
         String sqlColumnLabel = metaData.getColumnLabel(position);
         String javaColumnLabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
-        Optional<Table> table = getTable(metaData, position);
+        Optional<? extends Table<?>> table = getTable(metaData, position);
 
         // JDBC return all required information
         if (table.isPresent()) {
@@ -103,15 +103,15 @@ public class Query implements Iterable<QueriedRow> {
         }
 
         // Table lookup failed. Check SQL string for aliases.
-        Optional<Column> columnOptional = selectStatement.getColumnFromSqlStatement(javaColumnLabel);
+        Optional<? extends Column<?>> columnOptional = selectStatement.getColumnFromSqlStatement(javaColumnLabel);
         if (columnOptional.isPresent()) {
             return columnOptional.get();
         }
 
         // Alias search in SQL string failed. Create column based on type.
         Converter converter = getConverter(metaData, position);
-        return new Column(
-                table,
+        return Column.create(
+                table.orNull(),
                 javaColumnName,
                 metaData.getColumnType(position),
                 converter,
@@ -123,26 +123,26 @@ public class Query implements Iterable<QueriedRow> {
         return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
     }
 
-    private Map<String, ResultSetColumn> createRawResultSetColums(ResultSetMetaData metaData) throws SQLException {
+    private Map<String, ResultSetColumn<?>> createRawResultSetColums(ResultSetMetaData metaData) throws SQLException {
         Set<String> processedColumnLabels = Sets.newLinkedHashSet(); // used to find duplicates
-        Map<String, ResultSetColumn> columnList = Maps.newLinkedHashMap();
+        Map<String, ResultSetColumn<?>> columnList = Maps.newLinkedHashMap();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             String columnLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
-            Column column = getColumnForResultSetColumn(metaData, i);
+            Column<?> column = getColumnForResultSetColumn(metaData, i);
             if (processedColumnLabels.contains(columnLabel)) {
                 throw new IllegalStateException("Dublicate column '" + columnLabel + "' in query.");
             }
             processedColumnLabels.add(columnLabel);
 
-            ResultSetColumn rsc = new ResultSetColumn(i, columnLabel, column);
+            ResultSetColumn<?> rsc = ResultSetColumn.create(i, columnLabel, column);
             columnList.put(columnLabel, rsc);
         }
         return columnList;
     }
 
-    private Optional<Table> getTable(ResultSetMetaData metaData, int position) throws SQLException {
+    private Optional<? extends Table<?>> getTable(ResultSetMetaData metaData, int position) throws SQLException {
         String sqlTableName = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, position);
-        Optional<Table> table;
+        Optional<? extends Table<?>> table;
         if (sqlTableName == null || "".equals(sqlTableName)) {
             table = absent();
         } else {

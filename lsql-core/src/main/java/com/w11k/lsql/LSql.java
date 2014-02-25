@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
-    private final Map<String, Table> tables = Maps.newLinkedHashMap();
+    private final Map<String, Table<? extends RowPojo>> tables = Maps.newLinkedHashMap();
 
     private final BaseDialect dialect;
 
@@ -85,7 +85,7 @@ public class LSql {
         this.initColumnCallback = initColumnCallback;
     }
 
-    public Iterable<Table> getTables() {
+    public Iterable<Table<?>> getTables() {
         return Iterables.unmodifiableIterable(tables.values());
     }
 
@@ -121,11 +121,25 @@ public class LSql {
      * @param tableName the table name (Java identifier format)
      * @return the Table instance
      */
-    public synchronized Table table(String tableName) {
+    public synchronized Table<?> table(String tableName) {
         if (!tables.containsKey(tableName)) {
-            tables.put(tableName, new Table(this, tableName));
+            tables.put(tableName, Table.create(this, tableName, RowPojo.class));
         }
         return tables.get(tableName);
+    }
+
+    /**
+     * Returns a Table instance.
+     *
+     * @param tableName the table name (Java identifier format)
+     * @return the Table instance
+     */
+    public synchronized <P extends RowPojo> Table<P> table(String tableName, Class<P> rowPojoClass) {
+        if (!tables.containsKey(tableName)) {
+            tables.put(tableName, Table.create(this, tableName, rowPojoClass));
+        }
+        //noinspection unchecked
+        return (Table<P>) tables.get(tableName);
     }
 
     /**
