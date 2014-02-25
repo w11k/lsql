@@ -5,6 +5,7 @@ import com.w11k.lsql.LSql;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -19,6 +20,11 @@ public class JavaBoolToSqlStringConverter extends Converter {
         checkArgument(!sqlStringValueForTrue.equals(sqlStringValueForFalse));
         this.sqlStringValueForTrue = sqlStringValueForTrue;
         this.sqlStringValueForFalse = sqlStringValueForFalse;
+    }
+
+    @Override
+    public int[] getSupportedSqlTypes() {
+        return new int[]{Types.VARCHAR, Types.CHAR};
     }
 
     @Override

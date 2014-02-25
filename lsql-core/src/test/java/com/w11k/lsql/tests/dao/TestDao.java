@@ -1,11 +1,11 @@
 package com.w11k.lsql.tests.dao;
 
 import com.w11k.lsql.guice.LSqlDao;
-import com.w11k.lsql.sqlfile.LSqlFileStatement;
+import com.w11k.lsql.SelectStatement;
 
 public class TestDao extends LSqlDao {
 
-    public LSqlFileStatement getStatement() {
+    public SelectStatement getStatement() {
         return statement("query1");
     }
 

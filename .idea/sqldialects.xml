@@ -2,6 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/lsql-core/src/test/java/com/w11k/lsql/tests/dialects/PostgresqlTest.java" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/lsql-core/src/test/java/com/w11k/lsql/tests/dialects/aliases.sql" dialect="SQL92" />
     <file url="file://$PROJECT_DIR$/lsql-core/src/test/java/com/w11k/lsql/tests/dialects/statements.sql" dialect="SQL92" />
     <file url="file://$PROJECT_DIR$/lsql-core/src/test/java/com/w11k/lsql/tests/file1.sql" dialect="PostgreSQL" />
   </component>

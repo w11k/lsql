@@ -1,4 +1,4 @@
-package com.w11k.lsql.sqlfile;
+package com.w11k.lsql;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

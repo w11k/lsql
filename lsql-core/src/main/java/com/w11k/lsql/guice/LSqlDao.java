@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.sqlfile.LSqlFile;
-import com.w11k.lsql.sqlfile.LSqlFileStatement;
+import com.w11k.lsql.SelectStatement;
 
 public class LSqlDao {
 
@@ -32,7 +32,7 @@ public class LSqlDao {
         this.lSqlFile = lSqlFile;
     }
 
-    public LSqlFileStatement statement(String name) {
+    public SelectStatement statement(String name) {
         return getlSqlFile().statement(name);
     }
 

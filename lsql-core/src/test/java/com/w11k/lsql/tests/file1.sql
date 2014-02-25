@@ -15,7 +15,7 @@ CREATE TABLE table2 (
 
 -- deleteYoung
 DELETE FROM table1
-WHERE age < /*(*/ 5 /*)*/;
+WHERE table1.age < /*(*/ 5 /*)*/;
 
 -- getAll
 SELECT
@@ -50,29 +50,3 @@ SELECT
 FROM table1
 WHERE age = /*(*/ 2 /*)*/;
 
-
---executeQueryWithAlias
-SELECT
-  table1.id      AS i,
-  table1.age     AS a,
-  table1.content AS c
-FROM table1
-WHERE
-  table1.age > /*(*/ 0 /*)*/;
-
---executeQueryWithTableAlias1
-SELECT
-  t1.id      AS i,
-  t1.age     AS a,
-  t1.content AS c
-FROM table1 t1
-WHERE t1.age > /*(*/ 0 /*)*/;
-
---executeQueryWithTableAlias2
-SELECT
-  t1.id      AS i,
-  t1.age     AS a,
-  t1.content AS c,
-  table2.id  AS t2_id
-FROM table2, table1 t1
-WHERE t1.age > /*(*/ 0 /*)*/;

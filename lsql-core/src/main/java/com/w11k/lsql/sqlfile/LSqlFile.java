@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.SelectStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ public class LSqlFile {
 
     private final String path;
 
-    private final Map<String, LSqlFileStatement> statements = Maps.newHashMap();
+    private final Map<String, SelectStatement> statements = Maps.newHashMap();
 
     public LSqlFile(LSql lSql, String fileName, String path) {
         this.lSql = lSql;
@@ -49,11 +50,11 @@ public class LSqlFile {
 
     // ----- public -----
 
-    public ImmutableMap<String, LSqlFileStatement> getStatements() {
+    public ImmutableMap<String, SelectStatement> getStatements() {
         return copyOf(statements);
     }
 
-    public LSqlFileStatement statement(String name) {
+    public SelectStatement statement(String name) {
         if (!statements.containsKey(name)) {
             throw new IllegalArgumentException("No statement with name '" + name +
                     "' found in file '" + path + "'.");
@@ -83,7 +84,7 @@ public class LSqlFile {
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
                 logger.debug("Found SQL statement '{}'", name);
-                statements.put(name, new LSqlFileStatement(lSql, this, name, sub));
+                statements.put(name, new SelectStatement(lSql, fileName + "." + name, sub));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

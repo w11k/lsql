@@ -56,6 +56,10 @@ public class Table {
         return ImmutableMap.copyOf(columns);
     }
 
+    public boolean exists() {
+        return columns.size() != 0;
+    }
+
     /**
      * @param columnName the name of the column
      *
@@ -291,14 +295,14 @@ public class Table {
     public Optional<LinkedRow> get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
-        PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
-                .createSelectByIdStatement(this, column);
+        String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
+        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, psString, false);
         try {
             column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        List<QueriedRow> queriedRows = new Query(lSql, ps).asList();
+        List<QueriedRow> queriedRows = new Query(lSql, ps, new SelectStatement(lSql, "Table.get", psString)).asList();
         if (queriedRows.size() == 1) {
             LinkedRow row = newLinkedRow(queriedRows.get(0));
             row.setTable(this);

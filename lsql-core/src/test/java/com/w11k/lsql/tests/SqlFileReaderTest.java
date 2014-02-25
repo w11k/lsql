@@ -5,8 +5,8 @@ import com.w11k.lsql.*;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.sqlfile.LSqlFile;
-import com.w11k.lsql.sqlfile.LSqlFileStatement;
-import com.w11k.lsql.sqlfile.QueryParameter;
+import com.w11k.lsql.SelectStatement;
+import com.w11k.lsql.QueryParameter;
 import com.w11k.lsql.tests.utils.IntWrapper;
 import org.testng.annotations.Test;
 
@@ -21,14 +21,14 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     @Test
     public void readSqlFileForClass() {
         LSqlFile lSqlFile = lSql.readSqlFile(DummyService.class);
-        ImmutableMap<String, LSqlFileStatement> stmts = lSqlFile.getStatements();
+        ImmutableMap<String, SelectStatement> stmts = lSqlFile.getStatements();
         assertTrue(stmts.size() == 1, "wrong number of SQL statements");
     }
 
     @Test
     public void readSqlFile() {
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        ImmutableMap<String, LSqlFileStatement> stmts = lSqlFile.getStatements();
+        ImmutableMap<String, SelectStatement> stmts = lSqlFile.getStatements();
         assertTrue(stmts.size() > 0, "wrong number of SQL statements in file1.sql");
     }
 
@@ -58,8 +58,8 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("age", 6, "content", "text3")).get();
 
         assertEquals(lSql.executeRawQuery("SELECT * FROM table1").asList().size(), 3);
-        LSqlFileStatement deleteYoung = lSqlFile.statement("deleteYoung");
-        deleteYoung.execute("age", 2);
+        SelectStatement deleteYoung = lSqlFile.statement("deleteYoung");
+        deleteYoung.execute("table1.age", 2);
         assertEquals(lSql.executeRawQuery("SELECT * FROM table1").asList().size(), 2);
     }
 
@@ -67,7 +67,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     public void executeQueryWithoutChangingParameters() {
         executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement qInt = lSqlFile.statement("queryRangeMarkers");
+        SelectStatement qInt = lSqlFile.statement("queryRangeMarkers");
         Query query = qInt.query();
         assertEquals(query.asList().size(), 1);
         String firstRow = query.getFirstRow().get().getString("content");
@@ -78,7 +78,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     public void executeQueryWithUnusedParameter() {
         executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement qInt = lSqlFile.statement("queryRangeMarkers");
+        SelectStatement qInt = lSqlFile.statement("queryRangeMarkers");
         qInt.query("WRONG", 1);
     }
 
@@ -88,7 +88,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         lSqlFile.statement("create1").execute();
         Table table1 = lSql.table("table1");
         table1.insert(Row.fromKeyVals("age", null, "content", "text1"));
-        LSqlFileStatement qInt = lSqlFile.statement("convertOperatorForNullValues");
+        SelectStatement qInt = lSqlFile.statement("convertOperatorForNullValues");
 
         Query query = qInt.query("age", null);
         assertTrue(query.getFirstRow().isPresent());
@@ -131,7 +131,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
     public void useFunctionCallbackAsParameter() {
         executeSqlStatement();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement markers = lSqlFile.statement("queryFunctionCallback");
+        SelectStatement markers = lSqlFile.statement("queryFunctionCallback");
         Query query = markers.query(
                 "table1.age", new QueryParameter() {
             @Override
@@ -142,38 +142,6 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         );
         List<QueriedRow> result = query.asList();
         assertEquals(result.size(), 1);
-    }
-
-    @Test
-    public void executeQueryWithAlias() {
-        executeSqlStatement();
-        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement statement = lSqlFile.statement("executeQueryWithAlias");
-        Query query = statement.query("table1.age", 0);
-        List<QueriedRow> result = query.asList();
-        assertEquals(result.size(), 3);
-    }
-
-    @Test
-    public void executeQueryWithTableAlias1() {
-        executeSqlStatement();
-        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        LSqlFileStatement statement = lSqlFile.statement("executeQueryWithTableAlias1");
-        Query query = statement.query("t1.age", 0);
-        List<QueriedRow> result = query.asList();
-        assertEquals(result.size(), 3);
-    }
-
-    @Test
-    public void executeQueryWithTableAlias2() {
-        executeSqlStatement();
-        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
-        lSqlFile.statement("create2").execute();
-        lSql.table("table2").newLinkedRow("number", 2).save();
-        LSqlFileStatement statement = lSqlFile.statement("executeQueryWithTableAlias2");
-        Query query = statement.query("t1.age", 0);
-        List<QueriedRow> result = query.asList();
-        assertEquals(result.size(), 3);
     }
 
 }

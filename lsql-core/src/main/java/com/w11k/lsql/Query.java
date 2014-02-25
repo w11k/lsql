@@ -17,26 +17,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
 public class Query implements Iterable<QueriedRow> {
 
-    private static final Pattern AS_STATEMENT = Pattern.compile("\\w(\\w\\d)");
-
     private final LSql lSql;
 
     private final PreparedStatement preparedStatement;
 
-    public Query(LSql lSql, PreparedStatement preparedStatement) {
+    private final SelectStatement selectStatement;
+
+    public Query(LSql lSql, PreparedStatement preparedStatement, SelectStatement selectStatement) {
         this.lSql = lSql;
         this.preparedStatement = preparedStatement;
+        this.selectStatement = selectStatement;
     }
 
     public Query(LSql lSql, String sql) {
-        this(lSql, ConnectionUtils.prepareStatement(lSql, sql, false));
+        this(lSql, ConnectionUtils.prepareStatement(lSql, sql, false), new SelectStatement(lSql, "raw query", sql));
     }
 
     public LSql getlSql() {
@@ -94,34 +94,28 @@ public class Query implements Iterable<QueriedRow> {
         String sqlColumnLabel = metaData.getColumnLabel(position);
         String javaColumnLabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
         Optional<Table> table = getTable(metaData, position);
-        Column column;
 
-        if (!table.isPresent()) {
-            // Check aliases in query
+        // JDBC return all required information
+        if (table.isPresent()) {
+            if (table.get().getColumns().containsKey(javaColumnName)) {
+                return table.get().column(javaColumnName);
+            }
         }
 
-        if (table.isPresent() && table.get().column(javaColumnName) == null) {
-            // Check aliases in query
+        // Table lookup failed. Check SQL string for aliases.
+        Optional<Column> columnOptional = selectStatement.getColumnFromSqlStatement(javaColumnLabel);
+        if (columnOptional.isPresent()) {
+            return columnOptional.get();
         }
 
-        if (table.isPresent() && table.get().column(javaColumnName) != null) {
-            column = table.get().column(javaColumnName);
-        }
-        // TODO: check is required for alias support
-        //else if (table.isPresent() && table.get().column(javaColumnName) == null) {
-        //    throw new RuntimeException();
-        //}
-        else {
-            Converter converter = getConverter(metaData, position);
-            column = new Column(
-                    table,
-                    javaColumnName,
-                    metaData.getColumnType(position),
-                    converter,
-                    -1);
-        }
-
-        return column;
+        // Alias search in SQL string failed. Create column based on type.
+        Converter converter = getConverter(metaData, position);
+        return new Column(
+                table,
+                javaColumnName,
+                metaData.getColumnType(position),
+                converter,
+                -1);
     }
 
     private Converter getConverter(ResultSetMetaData metaData, int position) throws SQLException {
@@ -133,15 +127,15 @@ public class Query implements Iterable<QueriedRow> {
         Set<String> processedColumnLabels = Sets.newLinkedHashSet(); // used to find duplicates
         Map<String, ResultSetColumn> columnList = Maps.newLinkedHashMap();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
+            String columnLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
             Column column = getColumnForResultSetColumn(metaData, i);
-            if (processedColumnLabels.contains(column.getColumnName())) {
-                throw new IllegalStateException("Dublicate column '" + column.getColumnName() + "' in query.");
+            if (processedColumnLabels.contains(columnLabel)) {
+                throw new IllegalStateException("Dublicate column '" + columnLabel + "' in query.");
             }
-            processedColumnLabels.add(column.getColumnName());
+            processedColumnLabels.add(columnLabel);
 
-            String javaLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
-            ResultSetColumn rsc = new ResultSetColumn(i, javaLabel, column);
-            columnList.put(javaLabel, rsc);
+            ResultSetColumn rsc = new ResultSetColumn(i, columnLabel, column);
+            columnList.put(columnLabel, rsc);
         }
         return columnList;
     }

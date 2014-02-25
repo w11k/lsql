@@ -1,12 +1,9 @@
-package com.w11k.lsql.sqlfile;
+package com.w11k.lsql;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.LSql;
-import com.w11k.lsql.Query;
-import com.w11k.lsql.Row;
-import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
@@ -23,7 +20,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LSqlFileStatement {
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
+
+public class SelectStatement {
 
     class Parameter {
         String name;
@@ -52,15 +52,12 @@ public class LSqlFileStatement {
 
     private final LSql lSql;
 
-    private final LSqlFile lSqlFile;
-
     private final String statementName;
 
     private final String sqlString;
 
-    LSqlFileStatement(LSql lSql, LSqlFile lSqlFile, String statementName, String sqlString) {
+    public SelectStatement(LSql lSql, String statementName, String sqlString) {
         this.lSql = lSql;
-        this.lSqlFile = lSqlFile;
         this.statementName = statementName;
         this.sqlString = sqlString;
     }
@@ -79,7 +76,7 @@ public class LSqlFileStatement {
 
     public Query query(Map<String, Object> queryParameters) {
         PreparedStatement ps = createPreparedStatement(queryParameters);
-        return new Query(lSql, ps);
+        return new Query(lSql, ps, this);
     }
 
     public void execute() {
@@ -100,8 +97,7 @@ public class LSqlFileStatement {
     }
 
     private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) {
-        logger.debug("Executing query '{}' ({}) with parameters {}",
-                statementName, lSqlFile.getFileName(), queryParameters.keySet());
+        logger.debug("Executing query '{}' with parameters {}", statementName, queryParameters.keySet());
 
         List<Parameter> found = checkQueryParameters(queryParameters);
         sortCollectedParameters(found);
@@ -135,7 +131,7 @@ public class LSqlFileStatement {
                         if (value instanceof QueryParameter) {
                             ((QueryParameter) value).set(ps, i + 1);
                         } else {
-                            Converter converter = getConverterFor(sql, p.name, value);
+                            Converter converter = getConverterFor(p.name, value);
                             converter.setValueInStatement(
                                     lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
                         }
@@ -232,19 +228,20 @@ public class LSqlFileStatement {
         return sql.toString();
     }
 
-    private Converter getConverterFor(String sql, String paramName, Object value) {
+    private Converter getConverterFor(String paramName, Object value) {
         String[] split = paramName.split("\\.");
         if (split.length == 1) {
             // No table prefix
+            //throw new RuntimeException("You must use <table>.<column> for query parameters!");
             return lSql.getDialect().getConverterRegistry().getConverterForJavaValue(value);
         } else if (split.length == 2) {
             // With table prefix
             String tableName = split[0];
             String columnName = split[1];
             Table table = lSql.table(tableName);
-            if (table.getColumns().size() == 0) {
+            if (!table.exists()) {
                 // table not found, table name must be an alias
-                tableName = getTableAliasFromSqlStatement(sql, tableName);
+                tableName = getTableAliasFromSqlStatement(tableName).get();
                 table = lSql.table(tableName);
             }
             return table.column(columnName).getConverter();
@@ -253,16 +250,40 @@ public class LSqlFileStatement {
         }
     }
 
-    private String getTableAliasFromSqlStatement(String sql, String tableName) {
+    private Optional<String> getTableAliasFromSqlStatement(String usedAlias) {
         Pattern tableAlias = Pattern.compile(
-                ".*[\n ,]+(\\w+)[\n ]+" + tableName.trim() + "[\n ,]+.*",
+                ".*[\n ,]+(\\w+)[\n ]+" + usedAlias.trim() + "[\n ,]+.*",
                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
         );
-        Matcher matcher = tableAlias.matcher(sql);
-        if (matcher.find()) {
-            return matcher.group(1);
+        Matcher matcher = tableAlias.matcher(sqlString);
+        if (matcher.find() && lSql.table(matcher.group(1)).exists()) {
+            return of(matcher.group(1));
+        } else {
+            return absent();
         }
-        return tableName;
+    }
+
+    public Optional<Column> getColumnFromSqlStatement(String columnAliasName) {
+        Pattern columnAlias = Pattern.compile(
+                //".*[\n ,]+([\\w+\\.?\\w*])[\n ]+as " + usedAlias.trim() + "[\n ,]+.*",
+                "((\\w+)\\.?(\\w*)) +as +" + columnAliasName.trim() + "[\\n ,]+",
+                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+        );
+        Matcher matcher = columnAlias.matcher(sqlString);
+        if (matcher.find()) {
+            String table = lSql.getDialect().identifierSqlToJava(matcher.group(2));
+            String column = lSql.getDialect().identifierSqlToJava(matcher.group(3));
+            if (!lSql.table(table).exists()) {
+                Optional<String> tableOptional = getTableAliasFromSqlStatement(table);
+                if (!tableOptional.isPresent()) {
+                    return absent();
+                }
+                table = tableOptional.get();
+            }
+            return of(lSql.table(table).column(column));
+        } else {
+            return absent();
+        }
     }
 
 }

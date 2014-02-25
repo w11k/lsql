@@ -41,8 +41,8 @@ public class IdGroupedRowCreatorTest extends AbstractLSqlTest {
                 assertTrue(address.containsKey("address_id"));
                 assertTrue(address.containsKey("person_id"));
                 assertTrue(address.containsKey("city"));
-                //assertFalse(address.containsKey("id")); // TODO fails due to alias bug
-                //assertFalse(address.containsKey("name")); // TODO fails due to alias bug
+                assertFalse(address.containsKey("id"));
+                assertFalse(address.containsKey("name"));
             }
         }
     }
@@ -94,6 +94,27 @@ public class IdGroupedRowCreatorTest extends AbstractLSqlTest {
             assertNotNull(s);
         }
     }
+
+    /**
+     * https://github.com/w11k/lsql/issues/3
+     */
+    @Test
+    public void npeWhenJoinedRowIsEmpty() {
+        lSql.executeRawSql("INSERT INTO person (id, name) VALUES (3, 'person3')");
+        List<QueriedRow> persons = createQuery().groupByIds("id", "address_id as addresses");
+        assertEquals(persons.size(), 3);
+
+        QueriedRow person3 = null;
+        for (QueriedRow person : persons) {
+            if (person.getInt("id") == 3) {
+                person3 = person;
+            }
+        }
+
+        assertNotNull(person3);
+        assertTrue(person3.getJoined("addresses").isEmpty());
+    }
+
 
     private Query createQuery() {
         return lSql.executeRawQuery("SELECT p.*, " +

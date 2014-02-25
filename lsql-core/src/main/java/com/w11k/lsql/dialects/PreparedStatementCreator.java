@@ -68,13 +68,12 @@ public class PreparedStatementCreator {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
-    public PreparedStatement createSelectByIdStatement(Table table, Column idColumn) {
+    public String createSelectByIdStatement(Table table, Column idColumn) {
         String sqlTableName = table.getlSql().getDialect()
                 .identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()
                 .identifierJavaToSql(idColumn.getColumnName());
-        String sql = "select * from " + sqlTableName + " where " + sqlColumnName + "=?";
-        return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
+        return "select * from " + sqlTableName + " where " + sqlColumnName + "=?";
     }
 
     public PreparedStatement createDeleteByIdStatement(Table table) {

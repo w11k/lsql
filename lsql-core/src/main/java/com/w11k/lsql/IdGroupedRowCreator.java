@@ -1,14 +1,13 @@
 package com.w11k.lsql;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 
 import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Lists.newLinkedList;
-import static com.google.common.collect.Multimaps.index;
 
 public class IdGroupedRowCreator {
 
@@ -37,6 +36,9 @@ public class IdGroupedRowCreator {
         return result;
     }
 
+    /**
+     * Remove columns with a different table source. Keep column if the table is unknown.
+     */
     private static void removeColumnWithDifferentTable(QueriedRow row, String column) {
         Map<String, ResultSetColumn> rscs = row.getResultSetColumns();
         ResultSetColumn rsc = rscs.get(column);
@@ -50,8 +52,8 @@ public class IdGroupedRowCreator {
                 row.remove(key);
             } else {
                 Optional<Table> toCheck = rscs.get(key).getColumn().getTable();
-                if (!expectedTable.equals(toCheck)) {
-                    row.remove(key); // TODO
+                if (toCheck.isPresent() && !expectedTable.equals(toCheck)) {
+                    row.remove(key);
                 }
             }
         }
@@ -77,12 +79,14 @@ public class IdGroupedRowCreator {
 
     private static ListMultimap<Object, QueriedRow> groupByColumn(List<QueriedRow> queriedRows,
                                                                   final String column) {
-        return index(queriedRows, new Function<QueriedRow, Object>() {
-            public Object apply(QueriedRow input) {
-                return input.get(column);
+        LinkedListMultimap<Object, QueriedRow> result = LinkedListMultimap.create();
+        for (QueriedRow row : queriedRows) {
+            Object value = row.get(column);
+            if (value != null) {
+                result.put(value, row);
             }
-        });
+        }
+        return result;
     }
-
 
 }

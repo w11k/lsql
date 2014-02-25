@@ -1,6 +1,7 @@
 package com.w11k.lsql.tests.dialects;
 
 import com.w11k.lsql.*;
+import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.sqlfile.LSqlFile;
@@ -20,11 +21,9 @@ import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public abstract class AbstractDialectTests {
 
@@ -47,6 +46,7 @@ public abstract class AbstractDialectTests {
             Connection con = dataSource.getConnection();
             this.lSql = new LSql(createDialect(), ConnectionProviders.fromInstance(con));
             setupTestTable();
+            setupTableForAliasTests();
             this.initOk = true;
         } catch (Exception e) {
             initException = e;
@@ -114,47 +114,109 @@ public abstract class AbstractDialectTests {
     }
 
     @Test
-    public void tableAliasBehaviourOnlyQuery() {
+    public void resolveTableAliasWhenReadingResultSet() {
         skipOnConfigError();
-        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "statements.sql");
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
+        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWhenReadingResultSet").query().asList();
+        assertEquals(list.size(), 2);
 
-        Table table1 = lSql.table("table1");
-        table1.newLinkedRow("age", 20).save();
-        table1.newLinkedRow("age", 30).save();
+        QueriedRow row1 = list.get(0);
+        assertEquals(row1.getInt("id"), 1);
+        assertEquals(row1.getBoolean("yesno"), Boolean.TRUE);
 
-        List<QueriedRow> list = lSqlFile.statement("tableAlias").query().asList();
-        assertEquals(list.size(), 1);
-        QueriedRow queriedRow = list.get(0);
-
-        Map<String, ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
-        assertEquals(resultSetColumns.size(), 1);
-        ResultSetColumn col = resultSetColumns.values().iterator().next();
-        assertEquals(col.getPosition(), 1);
-        assertEquals(col.getName(), "age");
-
-        assertTrue(col.getColumn().getTable().isPresent());
-        assertEquals(col.getColumn().getTable().get().getTableName(), "table1");
+        QueriedRow row2 = list.get(1);
+        assertEquals(row2.getInt("id"), 2);
+        assertEquals(row2.getBoolean("yesno"), Boolean.FALSE);
     }
 
     @Test
-    public void columnAliasBehaviour() {
+    public void resolveTableAliasWithWildcardWhenReadingResultSet() {
         skipOnConfigError();
-        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "statements.sql");
-        lSqlFile.statement("create2").execute();
-        lSqlFile.statement("insert2").execute();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
+        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWithWildcardWhenReadingResultSet").query().asList();
+        assertEquals(list.size(), 2);
 
-        List<QueriedRow> list = lSqlFile.statement("columnAliasBehaviour").query().asList();
+        QueriedRow row1 = list.get(0);
+        assertEquals(row1.getInt("id"), 1);
+        assertEquals(row1.getBoolean("yesno"), Boolean.TRUE);
+
+        QueriedRow row2 = list.get(1);
+        assertEquals(row2.getInt("id"), 2);
+        assertEquals(row2.getBoolean("yesno"), Boolean.FALSE);
+    }
+
+    @Test
+    public void resolveJoinedTableAliasWhenReadingResultSet() {
+        skipOnConfigError();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
+        List<QueriedRow> list = lSqlFile.statement("resolveJoinedTableAliasWhenReadingResultSet").query().asList();
+        assertEquals(list.size(), 2);
+
+        QueriedRow row1 = list.get(0);
+        assertEquals(row1.getInt("t1_id"), 1);
+        assertEquals(row1.getBoolean("t1_yesno"), Boolean.TRUE);
+        assertEquals(row1.getInt("t2_id"), 1);
+        assertEquals(row1.getBoolean("t2_yesno"), Boolean.TRUE);
+
+        QueriedRow row2 = list.get(1);
+        assertEquals(row2.getInt("t1_id"), 2);
+        assertEquals(row2.getBoolean("t1_yesno"), Boolean.FALSE);
+        assertEquals(row2.getInt("t2_id"), 2);
+        assertEquals(row2.getBoolean("t2_yesno"), Boolean.FALSE);
+    }
+
+    @Test
+    public void resolveColumnAliasWhenReadingResultSet() {
+        skipOnConfigError();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
+        List<QueriedRow> list = lSqlFile.statement("resolveColumnAliasWhenReadingResultSet").query().asList();
+        assertEquals(list.size(), 2);
+
+        QueriedRow row1 = list.get(0);
+        assertEquals(row1.getInt("ta_id"), 1);
+        assertEquals(row1.getBoolean("ta_yesno"), Boolean.TRUE);
+
+        QueriedRow row2 = list.get(1);
+        assertEquals(row2.getInt("ta_id"), 2);
+        assertEquals(row2.getBoolean("ta_yesno"), Boolean.FALSE);
+    }
+
+    @Test
+    public void resolveTableAndColumnAliasWhenReadingResultSet() {
+        skipOnConfigError();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
+        List<QueriedRow> list = lSqlFile.statement("resolveTableAndColumnAliasWhenReadingResultSet").query().asList();
+        assertEquals(list.size(), 2);
+
+        QueriedRow row1 = list.get(0);
+        assertEquals(row1.getInt("ta_id"), 1);
+        assertEquals(row1.getBoolean("ta_yesno"), Boolean.TRUE);
+
+        QueriedRow row2 = list.get(1);
+        assertEquals(row2.getInt("ta_id"), 2);
+        assertEquals(row2.getBoolean("ta_yesno"), Boolean.FALSE);
+    }
+
+    @Test
+    public void resolveTableAliasWhenSettingParameter() {
+        skipOnConfigError();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
+        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWhenSettingParameter").query(
+                "t1.yesno", false
+        ).asList();
         assertEquals(list.size(), 1);
-        QueriedRow queriedRow = list.get(0);
 
-        Map<String, ResultSetColumn> resultSetColumns = queriedRow.getResultSetColumns();
-        assertEquals(resultSetColumns.size(), 2);
-        ResultSetColumn col = resultSetColumns.values().iterator().next();
-        assertEquals(col.getPosition(), 1);
-        assertEquals(col.getName(), "a");
+        QueriedRow row1 = list.get(0);
+        assertEquals(row1.getInt("id"), 2);
+        assertEquals(row1.getBoolean("yesno"), Boolean.FALSE);
+    }
 
-        // TODO
-        //assertTrue(col.getColumn().getTable().isPresent());
+    protected void setupTableForAliasTests() {
+        lSql.executeRawSql("CREATE TABLE ta (id INT PRIMARY KEY, yesno VARCHAR(3))");
+        Table taTable = lSql.table("ta");
+        taTable.column("yesno").setConverter(new JavaBoolToSqlStringConverter("yes", "no"));
+        taTable.newLinkedRow("id", 1, "yesno", true).save();
+        taTable.newLinkedRow("id", 2, "yesno", false).save();
     }
 
     protected void skipOnConfigError() {
