@@ -13,14 +13,6 @@ public class TableRowPojoTest extends AbstractLSqlTest {
 
         private int age;
 
-        public Table1() {
-        }
-
-        public Table1(int id, int age) {
-            this.id = id;
-            this.age = age;
-        }
-
         public int getId() {
             return id;
         }
@@ -40,15 +32,19 @@ public class TableRowPojoTest extends AbstractLSqlTest {
 
     @Test
     public void rowToPojo() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT, rest INT)");
         Table<Table1> table1 = lSql.table("table1", Table1.class);
 
-        Table1 pojo1 = new Table1(1, 10);
+        Table1 pojo1 = new Table1();
+        pojo1.setId(1);
+        pojo1.setAge(10);
+        pojo1.put("rest", 20);
         table1.insert(pojo1);
 
         pojo1 = table1.get(1).get().toPojo();
         assertEquals(pojo1.getId(), 1);
         assertEquals(pojo1.getAge(), 10);
+        assertEquals(pojo1.getInt("rest"), 20);
     }
 
 }
