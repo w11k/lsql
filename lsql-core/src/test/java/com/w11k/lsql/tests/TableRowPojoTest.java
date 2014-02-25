@@ -13,6 +13,9 @@ public class TableRowPojoTest extends AbstractLSqlTest {
 
         private int age;
 
+        public Table1() {
+        }
+
         public Table1(int id, int age) {
             this.id = id;
             this.age = age;
@@ -41,8 +44,6 @@ public class TableRowPojoTest extends AbstractLSqlTest {
         Table<Table1> table1 = lSql.table("table1", Table1.class);
 
         Table1 pojo1 = new Table1(1, 10);
-        pojo1.setId(1);
-        pojo1.setAge(10);
         table1.insert(pojo1);
 
         pojo1 = table1.get(1).get().toPojo();

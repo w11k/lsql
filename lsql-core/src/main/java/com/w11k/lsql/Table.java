@@ -353,26 +353,16 @@ public class Table<P extends RowPojo> {
         return new LinkedRow<P>(this, data);
     }
 
-    public P rowToPojo(Row row) throws IllegalAccessException, InstantiationException {
+    public P rowToPojo(Row row) {
         try {
-            P p = createRowPojoInstance();
+            P p = rowPojoClass.newInstance();
             p.setDelegate(row);
             return p;
-        } catch (JsonMappingException e) {
+        } catch (InstantiationException e) {
             throw new RuntimeException(e);
-        } catch (JsonParseException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private P createRowPojoInstance() throws InstantiationException, IllegalAccessException {
-        Constructor<?>[] cons = rowPojoClass.getConstructors();
-
-
-
-        return rowPojoClass.newInstance();
     }
 
     /**
