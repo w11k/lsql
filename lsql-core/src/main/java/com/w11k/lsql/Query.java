@@ -70,8 +70,12 @@ public class Query implements Iterable<QueriedRow> {
         return new QueriedRows(asList()).getFirstRow();
     }
 
-    public List<QueriedRow> groupByIds(final String... ids) {
-        return new QueriedRows(asList()).groupByIds(ids);
+    public <T extends RowPojo> List<T> asTree(final String... ids) {
+        return new QueriedRows(asList()).asTree(ids);
+    }
+
+    public <T extends RowPojo> List<T> asRowTree(final String... ids) {
+        return new QueriedRows(asList()).asRowTree(ids);
     }
 
     private QueriedRow extractRow(ResultSet resultSet,

@@ -33,14 +33,14 @@ public class DocumentationSnippetsTest extends AbstractLSqlTest {
         john.put("age", 20);
 
         // Insert the new person
-        Table persons = lsql.table("persons");
+        Table<?> persons = lsql.table("persons");
         persons.insert(john);
 
         // The generated ID is automatically put into the row object
         Object newId = john.get("id");
 
         // Use the ID to load the row, returns com.google.common.base.Optional
-        Optional<LinkedRow> queried = persons.get(newId);
+        Optional<? extends LinkedRow> queried = persons.get(newId);
         LinkedRow queriedJohn = queried.get();
 
         assert queriedJohn.getString("name").equals("John");

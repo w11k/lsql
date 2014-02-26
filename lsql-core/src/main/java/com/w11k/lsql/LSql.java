@@ -15,6 +15,7 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -94,6 +95,7 @@ public class LSql {
      *
      * @param clazz    the class from which the basedir will be used
      * @param fileName the SQL file name
+     *
      * @return the {@code LSqlFile} instance
      */
     public LSqlFile readSqlFileRelativeToClass(Class clazz, String fileName) {
@@ -108,6 +110,7 @@ public class LSql {
      * Instead of '.class', the file extension '.sql' will be used.
      *
      * @param clazz the class which location and name will be used for the lookup
+     *
      * @return the {@code LSqlFile} instance
      */
     public LSqlFile readSqlFile(Class<?> clazz) {
@@ -119,27 +122,31 @@ public class LSql {
      * Returns a Table instance.
      *
      * @param tableName the table name (Java identifier format)
+     *
      * @return the Table instance
      */
-    public synchronized Table<?> table(String tableName) {
-        if (!tables.containsKey(tableName)) {
-            tables.put(tableName, Table.create(this, tableName, RowPojo.class));
-        }
-        return tables.get(tableName);
+    public Table<?> table(String tableName) {
+        return table(tableName, null);
     }
 
     /**
      * Returns a Table instance.
      *
      * @param tableName the table name (Java identifier format)
+     *
      * @return the Table instance
      */
+    @SuppressWarnings("unchecked")
     public synchronized <P extends RowPojo> Table<P> table(String tableName, Class<P> rowPojoClass) {
         if (!tables.containsKey(tableName)) {
-            tables.put(tableName, Table.create(this, tableName, rowPojoClass));
+            tables.put(tableName, Table.create(this, tableName, rowPojoClass == null ? RowPojo.class : rowPojoClass));
         }
-        //noinspection unchecked
-        return (Table<P>) tables.get(tableName);
+        Table<? extends RowPojo> table = tables.get(tableName);
+        if (rowPojoClass != null) {
+            checkArgument(rowPojoClass.isAssignableFrom(table.getRowPojoClass()),
+                    "A table instance was already created with class '" + table.getRowPojoClass().getName() + "'");
+        }
+        return (Table<P>) table;
     }
 
     /**
@@ -161,6 +168,7 @@ public class LSql {
      * {@link LSqlFile}s should be used for complex queries.
      *
      * @param sql the SQL SELECT string
+     *
      * @return the Query instance
      */
     public Query executeRawQuery(String sql) {

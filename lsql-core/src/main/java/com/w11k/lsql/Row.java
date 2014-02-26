@@ -119,9 +119,17 @@ public class Row extends ForwardingMap<String, Object> {
         return blob == null ? null : blob.getData();
     }
 
+    @SuppressWarnings("unchecked")
     public <A> List<A> getListOf(Class<A> clazz, String key) {
-        //noinspection unchecked
         return (List<A>) get(key);
+    }
+
+    public List<RowPojo> getJoined(String key) {
+        return getListOf(RowPojo.class, key);
+    }
+
+    public List<Row> getJoinedRows(String key) {
+        return getListOf(Row.class, key);
     }
 
     public Row pick(String... keys) {

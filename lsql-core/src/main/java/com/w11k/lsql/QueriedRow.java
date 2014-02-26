@@ -1,6 +1,5 @@
 package com.w11k.lsql;
 
-import java.util.List;
 import java.util.Map;
 
 public class QueriedRow extends Row {
@@ -13,10 +12,6 @@ public class QueriedRow extends Row {
 
     public Map<String, ResultSetColumn<?>> getResultSetColumns() {
         return resultSetColumns;
-    }
-
-    public List<QueriedRow> getJoined(String key) {
-        return getListOf(QueriedRow.class, key);
     }
 
 }

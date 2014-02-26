@@ -12,12 +12,7 @@ import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
@@ -353,16 +348,20 @@ public class Table<P extends RowPojo> {
         return new LinkedRow<P>(this, data);
     }
 
-    public P rowToPojo(Row row) {
+    public P newRowPojoInstance() {
         try {
-            P p = rowPojoClass.newInstance();
-            p.setDelegate(row);
-            return p;
+            return rowPojoClass.newInstance();
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public P rowToPojo(Row row) {
+        P p = newRowPojoInstance();
+        p.setDelegate(row);
+        return p;
     }
 
     /**

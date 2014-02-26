@@ -34,8 +34,12 @@ public class QueriedRows extends ForwardingList<QueriedRow> {
         }
     }
 
-    public List<QueriedRow> groupByIds(final String... ids) {
-        return IdGroupedRowCreator.create(Lists.newArrayList(ids), rows);
+    public <T extends RowPojo> List<T> asTree(final String... ids) {
+        return QueriedRowsToTreeCreator.createTree(Lists.newArrayList(ids), rows);
+    }
+
+    public <T extends RowPojo> List<T> asRowTree(final String... ids) {
+        return QueriedRowsToTreeCreator.createRowTree(Lists.newArrayList(ids), rows);
     }
 
     @Override
