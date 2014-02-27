@@ -11,15 +11,15 @@ import static com.google.common.collect.Lists.newLinkedList;
 
 public class QueriedRowsToTreeCreator {
 
-    public static <T extends RowPojo> List<T> createTree(final List<String> ids, List<QueriedRow> queriedRows) {
+    public static <T extends RowPojo> List<T> createResolvedTree(final List<String> ids, List<QueriedRow> queriedRows) {
         return create(true, ids, queriedRows);
     }
 
-    public static <T extends RowPojo> List<T> createRowTree(final List<String> ids, List<QueriedRow> queriedRows) {
+    public static List<RowPojo> createViewTree(final List<String> ids, List<QueriedRow> queriedRows) {
         return create(false, ids, queriedRows);
     }
 
-    private static <T extends RowPojo> List<T> create(boolean usePojoAndReplaceAliases,
+    private static <T extends RowPojo> List<T> create(boolean useTableRowClassAndReplaceAliases,
                                         final List<String> ids,
                                         List<QueriedRow> queriedRows) {
         List<T> result = newLinkedList();
@@ -33,11 +33,11 @@ public class QueriedRowsToTreeCreator {
             QueriedRow root = rowsForKey.get(0);
 
             // Create copy
-            RowPojo copy = createRow(usePojoAndReplaceAliases, root, id);
+            RowPojo copy = createRow(useTableRowClassAndReplaceAliases, root, id);
 
             if (!ids.isEmpty()) {
                 String childId = getJoinedEntriesName(ids.get(0));
-                List<RowPojo> childs = create(usePojoAndReplaceAliases, newLinkedList(ids), rowsForKey);
+                List<RowPojo> childs = create(useTableRowClassAndReplaceAliases, newLinkedList(ids), rowsForKey);
                 copy.put(childId, childs);
             }
             addEntryToList(result, copy);
@@ -67,8 +67,11 @@ public class QueriedRowsToTreeCreator {
                 ResultSetColumn<?> resultSetColumn = rscs.get(key);
                 Column<? extends RowPojo> column = resultSetColumn.getColumn();
                 Optional<? extends Table<?>> toCheck = column.getTable();
-                // Check if the column belongs to the same table as the ID column
-                if (toCheck.isPresent() && expectedTable.equals(toCheck)) {
+
+                // Store the column, if ...
+                // ... it belongs to no table (e.g. a calculated value)
+                // ... it belongs to the same table
+                if (!toCheck.isPresent() || expectedTable.equals(toCheck)) {
                     Object value = root.get(key);
                     row.put(usePojoAndReplaceAliases ? column.getColumnName() : resultSetColumn.getName(), value);
                 }

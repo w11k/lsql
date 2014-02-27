@@ -36,7 +36,8 @@ public class Query implements Iterable<QueriedRow> {
     }
 
     public Query(LSql lSql, String sql) {
-        this(lSql, ConnectionUtils.prepareStatement(lSql, sql, false), new SelectStatement(lSql, "raw query", sql));
+        this(lSql, ConnectionUtils
+                .prepareStatement(lSql, sql, false), new SelectStatement(lSql, "raw query", sql));
     }
 
     public LSql getlSql() {
@@ -70,12 +71,31 @@ public class Query implements Iterable<QueriedRow> {
         return new QueriedRows(asList()).getFirstRow();
     }
 
-    public <T extends RowPojo> List<T> asTree(final String... ids) {
-        return new QueriedRows(asList()).asTree(ids);
+    /**
+     * Transforms this query into a tree structure. For each ID column, a child collection
+     * is stored in the parent Row object. The key under which the child collection is
+     * stored depends on the id string. If the string only consists of the column name, the
+     * column name followed by a 's' is used. The key can be renamed with the syntax
+     * 'columnLabel as keyName'. The {@link RowPojo} instances only contain columns with the
+     * same table as the ID column and columns based on SQL functions.
+     *
+     * @param idColumns the list of columns to join the nested collections
+     * @return the tree structure
+     */
+    public List<RowPojo> asViewTree(final String... idColumns) {
+        return new QueriedRows(asList()).asViewTree(idColumns);
     }
 
-    public <T extends RowPojo> List<T> asRowTree(final String... ids) {
-        return new QueriedRows(asList()).asRowTree(ids);
+    /**
+     * Like {@link com.w11k.lsql.Query#asViewTree(String...)}, but each {@link RowPojo}
+     * gets replaced with the concrete type defined in the {@link Table} instance. The
+     * used {@link Table} instance is the same as the table of the ID column. The column names
+     * (aliases) are replaced with their actual column names defined by the table.
+     *
+     * @param <T> the expected type of the root collection.
+     */
+    public <T extends RowPojo> List<T> asResolvedTree(final String... idColumns) {
+        return new QueriedRows(asList()).asResolvedTree(idColumns);
     }
 
     private QueriedRow extractRow(ResultSet resultSet,
@@ -127,7 +147,8 @@ public class Query implements Iterable<QueriedRow> {
         return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
     }
 
-    private Map<String, ResultSetColumn<?>> createRawResultSetColums(ResultSetMetaData metaData) throws SQLException {
+    private Map<String, ResultSetColumn<?>> createRawResultSetColums(
+            ResultSetMetaData metaData) throws SQLException {
         Set<String> processedColumnLabels = Sets.newLinkedHashSet(); // used to find duplicates
         Map<String, ResultSetColumn<?>> columnList = Maps.newLinkedHashMap();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {

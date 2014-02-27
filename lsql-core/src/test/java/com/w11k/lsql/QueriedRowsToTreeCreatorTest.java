@@ -80,31 +80,9 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void onlyKeepsColumnOfTheIdColumnTable() {
-        List<RowPojo> persons = createQuery().asRowTree("id", "address_id");
-        assertEquals(persons.size(), 2);
-        for (Row person : persons) {
-            assertTrue(person.containsKey("id"));
-            assertTrue(person.containsKey("name"));
-            assertFalse(person.containsKey("address_id"));
-            assertFalse(person.containsKey("person_id"));
-            assertFalse(person.containsKey("city"));
-            List<Row> addresses = person.getJoinedRows("address_ids");
-            assertEquals(addresses.size(), 2);
-            for (Row address : addresses) {
-                assertTrue(address.containsKey("address_id"));
-                assertTrue(address.containsKey("person_id"));
-                assertTrue(address.containsKey("city"));
-                assertFalse(address.containsKey("id"));
-                assertFalse(address.containsKey("name"));
-            }
-        }
-    }
-
-    @Test
     public void autoPluralNames() {
         Set<Integer> collectedAddressIds = Sets.newLinkedHashSet();
-        List<RowPojo> persons = createQuery().asRowTree("id", "address_id");
+        List<RowPojo> persons = createQuery().asViewTree("id", "address_id");
         assertEquals(persons.size(), 2);
         for (Row person : persons) {
             List<Row> addresses = person.getJoinedRows("address_ids");
@@ -122,7 +100,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     @Test
     public void userDefinedName() {
         Set<Integer> collectedAddressIds = Sets.newLinkedHashSet();
-        List<RowPojo> persons = createQuery().asRowTree("id", "address_id as addresses");
+        List<RowPojo> persons = createQuery().asViewTree("id", "address_id as addresses");
         assertEquals(persons.size(), 2);
         for (Row person : persons) {
             List<Row> addresses = person.getJoinedRows("addresses");
@@ -141,7 +119,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     public void useRowPojoClass() {
         lSql.table("person", Person.class);
 
-        List<Person> persons = createQuery().asTree("id", "address_id as addresses");
+        List<Person> persons = createQuery().asResolvedTree("id", "address_id as addresses");
         assertEquals(persons.size(), 2);
 
         Set<Object> collected = Sets.newLinkedHashSet();
@@ -169,7 +147,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
         lSql.table("person", Person.class);
         lSql.table("address", Address.class);
 
-        List<Person> persons = createQuery().asTree("id", "address_id as addresses");
+        List<Person> persons = createQuery().asResolvedTree("id", "address_id as addresses");
         assertEquals(persons.size(), 2);
 
         Set<Object> collected = Sets.newLinkedHashSet();
@@ -191,13 +169,13 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void asTreeResolvesAliases() {
+    public void asResolvedTreeResolvesAliases() {
         lSql.table("person", Person.class);
         lSql.table("address", Address.class);
 
         Query q = createQueryWithAliases();
 
-        List<Person> persons = q.asTree("pid", "aid as addresses");
+        List<Person> persons = q.asResolvedTree("pid", "aid as addresses");
         assertEquals(persons.size(), 2);
 
         Set<Object> collected = Sets.newLinkedHashSet();
@@ -219,13 +197,39 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void asRowTreeKeepsAliases() {
+    public void asResolvedTreeResolvesAliasesButKeepsFunctionValues() {
+        lSql.table("person", Person.class);
+        lSql.table("address", Address.class);
+
+        Query q = createQueryWithAliasesAndFunctionValue();
+
+        List<Person> persons = q.asResolvedTree("pid", "aid as addresses");
+        assertEquals(persons.size(), 2);
+
+        Set<Object> collected = Sets.newLinkedHashSet();
+        for (Person person : persons) {
+            assertEquals(person.size(), 4);
+            List<Address> addresses = person.getJoined("addresses");
+            assertEquals(addresses.size(), 2);
+            for (Address address : addresses) {
+                assertEquals(address.size(), 4);
+                collected.add("a#power#" + address.getInt("apower"));
+            }
+        }
+        assertTrue(collected.contains("a#power#" + 1));
+        assertTrue(collected.contains("a#power#" + 4));
+        assertTrue(collected.contains("a#power#" + 9));
+        assertTrue(collected.contains("a#power#" + 16));
+    }
+
+    @Test
+    public void asViewRowTreeKeepsAliases() {
         lSql.table("person", Person.class);
         lSql.table("address", Address.class);
 
         Query q = createQueryWithAliases();
 
-        List<RowPojo> persons = q.asRowTree("pid", "aid as addresses");
+        List<RowPojo> persons = q.asViewTree("pid", "aid as addresses");
         assertEquals(persons.size(), 2);
 
         Set<Object> collected = Sets.newLinkedHashSet();
@@ -260,7 +264,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
      */
     @Test
     public void soeOnToString() {
-        List<RowPojo> persons = createQuery().asRowTree("id", "address_id as addresses");
+        List<RowPojo> persons = createQuery().asViewTree("id", "address_id as addresses");
         for (Row person : persons) {
             String s = person.toString();
             assertNotNull(s);
@@ -273,7 +277,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     @Test
     public void npeWhenJoinedRowIsEmpty() {
         lSql.executeRawSql("INSERT INTO person (id, name) VALUES (3, 'person3')");
-        List<RowPojo> persons = createQuery().asRowTree("id", "address_id as addresses");
+        List<RowPojo> persons = createQuery().asViewTree("id", "address_id as addresses");
         assertEquals(persons.size(), 3);
 
         Row person3 = null;
@@ -295,6 +299,12 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     private Query createQueryWithAliases() {
         return lSql.executeRawQuery("SELECT p.id AS pid, p.name AS pname, " +
                 "a.id AS aid, a.person_id AS aperson_id, a.city AS acity " +
+                "FROM person p LEFT OUTER JOIN address a ON a.person_id = p.id");
+    }
+
+    private Query createQueryWithAliasesAndFunctionValue() {
+        return lSql.executeRawQuery("SELECT p.id AS pid, p.name AS pname, " +
+                "a.id AS aid, a.person_id AS aperson_id, a.city AS acity, power(a.id, 2) as apower " +
                 "FROM person p LEFT OUTER JOIN address a ON a.person_id = p.id");
     }
 
