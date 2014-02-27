@@ -26,14 +26,14 @@ public class PreparedStatementCreator {
 
     public PreparedStatement createInsertStatement(final Table<?> table, List<String> columns) {
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO ").append(sqlTableName);
-        sql.append("(");
-        sql.append(Joiner.on(",").join(createSqlColumnNames(table, columns)));
-        sql.append(")VALUES(");
-        sql.append(Joiner.on(",").join(Collections.nCopies(columns.size(), "?")));
-        sql.append(");");
-        return ConnectionUtils.prepareStatement(table.getlSql(), sql.toString(), true);
+        String sql = "";
+        sql += "INSERT INTO " + sqlTableName;
+        sql += "(";
+        sql += Joiner.on(",").join(createSqlColumnNames(table, columns));
+        sql += ")VALUES(";
+        sql += Joiner.on(",").join(Collections.nCopies(columns.size(), "?"));
+        sql += ");";
+        return ConnectionUtils.prepareStatement(table.getlSql(), sql, true);
     }
 
     public PreparedStatement createUpdateStatement(Table<?> table, List<String> columns) {

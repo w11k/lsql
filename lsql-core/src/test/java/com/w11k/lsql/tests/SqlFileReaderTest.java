@@ -5,12 +5,13 @@ import com.w11k.lsql.*;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.sqlfile.LSqlFile;
-import com.w11k.lsql.SelectStatement;
-import com.w11k.lsql.QueryParameter;
 import com.w11k.lsql.tests.utils.IntWrapper;
 import org.testng.annotations.Test;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;

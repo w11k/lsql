@@ -1,6 +1,5 @@
 package com.w11k.lsql.tests.dialects;
 
-import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.dialects.PostgresDialect;
 
