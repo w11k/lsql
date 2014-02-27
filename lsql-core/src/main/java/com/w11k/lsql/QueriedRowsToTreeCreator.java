@@ -11,15 +11,15 @@ import static com.google.common.collect.Lists.newLinkedList;
 
 public class QueriedRowsToTreeCreator {
 
-    public static <T extends RowPojo> List<T> createResolvedTree(final List<String> ids, List<QueriedRow> queriedRows) {
+    public static <T extends Row> List<T> createResolvedTree(final List<String> ids, List<QueriedRow> queriedRows) {
         return create(true, ids, queriedRows);
     }
 
-    public static List<RowPojo> createViewTree(final List<String> ids, List<QueriedRow> queriedRows) {
+    public static List<Row> createViewTree(final List<String> ids, List<QueriedRow> queriedRows) {
         return create(false, ids, queriedRows);
     }
 
-    private static <T extends RowPojo> List<T> create(boolean useTableRowClassAndReplaceAliases,
+    private static <T extends Row> List<T> create(boolean useTableRowClassAndReplaceAliases,
                                         final List<String> ids,
                                         List<QueriedRow> queriedRows) {
         List<T> result = newLinkedList();
@@ -33,11 +33,11 @@ public class QueriedRowsToTreeCreator {
             QueriedRow root = rowsForKey.get(0);
 
             // Create copy
-            RowPojo copy = createRow(useTableRowClassAndReplaceAliases, root, id);
+            Row copy = createRow(useTableRowClassAndReplaceAliases, root, id);
 
             if (!ids.isEmpty()) {
                 String childId = getJoinedEntriesName(ids.get(0));
-                List<RowPojo> childs = create(useTableRowClassAndReplaceAliases, newLinkedList(ids), rowsForKey);
+                List<Row> childs = create(useTableRowClassAndReplaceAliases, newLinkedList(ids), rowsForKey);
                 copy.put(childId, childs);
             }
             addEntryToList(result, copy);
@@ -47,25 +47,25 @@ public class QueriedRowsToTreeCreator {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends RowPojo> void addEntryToList(List<T> result, RowPojo copy) {
+    private static <T extends Row> void addEntryToList(List<T> result, Row copy) {
         result.add((T) copy);
     }
 
-    private static RowPojo createRow(boolean usePojoAndReplaceAliases, QueriedRow root, String id) {
+    private static Row createRow(boolean usePojoAndReplaceAliases, QueriedRow root, String id) {
         Map<String, ResultSetColumn<?>> rscs = root.getResultSetColumns();
         ResultSetColumn<?> rsc = rscs.get(id);
         Optional<? extends Table<?>> expectedTable = rsc.getColumn().getTable();
 
-        RowPojo row = usePojoAndReplaceAliases && expectedTable.isPresent()
+        Row row = usePojoAndReplaceAliases && expectedTable.isPresent()
                 ? expectedTable.get().newRowPojoInstance()
-                : new RowPojo();
+                : new Row();
 
         // Check all columns
         for (String key : newLinkedList(root.keySet())) {
             // Only process columns that are in the result set (skip already created joins)
             if (rscs.containsKey(key)) {
                 ResultSetColumn<?> resultSetColumn = rscs.get(key);
-                Column<? extends RowPojo> column = resultSetColumn.getColumn();
+                Column<? extends Row> column = resultSetColumn.getColumn();
                 Optional<? extends Table<?>> toCheck = column.getTable();
 
                 // Store the column, if ...

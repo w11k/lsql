@@ -9,7 +9,7 @@ import com.w11k.lsql.validation.TypeError;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
-public class Column<P extends RowPojo> {
+public class Column<P extends Row> {
 
     private Optional<? extends Table<P>> table;
 
@@ -23,7 +23,7 @@ public class Column<P extends RowPojo> {
 
     private boolean ignored = false;
 
-    public static <A extends RowPojo> Column<A> create(Table<A> table,
+    public static <A extends Row> Column<A> create(Table<A> table,
                                                        String columnName,
                                                        int sqlType,
                                                        Converter converter,

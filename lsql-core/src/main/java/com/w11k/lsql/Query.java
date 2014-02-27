@@ -76,25 +76,25 @@ public class Query implements Iterable<QueriedRow> {
      * is stored in the parent Row object. The key under which the child collection is
      * stored depends on the id string. If the string only consists of the column name, the
      * column name followed by a 's' is used. The key can be renamed with the syntax
-     * 'columnLabel as keyName'. The {@link RowPojo} instances only contain columns with the
+     * 'columnLabel as keyName'. The {@link Row} instances only contain columns with the
      * same table as the ID column and columns based on SQL functions.
      *
      * @param idColumns the list of columns to join the nested collections
      * @return the tree structure
      */
-    public List<RowPojo> asViewTree(final String... idColumns) {
+    public List<Row> asViewTree(final String... idColumns) {
         return new QueriedRows(asList()).asViewTree(idColumns);
     }
 
     /**
-     * Like {@link com.w11k.lsql.Query#asViewTree(String...)}, but each {@link RowPojo}
+     * Like {@link com.w11k.lsql.Query#asViewTree(String...)}, but each {@link Row}
      * gets replaced with the concrete type defined in the {@link Table} instance. The
      * used {@link Table} instance is the same as the table of the ID column. The column names
      * (aliases) are replaced with their actual column names defined by the table.
      *
      * @param <T> the expected type of the root collection.
      */
-    public <T extends RowPojo> List<T> asResolvedTree(final String... idColumns) {
+    public <T extends Row> List<T> asResolvedTree(final String... idColumns) {
         return new QueriedRows(asList()).asResolvedTree(idColumns);
     }
 

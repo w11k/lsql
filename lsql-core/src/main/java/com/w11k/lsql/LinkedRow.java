@@ -8,7 +8,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.util.Map;
 
-public class LinkedRow<P extends RowPojo> extends Row {
+public class LinkedRow<P extends Row> extends Row {
 
     private Table<P> table;
 
@@ -76,7 +76,7 @@ public class LinkedRow<P extends RowPojo> extends Row {
     }
 
     /**
-     * Puts all known entries into this {@link LinkedRow}. Tries to convert values with wrong type.
+     * Puts all known entries into this instance. Tries to convert values with wrong type.
      */
     public LinkedRow<P> putAllKnown(Row from) {
         for (String key : from.keySet()) {

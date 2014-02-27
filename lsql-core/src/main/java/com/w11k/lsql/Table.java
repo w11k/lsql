@@ -22,9 +22,9 @@ import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class Table<P extends RowPojo> {
+public class Table<P extends Row> {
 
-    public static <A extends RowPojo> Table<A> create(LSql lSql, String tableName, Class<A> rowPojoClass) {
+    public static <A extends Row> Table<A> create(LSql lSql, String tableName, Class<A> rowPojoClass) {
         return new Table<A>(lSql, tableName, rowPojoClass);
     }
 

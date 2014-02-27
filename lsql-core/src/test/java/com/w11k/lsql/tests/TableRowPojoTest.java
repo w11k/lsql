@@ -1,6 +1,6 @@
 package com.w11k.lsql.tests;
 
-import com.w11k.lsql.RowPojo;
+import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import org.testng.annotations.Test;
 
@@ -8,26 +8,24 @@ import static org.testng.Assert.assertEquals;
 
 public class TableRowPojoTest extends AbstractLSqlTest {
 
-    public static class Table1 extends RowPojo {
-        private int id;
-
-        private int age;
+    public static class Table1 extends Row {
 
         public int getId() {
-            return id;
+            return getAs(Integer.class, "id");
         }
 
-        public void setId(int id) {
-            this.id = id;
+        public void setId(Integer id) {
+            put("id", id);
         }
 
         public int getAge() {
-            return age;
+            return getAs(Integer.class, "age");
         }
 
-        public void setAge(int age) {
-            this.age = age;
+        public void setAge(Integer age) {
+            put("age", age);
         }
+
     }
 
     @Test

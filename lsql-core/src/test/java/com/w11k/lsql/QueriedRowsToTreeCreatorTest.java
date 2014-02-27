@@ -12,58 +12,52 @@ import static org.testng.Assert.*;
 
 public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
 
-    public static class Person extends RowPojo {
-        int id;
+    public static class Person extends Row {
 
-        String name;
-
-        public int getId() {
-            return id;
+        public Integer getId() {
+            return getAs(Integer.class, "id");
         }
 
-        public void setId(int id) {
-            this.id = id;
+        public void setId(Integer id) {
+            put("id", id);
         }
 
         public String getName() {
-            return name;
+            return getAs(String.class, "name");
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public void setName(Integer name) {
+            put("name", name);
         }
+
     }
 
-    public static class Address extends RowPojo {
-        private int id;
+    public static class Address extends Row {
 
-        private int person_id;
-
-        private String city;
-
-        public int getId() {
-            return id;
+        public Integer getId() {
+            return getAs(Integer.class, "id");
         }
 
-        public void setId(int id) {
-            this.id = id;
+        public void setId(Integer id) {
+            put("id", id);
         }
 
-        public int getPerson_id() {
-            return person_id;
+        public Integer getPerson_id() {
+            return getAs(Integer.class, "person_id");
         }
 
-        public void setPerson_id(int person_id) {
-            this.person_id = person_id;
+        public void setPerson_id(Integer person_id) {
+            put("person_id", person_id);
         }
 
         public String getCity() {
-            return city;
+            return getAs(String.class, "city");
         }
 
-        public void setCity(String city) {
-            this.city = city;
+        public void setCity(Integer city) {
+            put("city", city);
         }
+
     }
 
     @BeforeMethod
@@ -82,7 +76,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     @Test
     public void autoPluralNames() {
         Set<Integer> collectedAddressIds = Sets.newLinkedHashSet();
-        List<RowPojo> persons = createQuery().asViewTree("id", "address_id");
+        List<Row> persons = createQuery().asViewTree("id", "address_id");
         assertEquals(persons.size(), 2);
         for (Row person : persons) {
             List<Row> addresses = person.getJoinedRows("address_ids");
@@ -100,7 +94,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     @Test
     public void userDefinedName() {
         Set<Integer> collectedAddressIds = Sets.newLinkedHashSet();
-        List<RowPojo> persons = createQuery().asViewTree("id", "address_id as addresses");
+        List<Row> persons = createQuery().asViewTree("id", "address_id as addresses");
         assertEquals(persons.size(), 2);
         for (Row person : persons) {
             List<Row> addresses = person.getJoinedRows("addresses");
@@ -229,17 +223,17 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
 
         Query q = createQueryWithAliases();
 
-        List<RowPojo> persons = q.asViewTree("pid", "aid as addresses");
+        List<Row> persons = q.asViewTree("pid", "aid as addresses");
         assertEquals(persons.size(), 2);
 
         Set<Object> collected = Sets.newLinkedHashSet();
-        for (RowPojo row : persons) {
+        for (Row row : persons) {
             assertEquals(row.size(), 3);
             collected.add("p#" + row.get("pid"));
             collected.add("p#" + row.get("pname"));
-            List<RowPojo> addresses = row.getJoined("addresses");
+            List<Row> addresses = row.getJoined("addresses");
             assertEquals(addresses.size(), 2);
-            for (RowPojo address : addresses) {
+            for (Row address : addresses) {
                 collected.add("a#" + address.get("aid"));
                 collected.add("a#p#" + address.get("aperson_id"));
                 collected.add("a#" + address.get("acity"));
@@ -264,7 +258,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
      */
     @Test
     public void soeOnToString() {
-        List<RowPojo> persons = createQuery().asViewTree("id", "address_id as addresses");
+        List<Row> persons = createQuery().asViewTree("id", "address_id as addresses");
         for (Row person : persons) {
             String s = person.toString();
             assertNotNull(s);
@@ -277,7 +271,7 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
     @Test
     public void npeWhenJoinedRowIsEmpty() {
         lSql.executeRawSql("INSERT INTO person (id, name) VALUES (3, 'person3')");
-        List<RowPojo> persons = createQuery().asViewTree("id", "address_id as addresses");
+        List<Row> persons = createQuery().asViewTree("id", "address_id as addresses");
         assertEquals(persons.size(), 3);
 
         Row person3 = null;

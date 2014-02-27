@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
-    private final Map<String, Table<? extends RowPojo>> tables = Maps.newLinkedHashMap();
+    private final Map<String, Table<? extends Row>> tables = Maps.newLinkedHashMap();
 
     private final BaseDialect dialect;
 
@@ -137,11 +137,11 @@ public class LSql {
      * @return the Table instance
      */
     @SuppressWarnings("unchecked")
-    public synchronized <P extends RowPojo> Table<P> table(String tableName, Class<P> rowPojoClass) {
+    public synchronized <P extends Row> Table<P> table(String tableName, Class<P> rowPojoClass) {
         if (!tables.containsKey(tableName)) {
-            tables.put(tableName, Table.create(this, tableName, rowPojoClass == null ? RowPojo.class : rowPojoClass));
+            tables.put(tableName, Table.create(this, tableName, rowPojoClass == null ? Row.class : rowPojoClass));
         }
-        Table<? extends RowPojo> table = tables.get(tableName);
+        Table<? extends Row> table = tables.get(tableName);
         if (rowPojoClass != null) {
             checkArgument(rowPojoClass.isAssignableFrom(table.getRowPojoClass()),
                     "A table instance was already created with class '" + table.getRowPojoClass().getName() + "'");

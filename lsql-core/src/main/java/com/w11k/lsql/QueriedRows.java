@@ -34,11 +34,11 @@ public class QueriedRows extends ForwardingList<QueriedRow> {
         }
     }
 
-    public List<RowPojo> asViewTree(final String... ids) {
+    public List<Row> asViewTree(final String... ids) {
         return QueriedRowsToTreeCreator.createViewTree(Lists.newArrayList(ids), rows);
     }
 
-    public <T extends RowPojo> List<T> asResolvedTree(final String... ids) {
+    public <T extends Row> List<T> asResolvedTree(final String... ids) {
         return QueriedRowsToTreeCreator.createResolvedTree(Lists.newArrayList(ids), rows);
     }
 

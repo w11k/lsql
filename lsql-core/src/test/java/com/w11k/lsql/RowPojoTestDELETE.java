@@ -1,15 +1,7 @@
 package com.w11k.lsql;
 
-import org.testng.annotations.Test;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-
-import static org.testng.Assert.*;
-
-public class RowPojoTest {
-
+public class RowPojoTestDELETE {
+    /*
     private static class Pojo1 extends RowPojo {
         private String name;
 
@@ -114,5 +106,5 @@ public class RowPojoTest {
         Set<Map.Entry<String, Object>> entries = p1.entrySet();
         assertEquals(entries.size(), 2);
     }
-
+    */
 }

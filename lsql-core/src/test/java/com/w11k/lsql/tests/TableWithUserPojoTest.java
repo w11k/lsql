@@ -1,33 +1,31 @@
 package com.w11k.lsql.tests;
 
-import com.w11k.lsql.RowPojo;
+import com.w11k.lsql.Row;
 import org.testng.annotations.Test;
 
 public class TableWithUserPojoTest extends AbstractLSqlTest {
 
-    public static class PersonA extends RowPojo {
-        private int id;
+    public static class PersonA extends Row {
 
         public int getId() {
-            return id;
+            return getAs(int.class, "id");
         }
 
-        public void setId(int id) {
-            this.id = id;
+        public void setId(Integer id) {
+            put("id", id);
         }
 
     }
 
     public static class PersonB extends PersonA {
-        private int age;
-
         public int getAge() {
-            return age;
+            return getAs(int.class, "age");
         }
 
-        public void setAge(int age) {
-            this.age = age;
+        public void setAge(Integer age) {
+            put("age", age);
         }
+
     }
 
     @Test

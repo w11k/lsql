@@ -125,8 +125,8 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends RowPojo> List<T> getJoined(String key) {
-        return (List<T>) getListOf(RowPojo.class, key);
+    public <T extends Row> List<T> getJoined(String key) {
+        return (List<T>) getListOf(Row.class, key);
     }
 
     public List<Row> getJoinedRows(String key) {

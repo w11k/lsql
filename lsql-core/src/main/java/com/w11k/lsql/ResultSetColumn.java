@@ -1,6 +1,6 @@
 package com.w11k.lsql;
 
-public class ResultSetColumn<P extends RowPojo> {
+public class ResultSetColumn<P extends Row> {
 
     private final int position;
 
@@ -8,7 +8,7 @@ public class ResultSetColumn<P extends RowPojo> {
 
     private final Column<P> column;
 
-    public static <A extends RowPojo> ResultSetColumn<A> create(int position, String name, Column<A> column) {
+    public static <A extends Row> ResultSetColumn<A> create(int position, String name, Column<A> column) {
         return new ResultSetColumn<A>(position, name, column);
     }
 

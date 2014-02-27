@@ -12,9 +12,9 @@ import java.util.Set;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
-public class RowPojo extends Row {
+public class RowPojoREMOVE extends Row {
 
-    public RowPojo() {
+    public RowPojoREMOVE() {
     }
 
     @Override
