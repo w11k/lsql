@@ -124,8 +124,9 @@ public class Row extends ForwardingMap<String, Object> {
         return (List<A>) get(key);
     }
 
-    public List<RowPojo> getJoined(String key) {
-        return getListOf(RowPojo.class, key);
+    @SuppressWarnings("unchecked")
+    public <T extends RowPojo> List<T> getJoined(String key) {
+        return (List<T>) getListOf(RowPojo.class, key);
     }
 
     public List<Row> getJoinedRows(String key) {
@@ -142,7 +143,7 @@ public class Row extends ForwardingMap<String, Object> {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("data", delegate()).toString();
+        return Objects.toStringHelper(this).add("content", delegate()).toString();
     }
 
     protected ObjectMapper getObjectMapper() {

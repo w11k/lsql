@@ -34,6 +34,38 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
         }
     }
 
+    public static class Address extends RowPojo {
+        private int id;
+
+        private int person_id;
+
+        private String city;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getPerson_id() {
+            return person_id;
+        }
+
+        public void setPerson_id(int person_id) {
+            this.person_id = person_id;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
+        public void setCity(String city) {
+            this.city = city;
+        }
+    }
+
     @BeforeMethod
     public void setupTablesAndData() {
         createTable("CREATE TABLE person (id INT PRIMARY KEY, name TEXT)");
@@ -132,6 +164,97 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
         assertTrue(collected.contains("city4"));
     }
 
+    @Test
+    public void useRowPojoClassInJoinedCollections() {
+        lSql.table("person", Person.class);
+        lSql.table("address", Address.class);
+
+        List<Person> persons = createQuery().asTree("id", "address_id as addresses");
+        assertEquals(persons.size(), 2);
+
+        Set<Object> collected = Sets.newLinkedHashSet();
+        for (Person person : persons) {
+            assertEquals(person.size(), 3);
+            List<Address> addresses = person.getJoined("addresses");
+            assertEquals(addresses.size(), 2);
+            for (Address address : addresses) {
+                collected.add(address.getId());
+                collected.add(address.getCity());
+            }
+        }
+        assertTrue(collected.contains(1));
+        assertTrue(collected.contains(2));
+        assertTrue(collected.contains("city1"));
+        assertTrue(collected.contains("city2"));
+        assertTrue(collected.contains("city3"));
+        assertTrue(collected.contains("city4"));
+    }
+
+    @Test
+    public void asTreeResolvesAliases() {
+        lSql.table("person", Person.class);
+        lSql.table("address", Address.class);
+
+        Query q = createQueryWithAliases();
+
+        List<Person> persons = q.asTree("pid", "aid as addresses");
+        assertEquals(persons.size(), 2);
+
+        Set<Object> collected = Sets.newLinkedHashSet();
+        for (Person person : persons) {
+            assertEquals(person.size(), 3);
+            List<Address> addresses = person.getJoined("addresses");
+            assertEquals(addresses.size(), 2);
+            for (Address address : addresses) {
+                collected.add(address.getId());
+                collected.add(address.getCity());
+            }
+        }
+        assertTrue(collected.contains(1));
+        assertTrue(collected.contains(2));
+        assertTrue(collected.contains("city1"));
+        assertTrue(collected.contains("city2"));
+        assertTrue(collected.contains("city3"));
+        assertTrue(collected.contains("city4"));
+    }
+
+    @Test
+    public void asRowTreeKeepsAliases() {
+        lSql.table("person", Person.class);
+        lSql.table("address", Address.class);
+
+        Query q = createQueryWithAliases();
+
+        List<RowPojo> persons = q.asRowTree("pid", "aid as addresses");
+        assertEquals(persons.size(), 2);
+
+        Set<Object> collected = Sets.newLinkedHashSet();
+        for (RowPojo row : persons) {
+            assertEquals(row.size(), 3);
+            collected.add("p#" + row.get("pid"));
+            collected.add("p#" + row.get("pname"));
+            List<RowPojo> addresses = row.getJoined("addresses");
+            assertEquals(addresses.size(), 2);
+            for (RowPojo address : addresses) {
+                collected.add("a#" + address.get("aid"));
+                collected.add("a#p#" + address.get("aperson_id"));
+                collected.add("a#" + address.get("acity"));
+            }
+        }
+        assertTrue(collected.contains("p#1"));
+        assertTrue(collected.contains("p#2"));
+        assertTrue(collected.contains("p#person1"));
+        assertTrue(collected.contains("p#person2"));
+
+        assertTrue(collected.contains("a#1"));
+        assertTrue(collected.contains("a#2"));
+        assertTrue(collected.contains("a#p#1"));
+        assertTrue(collected.contains("a#p#2"));
+
+        assertTrue(collected.contains("a#city1"));
+        assertTrue(collected.contains("a#city2"));
+    }
+
     /**
      * https://github.com/w11k/lsql/issues/2
      */
@@ -164,10 +287,15 @@ public class QueriedRowsToTreeCreatorTest extends AbstractLSqlTest {
         assertTrue(person3.getJoinedRows("addresses").isEmpty());
     }
 
-
     private Query createQuery() {
         return lSql.executeRawQuery("SELECT p.*, " +
                 "a.id AS address_id, a.person_id, a.city FROM person p LEFT OUTER JOIN address a ON a.person_id = p.id");
+    }
+
+    private Query createQueryWithAliases() {
+        return lSql.executeRawQuery("SELECT p.id AS pid, p.name AS pname, " +
+                "a.id AS aid, a.person_id AS aperson_id, a.city AS acity " +
+                "FROM person p LEFT OUTER JOIN address a ON a.person_id = p.id");
     }
 
 }
