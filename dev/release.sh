@@ -14,15 +14,17 @@ if [ $branch != "master" ]; then
 fi
 
 # Test build
-mvn clean test
+cd lsql-core
+mvn clean install
+cd ..
 exit_on_error
 
-# Check for pending changes
-#changes=$(git status --porcelain 2>/dev/null| egrep "^(AM|M| M|\?\?)" | wc -l)
-#if [[ $changes != 0 ]]; then
-#    echo "Project contains pending changes."
-#    exit 1
-#fi
+# Test Sample Application
+cd lsql-example
+sed -i "s/<lsql-version>.*<\/lsql-version>/<lsql-version>`../dev/get_current_version.sh`<\/lsql-version>/g" pom.xml
+#mvn clean test
+cd ..
+exit_on_error
 
 # Set the current version
 git tag "`dev/get_current_version.sh`"

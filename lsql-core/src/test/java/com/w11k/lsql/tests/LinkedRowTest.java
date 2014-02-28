@@ -55,11 +55,11 @@ public class LinkedRowTest extends AbstractLSqlTest {
         Table<?> table1 = lSql.table("table1");
         table1.enableRevisionSupport();
         table1.insert(Row.fromKeyVals("id", 1, "age", 1));
-        LinkedRow<?> row = table1.get(1).get();
+        LinkedRow row = table1.get(1).get();
         assertTrue(row.containsKey("id"));
         assertTrue(row.containsKey("revision"));
 
-        LinkedRow<?> copy = table1.newLinkedRow(row);
+        LinkedRow copy = table1.newLinkedRow(row);
         assertTrue(copy.containsKey("id"));
         assertTrue(copy.containsKey("revision"));
     }

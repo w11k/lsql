@@ -303,7 +303,7 @@ public class Table<P extends Row> {
      * @return a {@link com.google.common.base.Present} with a {@link Row} instance if the passed primary key
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
-    public Optional<LinkedRow<P>> get(Object id) {
+    public Optional<LinkedRow> get(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
@@ -315,7 +315,7 @@ public class Table<P extends Row> {
         }
         List<QueriedRow> queriedRows = new Query(lSql, ps, new SelectStatement(lSql, "Table.get", psString)).asList();
         if (queriedRows.size() == 1) {
-            LinkedRow<P> row = newLinkedRow(queriedRows.get(0));
+            LinkedRow row = newLinkedRow(queriedRows.get(0));
             row.setTable(this);
             return of(row);
         }
@@ -326,7 +326,7 @@ public class Table<P extends Row> {
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
     public LinkedRow newLinkedRow() {
-        return new LinkedRow<P>(this);
+        return new LinkedRow(this);
     }
 
     /**
@@ -344,8 +344,8 @@ public class Table<P extends Row> {
      *
      * @param data content to be added
      */
-    public LinkedRow<P> newLinkedRow(Map<String, Object> data) {
-        return new LinkedRow<P>(this, data);
+    public LinkedRow newLinkedRow(Map<String, Object> data) {
+        return new LinkedRow(this, data);
     }
 
     public P newRowPojoInstance() {

@@ -24,6 +24,7 @@
         <processorPath useClasspath="true" />
         <module name="lsql-core" />
         <module name="lsql-doc" />
+        <module name="lsql-example" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

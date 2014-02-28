@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/lsql.iml" filepath="$PROJECT_DIR$/lsql.iml" />
       <module fileurl="file://$PROJECT_DIR$/lsql-core/lsql-core.iml" filepath="$PROJECT_DIR$/lsql-core/lsql-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/lsql-doc/lsql-doc.iml" filepath="$PROJECT_DIR$/lsql-doc/lsql-doc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lsql-example/lsql-example.iml" filepath="$PROJECT_DIR$/lsql-example/lsql-example.iml" />
     </modules>
   </component>
 </project>
