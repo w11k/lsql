@@ -47,4 +47,6 @@ git add --all
 git commit -m "started new version `dev/get_current_version.sh`"
 git push origin master
 
-echo 
+echo --------------------------------------------------------------------
+echo Released version $VERSION
+echo --------------------------------------------------------------------
