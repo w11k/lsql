@@ -39,8 +39,12 @@ git push origin master
 # Deploy
 mvn -Dmaven.test.skip=true deploy
 
+VERSION=`dev/get_current_version.sh`
+
 # Increment version and push
 dev/increment_project_version.sh
 git add --all
 git commit -m "started new version `dev/get_current_version.sh`"
 git push origin master
+
+echo 
