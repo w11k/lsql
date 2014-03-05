@@ -17,5 +17,5 @@ if [ $version_snapshot -ne 0 ]; then
     version_new="$version_new-SNAPSHOT"
 fi
 
-mvn versions:set -DnewVersion=$version_new -DgenerateBackupPoms=false
+dev/set_project_version.sh $version_new
 mvn -Dmaven.test.skip=true install

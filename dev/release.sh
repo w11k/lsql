@@ -21,8 +21,7 @@ exit_on_error
 
 # Test Sample Application
 cd lsql-example
-sed -i "s/<lsql-version>.*<\/lsql-version>/<lsql-version>`../dev/get_current_version.sh`<\/lsql-version>/g" pom.xml
-#mvn clean test
+mvn clean test
 cd ..
 exit_on_error
 

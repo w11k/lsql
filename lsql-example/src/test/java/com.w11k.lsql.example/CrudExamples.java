@@ -5,12 +5,14 @@ import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.dialects.H2Dialect;
-import org.apache.commons.dbcp.BasicDataSource;
+import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.joda.time.DateTime;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,11 +22,8 @@ public class CrudExamples {
 
     @BeforeMethod
     public void beforeMethod() throws Exception {
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(org.h2.Driver.class.getName());
-        dataSource.setUrl("jdbc:h2:mem:lsqlexamples;mode=postgresql");
-        dataSource.setDefaultAutoCommit(false);
-        lSql = new LSql(new H2Dialect(), dataSource);
+        Connection conn = DriverManager.getConnection("jdbc:h2:mem:lsqlexamples;mode=postgresql");
+        lSql = new LSql(new H2Dialect(), ConnectionProviders.fromInstance(conn));
 
         lSql.executeRawSql("CREATE TABLE person (" +
                 "id SERIAL PRIMARY KEY, " +
@@ -77,9 +76,7 @@ public class CrudExamples {
 
         Table<?> personTable = lSql.table("person");
         LinkedRow linkedRow = personTable.get(1).get();
-
-
-
+        assert linkedRow.getString("name").equals("John");
     }
 
 
