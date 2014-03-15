@@ -130,10 +130,24 @@ public abstract class AbstractDialectTests {
     }
 
     @Test
+    public void resolveTableAliasWhenReadingResultSetWithSpecialCharsInTableName() {
+        skipOnConfigError();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
+        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWhenReadingResultSetWithSpecialCharsInTableName")
+                .query("t1.id", 1).asList();
+        assertEquals(list.size(), 1);
+
+        QueriedRow row1 = list.get(0);
+        assertEquals(row1.getInt("id"), 1);
+        assertEquals(row1.getBoolean("yesno"), Boolean.TRUE);
+    }
+
+    @Test
     public void resolveTableAliasWithWildcardWhenReadingResultSet() {
         skipOnConfigError();
         LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
-        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWithWildcardWhenReadingResultSet").query().asList();
+        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWithWildcardWhenReadingResultSet").query()
+                .asList();
         assertEquals(list.size(), 2);
 
         QueriedRow row1 = list.get(0);
@@ -213,10 +227,17 @@ public abstract class AbstractDialectTests {
 
     protected void setupTableForAliasTests() {
         lSql.executeRawSql("CREATE TABLE ta (id INT PRIMARY KEY, yesno VARCHAR(3))");
+        lSql.executeRawSql("CREATE TABLE t_b (id INT PRIMARY KEY, yesno VARCHAR(3))");
+
         Table taTable = lSql.table("ta");
         taTable.column("yesno").setConverter(new JavaBoolToSqlStringConverter("yes", "no"));
         taTable.newLinkedRow("id", 1, "yesno", true).save();
         taTable.newLinkedRow("id", 2, "yesno", false).save();
+
+        Table tbTable = lSql.table("t_b");
+        tbTable.column("yesno").setConverter(new JavaBoolToSqlStringConverter("yes", "no"));
+        tbTable.newLinkedRow("id", 1, "yesno", true).save();
+        tbTable.newLinkedRow("id", 2, "yesno", false).save();
     }
 
     protected void skipOnConfigError() {

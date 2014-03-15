@@ -6,6 +6,14 @@ FROM ta t1
 WHERE t1.id > -1
 ORDER BY t1.id;
 
+--resolveTableAliasWhenReadingResultSetWithSpecialCharsInTableName
+SELECT
+  t1.id,
+  t1.yesno
+FROM t_b t1
+WHERE t1.id = /*(*/ 1 /*)*/
+ORDER BY t1.id;
+
 --resolveTableAliasWithWildcardWhenReadingResultSet
 SELECT
   t1.*
