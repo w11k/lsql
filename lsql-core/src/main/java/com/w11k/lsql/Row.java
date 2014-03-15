@@ -110,6 +110,10 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(String.class, key);
     }
 
+    public Row getRow(String key) {
+        return getAs(Row.class, key);
+    }
+
     public Blob getBlob(String key) {
         return getAs(Blob.class, key);
     }
