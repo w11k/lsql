@@ -71,4 +71,13 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(dt, dateTime);
     }
 
+    @Test
+    public void longToDateTime() {
+        Row r = new Row();
+        DateTime dt1 = new DateTime();
+        r.put("date", dt1.getMillis());
+        DateTime dt2 = r.getDateTime("date");
+        assertEquals(dt1, dt2);
+    }
+
 }

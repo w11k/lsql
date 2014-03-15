@@ -2,7 +2,10 @@ package com.w11k.lsql;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.collect.*;
+import com.google.common.collect.ForwardingMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
@@ -41,7 +44,8 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     public Row addKeyVals(Object... keyVals) {
-        checkArgument(keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
+        checkArgument(
+                keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
 
         Iterable<List<Object>> partition = Iterables.partition(newArrayList(keyVals), 2);
         for (List<Object> objects : partition) {
@@ -103,7 +107,7 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     public DateTime getDateTime(String key) {
-        return getAs(DateTime.class, key);
+        return new DateTime(get(key));
     }
 
     public String getString(String key) {
