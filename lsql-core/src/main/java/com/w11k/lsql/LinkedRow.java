@@ -1,10 +1,10 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.validation.AbstractValidationError;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.util.Map;
 

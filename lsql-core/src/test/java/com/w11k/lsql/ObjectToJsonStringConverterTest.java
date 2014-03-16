@@ -2,10 +2,10 @@ package com.w11k.lsql;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.w11k.lsql.converter.ObjectToJsonStringConverter;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import com.w11k.lsql.tests.utils.Person;
-import org.codehaus.jackson.type.TypeReference;
 import org.testng.annotations.Test;
 
 import java.util.List;

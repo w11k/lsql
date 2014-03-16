@@ -1,12 +1,13 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.sqlfile.LSqlFile;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -28,15 +29,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
+    public static final ObjectMapper OBJECT_MAPPER = CREATE_JSON_MAPPER_INSTANCE();
+
     private final Map<String, Table<? extends Row>> tables = Maps.newLinkedHashMap();
 
     private final BaseDialect dialect;
 
     private final Callable<Connection> connectionProvider;
 
-    private ObjectMapper objectMapper = createJsonMapperInstance();
-
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
+
+    private static ObjectMapper CREATE_JSON_MAPPER_INSTANCE() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+        return mapper;
+    }
 
     /**
      * Creates a new LSql instance.
@@ -75,7 +82,7 @@ public class LSql {
     }
 
     public ObjectMapper getObjectMapper() {
-        return objectMapper;
+        return OBJECT_MAPPER;
     }
 
     public InitColumnCallback getInitColumnCallback() {
@@ -180,10 +187,6 @@ public class LSql {
         return "LSql{" +
                 "dialect=" + dialect +
                 '}';
-    }
-
-    protected ObjectMapper createJsonMapperInstance() {
-        return new ObjectMapper();
     }
 
 }

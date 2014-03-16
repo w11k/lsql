@@ -1,13 +1,13 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -155,7 +155,7 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     protected ObjectMapper getObjectMapper() {
-        return new ObjectMapper();
+        return LSql.OBJECT_MAPPER;
     }
 
     @Override

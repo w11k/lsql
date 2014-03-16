@@ -1,8 +1,8 @@
 package com.w11k.lsql.converter;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
-import org.codehaus.jackson.type.TypeReference;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
