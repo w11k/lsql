@@ -6,7 +6,7 @@
 
   <groupId>com.w11k.lsql</groupId>
   <artifactId>lsql-parent</artifactId>
-  <version>0.6.16</version>
+  <version>0.6.17</version>
   <packaging>pom</packaging>
 
   <modules>
