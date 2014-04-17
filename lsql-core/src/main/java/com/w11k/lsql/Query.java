@@ -27,17 +27,17 @@ public class Query implements Iterable<QueriedRow> {
 
     private final PreparedStatement preparedStatement;
 
-    private final SelectStatement selectStatement;
+    private final SqlStatement sqlStatement;
 
-    public Query(LSql lSql, PreparedStatement preparedStatement, SelectStatement selectStatement) {
+    public Query(LSql lSql, PreparedStatement preparedStatement, SqlStatement sqlStatement) {
         this.lSql = lSql;
         this.preparedStatement = preparedStatement;
-        this.selectStatement = selectStatement;
+        this.sqlStatement = sqlStatement;
     }
 
     public Query(LSql lSql, String sql) {
         this(lSql, ConnectionUtils
-                .prepareStatement(lSql, sql, false), new SelectStatement(lSql, "raw query", sql));
+                .prepareStatement(lSql, sql, false), new SqlStatement(lSql, "raw query", sql));
     }
 
     public LSql getlSql() {
@@ -127,7 +127,7 @@ public class Query implements Iterable<QueriedRow> {
         }
 
         // Table lookup failed. Check SQL string for aliases.
-        Optional<? extends Column<?>> columnOptional = selectStatement.getColumnFromSqlStatement(javaColumnLabel);
+        Optional<? extends Column<?>> columnOptional = sqlStatement.getColumnFromSqlStatement(javaColumnLabel);
         if (columnOptional.isPresent()) {
             return columnOptional.get();
         }

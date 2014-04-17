@@ -149,6 +149,12 @@ public class Row extends ForwardingMap<String, Object> {
         return extracted;
     }
 
+    public Row copy() {
+        Row copy = new Row();
+        copy.putAll(this);
+        return copy;
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this).add("content", delegate()).toString();

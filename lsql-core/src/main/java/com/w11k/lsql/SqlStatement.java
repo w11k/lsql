@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
-public class SelectStatement {
+public class SqlStatement {
 
     class Parameter {
         String name;
@@ -56,7 +56,7 @@ public class SelectStatement {
 
     private final String sqlString;
 
-    public SelectStatement(LSql lSql, String statementName, String sqlString) {
+    public SqlStatement(LSql lSql, String statementName, String sqlString) {
         this.lSql = lSql;
         this.statementName = statementName;
         this.sqlString = sqlString;

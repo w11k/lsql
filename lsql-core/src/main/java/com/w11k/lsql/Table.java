@@ -313,7 +313,7 @@ public class Table<P extends Row> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        List<QueriedRow> queriedRows = new Query(lSql, ps, new SelectStatement(lSql, "Table.get", psString)).asList();
+        List<QueriedRow> queriedRows = new Query(lSql, ps, new SqlStatement(lSql, "Table.get", psString)).asList();
         if (queriedRows.size() == 1) {
             LinkedRow row = newLinkedRow(queriedRows.get(0));
             row.setTable(this);
