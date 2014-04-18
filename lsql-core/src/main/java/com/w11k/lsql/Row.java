@@ -107,7 +107,8 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     public DateTime getDateTime(String key) {
-        return new DateTime(get(key));
+        Object val = get(key);
+        return val == null ? null : new DateTime(get(key));
     }
 
     public String getString(String key) {
