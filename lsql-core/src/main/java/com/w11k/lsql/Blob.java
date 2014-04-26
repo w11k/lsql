@@ -9,6 +9,8 @@ import java.util.Arrays;
 
 public class Blob {
 
+    public static Blob EMPTY = new Blob(new byte[]{});
+
     private byte[] data;
 
     public Blob(byte[] data) {
@@ -23,16 +25,16 @@ public class Blob {
         return data;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
     public void setData(InputStream inputStream) {
         try {
             this.data = ByteStreams.toByteArray(inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     public InputStream getInputStream() {
