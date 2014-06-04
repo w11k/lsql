@@ -17,8 +17,12 @@ public class LinkedRow extends Row {
     }
 
     public LinkedRow(Table<?> table, Map<String, Object> row) {
-        super(row);
         this.table = table;
+
+        // required to include validation
+        for (String key : row.keySet()) {
+            put(key, row.get(key));
+        }
     }
 
     public Table<?> getTable() {
