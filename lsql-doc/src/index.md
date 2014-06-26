@@ -28,35 +28,39 @@ HTML rendering), are less suitable for those environments.
 
 Assume the following DDL:
 
-    CREATE TABLE person (
-        id SERIAL PRIMARY KEY, -- auto increment primary key
-        name TEXT,
-        age INT
-    );
+```{.language-sql}
+CREATE TABLE person (
+    id SERIAL PRIMARY KEY, -- auto increment primary key
+    name TEXT,
+    age INT
+);
+```
 
 LSql Java code:
 
-    DataSource dataSource = ...;
-    LSql lsql = new LSql(new H2Dialect(), dataSource);
+```{.language-java}
+DataSource dataSource = ...;
+LSql lsql = new LSql(new H2Dialect(), dataSource);
 
-    // Create a new person
-    Row john = new Row();
-    john.put("name", "John");
-    john.put("age", 20);
+// Create a new person
+Row john = new Row();
+john.put("name", "John");
+john.put("age", 20);
 
-    // Insert the new person
-    Table persons = lsql.table("persons");
-    persons.insert(john);
+// Insert the new person
+Table personTable = lsql.table("person");
+personTable.insert(john);
 
-    // The generated ID is automatically put into the row object
-    Object newId = john.get("id");
+// The generated ID is automatically put into the row object
+Object newId = john.get("id");
 
-    // Use the ID to load the row, returns com.google.common.base.Optional
-    Optional<QueriedRow> queried = persons.get(newId);
-    QueriedRow queriedJohn = queried.get();
+// Use the ID to load the row, returns com.google.common.base.Optional
+Optional<QueriedRow> queried = personTable.get(newId);
+QueriedRow queriedJohn = queried.get();
 
-    assert queriedJohn.getString("name").equals("John");
-    assert queriedJohn.getInt("age") == 20;
+assert queriedJohn.getString("name").equals("John");
+assert queriedJohn.getInt("age") == 20;
+```
 
 # Download
 
@@ -64,24 +68,28 @@ LSql Java code:
 
 All released files are stored in a Maven repository:
 
-    <repositories>
-        <repository>
-            <id>lsql-repo</id>
-            <name>w11k Repository</name>
-            <url>http://mvn.w11k.com/releases</url>
-        </repository>
-    </repositories>
+```{.language-xml}
+<repositories>
+    <repository>
+        <id>lsql-repo</id>
+        <name>w11k Repository</name>
+        <url>http://mvn.w11k.com/releases</url>
+    </repository>
+</repositories>
+```
 
 Add the following dependency to your POM. The latest version number can always
 be found here:
 
 [Latest Released Version](https://raw.github.com/weiglewilczek/lsql/master/LATEST_RELEASED_VERSION)
 
-    <dependency>
-        <groupId>com.w11k.lsql</groupId>
-        <artifactId>lsql-core</artifactId>
-        <version> {{see link above for the latest version}} </version>
-    </dependency>
+```{.language-xml}
+<dependency>
+    <groupId>com.w11k.lsql</groupId>
+    <artifactId>lsql-core</artifactId>
+    <version>{{see link above for the latest version}} </version>
+</dependency>
+```
 
 # Documentation
 

@@ -242,6 +242,7 @@ public abstract class AbstractDialectTests {
 
     protected void skipOnConfigError() {
         if (!initOk) {
+            initException.printStackTrace();
             throw new SkipException("Init failed: " + initException.getMessage(), initException) {
                 @Override
                 public boolean isSkip() {
