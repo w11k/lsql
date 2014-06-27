@@ -10,6 +10,7 @@
 
   <properties>
     <github.global.server>github</github.global.server>
+    <pandoc.path>${env.HOME}/.cabal/bin/pandoc</pandoc.path>
   </properties>
 
   <build>
@@ -31,14 +32,18 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
-            <id>run grunt build</id>
+            <id>create doc</id>
             <phase>compile</phase>
             <goals>
               <goal>run</goal>
             </goals>
             <configuration>
               <tasks>
-                <exec dir="." executable="pandoc" failonerror="true">
+                <exec dir="." executable="bash" failonerror="true">
+                  <arg value="-c"/>
+                  <arg value="src/extract_snippets.sh"/>
+                </exec>
+                <exec dir="." executable="${pandoc.path}" failonerror="true">
                   <arg value="src/index.md"/>
                   <arg value="--smart"/>
                   <arg value="--standalone"/>

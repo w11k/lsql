@@ -43,15 +43,20 @@ public abstract class Converter {
         if (value == null) {
             return isNullValid();
         }
-        return getSupportedJavaClass().get().isAssignableFrom(value.getClass());
+        if (getSupportedJavaClass().isPresent()) {
+            return getSupportedJavaClass().get().isAssignableFrom(value.getClass());
+        } else {
+            return true;
+        }
     }
 
     public int[] getSupportedSqlTypes() {
         throw new RuntimeException("This converter does not specify the supported SQL types.");
     }
 
+    // TODO maybe remove the Optional, since we now have Object as default
     public Optional<? extends Class<?>> getSupportedJavaClass() {
-        return Optional.absent();
+        return Optional.of(Object.class);
     }
 
     public int getSqlTypeForNullValues() {

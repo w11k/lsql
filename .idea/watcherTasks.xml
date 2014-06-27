@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectTasksOptions">
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="-Dpandoc_path=/home/roman/.cabal/bin/pandoc compile" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" value="" />
+      <option name="exitCodeBehavior" value="ALWAYS" />
+      <option name="fileExtension" value="markdown" />
+      <option name="immediateSync" value="false" />
+      <option name="name" value="maven" />
+      <option name="output" value="" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="program" value="$USER_HOME$/apps/apache-maven/bin/mvn" />
+      <option name="scopeName" value="Project Files" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="$ProjectFileDir$" />
+      <envs>
+        <env name="" value="" />
+      </envs>
+    </TaskOptions>
+  </component>
+</project>
+
