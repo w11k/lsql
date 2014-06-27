@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <link rel="stylesheet" href="bootstrap.min.css">
   <link rel="stylesheet" href="style.css">
+
   <script type="text/javascript" src="jquery.min.js"></script>
+  <script type="text/javascript" src="jquery-syntaxhighlighter-master/scripts/jquery.syntaxhighlighter.js"></script>
+
   <script type="text/javascript">
     //noinspection JSUnresolvedVariable
     var J = $$;
@@ -43,13 +46,19 @@
         var newText = removeIndent(codeElem.text());
         codeElem.text(newText);
       });
+
+      J.SyntaxHighlighter.init({
+        'prettifyBaseUrl': 'jquery-syntaxhighlighter-master/prettify',
+        'baseUrl': 'jquery-syntaxhighlighter-master'
+      });
+
     });
   </script>
   <title>LSql Library</title>
 </head>
 <body>
 <div>
-  <div class="navbar navbar-fixed-top">
+  <div class="navbar navbar-static-top">
     <div class="navbar-inner">
       <div class="container">
         <a class="brand" href="#">LSql - Java SQL Database Library </a>
@@ -57,7 +66,7 @@
     </div>
   </div>
 </div>
-<div class="container" style="margin-top:60px">
+<div class="container">
   <div class="row">
     <div id="TOC" class="span4">
       <div class="pa-sidebar">
