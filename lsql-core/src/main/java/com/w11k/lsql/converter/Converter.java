@@ -34,11 +34,12 @@ public abstract class Converter {
     }
 
     public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
-        Object value = getValue(lSql, rs, index);
+        rs.getObject(index);
         if (rs.wasNull()) {
             return null;
         }
-        return value;
+
+        return getValue(lSql, rs, index);
     }
 
     public boolean isValueValid(Object value) {
