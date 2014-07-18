@@ -94,6 +94,10 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(Integer.class, key);
     }
 
+    public long getLong(String key) {
+        return getAs(Long.class, key);
+    }
+
     public Double getDouble(String key) {
         return getAs(Double.class, key);
     }
