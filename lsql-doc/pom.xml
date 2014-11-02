@@ -6,7 +6,7 @@
 
   <groupId>com.w11k.lsql</groupId>
   <artifactId>lsql-doc</artifactId>
-  <version>0.0.25</version>
+  <version>0.7.3</version>
 
   <properties>
     <github.global.server>github</github.global.server>

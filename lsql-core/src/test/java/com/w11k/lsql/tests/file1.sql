@@ -34,7 +34,7 @@ SELECT
   *
 FROM table1
 WHERE
-  table1.age IN (/*(*/ 10, 30, 60 /*)*/);
+  table1.age IN ( /*(*/ 10, 60 /*)*/ );
 
 -- queryColumnConverter
 SELECT
