@@ -40,7 +40,7 @@ public class DocumentationSnippetsTest extends AbstractLSqlTest {
         Object newId = john.get("id");
 
         // Use the ID to load the row, returns com.google.common.base.Optional
-        Optional<? extends LinkedRow> queried = persons.get(newId);
+        Optional<? extends LinkedRow> queried = persons.load(newId);
         LinkedRow queriedJohn = queried.get();
 
         assert queriedJohn.getString("name").equals("John");

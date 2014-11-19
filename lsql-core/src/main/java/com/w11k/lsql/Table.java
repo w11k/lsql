@@ -207,7 +207,7 @@ public class Table<P extends Row> {
             // Set new revision
             applyNewRevision(row, id);
 
-            //return row.getOptional(getPrimaryKeyColumn().get());
+            //return row.getOptional(getPrimaryKeyColumn().load());
         } catch (Exception e) {
             throw new UpdateException(e);
         }
@@ -303,7 +303,7 @@ public class Table<P extends Row> {
      * @return a {@link com.google.common.base.Present} with a {@link Row} instance if the passed primary key
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
-    public Optional<LinkedRow> get(Object id) {
+    public Optional<LinkedRow> load(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
@@ -313,7 +313,7 @@ public class Table<P extends Row> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        List<QueriedRow> queriedRows = new Query(lSql, ps, new SqlStatement(lSql, "Table.get", psString)).asList();
+        List<QueriedRow> queriedRows = new Query(lSql, ps, new SqlStatement(lSql, "Table.load", psString)).asList();
         if (queriedRows.size() == 1) {
             LinkedRow row = newLinkedRow(queriedRows.get(0));
             row.setTable(this);
@@ -333,7 +333,7 @@ public class Table<P extends Row> {
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
     public LinkedRow newLinkedRow(Object... keyVals) {
-        return newLinkedRow(Row.fromKeyVals(keyVals));
+        return newLinkedRow(newRowPojoInstance().addKeyVals(keyVals));
     }
 
     /**

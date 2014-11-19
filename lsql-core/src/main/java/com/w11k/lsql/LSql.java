@@ -51,7 +51,7 @@ public class LSql {
      * LSql will use the {@link Callable} for obtaining connections.
      *
      * @param dialect            the database dialect
-     * @param connectionProvider provider to get a Connection instance
+     * @param connectionProvider provider to load a Connection instance
      */
     public LSql(BaseDialect dialect, Callable<Connection> connectionProvider) {
         checkNotNull(connectionProvider);
@@ -67,7 +67,7 @@ public class LSql {
      * LSql will use the {@link DataSource} for obtaining connections.
      *
      * @param dialect    the database dialect
-     * @param dataSource data source to get a Connection instance
+     * @param dataSource data source to load a Connection instance
      */
     public LSql(BaseDialect dialect, DataSource dataSource) {
         this(dialect, ConnectionProviders.fromDataSource(dataSource));

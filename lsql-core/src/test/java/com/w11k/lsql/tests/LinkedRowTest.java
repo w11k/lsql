@@ -21,12 +21,12 @@ public class LinkedRowTest extends AbstractLSqlTest {
         assertTrue(row1Id.isPresent());
         assertEquals(row1Id.get(), 1);
 
-        LinkedRow queriedRow1 = table1.get(1).get();
+        LinkedRow queriedRow1 = table1.load(1).get();
         assertEquals(queriedRow1.getInt("age"), 1);
 
         queriedRow1.put("age", 99);
         queriedRow1.save();
-        LinkedRow queriedRow1b = table1.get(1).get();
+        LinkedRow queriedRow1b = table1.load(1).get();
         assertEquals(queriedRow1b.getInt("age"), 99);
     }
 
@@ -37,9 +37,9 @@ public class LinkedRowTest extends AbstractLSqlTest {
         LinkedRow row1 = table1.newLinkedRow();
         row1.addKeyVals("id", 1, "age", 1);
         row1.save();
-        assertEquals(table1.get(1).get().getInt("age"), 1);
+        assertEquals(table1.load(1).get().getInt("age"), 1);
         row1.delete();
-        assertFalse(table1.get(1).isPresent());
+        assertFalse(table1.load(1).isPresent());
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -55,7 +55,7 @@ public class LinkedRowTest extends AbstractLSqlTest {
         Table<?> table1 = lSql.table("table1");
         table1.enableRevisionSupport();
         table1.insert(Row.fromKeyVals("id", 1, "age", 1));
-        LinkedRow row = table1.get(1).get();
+        LinkedRow row = table1.load(1).get();
         assertTrue(row.containsKey("id"));
         assertTrue(row.containsKey("revision"));
 

@@ -30,9 +30,9 @@ public class TableTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("id", 2, "age", 2));
         table1.insert(Row.fromKeyVals("id", 3, "age", 3));
 
-        assertEquals(table1.get(1).get().getInt("age"), 1);
-        assertEquals(table1.get(2).get().getInt("age"), 2);
-        assertEquals(table1.get(3).get().getInt("age"), 3);
+        assertEquals(table1.load(1).get().getInt("age"), 1);
+        assertEquals(table1.load(2).get().getInt("age"), 2);
+        assertEquals(table1.load(3).get().getInt("age"), 3);
     }
 
     @Test
@@ -40,7 +40,7 @@ public class TableTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
         Table table1 = lSql.table("table1");
 
-        assertFalse(table1.get(999).isPresent());
+        assertFalse(table1.load(999).isPresent());
     }
 
     @Test
@@ -120,12 +120,12 @@ public class TableTest extends AbstractLSqlTest {
         Table<?> table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("id", 1, "name", "Max");
         table1.insert(row);
-        LinkedRow queriedRow = table1.get(1).get();
+        LinkedRow queriedRow = table1.load(1).get();
         assertEquals(queriedRow, row);
 
         row.put("name", "John");
         table1.update(row);
-        queriedRow = table1.get(1).get();
+        queriedRow = table1.load(1).get();
         assertEquals(queriedRow, row);
     }
 
@@ -135,7 +135,7 @@ public class TableTest extends AbstractLSqlTest {
         Table<?> table1 = lSql.table("table1");
         Row row = new Row().addKeyVals("name", "Max");
         Object id = table1.insert(row).get();
-        LinkedRow queriedRow = table1.get(id).get();
+        LinkedRow queriedRow = table1.load(id).get();
         assertEquals(queriedRow, row);
 
         row.put("id", 999);
@@ -154,7 +154,7 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(id, row.get(table1.getPrimaryKeyColumn().get()));
 
         // Verify insert
-        LinkedRow queriedRow = table1.get(id).get();
+        LinkedRow queriedRow = table1.load(id).get();
         assertEquals(queriedRow, row);
 
         // Update
@@ -162,7 +162,7 @@ public class TableTest extends AbstractLSqlTest {
         id = table1.save(row).get();
 
         // Verify update
-        queriedRow = table1.get(id).get();
+        queriedRow = table1.load(id).get();
         assertEquals(queriedRow, row);
     }
 
@@ -177,7 +177,7 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(id, row.get(table1.getPrimaryKeyColumn().get()));
 
         // Verify insert
-        LinkedRow queriedRow = table1.get(id).get();
+        LinkedRow queriedRow = table1.load(id).get();
         assertEquals(queriedRow, row);
 
         // Update
@@ -185,7 +185,7 @@ public class TableTest extends AbstractLSqlTest {
         id = table1.save(row).get();
 
         // Verify update
-        queriedRow = table1.get(id).get();
+        queriedRow = table1.load(id).get();
         assertEquals(queriedRow, row);
 
         List<QueriedRow> rows = lSql.executeRawQuery("SELECT * FROM table1").asList();

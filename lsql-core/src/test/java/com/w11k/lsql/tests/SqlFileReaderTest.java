@@ -142,8 +142,8 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         List<QueriedRow> result = query.asList();
         // TODO does not work currently !!!
 //        assertEquals(result.size(), 2);
-//        assertEquals(result.get(0).getInt("age"), 10);
-//        assertEquals(result.get(1).getInt("age"), 60);
+//        assertEquals(result.load(0).getInt("age"), 10);
+//        assertEquals(result.load(1).getInt("age"), 60);
     }
 
 }

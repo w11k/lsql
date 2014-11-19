@@ -75,7 +75,7 @@ public class CrudExamples {
         insert();
 
         Table<?> personTable = lSql.table("person");
-        LinkedRow linkedRow = personTable.get(1).get();
+        LinkedRow linkedRow = personTable.load(1).get();
         assert linkedRow.getString("name").equals("John");
     }
 

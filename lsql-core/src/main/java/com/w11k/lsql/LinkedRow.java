@@ -12,11 +12,11 @@ public class LinkedRow extends Row {
 
     private Table<?> table;
 
-    public LinkedRow(Table<?> table) {
+    LinkedRow(Table<?> table) {
         this(table, Maps.<String, Object>newLinkedHashMap());
     }
 
-    public LinkedRow(Table<?> table, Map<String, Object> row) {
+    LinkedRow(Table<?> table, Map<String, Object> row) {
         this.table = table;
 
         // required to include validation
@@ -69,6 +69,8 @@ public class LinkedRow extends Row {
     /**
      * Puts the given key/value pair into this instance and calls
      * {@link com.w11k.lsql.Table#validate(String, Object)}.
+     *
+     * Throws an exception if the validation fails.
      */
     @Override
     public Object put(String key, Object value) {

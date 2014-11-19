@@ -39,7 +39,7 @@ public class TableRowPojoTest extends AbstractLSqlTest {
         pojo1.put("rest", 20);
         table1.insert(pojo1);
 
-        pojo1 = table1.rowToPojo(table1.get(1).get());
+        pojo1 = table1.rowToPojo(table1.load(1).get());
 
         assertEquals(pojo1.getId(), 1);
         assertEquals(pojo1.getAge(), 10);
