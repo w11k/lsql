@@ -190,7 +190,7 @@ public class SqlStatement {
 
     private String queryParameterInLine(Map<String, Object> queryParameters, String line) {
         for (String s : queryParameters.keySet()) {
-            if (line.contains(" " + s + " ") || line.contains("." + s + " ")) {
+            if (line.startsWith(s + " ") || line.contains(" " + s + " ") || line.contains("." + s + " ")) {
                 return s;
             }
         }
