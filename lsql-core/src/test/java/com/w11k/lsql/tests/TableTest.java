@@ -30,9 +30,9 @@ public class TableTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("id", 2, "age", 2));
         table1.insert(Row.fromKeyVals("id", 3, "age", 3));
 
-        assertEquals(table1.load(1).get().getInt("age"), 1);
-        assertEquals(table1.load(2).get().getInt("age"), 2);
-        assertEquals(table1.load(3).get().getInt("age"), 3);
+        assertEquals(table1.load(1).get().getInt("age"), (Integer) 1);
+        assertEquals(table1.load(2).get().getInt("age"), (Integer) 2);
+        assertEquals(table1.load(3).get().getInt("age"), (Integer) 3);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class TableTest extends AbstractLSqlTest {
 
         Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).getFirstRow()
                 .get();
-        assertEquals(query.getInt("age"), 1);
+        assertEquals(query.getInt("age"), (Integer) 1);
     }
 
     @Test
@@ -256,8 +256,8 @@ public class TableTest extends AbstractLSqlTest {
         t1.column("c2").setIgnored(true);
         t1.insert(Row.fromKeyVals("c1", 1, "c2", 2));
         QueriedRow row = lSql.executeRawQuery("SELECT c1, sum(c2) AS s FROM t1 GROUP BY c1").getFirstRow().get();
-        assertEquals(row.getInt("c1"), 1);
-        assertEquals(row.getInt("s"), 999);
+        assertEquals(row.getInt("c1"), (Integer) 1);
+        assertEquals(row.getInt("s"), (Integer) 999);
     }
 
     @Test
@@ -270,8 +270,8 @@ public class TableTest extends AbstractLSqlTest {
         t1.update(Row.fromKeyVals("c1", 1, "c2", 2, "c3", 3));
 
         QueriedRow row = lSql.executeRawQuery("SELECT c1, sum(c2) AS s FROM t1 GROUP BY c1").getFirstRow().get();
-        assertEquals(row.getInt("c1"), 1);
-        assertEquals(row.getInt("s"), 555);
+        assertEquals(row.getInt("c1"), (Integer) 1);
+        assertEquals(row.getInt("s"), (Integer) 555);
     }
 
     @Test
@@ -283,7 +283,7 @@ public class TableTest extends AbstractLSqlTest {
         t1.column("c2").setIgnored(true);
 
         QueriedRow row = lSql.executeRawQuery("SELECT c1, c2 FROM t1").getFirstRow().get();
-        assertEquals(row.getInt("c1"), 1);
+        assertEquals(row.getInt("c1"), (Integer) 1);
         assertFalse(row.containsKey("c2"));
     }
 

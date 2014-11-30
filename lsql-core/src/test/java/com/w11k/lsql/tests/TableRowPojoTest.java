@@ -43,7 +43,7 @@ public class TableRowPojoTest extends AbstractLSqlTest {
 
         assertEquals(pojo1.getId(), 1);
         assertEquals(pojo1.getAge(), 10);
-        assertEquals(pojo1.getInt("rest"), 20);
+        assertEquals(pojo1.getInt("rest"), (Integer) 20);
     }
 
 }

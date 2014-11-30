@@ -90,11 +90,11 @@ public class Row extends ForwardingMap<String, Object> {
         }
     }
 
-    public int getInt(String key) {
+    public Integer getInt(String key) {
         return getAs(Integer.class, key);
     }
 
-    public long getLong(String key) {
+    public Long getLong(String key) {
         return getAs(Long.class, key);
     }
 

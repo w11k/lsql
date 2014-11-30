@@ -66,7 +66,7 @@ public class QueryTest extends AbstractLSqlTest {
         QueriedRow row = rows.getFirstRow().get();
         assertNotNull(row);
         assertEquals(row.getString("name"), "cus1");
-        assertEquals(row.getInt("age"), 20);
+        assertEquals(row.getInt("age"), (Integer) 20);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         Query rows = lSql.executeRawQuery("SELECT count(*) AS c FROM table1");
         Row row = rows.getFirstRow().get();
-        assertEquals(row.getInt("c"), 2);
+        assertEquals(row.getInt("c"), (Integer) 2);
     }
 
     @Test
@@ -86,8 +86,8 @@ public class QueryTest extends AbstractLSqlTest {
         Query rows = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1");
         Row row = rows.getFirstRow().get();
         assertEquals(row.getString("name"), "cus1");
-        assertEquals(row.getInt("age"), 20);
-        assertEquals(row.getInt("c"), 1);
+        assertEquals(row.getInt("age"), (Integer) 20);
+        assertEquals(row.getInt("c"), (Integer) 1);
     }
 
     @Test(expectedExceptions = IllegalStateException.class)

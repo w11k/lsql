@@ -28,7 +28,7 @@ public class RowTest extends AbstractLSqlTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void getAsThrowsExceptionOnWrongKey() {
         Row r = new Row().addKeyVals("a", "1");
-        assertEquals(r.getInt("x"), 1);
+        assertEquals(r.getInt("x"), (Integer) 1);
     }
 
     @Test
@@ -50,14 +50,14 @@ public class RowTest extends AbstractLSqlTest {
     public void aConversionRemembersTheResult() {
         Row r = new Row().addKeyVals("a", "1");
         assertEquals(r.get("a"), "1");
-        assertEquals(r.getInt("a"), 1);
+        assertEquals(r.getInt("a"), (Integer) 1);
         assertEquals(r.get("a"), 1);
     }
 
     @Test
     public void stringToIntConversion() {
         Row r = new Row().addKeyVals("a", "1");
-        assertEquals(r.getInt("a"), 1);
+        assertEquals(r.getInt("a"), (Integer) 1);
     }
 
     @Test

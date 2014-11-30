@@ -94,7 +94,7 @@ public abstract class AbstractDialectTests {
 
         LinkedRow queried2 = table1.load(id2).get();
         assertEquals(queried2.get("id"), id2);
-        assertEquals(queried2.getInt("age"), 20);
+        assertEquals(queried2.getInt("age"), (Integer) 20);
         assertEquals(row2.get("id"), id2);
 
         // Delete
@@ -121,11 +121,11 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 2);
 
         QueriedRow row1 = list.get(0);
-        assertEquals(row1.getInt("id"), 1);
+        assertEquals(row1.getInt("id"), (Integer) 1);
         assertEquals(row1.getBoolean("yesno"), Boolean.TRUE);
 
         QueriedRow row2 = list.get(1);
-        assertEquals(row2.getInt("id"), 2);
+        assertEquals(row2.getInt("id"), (Integer) 2);
         assertEquals(row2.getBoolean("yesno"), Boolean.FALSE);
     }
 
@@ -138,7 +138,7 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 1);
 
         QueriedRow row1 = list.get(0);
-        assertEquals(row1.getInt("id"), 1);
+        assertEquals(row1.getInt("id"), (Integer) 1);
         assertEquals(row1.getBoolean("yesno"), Boolean.TRUE);
     }
 
@@ -151,11 +151,11 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 2);
 
         QueriedRow row1 = list.get(0);
-        assertEquals(row1.getInt("id"), 1);
+        assertEquals(row1.getInt("id"), (Integer) 1);
         assertEquals(row1.getBoolean("yesno"), Boolean.TRUE);
 
         QueriedRow row2 = list.get(1);
-        assertEquals(row2.getInt("id"), 2);
+        assertEquals(row2.getInt("id"), (Integer) 2);
         assertEquals(row2.getBoolean("yesno"), Boolean.FALSE);
     }
 
@@ -167,15 +167,15 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 2);
 
         QueriedRow row1 = list.get(0);
-        assertEquals(row1.getInt("t1_id"), 1);
+        assertEquals(row1.getInt("t1_id"),(Integer)  1);
         assertEquals(row1.getBoolean("t1_yesno"), Boolean.TRUE);
-        assertEquals(row1.getInt("t2_id"), 1);
+        assertEquals(row1.getInt("t2_id"), (Integer) 1);
         assertEquals(row1.getBoolean("t2_yesno"), Boolean.TRUE);
 
         QueriedRow row2 = list.get(1);
-        assertEquals(row2.getInt("t1_id"), 2);
+        assertEquals(row2.getInt("t1_id"), (Integer) 2);
         assertEquals(row2.getBoolean("t1_yesno"), Boolean.FALSE);
-        assertEquals(row2.getInt("t2_id"), 2);
+        assertEquals(row2.getInt("t2_id"), (Integer) 2);
         assertEquals(row2.getBoolean("t2_yesno"), Boolean.FALSE);
     }
 
@@ -187,11 +187,11 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 2);
 
         QueriedRow row1 = list.get(0);
-        assertEquals(row1.getInt("ta_id"), 1);
+        assertEquals(row1.getInt("ta_id"), (Integer) 1);
         assertEquals(row1.getBoolean("ta_yesno"), Boolean.TRUE);
 
         QueriedRow row2 = list.get(1);
-        assertEquals(row2.getInt("ta_id"), 2);
+        assertEquals(row2.getInt("ta_id"), (Integer) 2);
         assertEquals(row2.getBoolean("ta_yesno"), Boolean.FALSE);
     }
 
@@ -203,11 +203,11 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 2);
 
         QueriedRow row1 = list.get(0);
-        assertEquals(row1.getInt("ta_id"), 1);
+        assertEquals(row1.getInt("ta_id"), (Integer) 1);
         assertEquals(row1.getBoolean("ta_yesno"), Boolean.TRUE);
 
         QueriedRow row2 = list.get(1);
-        assertEquals(row2.getInt("ta_id"), 2);
+        assertEquals(row2.getInt("ta_id"), (Integer) 2);
         assertEquals(row2.getBoolean("ta_yesno"), Boolean.FALSE);
     }
 
@@ -221,7 +221,7 @@ public abstract class AbstractDialectTests {
         assertEquals(list.size(), 1);
 
         QueriedRow row1 = list.get(0);
-        assertEquals(row1.getInt("id"), 2);
+        assertEquals(row1.getInt("id"), (Integer) 2);
         assertEquals(row1.getBoolean("yesno"), Boolean.FALSE);
     }
 

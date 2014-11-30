@@ -22,12 +22,12 @@ public class LinkedRowTest extends AbstractLSqlTest {
         assertEquals(row1Id.get(), 1);
 
         LinkedRow queriedRow1 = table1.load(1).get();
-        assertEquals(queriedRow1.getInt("age"), 1);
+        assertEquals(queriedRow1.getInt("age"), (Integer) 1);
 
         queriedRow1.put("age", 99);
         queriedRow1.save();
         LinkedRow queriedRow1b = table1.load(1).get();
-        assertEquals(queriedRow1b.getInt("age"), 99);
+        assertEquals(queriedRow1b.getInt("age"), (Integer) 99);
     }
 
     @Test
@@ -37,7 +37,7 @@ public class LinkedRowTest extends AbstractLSqlTest {
         LinkedRow row1 = table1.newLinkedRow();
         row1.addKeyVals("id", 1, "age", 1);
         row1.save();
-        assertEquals(table1.load(1).get().getInt("age"), 1);
+        assertEquals(table1.load(1).get().getInt("age"), (Integer) 1);
         row1.delete();
         assertFalse(table1.load(1).isPresent());
     }
