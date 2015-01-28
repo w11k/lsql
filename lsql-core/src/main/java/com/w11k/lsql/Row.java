@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
@@ -141,6 +142,11 @@ public class Row extends ForwardingMap<String, Object> {
     @SuppressWarnings("unchecked")
     public <A> Set<A> getSetOf(Class<A> clazz, String key) {
         return (Set<A>) get(key);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <A> TreeSet<A> getTreeSetOf(Class<A> clazz, String key) {
+        return (TreeSet<A>) get(key);
     }
 
     @SuppressWarnings("unchecked")
