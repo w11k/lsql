@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
@@ -135,6 +136,11 @@ public class Row extends ForwardingMap<String, Object> {
     @SuppressWarnings("unchecked")
     public <A> List<A> getListOf(Class<A> clazz, String key) {
         return (List<A>) get(key);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <A> Set<A> getSetOf(Class<A> clazz, String key) {
+        return (Set<A>) get(key);
     }
 
     @SuppressWarnings("unchecked")
