@@ -8,7 +8,10 @@ import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.tests.utils.IntWrapper;
 import org.testng.annotations.Test;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -144,6 +147,19 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
 //        assertEquals(result.size(), 2);
 //        assertEquals(result.load(0).getInt("age"), 10);
 //        assertEquals(result.load(1).getInt("age"), 60);
+    }
+
+    @Test
+    public void namedParameter() {
+        executeSqlStatement();
+        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "file1.sql");
+        SqlStatement markers = lSqlFile.statement("namedParameter");
+        Query query = markers.query(
+                "foo", 60
+        );
+        List<QueriedRow> result = query.asList();
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0).getString("content"), "text3");
     }
 
 }

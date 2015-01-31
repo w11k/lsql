@@ -41,7 +41,7 @@ public class SqlStatement {
 
     // column = /*(*/ 123 /*)*/
     private static final Pattern RANGE_QUERY_ARG = Pattern.compile(
-            "^.*(/\\*\\(\\*/.*/\\*\\)\\*/).*$");
+            "^.*(/\\*(\\?.+)?\\(\\*/.*/\\*\\)\\*/).*$");
 
     // column =
     private static final Pattern EQUAL_OPERATOR_QUERY = Pattern.compile(
@@ -190,7 +190,7 @@ public class SqlStatement {
 
     private String queryParameterInLine(Map<String, Object> queryParameters, String line) {
         for (String s : queryParameters.keySet()) {
-            if (line.startsWith(s + " ") || line.contains(" " + s + " ") || line.contains("." + s + " ")) {
+            if (line.startsWith(s + " ") || line.contains(" " + s + " ") || line.contains("." + s + " ") || line.contains("?" + s + "")) {
                 return s;
             }
         }

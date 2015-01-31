@@ -18,35 +18,35 @@ DELETE FROM table1
 WHERE table1.age < /*(*/ 5 /*)*/;
 
 -- getAll
-SELECT
-  *
+SELECT *
 FROM table1;
 
 -- queryRangeMarkers
-SELECT
-  *
+SELECT *
 FROM table1
 WHERE
   age < /*(*/ 15 /*)*/;
 
 -- queryFunctionCallback
-SELECT
-  *
+SELECT *
 FROM table1
 WHERE
-  table1.age IN ( /*(*/ 10, 60 /*)*/ );
+  table1.age IN (/*(*/ 10, 60 /*)*/);
 
 -- queryColumnConverter
-SELECT
-  *
+SELECT *
 FROM table2
 WHERE
   table2.number < /*(*/ 1 /*)*/
 ;
 
 --convertOperatorForNullValues
-SELECT
-  *
+SELECT *
 FROM table1
 WHERE age = /*(*/ 2 /*)*/;
+
+--namedParameter
+SELECT *
+FROM table1
+WHERE age = /*?foo(*/ 30 /*)*/;
 
