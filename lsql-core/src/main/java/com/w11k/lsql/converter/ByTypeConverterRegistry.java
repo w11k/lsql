@@ -2,11 +2,10 @@ package com.w11k.lsql.converter;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.*;
+import com.w11k.lsql.LSql;
 import org.joda.time.DateTime;
 
 import java.sql.*;
-import java.sql.Blob;
 import java.util.Map;
 
 public class ByTypeConverterRegistry {
