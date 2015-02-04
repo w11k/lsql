@@ -1,5 +1,10 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
@@ -13,6 +18,7 @@ import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +28,9 @@ import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class Table<P extends Row> {
+public class Table<P> {
 
-    public static <A extends Row> Table<A> create(LSql lSql, String tableName, Class<A> rowPojoClass) {
+    public static <A> Table<A> create(LSql lSql, String tableName, Class<A> rowPojoClass) {
         return new Table<A>(lSql, tableName, rowPojoClass);
     }
 
@@ -34,7 +40,7 @@ public class Table<P extends Row> {
 
     private final Class<P> rowPojoClass;
 
-    private final Map<String, Column<P>> columns = Maps.newHashMap();
+    private final Map<String, Column> columns = Maps.newHashMap();
 
     private Optional<String> primaryKeyColumn = absent();
 
@@ -63,7 +69,7 @@ public class Table<P extends Row> {
         return primaryKeyColumn;
     }
 
-    public Map<String, Column<P>> getColumns() {
+    public Map<String, Column> getColumns() {
         return ImmutableMap.copyOf(columns);
     }
 
@@ -76,7 +82,7 @@ public class Table<P extends Row> {
      *
      * @return the column instance
      */
-    public synchronized Column<P> column(String columnName) {
+    public synchronized Column column(String columnName) {
         if (!columns.containsKey(columnName)) {
             return null;
         }
@@ -256,6 +262,10 @@ public class Table<P extends Row> {
         }
     }
 
+    public Optional<?> save(P pojo) {
+        return save(pojoToRow(pojo));
+    }
+
     /**
      * Deletes the row with the given primary key value.
      * <p/>
@@ -303,7 +313,7 @@ public class Table<P extends Row> {
      * @return a {@link com.google.common.base.Present} with a {@link Row} instance if the passed primary key
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
-    public Optional<LinkedRow> load(Object id) {
+    public Optional<LinkedRow<P>> load(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
@@ -315,8 +325,7 @@ public class Table<P extends Row> {
         }
         List<QueriedRow> queriedRows = new Query(lSql, ps, new SqlStatement(lSql, "Table.load", psString)).asList();
         if (queriedRows.size() == 1) {
-            LinkedRow row = newLinkedRow(queriedRows.get(0));
-            row.setTable(this);
+            LinkedRow<P> row = newLinkedRow(queriedRows.get(0));
             return of(row);
         }
         return absent();
@@ -325,15 +334,15 @@ public class Table<P extends Row> {
     /**
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
-    public LinkedRow newLinkedRow() {
-        return new LinkedRow(this);
+    public LinkedRow<P> newLinkedRow() {
+        return new LinkedRow<P>(this);
     }
 
     /**
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
-    public LinkedRow newLinkedRow(Object... keyVals) {
-        return newLinkedRow(newRowPojoInstance().addKeyVals(keyVals));
+    public LinkedRow<P> newLinkedRow(Object... keyVals) {
+        return newLinkedRow(Row.fromKeyVals(keyVals));
     }
 
     /**
@@ -344,8 +353,8 @@ public class Table<P extends Row> {
      *
      * @param data content to be added
      */
-    public LinkedRow newLinkedRow(Map<String, Object> data) {
-        return new LinkedRow(this, data);
+    public LinkedRow<P> newLinkedRow(Map<String, Object> data) {
+        return new LinkedRow<P>(this, data);
     }
 
     public P newRowPojoInstance() {
@@ -359,9 +368,28 @@ public class Table<P extends Row> {
     }
 
     public P rowToPojo(Row row) {
-        P p = newRowPojoInstance();
-        p.setDelegate(row);
-        return p;
+        Class<P> rowPojoClass = getRowPojoClass();
+        try {
+            byte[] bytes = getlSql().getObjectMapper().writeValueAsBytes(row.delegate());
+            return getlSql().getObjectMapper().readValue(bytes, rowPojoClass);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Row pojoToRow(P pojo) {
+        ObjectMapper mapper = getlSql().getObjectMapper();
+        JsonNode tree = mapper.valueToTree(pojo);
+        JsonParser jsonParser = mapper.treeAsTokens(tree);
+        JavaType javaType = mapper.getTypeFactory().constructType(Row.class);
+        try {
+            Object paramValue = mapper.readValue(jsonParser, javaType);
+            return (Row) paramValue;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -483,7 +511,7 @@ public class Table<P extends Row> {
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
                 int dataType = columnsMetaData.getInt(5);
                 Converter converter = lSql.getDialect().getConverterRegistry().getConverterForSqlType(dataType);
-                Column<P> column = new Column<P>(of(this), javaColumnName, dataType, converter, columnSize);
+                Column column = new Column(of(this), javaColumnName, dataType, converter, columnSize);
                 lSql.getInitColumnCallback().onNewColumn(column);
                 columns.put(javaColumnName, column);
             }

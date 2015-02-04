@@ -9,9 +9,7 @@ import com.w11k.lsql.validation.TypeError;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
-public class Column<P extends Row> {
-
-    private Optional<? extends Table<P>> table;
+public class Column {
 
     private final String columnName;
 
@@ -19,18 +17,20 @@ public class Column<P extends Row> {
 
     private final int sqlType;
 
+    private Optional<? extends Table<?>> table;
+
     private Converter converter;
 
     private boolean ignored = false;
 
-    public static <A extends Row> Column<A> create(Table<A> table,
-                                                       String columnName,
-                                                       int sqlType,
-                                                       Converter converter,
-                                                       int columnSize) {
+    public static Column create(Table<?> table,
+                                    String columnName,
+                                    int sqlType,
+                                    Converter converter,
+                                    int columnSize) {
 
-        Optional<Table<A>> tableOptional = Optional.fromNullable(table);
-        return new Column<A>(tableOptional, columnName, sqlType, converter, columnSize);
+        Optional<? extends Table<?>> tableOptional = Optional.fromNullable(table);
+        return new Column(tableOptional, columnName, sqlType, converter, columnSize);
     }
 
     /**
@@ -41,7 +41,7 @@ public class Column<P extends Row> {
      * @param converter  Converter instance used to convert between SQL and Java values.
      * @param columnSize The maximum column size. -1 if not applicable.
      */
-    public Column(Optional<? extends Table<P>> table, String columnName, int sqlType, Converter converter, int columnSize) {
+    public Column(Optional<? extends Table<?>> table, String columnName, int sqlType, Converter converter, int columnSize) {
         this.table = table;
         this.columnName = columnName;
         this.sqlType = sqlType;
@@ -53,7 +53,7 @@ public class Column<P extends Row> {
         return columnName;
     }
 
-    public Optional<? extends Table<P>> getTable() {
+    public Optional<? extends Table> getTable() {
         return table;
     }
 

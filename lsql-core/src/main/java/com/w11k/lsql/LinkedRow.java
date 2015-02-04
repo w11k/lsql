@@ -8,15 +8,15 @@ import com.w11k.lsql.validation.AbstractValidationError;
 
 import java.util.Map;
 
-public class LinkedRow extends Row {
+public class LinkedRow<P> extends Row {
 
-    private Table<?> table;
+    private Table<P> table;
 
-    LinkedRow(Table<?> table) {
+    LinkedRow(Table<P> table) {
         this(table, Maps.<String, Object>newLinkedHashMap());
     }
 
-    LinkedRow(Table<?> table, Map<String, Object> row) {
+    LinkedRow(Table<P> table, Map<String, Object> row) {
         this.table = table;
 
         // required to include validation
@@ -25,11 +25,11 @@ public class LinkedRow extends Row {
         }
     }
 
-    public Table<?> getTable() {
+    public Table<P> getTable() {
         return table;
     }
 
-    public void setTable(Table<?> table) {
+    public void setTable(Table<P> table) {
         this.table = table;
     }
 
@@ -124,6 +124,10 @@ public class LinkedRow extends Row {
             throw new IllegalStateException("Can not delete this LinkedRow because the primary key value is not present.");
         }
         table.delete(this);
+    }
+
+    public P toPojo() {
+        return table.rowToPojo(this);
     }
 
     @Override

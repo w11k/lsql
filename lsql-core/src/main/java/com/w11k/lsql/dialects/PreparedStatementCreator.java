@@ -68,7 +68,7 @@ public class PreparedStatementCreator {
         return ConnectionUtils.prepareStatement(table.getlSql(), sql, false);
     }
 
-    public String createSelectByIdStatement(Table<?> table, Column<?> idColumn) {
+    public String createSelectByIdStatement(Table<?> table, Column idColumn) {
         String sqlTableName = table.getlSql().getDialect()
                 .identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()
@@ -77,7 +77,7 @@ public class PreparedStatementCreator {
     }
 
     public PreparedStatement createDeleteByIdStatement(Table<?> table) {
-        Column<?> idColumn = table.column(table.getPrimaryKeyColumn().get());
+        Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
         String sqlIdName = idColumn.getTable().get().getlSql().getDialect().identifierJavaToSql(idColumn.getColumnName());
 
@@ -95,7 +95,7 @@ public class PreparedStatementCreator {
     }
 
     public PreparedStatement createCountForIdStatement(Table<?> table) throws SQLException {
-        Column<?> idColumn = table.column(table.getPrimaryKeyColumn().get());
+        Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect()
                 .identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().get().getlSql().getDialect()

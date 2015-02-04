@@ -71,32 +71,32 @@ public class Query implements Iterable<QueriedRow> {
         return new QueriedRows(asList()).getFirstRow();
     }
 
-    /**
-     * Transforms this query into a tree structure. For each ID column, a child collection
-     * is stored in the parent Row object. The key under which the child collection is
-     * stored depends on the id string. If the string only consists of the column name, the
-     * column name followed by a 's' is used. The key can be renamed with the syntax
-     * 'columnLabel as keyName'. The {@link Row} instances only contain columns with the
-     * same table as the ID column and columns based on SQL functions.
-     *
-     * @param idColumns the list of columns to join the nested collections
-     * @return the tree structure
-     */
-    public List<Row> asViewTree(final String... idColumns) {
-        return new QueriedRows(asList()).asViewTree(idColumns);
-    }
+//    /**
+//     * Transforms this query into a tree structure. For each ID column, a child collection
+//     * is stored in the parent Row object. The key under which the child collection is
+//     * stored depends on the id string. If the string only consists of the column name, the
+//     * column name followed by a 's' is used. The key can be renamed with the syntax
+//     * 'columnLabel as keyName'. The {@link Row} instances only contain columns with the
+//     * same table as the ID column and columns based on SQL functions.
+//     *
+//     * @param idColumns the list of columns to join the nested collections
+//     * @return the tree structure
+//     */
+//    public List<Row> asViewTree(final String... idColumns) {
+//        return new QueriedRows(asList()).asViewTree(idColumns);
+//    }
 
-    /**
-     * Like {@link com.w11k.lsql.Query#asViewTree(String...)}, but each {@link Row}
-     * gets replaced with the concrete type defined in the {@link Table} instance. The
-     * used {@link Table} instance is the same as the table of the ID column. The column names
-     * (aliases) are replaced with their actual column names defined by the table.
-     *
-     * @param <T> the expected type of the root collection.
-     */
-    public <T extends Row> List<T> asResolvedTree(final String... idColumns) {
-        return new QueriedRows(asList()).asResolvedTree(idColumns);
-    }
+//    /**
+//     * Like {@link com.w11k.lsql.Query#asViewTree(String...)}, but each {@link Row}
+//     * gets replaced with the concrete type defined in the {@link Table} instance. The
+//     * used {@link Table} instance is the same as the table of the ID column. The column names
+//     * (aliases) are replaced with their actual column names defined by the table.
+//     *
+//     * @param <T> the expected type of the root collection.
+//     */
+//    public <T extends Row> List<T> asResolvedTree(final String... idColumns) {
+//        return new QueriedRows(asList()).asResolvedTree(idColumns);
+//    }
 
     private QueriedRow extractRow(ResultSet resultSet,
                                   Map<String, ResultSetColumn<?>> resultSetColumns) throws SQLException {
@@ -112,7 +112,7 @@ public class Query implements Iterable<QueriedRow> {
         return r;
     }
 
-    private Column<?> getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
+    private Column getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
         String sqlColumnName = metaData.getColumnName(position);
         String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
         String sqlColumnLabel = metaData.getColumnLabel(position);
@@ -127,7 +127,7 @@ public class Query implements Iterable<QueriedRow> {
         }
 
         // Table lookup failed. Check SQL string for aliases.
-        Optional<? extends Column<?>> columnOptional = sqlStatement.getColumnFromSqlStatement(javaColumnLabel);
+        Optional<? extends Column> columnOptional = sqlStatement.getColumnFromSqlStatement(javaColumnLabel);
         if (columnOptional.isPresent()) {
             return columnOptional.get();
         }
@@ -153,7 +153,7 @@ public class Query implements Iterable<QueriedRow> {
         Map<String, ResultSetColumn<?>> columnList = Maps.newLinkedHashMap();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             String columnLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
-            Column<?> column = getColumnForResultSetColumn(metaData, i);
+            Column column = getColumnForResultSetColumn(metaData, i);
             if (processedColumnLabels.contains(columnLabel)) {
                 throw new IllegalStateException("Dublicate column '" + columnLabel + "' in query.");
             }

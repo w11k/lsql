@@ -31,7 +31,7 @@ public class LSql {
 
     public static final ObjectMapper OBJECT_MAPPER = CREATE_JSON_MAPPER_INSTANCE();
 
-    private final Map<String, Table<? extends Row>> tables = Maps.newLinkedHashMap();
+    private final Map<String, Table<?>> tables = Maps.newConcurrentMap();
 
     private final BaseDialect dialect;
 
@@ -144,14 +144,14 @@ public class LSql {
      * @return the Table instance
      */
     @SuppressWarnings("unchecked")
-    public synchronized <P extends Row> Table<P> table(String tableName, Class<P> rowPojoClass) {
-        if (!tables.containsKey(tableName)) {
-            tables.put(tableName, Table.create(this, tableName, rowPojoClass == null ? Row.class : rowPojoClass));
-        }
-        Table<? extends Row> table = tables.get(tableName);
+    public synchronized <P> Table<P> table(String tableName, Class<P> rowPojoClass) {
+        tables.putIfAbsent(tableName, Table.create(this, tableName, rowPojoClass == null ? Row.class : rowPojoClass));
+
+        Table<?> table = tables.get(tableName);
         if (rowPojoClass != null) {
             checkArgument(rowPojoClass.isAssignableFrom(table.getRowPojoClass()),
-                    "A table instance was already created with class '" + table.getRowPojoClass().getName() + "'");
+                    "A table instance was already created with '" + table.getRowPojoClass().getName() + "' as the row pojo class and " +
+                            "'" + rowPojoClass.getName() + "' is not a subclass of it.");
         }
         return (Table<P>) table;
     }
