@@ -85,11 +85,7 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     public Optional<Object> getOptional(String key) {
-        if (containsKey(key)) {
-            return Optional.of(get(key));
-        } else {
-            return Optional.absent();
-        }
+        return Optional.fromNullable(get(key));
     }
 
     public Integer getInt(String key) {
