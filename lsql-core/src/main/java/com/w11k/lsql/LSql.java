@@ -13,8 +13,8 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,7 +31,7 @@ public class LSql {
 
     public static final ObjectMapper OBJECT_MAPPER = CREATE_JSON_MAPPER_INSTANCE();
 
-    private final Map<String, Table<?>> tables = Maps.newConcurrentMap();
+    private final ConcurrentMap<String, Table<?>> tables = Maps.newConcurrentMap();
 
     private final BaseDialect dialect;
 

@@ -75,7 +75,7 @@ public abstract class Converter {
 
     protected abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
 
-    private boolean isNullValid() {
+    protected boolean isNullValid() {
         return true;
     }
 

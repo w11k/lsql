@@ -41,6 +41,12 @@ public class ObjectToJsonStringConverter extends Converter {
 
     @Override
     public boolean isValueValid(Object value) {
+        if (value == null && isNullValid()) {
+            return true;
+        } else if (value == null) {
+            return false;
+        }
+
         return getSupportedJavaClass().get().isAssignableFrom(value.getClass());
     }
 
