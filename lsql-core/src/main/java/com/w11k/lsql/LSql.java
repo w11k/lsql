@@ -132,7 +132,7 @@ public class LSql {
      *
      * @return the Table instance
      */
-    public Table<?> table(String tableName) {
+    public Table<Object> table(String tableName) {
         return table(tableName, null);
     }
 

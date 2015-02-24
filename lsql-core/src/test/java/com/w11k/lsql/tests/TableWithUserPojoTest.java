@@ -1,5 +1,7 @@
 package com.w11k.lsql.tests;
 
+import com.google.common.base.Optional;
+import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import org.testng.annotations.Test;
@@ -94,6 +96,25 @@ public class TableWithUserPojoTest extends AbstractLSqlTest {
         PersonB b2 = table1.load(999).get().toPojo();
         assertEquals(b2.getId(), 999);
         assertEquals(b2.getAge(), 50);
+    }
+
+    @Test
+    public void apiShouldNotBeVerbose() {
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, age INT)");
+        Table<PersonB> table1 = lSql.table("table1", PersonB.class);
+
+        PersonB b1 = new PersonB();
+        b1.setId(999);
+        b1.setAge(50);
+        table1.save(b1);
+
+        Optional<LinkedRow<PersonB>> linkedRowOptional = methodForTestApiShouldNotBeVerbose(table1);
+        PersonB personB = linkedRowOptional.get().toPojo();
+        assertEquals(personB.getId(), 999);
+    }
+
+    public Optional<LinkedRow<PersonB>> methodForTestApiShouldNotBeVerbose(Table<PersonB> person) {
+        return person.load(999);
     }
 
 
