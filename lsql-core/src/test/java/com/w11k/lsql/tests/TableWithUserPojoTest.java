@@ -93,7 +93,7 @@ public class TableWithUserPojoTest extends AbstractLSqlTest {
         b1.setAge(50);
         table1.save(b1);
 
-        PersonB b2 = table1.load(999).get().toPojo();
+        PersonB b2 = table1.loadPojo(999).get();
         assertEquals(b2.getId(), 999);
         assertEquals(b2.getAge(), 50);
     }
@@ -108,12 +108,12 @@ public class TableWithUserPojoTest extends AbstractLSqlTest {
         b1.setAge(50);
         table1.save(b1);
 
-        Optional<LinkedRow<PersonB>> linkedRowOptional = methodForTestApiShouldNotBeVerbose(table1);
-        PersonB personB = linkedRowOptional.get().toPojo();
+        Optional<LinkedRow> linkedRowOptional = methodForTestApiShouldNotBeVerbose(table1);
+        PersonB personB = (PersonB) linkedRowOptional.get().toPojo();
         assertEquals(personB.getId(), 999);
     }
 
-    public Optional<LinkedRow<PersonB>> methodForTestApiShouldNotBeVerbose(Table<PersonB> person) {
+    public Optional<LinkedRow> methodForTestApiShouldNotBeVerbose(Table<PersonB> person) {
         return person.load(999);
     }
 

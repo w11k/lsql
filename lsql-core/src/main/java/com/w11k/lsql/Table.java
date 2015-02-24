@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
@@ -18,6 +19,7 @@ import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.sql.*;
 import java.util.List;
@@ -313,7 +315,7 @@ public class Table<P> {
      * @return a {@link com.google.common.base.Present} with a {@link Row} instance if the passed primary key
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
-    public Optional<LinkedRow<P>> load(Object id) {
+    public Optional<LinkedRow> load(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
@@ -325,10 +327,20 @@ public class Table<P> {
         }
         List<QueriedRow> queriedRows = new Query(lSql, ps, new SqlStatement(lSql, "Table.load", psString)).asList();
         if (queriedRows.size() == 1) {
-            LinkedRow<P> row = newLinkedRow(queriedRows.get(0));
+            LinkedRow row = newLinkedRow(queriedRows.get(0));
             return of(row);
         }
         return absent();
+    }
+
+    public Optional<P> loadPojo(Object id) {
+        return load(id).transform(new Function<LinkedRow, P>() {
+            @Nullable
+            @Override
+            public P apply(LinkedRow input) {
+                return rowToPojo(input);
+            }
+        });
     }
 
     /**
