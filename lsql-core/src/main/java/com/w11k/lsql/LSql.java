@@ -13,8 +13,8 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,7 +31,7 @@ public class LSql {
 
     public static final ObjectMapper OBJECT_MAPPER = CREATE_JSON_MAPPER_INSTANCE();
 
-    private final ConcurrentMap<String, Table<?>> tables = Maps.newConcurrentMap();
+    private final Map<String, Table<?>> tables = Maps.newHashMap();
 
     private final BaseDialect dialect;
 
@@ -132,7 +132,7 @@ public class LSql {
      *
      * @return the Table instance
      */
-    public Table<Object> table(String tableName) {
+    public Table<?> table(String tableName) {
         return table(tableName, null);
     }
 
@@ -144,8 +144,12 @@ public class LSql {
      * @return the Table instance
      */
     @SuppressWarnings("unchecked")
-    public synchronized <P> Table<P> table(String tableName, Class<P> rowPojoClass) {
-        tables.putIfAbsent(tableName, Table.create(this, tableName, rowPojoClass == null ? Row.class : rowPojoClass));
+    public <P> Table<P> table(String tableName, Class<P> rowPojoClass) {
+        synchronized (tables) {
+            if (!tables.containsKey(tableName)) {
+                tables.put(tableName, Table.create(this, tableName, rowPojoClass == null ? Row.class : rowPojoClass));
+            }
+        }
 
         Table<?> table = tables.get(tableName);
         if (rowPojoClass != null) {

@@ -346,14 +346,14 @@ public class Table<P> {
     /**
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
-    public LinkedRow<P> newLinkedRow() {
-        return new LinkedRow<P>(this);
+    public LinkedRow newLinkedRow() {
+        return new LinkedRow(this);
     }
 
     /**
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
-    public LinkedRow<P> newLinkedRow(Object... keyVals) {
+    public LinkedRow newLinkedRow(Object... keyVals) {
         return newLinkedRow(Row.fromKeyVals(keyVals));
     }
 
@@ -365,8 +365,8 @@ public class Table<P> {
      *
      * @param data content to be added
      */
-    public LinkedRow<P> newLinkedRow(Map<String, Object> data) {
-        return new LinkedRow<P>(this, data);
+    public LinkedRow newLinkedRow(Map<String, Object> data) {
+        return new LinkedRow(this, data);
     }
 
     public P newRowPojoInstance() {

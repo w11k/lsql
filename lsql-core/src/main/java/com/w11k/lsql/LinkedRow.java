@@ -8,15 +8,15 @@ import com.w11k.lsql.validation.AbstractValidationError;
 
 import java.util.Map;
 
-public class LinkedRow<P> extends Row {
+public class LinkedRow extends Row {
 
-    private Table<P> table;
+    private Table<?> table;
 
-    LinkedRow(Table<P> table) {
+    LinkedRow(Table<?> table) {
         this(table, Maps.<String, Object>newLinkedHashMap());
     }
 
-    LinkedRow(Table<P> table, Map<String, Object> row) {
+    LinkedRow(Table<?> table, Map<String, Object> row) {
         this.table = table;
 
         // required to include validation
@@ -25,11 +25,11 @@ public class LinkedRow<P> extends Row {
         }
     }
 
-    public Table<P> getTable() {
+    public Table<?> getTable() {
         return table;
     }
 
-    public void setTable(Table<P> table) {
+    public void setTable(Table<?> table) {
         this.table = table;
     }
 
@@ -126,7 +126,7 @@ public class LinkedRow<P> extends Row {
         table.delete(this);
     }
 
-    public P toPojo() {
+    public Object toPojo() {
         return table.rowToPojo(this);
     }
 
