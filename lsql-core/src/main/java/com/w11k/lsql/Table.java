@@ -1,11 +1,5 @@
 package com.w11k.lsql;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
@@ -19,9 +13,8 @@ import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,11 +23,7 @@ import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class Table<P> {
-
-    public static <A> Table<A> create(LSql lSql, String tableName, Class<A> rowPojoClass) {
-        return new Table<A>(lSql, tableName, rowPojoClass);
-    }
+public class Table<P extends LinkedRow> {
 
     private final LSql lSql;
 
@@ -47,6 +36,10 @@ public class Table<P> {
     private Optional<String> primaryKeyColumn = absent();
 
     private Optional<Column> revisionColumn = absent();
+
+    public static <A extends LinkedRow> Table<A> create(LSql lSql, String tableName, Class<A> rowPojoClass) {
+        return new Table<A>(lSql, tableName, rowPojoClass);
+    }
 
     public Table(LSql lSql, String tableName, Class<P> rowPojoClass) {
         this.lSql = lSql;
@@ -264,9 +257,9 @@ public class Table<P> {
         }
     }
 
-    public Optional<?> save(P pojo) {
-        return save(pojoToRow(pojo));
-    }
+//    public Optional<?> save(P pojo) {
+//        return save(pojoToRow(pojo));
+//    }
 
     /**
      * Deletes the row with the given primary key value.
@@ -315,7 +308,7 @@ public class Table<P> {
      * @return a {@link com.google.common.base.Present} with a {@link Row} instance if the passed primary key
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
-    public Optional<LinkedRow> load(Object id) {
+    public Optional<P> load(Object id) {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
@@ -327,33 +320,34 @@ public class Table<P> {
         }
         List<QueriedRow> queriedRows = new Query(lSql, ps, new SqlStatement(lSql, "Table.load", psString)).asList();
         if (queriedRows.size() == 1) {
-            LinkedRow row = newLinkedRow(queriedRows.get(0));
+            P row = newLinkedRow(queriedRows.get(0));
             return of(row);
         }
         return absent();
     }
 
-    public Optional<P> loadPojo(Object id) {
-        return load(id).transform(new Function<LinkedRow, P>() {
-            @Nullable
-            @Override
-            public P apply(LinkedRow input) {
-                return rowToPojo(input);
-            }
-        });
+//    public Optional<P> loadPojo(Object id) {
+//        return load(id).transform(new Function<LinkedRow, P>() {
+//            @Nullable
+//            @Override
+//            public P apply(LinkedRow input) {
+//                return rowToPojo(input);
+//            }
+//        });
+//    }
+
+    /**
+     * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
+     */
+    public P newLinkedRow() {
+        Map<String, Object> empty = new HashMap<String, Object>();
+        return newLinkedRow(empty);
     }
 
     /**
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
-    public LinkedRow newLinkedRow() {
-        return new LinkedRow(this);
-    }
-
-    /**
-     * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
-     */
-    public LinkedRow newLinkedRow(Object... keyVals) {
+    public P newLinkedRow(Object... keyVals) {
         return newLinkedRow(Row.fromKeyVals(keyVals));
     }
 
@@ -365,41 +359,15 @@ public class Table<P> {
      *
      * @param data content to be added
      */
-    public LinkedRow newLinkedRow(Map<String, Object> data) {
-        return new LinkedRow(this, data);
-    }
-
-    public P newRowPojoInstance() {
+    public P newLinkedRow(Map<String, Object> data) {
         try {
-            return rowPojoClass.newInstance();
+            P newInstance = rowPojoClass.newInstance();
+            newInstance.setTable(this);
+            newInstance.setData(data);
+            return newInstance;
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public P rowToPojo(Row row) {
-        Class<P> rowPojoClass = getRowPojoClass();
-        try {
-            byte[] bytes = getlSql().getObjectMapper().writeValueAsBytes(row.delegate());
-            return getlSql().getObjectMapper().readValue(bytes, rowPojoClass);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Row pojoToRow(P pojo) {
-        ObjectMapper mapper = getlSql().getObjectMapper();
-        JsonNode tree = mapper.valueToTree(pojo);
-        JsonParser jsonParser = mapper.treeAsTokens(tree);
-        JavaType javaType = mapper.getTypeFactory().constructType(Row.class);
-        try {
-            Object paramValue = mapper.readValue(jsonParser, javaType);
-            return (Row) paramValue;
-        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -545,6 +513,5 @@ public class Table<P> {
             throw new RuntimeException(e);
         }
     }
-
 
 }

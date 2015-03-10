@@ -57,6 +57,8 @@ public class H2Dialect extends BaseDialect {
 
     @Override
     public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData, int columnIndex) throws SQLException {
+//        JdbcResultSetMetaData h2meta = (JdbcResultSetMetaData) metaData;
+//        return h2meta.getTableName(columnIndex);
         return super.getTableNameFromResultSetMetaData(metaData, columnIndex);
     }
 
