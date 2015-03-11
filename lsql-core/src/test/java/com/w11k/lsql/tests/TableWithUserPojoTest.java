@@ -1,28 +1,25 @@
 package com.w11k.lsql.tests;
 
-import com.google.common.base.Optional;
 import com.w11k.lsql.LinkedRow;
-import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
 public class TableWithUserPojoTest extends AbstractLSqlTest {
 
-    public static class PersonA extends Row {
-
-        public int getId() {
-            return getAs(int.class, "id");
-        }
-
-        public void setId(Integer id) {
-            put("id", id);
-        }
-
+    public static class PersonA extends LinkedRow {
+//        protected PersonA(Table<?> table, Map<String, Object> row) {
+//            super(table, row);
+//        }
     }
 
     public static class PersonB extends PersonA {
+//        protected PersonB(Table<?> table, Map<String, Object> row) {
+//            super(table, row);
+//        }
+
         public int getAge() {
             return getAs(int.class, "age");
         }
@@ -32,14 +29,33 @@ public class TableWithUserPojoTest extends AbstractLSqlTest {
         }
     }
 
-    public static class Animal extends Row {
+    public static class Animal extends LinkedRow {
+//        protected Animal(Table<?> table, Map<String, Object> row) {
+//            super(table, row);
+//        }
+    }
+
+    public static class Table1 extends LinkedRow {
+//        protected Table1(Table<?> table, Map<String, Object> row) {
+//            super(table, row);
+//        }
+
+        public int getAge() {
+            return getAs(Integer.class, "age");
+        }
+
+        public void setAge(Integer age) {
+            put("age", age);
+        }
     }
 
     @Test
     public void onlyNeedsToSetTheClassOnce() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, age INT)");
         lSql.table("table1", PersonB.class);
-        lSql.table("table1");
+        Table<?> table1 = lSql.table("table1");
+        LinkedRow linkedRow = table1.newLinkedRow();
+        Assert.assertEquals(linkedRow.getClass(), PersonB.class);
     }
 
     @Test
@@ -71,51 +87,20 @@ public class TableWithUserPojoTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void convertPojoToRowAndBack() {
-        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, age INT)");
-        Table<PersonA> table1 = lSql.table("table1", PersonA.class);
+    public void rowToPojo() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT, rest INT)");
+        Table<Table1> table1 = lSql.table("table1", Table1.class);
 
-        PersonA pojo = new PersonA();
-        pojo.setId(999);
-        Row row = table1.pojoToRow(pojo);
-        assertEquals(row.getInt("id").intValue(), 999);
-        pojo = table1.rowToPojo(row);
-        assertEquals(pojo.getId(), 999);
+        Table1 pojo1 = table1.newLinkedRow();
+        pojo1.setId(1);
+        pojo1.setAge(10);
+        pojo1.put("rest", 20);
+        table1.insert(pojo1);
+
+        pojo1 = table1.load(1).get();
+        assertEquals(pojo1.getId(), 1);
+        assertEquals(pojo1.getAge(), 10);
+        assertEquals(pojo1.getInt("rest"), (Integer) 20);
     }
-
-    @Test
-    public void saveAndLoadPojo() {
-        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, age INT)");
-        Table<PersonB> table1 = lSql.table("table1", PersonB.class);
-
-        PersonB b1 = new PersonB();
-        b1.setId(999);
-        b1.setAge(50);
-        table1.save(b1);
-
-        PersonB b2 = table1.loadPojo(999).get();
-        assertEquals(b2.getId(), 999);
-        assertEquals(b2.getAge(), 50);
-    }
-
-    @Test
-    public void apiShouldNotBeVerbose() {
-        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, age INT)");
-        Table<PersonB> table1 = lSql.table("table1", PersonB.class);
-
-        PersonB b1 = new PersonB();
-        b1.setId(999);
-        b1.setAge(50);
-        table1.save(b1);
-
-        Optional<LinkedRow> linkedRowOptional = methodForTestApiShouldNotBeVerbose(table1);
-        PersonB personB = (PersonB) linkedRowOptional.get().toPojo();
-        assertEquals(personB.getId(), 999);
-    }
-
-    public Optional<LinkedRow> methodForTestApiShouldNotBeVerbose(Table<PersonB> person) {
-        return person.load(999);
-    }
-
 
 }

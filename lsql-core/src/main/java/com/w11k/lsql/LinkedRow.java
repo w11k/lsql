@@ -2,7 +2,6 @@ package com.w11k.lsql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.validation.AbstractValidationError;
 
@@ -12,24 +11,11 @@ public class LinkedRow extends Row {
 
     private Table<?> table;
 
-    LinkedRow(Table<?> table) {
-        this(table, Maps.<String, Object>newLinkedHashMap());
-    }
-
-    LinkedRow(Table<?> table, Map<String, Object> row) {
-        this.table = table;
-
-        // required to include validation
-        for (String key : row.keySet()) {
-            put(key, row.get(key));
-        }
-    }
-
     public Table<?> getTable() {
         return table;
     }
 
-    public void setTable(Table<?> table) {
+    void setTable(Table<?> table) {
         this.table = table;
     }
 
@@ -38,6 +24,13 @@ public class LinkedRow extends Row {
      */
     public Object getId() {
         return get(table.getPrimaryKeyColumn().get());
+    }
+
+    /**
+     * set the primary key value
+     */
+    public void setId(Object id) {
+        put(table.getPrimaryKeyColumn().get(), id);
     }
 
     /**
@@ -69,7 +62,7 @@ public class LinkedRow extends Row {
     /**
      * Puts the given key/value pair into this instance and calls
      * {@link com.w11k.lsql.Table#validate(String, Object)}.
-     *
+     * <p/>
      * Throws an exception if the validation fails.
      */
     @Override
@@ -126,13 +119,21 @@ public class LinkedRow extends Row {
         table.delete(this);
     }
 
-    public Object toPojo() {
-        return table.rowToPojo(this);
+    @Override
+    public LinkedRow addKeyVals(Object... keyVals) {
+        super.addKeyVals(keyVals);
+        return this;
     }
 
     @Override
     protected ObjectMapper getObjectMapper() {
         return table.getlSql().getObjectMapper();
+    }
+
+    void setData(Map<String, Object> row) {
+        for (String key : row.keySet()) {
+            put(key, row.get(key));
+        }
     }
 
 }

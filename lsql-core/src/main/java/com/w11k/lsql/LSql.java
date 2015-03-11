@@ -144,10 +144,10 @@ public class LSql {
      * @return the Table instance
      */
     @SuppressWarnings("unchecked")
-    public <P> Table<P> table(String tableName, Class<P> rowPojoClass) {
+    public <P extends LinkedRow> Table<P> table(String tableName, Class<P> rowPojoClass) {
         synchronized (tables) {
             if (!tables.containsKey(tableName)) {
-                tables.put(tableName, Table.create(this, tableName, rowPojoClass == null ? Row.class : rowPojoClass));
+                tables.put(tableName, Table.create(this, tableName, rowPojoClass == null ? LinkedRow.class : rowPojoClass));
             }
         }
 
