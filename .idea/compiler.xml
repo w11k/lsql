@@ -30,10 +30,11 @@
     <bytecodeTargetLevel>
       <module name="lsql" target="1.6" />
       <module name="lsql-core" target="1.6" />
+      <module name="lsql-doc" target="1.5" />
+      <module name="lsql-example" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-Xlint:unchecked" />
   </component>
 </project>
-
