@@ -96,6 +96,29 @@ public class SqlStatement {
         }
     }
 
+    public Optional<? extends Column> getColumnFromSqlStatement(String columnAliasName) {
+        Pattern columnAlias = Pattern.compile(
+                //".*[\n ,]+([\\w+\\.?\\w*])[\n ]+as " + usedAlias.trim() + "[\n ,]+.*",
+                "((\\w+)\\.?(\\w*)) +as +" + columnAliasName.trim() + "[\\n ,]+",
+                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+        );
+        Matcher matcher = columnAlias.matcher(sqlString);
+        if (matcher.find()) {
+            String table = lSql.getDialect().identifierSqlToJava(matcher.group(2));
+            String column = lSql.getDialect().identifierSqlToJava(matcher.group(3));
+            if (!lSql.table(table).exists()) {
+                Optional<String> tableOptional = getTableAliasFromSqlStatement(table);
+                if (!tableOptional.isPresent()) {
+                    return absent();
+                }
+                table = tableOptional.get();
+            }
+            return of(lSql.table(table).column(column));
+        } else {
+            return absent();
+        }
+    }
+
     private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) {
         logger.debug("Executing query '{}' with parameters {}", statementName, queryParameters.keySet());
 
@@ -109,14 +132,14 @@ public class SqlStatement {
                 keyVals.add(key + ": " + queryParameters.get(key));
             }
             logger.trace("\n" +
-                    "------------------------------------------------------------\n" +
-                    "Executing '{}'\n" +
-                    "------------------------------------------------------------\n" +
-                    Joiner.on("\n").join(keyVals) + "\n" +
-                    "------------------------------------------------------------\n" +
-                    "{}\n" +
-                    "------------------------------------------------------------\n" +
-                    "\n",
+                            "------------------------------------------------------------\n" +
+                            "Executing '{}'\n" +
+                            "------------------------------------------------------------\n" +
+                            Joiner.on("\n").join(keyVals) + "\n" +
+                            "------------------------------------------------------------\n" +
+                            "{}\n" +
+                            "------------------------------------------------------------\n" +
+                            "\n",
                     statementName, sql);
         }
 
@@ -190,7 +213,12 @@ public class SqlStatement {
 
     private String queryParameterInLine(Map<String, Object> queryParameters, String line) {
         for (String s : queryParameters.keySet()) {
-            if (line.startsWith(s + " ") || line.contains(" " + s + " ") || line.contains("." + s + " ") || line.contains("?" + s + "")) {
+            if (line.startsWith(s + " ")
+                    || line.contains(" " + s + " ")
+                    || line.contains("." + s + " ")
+                    || line.contains("?" + s + " ")
+                    || line.contains("?" + s + "(")
+                    ) {
                 return s;
             }
         }
@@ -258,29 +286,6 @@ public class SqlStatement {
         Matcher matcher = tableAlias.matcher(sqlString);
         if (matcher.find() && lSql.table(matcher.group(1)).exists()) {
             return of(matcher.group(1));
-        } else {
-            return absent();
-        }
-    }
-
-    public Optional<? extends Column> getColumnFromSqlStatement(String columnAliasName) {
-        Pattern columnAlias = Pattern.compile(
-                //".*[\n ,]+([\\w+\\.?\\w*])[\n ]+as " + usedAlias.trim() + "[\n ,]+.*",
-                "((\\w+)\\.?(\\w*)) +as +" + columnAliasName.trim() + "[\\n ,]+",
-                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
-        );
-        Matcher matcher = columnAlias.matcher(sqlString);
-        if (matcher.find()) {
-            String table = lSql.getDialect().identifierSqlToJava(matcher.group(2));
-            String column = lSql.getDialect().identifierSqlToJava(matcher.group(3));
-            if (!lSql.table(table).exists()) {
-                Optional<String> tableOptional = getTableAliasFromSqlStatement(table);
-                if (!tableOptional.isPresent()) {
-                    return absent();
-                }
-                table = tableOptional.get();
-            }
-            return of(lSql.table(table).column(column));
         } else {
             return absent();
         }
