@@ -84,6 +84,13 @@ public class Row extends ForwardingMap<String, Object> {
         return type.cast(value);
     }
 
+    public <A> A getAsOr(Class<A> type, String key, A defaultValue) {
+        if (!containsKey(key)) {
+            return defaultValue;
+        }
+        return getAs(type, key);
+    }
+
     public Optional<Object> getOptional(String key) {
         return Optional.fromNullable(get(key));
     }
