@@ -16,7 +16,6 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -31,7 +30,7 @@ public class LSql {
 
     public static final ObjectMapper OBJECT_MAPPER = CREATE_JSON_MAPPER_INSTANCE();
 
-    private final Map<String, Table<?>> tables = Maps.newHashMap();
+    private final Map<String, Table> tables = Maps.newHashMap();
 
     private final BaseDialect dialect;
 
@@ -93,7 +92,7 @@ public class LSql {
         this.initColumnCallback = initColumnCallback;
     }
 
-    public Iterable<Table<?>> getTables() {
+    public Iterable<Table> getTables() {
         return Iterables.unmodifiableIterable(tables.values());
     }
 
@@ -132,32 +131,15 @@ public class LSql {
      *
      * @return the Table instance
      */
-    public Table<?> table(String tableName) {
-        return table(tableName, null);
-    }
-
-    /**
-     * Returns a Table instance.
-     *
-     * @param tableName the table name (Java identifier format)
-     *
-     * @return the Table instance
-     */
     @SuppressWarnings("unchecked")
-    public <P extends LinkedRow> Table<P> table(String tableName, Class<P> rowPojoClass) {
+    public Table table(String tableName) {
         synchronized (tables) {
             if (!tables.containsKey(tableName)) {
-                tables.put(tableName, Table.create(this, tableName, rowPojoClass == null ? LinkedRow.class : rowPojoClass));
+                tables.put(tableName, Table.create(this, tableName));
             }
         }
 
-        Table<?> table = tables.get(tableName);
-        if (rowPojoClass != null) {
-            checkArgument(rowPojoClass.isAssignableFrom(table.getRowPojoClass()),
-                    "A table instance was already created with '" + table.getRowPojoClass().getName() + "' as the row pojo class and " +
-                            "'" + rowPojoClass.getName() + "' is not a subclass of it.");
-        }
-        return (Table<P>) table;
+        return tables.get(tableName);
     }
 
     /**

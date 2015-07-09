@@ -33,7 +33,7 @@ public class DocumentationSnippetsTest extends AbstractLSqlTest {
         john.put("age", 20);
 
         // Insert the new person
-        Table<?> persons = lsql.table("persons");
+        Table persons = lsql.table("persons");
         persons.insert(john);
 
         // The generated ID is automatically put into the row object

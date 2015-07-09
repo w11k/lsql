@@ -45,7 +45,7 @@ public class CrudExamples {
 
     @Test
     public void insert() throws Exception {
-        Table<?> personTable = lSql.table("person");
+        Table personTable = lSql.table("person");
 
         // Option 1: java.util.Map
         Map<String, Object> person1 = new HashMap<String, Object>();
@@ -74,7 +74,7 @@ public class CrudExamples {
     public void get() throws Exception {
         insert();
 
-        Table<?> personTable = lSql.table("person");
+        Table personTable = lSql.table("person");
         LinkedRow linkedRow = personTable.load(1).get();
         assert linkedRow.getString("name").equals("John");
     }

@@ -155,8 +155,7 @@ public class SqlStatement {
                             ((QueryParameter) value).set(ps, i + 1);
                         } else {
                             Converter converter = getConverterFor(p.name, value);
-                            converter.setValueInStatement(
-                                    lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
+                            converter.setValueInStatement(lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
                         }
                     } else {
                         ps.setObject(i + 1, null);
@@ -257,25 +256,25 @@ public class SqlStatement {
     }
 
     private Converter getConverterFor(String paramName, Object value) {
-        String[] split = paramName.split("\\.");
-        if (split.length == 1) {
+//        String[] split = paramName.split("\\.");
+//        if (split.length == 1) {
             // No table prefix
             //throw new RuntimeException("You must use <table>.<column> for query parameters!");
             return lSql.getDialect().getConverterRegistry().getConverterForJavaValue(value);
-        } else if (split.length == 2) {
-            // With table prefix
-            String tableName = split[0];
-            String columnName = split[1];
-            Table table = lSql.table(tableName);
-            if (!table.exists()) {
-                // table not found, table name must be an alias
-                tableName = getTableAliasFromSqlStatement(tableName).get();
-                table = lSql.table(tableName);
-            }
-            return table.column(columnName).getConverter();
-        } else {
-            throw new RuntimeException("Invalid query parameter: " + paramName);
-        }
+//        } else if (split.length == 2) {
+//             With table prefix
+//            String tableName = split[0];
+//            String columnName = split[1];
+//            Table table = lSql.table(tableName);
+//            if (!table.exists()) {
+//                 table not found, table name must be an alias
+//                tableName = getTableAliasFromSqlStatement(tableName).get();
+//                table = lSql.table(tableName);
+//            }
+//            return table.column(columnName).getConverter();
+//        } else {
+//            throw new RuntimeException("Invalid query parameter: " + paramName);
+//        }
     }
 
     private Optional<String> getTableAliasFromSqlStatement(String usedAlias) {

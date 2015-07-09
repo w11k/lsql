@@ -62,7 +62,7 @@ public class H2Dialect extends BaseDialect {
         return super.getTableNameFromResultSetMetaData(metaData, columnIndex);
     }
 
-    public Optional<Object> extractGeneratedPk(Table<?> table,
+    public Optional<Object> extractGeneratedPk(Table table,
                                                ResultSet resultSet) throws SQLException {
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();

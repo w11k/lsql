@@ -95,7 +95,7 @@ public class SqlServerDialect extends BaseDialect {
         return CaseFormat.UPPER_UNDERSCORE;
     }
 
-    public Optional<Object> extractGeneratedPk(Table<?> table,
+    public Optional<Object> extractGeneratedPk(Table table,
                                                ResultSet resultSet) throws SQLException {
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();

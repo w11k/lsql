@@ -17,19 +17,19 @@ public class Column {
 
     private final int sqlType;
 
-    private Optional<? extends Table<?>> table;
+    private Optional<Table> table;
 
     private Converter converter;
 
     private boolean ignored = false;
 
-    public static Column create(Table<?> table,
+    public static Column create(Table table,
                                     String columnName,
                                     int sqlType,
                                     Converter converter,
                                     int columnSize) {
 
-        Optional<? extends Table<?>> tableOptional = Optional.fromNullable(table);
+        Optional<Table> tableOptional = Optional.fromNullable(table);
         return new Column(tableOptional, columnName, sqlType, converter, columnSize);
     }
 
@@ -41,7 +41,7 @@ public class Column {
      * @param converter  Converter instance used to convert between SQL and Java values.
      * @param columnSize The maximum column size. -1 if not applicable.
      */
-    public Column(Optional<? extends Table<?>> table, String columnName, int sqlType, Converter converter, int columnSize) {
+    public Column(Optional<Table> table, String columnName, int sqlType, Converter converter, int columnSize) {
         this.table = table;
         this.columnName = columnName;
         this.sqlType = sqlType;
@@ -53,7 +53,7 @@ public class Column {
         return columnName;
     }
 
-    public Optional<? extends Table> getTable() {
+    public Optional<Table> getTable() {
         return table;
     }
 

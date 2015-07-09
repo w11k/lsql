@@ -9,13 +9,13 @@ import java.util.Map;
 
 public class LinkedRow extends Row {
 
-    private Table<?> table;
+    private Table table;
 
-    public Table<?> getTable() {
+    public Table getTable() {
         return table;
     }
 
-    void setTable(Table<?> table) {
+    void setTable(Table table) {
         this.table = table;
     }
 

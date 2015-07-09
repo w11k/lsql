@@ -13,7 +13,7 @@ public class LinkedRowTest extends AbstractLSqlTest {
     @Test
     public void save() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        Table<?> table1 = lSql.table("table1");
+        Table table1 = lSql.table("table1");
 
         LinkedRow row1 = table1.newLinkedRow();
         row1.addKeyVals("id", 1, "age", 1);
@@ -33,7 +33,7 @@ public class LinkedRowTest extends AbstractLSqlTest {
     @Test
     public void delete() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
-        Table<?> table1 = lSql.table("table1");
+        Table table1 = lSql.table("table1");
         LinkedRow row1 = table1.newLinkedRow();
         row1.addKeyVals("id", 1, "age", 1);
         row1.save();
@@ -52,7 +52,7 @@ public class LinkedRowTest extends AbstractLSqlTest {
     @Test
     public void newLinkedRowCopiesDataWithIdAndRevisionColumn() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT, revision INT DEFAULT 0)");
-        Table<?> table1 = lSql.table("table1");
+        Table table1 = lSql.table("table1");
         table1.enableRevisionSupport();
         table1.insert(Row.fromKeyVals("id", 1, "age", 1));
         LinkedRow row = table1.load(1).get();

@@ -71,33 +71,6 @@ public class Query implements Iterable<QueriedRow> {
         return new QueriedRows(asList()).getFirstRow();
     }
 
-//    /**
-//     * Transforms this query into a tree structure. For each ID column, a child collection
-//     * is stored in the parent Row object. The key under which the child collection is
-//     * stored depends on the id string. If the string only consists of the column name, the
-//     * column name followed by a 's' is used. The key can be renamed with the syntax
-//     * 'columnLabel as keyName'. The {@link Row} instances only contain columns with the
-//     * same table as the ID column and columns based on SQL functions.
-//     *
-//     * @param idColumns the list of columns to join the nested collections
-//     * @return the tree structure
-//     */
-//    public List<Row> asViewTree(final String... idColumns) {
-//        return new QueriedRows(asList()).asViewTree(idColumns);
-//    }
-
-//    /**
-//     * Like {@link com.w11k.lsql.Query#asViewTree(String...)}, but each {@link Row}
-//     * gets replaced with the concrete type defined in the {@link Table} instance. The
-//     * used {@link Table} instance is the same as the table of the ID column. The column names
-//     * (aliases) are replaced with their actual column names defined by the table.
-//     *
-//     * @param <T> the expected type of the root collection.
-//     */
-//    public <T extends Row> List<T> asResolvedTree(final String... idColumns) {
-//        return new QueriedRows(asList()).asResolvedTree(idColumns);
-//    }
-
     private QueriedRow extractRow(ResultSet resultSet,
                                   Map<String, ResultSetColumn<?>> resultSetColumns) throws SQLException {
 
@@ -117,9 +90,9 @@ public class Query implements Iterable<QueriedRow> {
         String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
         String sqlColumnLabel = metaData.getColumnLabel(position);
         String javaColumnLabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
-        Optional<? extends Table<?>> table = getTable(metaData, position);
+        Optional<Table> table = getTable(metaData, position);
 
-        // JDBC return all required information
+        // JDBC returned all required information
         if (table.isPresent()) {
             if (table.get().getColumns().containsKey(javaColumnName)) {
                 return table.get().column(javaColumnName);
@@ -165,9 +138,9 @@ public class Query implements Iterable<QueriedRow> {
         return columnList;
     }
 
-    private Optional<? extends Table<?>> getTable(ResultSetMetaData metaData, int position) throws SQLException {
+    private Optional<Table> getTable(ResultSetMetaData metaData, int position) throws SQLException {
         String sqlTableName = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, position);
-        Optional<? extends Table<?>> table;
+        Optional<Table> table;
         if (sqlTableName == null || "".equals(sqlTableName)) {
             table = absent();
         } else {

@@ -22,9 +22,15 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="lsql-core" />
         <module name="lsql-doc" />
         <module name="lsql-example" />
+      </profile>
+      <profile default="false" name="Annotation profile for lsql-core" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="lsql-core" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
