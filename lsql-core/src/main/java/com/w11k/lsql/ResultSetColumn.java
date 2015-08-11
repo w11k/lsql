@@ -1,21 +1,19 @@
 package com.w11k.lsql;
 
-public class ResultSetColumn<P extends Row> {
+import com.w11k.lsql.converter.Converter;
+
+public class ResultSetColumn {
 
     private final int position;
 
     private final String name;
 
-    private final Column column;
+    private final Converter converter;
 
-    public static <A extends Row> ResultSetColumn<A> create(int position, String name, Column column) {
-        return new ResultSetColumn<A>(position, name, column);
-    }
-
-    public ResultSetColumn(int position, String name, Column column) {
+    public ResultSetColumn(int position, String name, Converter converter) {
         this.position = position;
         this.name = name;
-        this.column = column;
+        this.converter = converter;
     }
 
     public int getPosition() {
@@ -26,8 +24,7 @@ public class ResultSetColumn<P extends Row> {
         return name;
     }
 
-    public Column getColumn() {
-        return column;
+    public Converter getConverter() {
+        return converter;
     }
-
 }

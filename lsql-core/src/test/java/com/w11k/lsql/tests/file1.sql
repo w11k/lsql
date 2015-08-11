@@ -15,7 +15,7 @@ CREATE TABLE table2 (
 
 -- deleteYoung
 DELETE FROM table1
-WHERE table1.age < /*(*/ 5 /*)*/;
+WHERE table1.age < /*=age*/ 5 /**/;
 
 -- getAll
 SELECT *

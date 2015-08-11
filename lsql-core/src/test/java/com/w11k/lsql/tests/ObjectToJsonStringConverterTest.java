@@ -1,10 +1,11 @@
-package com.w11k.lsql;
+package com.w11k.lsql.tests;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.ObjectToJsonStringConverter;
-import com.w11k.lsql.tests.AbstractLSqlTest;
 import com.w11k.lsql.tests.utils.Person;
 import org.testng.annotations.Test;
 
@@ -17,19 +18,19 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
 
     @Test
     public void pojo() {
-        createTable("CREATE TABLE table1 (sometext TEXT, person TEXT)");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, sometext TEXT, person TEXT)");
         Table t1 = lSql.table("table1");
         t1.column("person").setConverter(new ObjectToJsonStringConverter(Person.class));
 
         Person p = new Person("John", "Doe");
-        t1.insert(Row.fromKeyVals("person", p, "sometext", "test"));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        t1.insert(Row.fromKeyVals("id", 1, "person", p, "sometext", "test"));
+        Row row = t1.load(1).get();
         assertEquals(row.get("person"), p);
     }
 
     @Test
     public void listOfString() {
-        createTable("CREATE TABLE table1 (data TEXT)");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
         t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class, new TypeReference<List<String>>() {
         }));
@@ -38,14 +39,14 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
         list.add("first");
         list.add("second");
 
-        t1.insert(Row.fromKeyVals("data", list));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        t1.insert(Row.fromKeyVals("id", 1, "data", list));
+        Row row = t1.load(1).get();
         assertEquals(row.get("data"), list);
     }
 
     @Test
     public void listOfMapStringString() {
-        createTable("CREATE TABLE table1 (data TEXT)");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
         t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
         }));
@@ -57,8 +58,8 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
         list.add(e);
         list.add(e);
 
-        t1.insert(Row.fromKeyVals("data", list));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        t1.insert(Row.fromKeyVals("id", 1, "data", list));
+        Row row = t1.load(1).get();
         assertEquals(row.get("data"), list);
     }
 
@@ -76,9 +77,9 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
         e.put("b", "2");
         list.add(e);
         list.add(e);
-        t1.newLinkedRow("data", list).save();
+        t1.newLinkedRow("id", 1, "data", list).save();
 
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        Row row = t1.load(1).get();
         assertEquals(row.get("data"), list);
     }
 

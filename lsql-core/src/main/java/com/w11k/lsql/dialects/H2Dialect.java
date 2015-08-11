@@ -55,12 +55,12 @@ public class H2Dialect extends BaseDialect {
         return CaseFormat.UPPER_UNDERSCORE;
     }
 
-    @Override
-    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData, int columnIndex) throws SQLException {
+//    @Override
+//    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData, int columnIndex) throws SQLException {
 //        JdbcResultSetMetaData h2meta = (JdbcResultSetMetaData) metaData;
 //        return h2meta.getTableName(columnIndex);
-        return super.getTableNameFromResultSetMetaData(metaData, columnIndex);
-    }
+//        return super.getTableNameFromResultSetMetaData(metaData, columnIndex);
+//    }
 
     public Optional<Object> extractGeneratedPk(Table table,
                                                ResultSet resultSet) throws SQLException {

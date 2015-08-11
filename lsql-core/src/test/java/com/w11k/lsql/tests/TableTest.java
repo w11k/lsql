@@ -2,8 +2,8 @@ package com.w11k.lsql.tests;
 
 import com.google.common.base.Optional;
 import com.w11k.lsql.LinkedRow;
-import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Row;
+import com.w11k.lsql.Rows;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.InsertException;
@@ -14,7 +14,6 @@ import com.w11k.lsql.validation.TypeError;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import static org.testng.Assert.*;
@@ -45,22 +44,22 @@ public class TableTest extends AbstractLSqlTest {
 
     @Test
     public void insertRow() throws SQLException {
-        createTable("CREATE TABLE table1 (name TEXT)");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
 
-        Row row = new Row().addKeyVals("name", "cus1");
+        Row row = new Row().addKeyVals("id", 1, "name", "cus1");
         table1.insert(row);
 
-        Row insertedRow = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        Row insertedRow = table1.load(1).get();
         assertEquals(insertedRow.getString("name"), "cus1");
     }
 
     @Test(expectedExceptions = DatabaseAccessException.class)
     public void insertFailsOnWrongColumnName() throws SQLException {
-        createTable("CREATE TABLE table1 (name TEXT)");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT)");
         Table table1 = lSql.table("table1");
 
-        Row row = new Row().addKeyVals("nameTYPO", "cus1");
+        Row row = new Row().addKeyVals("id", 1, "nameTYPO", "cus1");
         table1.insert(row);
     }
 
@@ -70,8 +69,7 @@ public class TableTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         Object newId = table1.insert(new Row().addKeyVals("age", 1)).get();
 
-        Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).getFirstRow()
-                .get();
+        Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).rows().first().get();
         assertEquals(query.getInt("age"), (Integer) 1);
     }
 
@@ -188,7 +186,7 @@ public class TableTest extends AbstractLSqlTest {
         queriedRow = table1.load(id).get();
         assertEquals(queriedRow, row);
 
-        List<QueriedRow> rows = lSql.executeRawQuery("SELECT * FROM table1").asList();
+        Rows rows = lSql.executeRawQuery("SELECT * FROM table1").rows();
         assertEquals(rows.size(), 1);
     }
 
@@ -202,7 +200,7 @@ public class TableTest extends AbstractLSqlTest {
         table1.insert(row).get();
 
         // Verify insert
-        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
+        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").rows().size();
         assertEquals(tableSize, 1);
 
         // Insert 2nd row
@@ -212,7 +210,7 @@ public class TableTest extends AbstractLSqlTest {
         table1.delete(row);
 
         // Verify delete
-        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").asList().size();
+        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").rows().size();
         assertEquals(tableSize, 1);
     }
 
@@ -247,44 +245,6 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(validate.size(), 2);
         assertEquals(validate.get("field2").getClass(), TypeError.class);
         assertEquals(validate.get("field3").getClass(), KeyError.class);
-    }
-
-    @Test
-    public void ignoreColumnOnInsert() {
-        createTable("CREATE TABLE t1 (c1 INT, c2 INT DEFAULT 999)");
-        Table t1 = lSql.table("t1");
-        t1.column("c2").setIgnored(true);
-        t1.insert(Row.fromKeyVals("c1", 1, "c2", 2));
-        QueriedRow row = lSql.executeRawQuery("SELECT c1, sum(c2) AS s FROM t1 GROUP BY c1").getFirstRow().get();
-        assertEquals(row.getInt("c1"), (Integer) 1);
-        assertEquals(row.getInt("s"), (Integer) 999);
-    }
-
-    @Test
-    public void ignoreColumnOnUpdate() {
-        createTable("CREATE TABLE t1 (c1 INT PRIMARY KEY, c2 INT DEFAULT 999, c3 INT)");
-        lSql.executeRawSql("INSERT INTO t1 (c1, c2, c3) VALUES (1, 555, 3)");
-
-        Table t1 = lSql.table("t1");
-        t1.column("c2").setIgnored(true);
-        t1.update(Row.fromKeyVals("c1", 1, "c2", 2, "c3", 3));
-
-        QueriedRow row = lSql.executeRawQuery("SELECT c1, sum(c2) AS s FROM t1 GROUP BY c1").getFirstRow().get();
-        assertEquals(row.getInt("c1"), (Integer) 1);
-        assertEquals(row.getInt("s"), (Integer) 555);
-    }
-
-    @Test
-    public void ignoreColumnOnQuery() {
-        createTable("CREATE TABLE t1 (c1 INT, c2 INT)");
-        lSql.executeRawSql("INSERT INTO t1 (c1, c2) VALUES (1, 555)");
-
-        Table t1 = lSql.table("t1");
-        t1.column("c2").setIgnored(true);
-
-        QueriedRow row = lSql.executeRawQuery("SELECT c1, c2 FROM t1").getFirstRow().get();
-        assertEquals(row.getInt("c1"), (Integer) 1);
-        assertFalse(row.containsKey("c2"));
     }
 
 }
