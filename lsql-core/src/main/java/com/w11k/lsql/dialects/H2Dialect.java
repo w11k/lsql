@@ -2,52 +2,48 @@ package com.w11k.lsql.dialects;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
-import com.google.common.io.CharStreams;
-import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.converter.Converter;
 
-import javax.sql.rowset.serial.SerialClob;
-import java.io.IOException;
-import java.io.Reader;
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 public class H2Dialect extends BaseDialect {
 
     public H2Dialect() {
-        getConverterRegistry().addConverter(
-                new Converter() {
-                    @Override
-                    public int[] getSupportedSqlTypes() {
-                        return new int[]{Types.CLOB};
-                    }
-
-                    @Override
-                    public Optional<Class<String>> getSupportedJavaClass() {
-                        return Optional.of(String.class);
-                    }
-
-                    public void setValue(LSql lSql, PreparedStatement ps,
-                                         int index,
-                                         Object val) throws SQLException {
-                        ps.setClob(index, new SerialClob(val.toString().toCharArray()));
-                    }
-
-                    public Object getValue(LSql lSql, ResultSet rs,
-                                           int index) throws SQLException {
-                        Clob clob = rs.getClob(index);
-                        if (clob != null) {
-                            Reader reader = clob.getCharacterStream();
-                            try {
-                                return CharStreams.toString(reader);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        } else {
-                            return null;
-                        }
-                    }
-                });
+//        getConverterRegistry().addConverter(
+//                new Converter() {
+//                    @Override
+//                    public int[] getSupportedSqlTypes() {
+//                        return new int[]{Types.CLOB};
+//                    }
+//
+//                    @Override
+//                    public Optional<Class<String>> getSupportedJavaClass() {
+//                        return Optional.of(String.class);
+//                    }
+//
+//                    public void setValue(LSql lSql, PreparedStatement ps,
+//                                         int index,
+//                                         Object val) throws SQLException {
+//                        ps.setClob(index, new SerialClob(val.toString().toCharArray()));
+//                    }
+//
+//                    public Object getValue(LSql lSql, ResultSet rs,
+//                                           int index) throws SQLException {
+//                        Clob clob = rs.getClob(index);
+//                        if (clob != null) {
+//                            Reader reader = clob.getCharacterStream();
+//                            try {
+//                                return CharStreams.toString(reader);
+//                            } catch (IOException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                        } else {
+//                            return null;
+//                        }
+//                    }
+//                });
     }
 
     @Override

@@ -7,5 +7,4 @@ public interface QueryParameter {
 
     void set(PreparedStatement ps, int index) throws SQLException;
 
-
 }

@@ -1,9 +1,19 @@
 package com.w11k.lsql;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.exceptions.DatabaseAccessException;
+import com.w11k.lsql.exceptions.QueryException;
+import com.w11k.lsql.jdbc.ConnectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,6 +21,8 @@ import java.util.regex.Pattern;
 public class SqlStatement {
 
     class Parameter {
+        public String placeholder;
+
         String name;
 
         int startIndex;
@@ -18,9 +30,18 @@ public class SqlStatement {
         int endIndex;
     }
 
+    class ParameterInPreparedStatement {
+        Parameter parameter;
+
+        Object value;
+    }
+
+
     // ..... /*name=*/ 123 /**/
-    private static final Pattern QUERY_ARG = Pattern.compile(
-            "^.+(/\\*=(.+)\\*/.*/\\*\\*/).*$");
+    private static final Pattern QUERY_ARG_START = Pattern.compile(
+            "/\\*\\s*(\\S*)\\s*=\\s*\\*/");
+
+    private static final String QUERY_ARG_END = "/**/";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -36,26 +57,7 @@ public class SqlStatement {
         this.lSql = lSql;
         this.statementName = statementName;
         this.sqlString = sqlString;
-         parameters = parseParameters();
-    }
-
-    private Map<String, Parameter> parseParameters() {
-        Map<String, Parameter> found = Maps.newHashMap();
-
-        int previousLinesLength = 0;
-        String[] lines = sqlString.split("\n");
-        for (String line : lines) {
-            Matcher matcher = QUERY_ARG.matcher(line);
-            if (matcher.find()) {
-                Parameter p = new Parameter();
-                p.name = matcher.group(2);
-                p.startIndex = previousLinesLength + matcher.start(1);
-                p.endIndex = previousLinesLength + matcher.end(1);
-                found.put(p.name, p);
-            }
-            previousLinesLength += (line + "\n").length();
-        }
-        return found;
+        parameters = parseParameters();
     }
 
     public String getSqlString() {
@@ -71,9 +73,13 @@ public class SqlStatement {
     }
 
     public Query query(Map<String, Object> queryParameters) {
-//        PreparedStatement ps = createPreparedStatement(queryParameters);
-//        return new Query(lSql, ps);
-        return null;
+        try {
+            PreparedStatement ps = createPreparedStatement(queryParameters);
+            return new Query(lSql, ps);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void execute() {
@@ -85,13 +91,153 @@ public class SqlStatement {
     }
 
     public void execute(Map<String, Object> queryParameters) {
-//        PreparedStatement ps = createPreparedStatement(queryParameters);
-//        try {
-//            ps.execute();
-//        } catch (SQLException e) {
-//            throw new DatabaseAccessException(e);
-//        }
+        try {
+            PreparedStatement ps = createPreparedStatement(queryParameters);
+            ps.execute();
+        } catch (SQLException e) {
+            throw new DatabaseAccessException(e);
+        }
     }
+
+    private Map<String, Parameter> parseParameters() {
+        Map<String, Parameter> found = Maps.newHashMap();
+
+        Matcher matcher = QUERY_ARG_START.matcher(sqlString);
+
+        while (matcher.find()) {
+            Parameter p = new Parameter();
+
+            // Name
+            String paramName = matcher.group(1);
+            paramName = paramName.equals("") ? extractParameterName(sqlString, matcher.start()) : paramName;
+            p.name = paramName;
+
+            // Start
+            p.startIndex = matcher.start();
+
+            // End
+            int paramEnd = sqlString.indexOf(QUERY_ARG_END, p.startIndex);
+            if (paramEnd == -1) {
+                throw new IllegalArgumentException("Unable to find end marker for parameter '" + p.name + "'");
+            }
+            paramEnd += QUERY_ARG_END.length();
+            p.endIndex = paramEnd;
+
+            // Placeholder for PreparedStatement
+            p.placeholder = "?" + StringUtils.repeat(" ", p.endIndex - p.startIndex - 1);
+            found.put(p.name, p);
+        }
+        return found;
+    }
+
+    private String extractParameterName(String sqlString, int start) {
+        String left = sqlString.substring(0, start);
+        left = left.trim();
+        String[] leftTokens = left.split("\\s+");
+
+        // column= /*=*/ ...
+        String name = leftTokens[leftTokens.length - 1];
+        if (name.length() > 1 && name.contains("=")) {
+            return name.substring(0, name.indexOf("="));
+        }
+
+        return leftTokens[leftTokens.length - 2];
+    }
+
+    private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
+        logger.debug("Executing statement '{}' with parameters {}", statementName, queryParameters.keySet());
+
+        List<ParameterInPreparedStatement> parameterInPreparedStatements = Lists.newLinkedList();
+        String sqlStringCopy = sqlString;
+        for (String queryParameter : queryParameters.keySet()) {
+            Parameter parameter = parameters.get(queryParameter);
+            if (parameter == null) {
+                throw new QueryException("Unused query parameter: " + queryParameter);
+            }
+
+            String left = sqlStringCopy.substring(0, parameter.startIndex);
+            String right = sqlStringCopy.substring(parameter.endIndex);
+            // TODO 'remove line'-feature
+            // TODO 'raw string replace'-feature
+            sqlStringCopy = left + parameter.placeholder + right;
+
+            ParameterInPreparedStatement pips = new ParameterInPreparedStatement();
+            pips.parameter = parameter;
+            pips.value = queryParameters.get(queryParameter);
+            parameterInPreparedStatements.add(pips);
+        }
+
+        // sort parameters by their position in the SQL statement
+        parameterInPreparedStatements.sort(new Comparator<ParameterInPreparedStatement>() {
+            public int compare(ParameterInPreparedStatement o1, ParameterInPreparedStatement o2) {
+                return o1.parameter.startIndex - o2.parameter.startIndex;
+            }
+        });
+
+        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlStringCopy, true);
+        for (int i = 0; i < parameterInPreparedStatements.size(); i++) {
+            ParameterInPreparedStatement pips = parameterInPreparedStatements.get(i);
+            // TODO instanceOf QueryParameter
+            // TODO IN converter
+
+            Converter converter = lSql.getDialect().getConverterRegistry().getConverterForJavaValue(pips.value);
+            converter.setValueInStatement(lSql, ps, i + 1, pips.value, converter.getSqlTypeForNullValues());
+
+
+        }
+
+
+        return ps;
+
+
+//        List<Parameter> found = checkQueryParameters(queryParameters);
+//        sortCollectedParameters(found);
+//        String sql = createSqlStringWithPlaceholders(queryParameters, found);
+
+
+        // Set values
+//        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sql, false);
+//        for (int i = 0; i < found.size(); i++) {
+//            Parameter p = found.get(i);
+//            if (queryParameters.containsKey(p.name)) {
+//                Object value = queryParameters.get(p.name);
+//                try {
+//                    if (value != null) {
+//                        if (value instanceof QueryParameter) {
+//                            ((QueryParameter) value).set(ps, i + 1);
+//                        } else {
+//                            Converter converter = getConverterFor(p.name, value);
+//                            converter.setValueInStatement(lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
+//                        }
+//                    } else {
+//                        ps.setObject(i + 1, null);
+//                    }
+//                } catch (Exception e) {
+//                    throw new QueryException(e);
+//                }
+//            }
+//        }
+
+        // Check for unused parameters
+//        for (Parameter parameter : found) {
+//            queryParameters.remove(parameter.name);
+//        }
+//        if (queryParameters.size() > 0) {
+//            throw new QueryException("Unused query parameters: " + queryParameters.keySet());
+//        }
+//        return ps;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     /*
     public Optional<? extends Column> getColumnFromSqlStatement(String columnAliasName) {
@@ -119,62 +265,7 @@ public class SqlStatement {
     */
 
     /*
-    private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) {
-        logger.debug("Executing query '{}' with parameters {}", statementName, queryParameters.keySet());
 
-        List<Parameter> found = checkQueryParameters(queryParameters);
-        sortCollectedParameters(found);
-        String sql = createSqlStringWithPlaceholders(queryParameters, found);
-
-        if (logger.isTraceEnabled()) {
-            List<String> keyVals = Lists.newLinkedList();
-            for (String key : queryParameters.keySet()) {
-                keyVals.add(key + ": " + queryParameters.get(key));
-            }
-            logger.trace("\n" +
-                            "------------------------------------------------------------\n" +
-                            "Executing '{}'\n" +
-                            "------------------------------------------------------------\n" +
-                            Joiner.on("\n").join(keyVals) + "\n" +
-                            "------------------------------------------------------------\n" +
-                            "{}\n" +
-                            "------------------------------------------------------------\n" +
-                            "\n",
-                    statementName, sql);
-        }
-
-        // Set values
-        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sql, false);
-        for (int i = 0; i < found.size(); i++) {
-            Parameter p = found.get(i);
-            if (queryParameters.containsKey(p.name)) {
-                Object value = queryParameters.get(p.name);
-                try {
-                    if (value != null) {
-                        if (value instanceof QueryParameter) {
-                            ((QueryParameter) value).set(ps, i + 1);
-                        } else {
-                            Converter converter = getConverterFor(p.name, value);
-                            converter.setValueInStatement(lSql, ps, i + 1, value, converter.getSqlTypeForNullValues());
-                        }
-                    } else {
-                        ps.setObject(i + 1, null);
-                    }
-                } catch (Exception e) {
-                    throw new QueryException(e);
-                }
-            }
-        }
-
-        // Check for unused parameters
-        for (Parameter parameter : found) {
-            queryParameters.remove(parameter.name);
-        }
-        if (queryParameters.size() > 0) {
-            throw new QueryException("Unused query parameters: " + queryParameters.keySet());
-        }
-        return ps;
-    }
 
 //    private void checkForEqualOperator(String line, Parameter p, int previousLinesLength, int valueStartInLine) {
 //        String lineBeforeValue = line.substring(0, valueStartInLine);

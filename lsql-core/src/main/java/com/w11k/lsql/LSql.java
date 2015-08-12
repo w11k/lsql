@@ -104,7 +104,7 @@ public class LSql {
      *
      * @return the {@code LSqlFile} instance
      */
-    public LSqlFile readSqlFileRelativeToClass(Class clazz, String fileName) {
+    public LSqlFile readSqlFile(Class clazz, String fileName) {
         String p = clazz.getPackage().getName();
         p = "/" + p.replaceAll("\\.", "/") + "/";
         String path = p + fileName;
@@ -121,7 +121,7 @@ public class LSql {
      */
     public LSqlFile readSqlFile(Class<?> clazz) {
         String fileName = clazz.getSimpleName() + ".sql";
-        return readSqlFileRelativeToClass(clazz, fileName);
+        return readSqlFile(clazz, fileName);
     }
 
     /**

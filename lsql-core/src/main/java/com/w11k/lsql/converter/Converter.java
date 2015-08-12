@@ -79,4 +79,11 @@ public abstract class Converter {
         return true;
     }
 
+    @Override
+    public String toString() {
+        if (getSupportedJavaClass().isPresent()) {
+            return "Converter{Java type=" + getSupportedJavaClass().get() + "}";
+        }
+        return "Converter{}";
+    }
 }
