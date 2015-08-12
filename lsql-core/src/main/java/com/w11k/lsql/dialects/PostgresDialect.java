@@ -4,9 +4,11 @@ import com.google.common.base.Optional;
 import com.w11k.lsql.Blob;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
-import org.postgresql.jdbc4.Jdbc4ResultSetMetaData;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 
 public class PostgresDialect extends BaseDialect {
 
@@ -66,11 +68,11 @@ public class PostgresDialect extends BaseDialect {
                 });
     }
 
-    @Override
-    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
-                                                    int columnIndex) throws SQLException {
-        Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
-        return postgresMetaData.getBaseTableName(columnIndex);
-    }
+//    @Override
+//    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
+//                                                    int columnIndex) throws SQLException {
+//        Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
+//        return postgresMetaData.getBaseTableName(columnIndex);
+//    }
 
 }

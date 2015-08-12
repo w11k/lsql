@@ -21,8 +21,6 @@ public class Column {
 
     private Converter converter;
 
-    private boolean ignored = false;
-
     public static Column create(Table table,
                                     String columnName,
                                     int sqlType,
@@ -67,14 +65,6 @@ public class Column {
 
     public int getSqlType() {
         return sqlType;
-    }
-
-    public boolean isIgnored() {
-        return ignored;
-    }
-
-    public void setIgnored(boolean ignored) {
-        this.ignored = ignored;
     }
 
     public Converter getConverter() {

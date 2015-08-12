@@ -1,52 +1,26 @@
 package com.w11k.lsql;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.exceptions.DatabaseAccessException;
-import com.w11k.lsql.exceptions.QueryException;
-import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.of;
 
 public class SqlStatement {
 
     class Parameter {
         String name;
 
-        int valueStart;
+        int startIndex;
 
-        int valueEnd;
-
-        boolean usesEqualOperator = false;
-
-        int operatorStart;
-
-        int operatorEnd;
+        int endIndex;
     }
 
-    // column = /*(*/ 123 /*)*/
-    private static final Pattern RANGE_QUERY_ARG = Pattern.compile(
-            "^.*(/\\*(\\?.+)?\\(\\*/.*/\\*\\)\\*/).*$");
-
-    // column =
-    private static final Pattern EQUAL_OPERATOR_QUERY = Pattern.compile(
-            "^.*(=)\\s"
-    );
+    // ..... /*name=*/ 123 /**/
+    private static final Pattern QUERY_ARG = Pattern.compile(
+            "^.+(/\\*=(.+)\\*/.*/\\*\\*/).*$");
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -56,10 +30,32 @@ public class SqlStatement {
 
     private final String sqlString;
 
+    private final Map<String, Parameter> parameters;
+
     public SqlStatement(LSql lSql, String statementName, String sqlString) {
         this.lSql = lSql;
         this.statementName = statementName;
         this.sqlString = sqlString;
+         parameters = parseParameters();
+    }
+
+    private Map<String, Parameter> parseParameters() {
+        Map<String, Parameter> found = Maps.newHashMap();
+
+        int previousLinesLength = 0;
+        String[] lines = sqlString.split("\n");
+        for (String line : lines) {
+            Matcher matcher = QUERY_ARG.matcher(line);
+            if (matcher.find()) {
+                Parameter p = new Parameter();
+                p.name = matcher.group(2);
+                p.startIndex = previousLinesLength + matcher.start(1);
+                p.endIndex = previousLinesLength + matcher.end(1);
+                found.put(p.name, p);
+            }
+            previousLinesLength += (line + "\n").length();
+        }
+        return found;
     }
 
     public String getSqlString() {
@@ -75,8 +71,9 @@ public class SqlStatement {
     }
 
     public Query query(Map<String, Object> queryParameters) {
-        PreparedStatement ps = createPreparedStatement(queryParameters);
-        return new Query(lSql, ps, this);
+//        PreparedStatement ps = createPreparedStatement(queryParameters);
+//        return new Query(lSql, ps);
+        return null;
     }
 
     public void execute() {
@@ -88,14 +85,15 @@ public class SqlStatement {
     }
 
     public void execute(Map<String, Object> queryParameters) {
-        PreparedStatement ps = createPreparedStatement(queryParameters);
-        try {
-            ps.execute();
-        } catch (SQLException e) {
-            throw new DatabaseAccessException(e);
-        }
+//        PreparedStatement ps = createPreparedStatement(queryParameters);
+//        try {
+//            ps.execute();
+//        } catch (SQLException e) {
+//            throw new DatabaseAccessException(e);
+//        }
     }
 
+    /*
     public Optional<? extends Column> getColumnFromSqlStatement(String columnAliasName) {
         Pattern columnAlias = Pattern.compile(
                 //".*[\n ,]+([\\w+\\.?\\w*])[\n ]+as " + usedAlias.trim() + "[\n ,]+.*",
@@ -118,7 +116,9 @@ public class SqlStatement {
             return absent();
         }
     }
+    */
 
+    /*
     private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) {
         logger.debug("Executing query '{}' with parameters {}", statementName, queryParameters.keySet());
 
@@ -176,59 +176,35 @@ public class SqlStatement {
         return ps;
     }
 
-    private List<Parameter> checkQueryParameters(Map<String, Object> queryParameters) {
-        List<Parameter> found = Lists.newLinkedList();
+//    private void checkForEqualOperator(String line, Parameter p, int previousLinesLength, int valueStartInLine) {
+//        String lineBeforeValue = line.substring(0, valueStartInLine);
+//        Matcher matcher = EQUAL_OPERATOR_QUERY.matcher(lineBeforeValue);
+//        if (matcher.find()) {
+//            p.usesEqualOperator = true;
+//            p.operatorStart = previousLinesLength + matcher.start(1);
+//            p.operatorEnd = previousLinesLength + matcher.end(1);
+//        }
+//    }
 
-        int previousLinesLength = 0;
-        String[] lines = sqlString.split("\n");
-        for (String line : lines) {
-            String paramName;
-            if ((paramName = queryParameterInLine(queryParameters, line)) != null) {
-                Matcher matcher = RANGE_QUERY_ARG.matcher(line);
-                if (matcher.find()) {
-                    Parameter p = new Parameter();
-                    p.name = paramName;
-                    p.valueStart = previousLinesLength + matcher.start(1);
-                    p.valueEnd = previousLinesLength + matcher.end(1);
-                    checkForEqualOperator(line, p, previousLinesLength, matcher.start(1));
-                    found.add(p);
-                }
-            }
-            previousLinesLength += (line + "\n").length();
-        }
-
-        return found;
-    }
-
-    private void checkForEqualOperator(String line, Parameter p, int previousLinesLength, int valueStartInLine) {
-        String lineBeforeValue = line.substring(0, valueStartInLine);
-        Matcher matcher = EQUAL_OPERATOR_QUERY.matcher(lineBeforeValue);
-        if (matcher.find()) {
-            p.usesEqualOperator = true;
-            p.operatorStart = previousLinesLength + matcher.start(1);
-            p.operatorEnd = previousLinesLength + matcher.end(1);
-        }
-    }
-
-    private String queryParameterInLine(Map<String, Object> queryParameters, String line) {
-        for (String s : queryParameters.keySet()) {
-            if (line.startsWith(s + " ")
-                    || line.contains(" " + s + " ")
-                    || line.contains("." + s + " ")
-                    || line.contains("?" + s + " ")
-                    || line.contains("?" + s + "(")
-                    ) {
-                return s;
-            }
-        }
-        return null;
-    }
+//    private String queryParameterInLine(Map<String, Object> queryParameters, String line) {
+//        for (String s : queryParameters.keySet()) {
+//            if (line.startsWith(s + " ")
+//                    || line.contains(" " + s + " ")
+//                    || line.contains("." + s + " ")
+//                    || line.contains("?" + s + " ")
+//                    || line.contains("?" + s + "(")
+//                    ) {
+//                return s;
+//            }
+//        }
+//        return null;
+//    }
 
     private void sortCollectedParameters(List<Parameter> parameters) {
         Collections.sort(parameters, new Comparator<Parameter>() {
             @Override
             public int compare(Parameter o1, Parameter o2) {
-                return new Integer(o1.valueStart).compareTo(o2.valueStart);
+                return new Integer(o1.indexStart).compareTo(o2.indexStart);
             }
         });
     }
@@ -245,7 +221,7 @@ public class SqlStatement {
                     lastIndex = p.valueEnd;
                     queryParameters.remove(p.name);
                 } else {
-                    sql.append(sqlString.substring(lastIndex, p.valueStart));
+                    sql.append(sqlString.substring(lastIndex, p.indexStart));
                     sql.append("?");
                     lastIndex = p.valueEnd;
                 }
@@ -258,9 +234,9 @@ public class SqlStatement {
     private Converter getConverterFor(String paramName, Object value) {
 //        String[] split = paramName.split("\\.");
 //        if (split.length == 1) {
-            // No table prefix
-            //throw new RuntimeException("You must use <table>.<column> for query parameters!");
-            return lSql.getDialect().getConverterRegistry().getConverterForJavaValue(value);
+        // No table prefix
+        //throw new RuntimeException("You must use <table>.<column> for query parameters!");
+        return lSql.getDialect().getConverterRegistry().getConverterForJavaValue(value);
 //        } else if (split.length == 2) {
 //             With table prefix
 //            String tableName = split[0];
@@ -290,4 +266,5 @@ public class SqlStatement {
         }
     }
 
+*/
 }

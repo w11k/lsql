@@ -1,5 +1,7 @@
-package com.w11k.lsql;
+package com.w11k.lsql.tests;
 
+import com.w11k.lsql.Column;
+import com.w11k.lsql.InitColumnCallback;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import org.testng.annotations.Test;
 

@@ -57,10 +57,10 @@ public class BaseDialect {
         return getJavaCaseFormat().to(getSqlCaseFormat(), javaName);
     }
 
-    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
-                                                    int columnIndex) throws SQLException {
-        return metaData.getTableName(columnIndex);
-    }
+//    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
+//                                                    int columnIndex) throws SQLException {
+//        return metaData.getTableName(columnIndex);
+//    }
 
     public Optional<Object> extractGeneratedPk(Table table,
                                                ResultSet resultSet) throws SQLException {

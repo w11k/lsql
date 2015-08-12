@@ -31,6 +31,8 @@ public class Table {
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
+    private final Optional<PreparedStatement> loadPreparedStatement;
+
     private Optional<String> primaryKeyColumn = absent();
 
     private Optional<Column> revisionColumn = absent();
@@ -43,6 +45,18 @@ public class Table {
         this.lSql = lSql;
         this.tableName = tableName;
         fetchMeta();
+        this.loadPreparedStatement = createLoadPreparedStatement();
+    }
+
+    private Optional<PreparedStatement> createLoadPreparedStatement() {
+        Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
+        if (!primaryKeyColumn.isPresent()) {
+            return absent();
+        }
+        String pkColumn = primaryKeyColumn.get();
+        Column column = column(pkColumn);
+        String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
+        return of(ConnectionUtils.prepareStatement(lSql, psString, false));
     }
 
     public LSql getlSql() {
@@ -302,21 +316,28 @@ public class Table {
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
     public Optional<LinkedRow> load(Object id) {
+        if (!this.primaryKeyColumn.isPresent()) {
+            throw new IllegalArgumentException("Can not load by ID, table has no primary column");
+        }
+        PreparedStatement ps = this.loadPreparedStatement.get();
+
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
-        String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
-        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, psString, false);
         try {
             column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        List<QueriedRow> queriedRows = new Query(lSql, ps, new SqlStatement(lSql, "Table.load", psString)).asList();
-        if (queriedRows.size() == 1) {
-            LinkedRow row = newLinkedRow(queriedRows.get(0));
-            return of(row);
+        Query query = new Query(lSql, ps);
+        for (String columnInTable : this.columns.keySet()) {
+            query.setConverter(columnInTable, this.columns.get(columnInTable).getConverter());
         }
-        return absent();
+        Optional<Row> first = query.rows().first();
+        if (first.isPresent()) {
+            return of(newLinkedRow(first.get()));
+        } else {
+            return absent();
+        }
     }
 
 //    public Optional<P> loadPojo(Object id) {
@@ -423,7 +444,7 @@ public class Table {
                 if (column(input) == null) {
                     throw new RuntimeException("Column " + input + " does not exist in table " + tableName);
                 }
-                return !column(input).isIgnored();
+                return true;
             }
         }));
         return columns;

@@ -1,7 +1,10 @@
 package com.w11k.lsql.tests;
 
+import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
 import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 
@@ -10,6 +13,8 @@ import java.sql.SQLException;
 import static org.testng.Assert.assertEquals;
 
 public class ConverterTypeTest extends AbstractLSqlTest {
+
+    private final Converter javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlStringConverter("yes", "no");
 
     @Test
     public void testBoolean() {
@@ -24,10 +29,10 @@ public class ConverterTypeTest extends AbstractLSqlTest {
 
     @Test
     public void testNullInt() {
-        createTable("CREATE TABLE table1 (col1 INT NULL)");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, col1 INT NULL)");
         Table table1 = lSql.table("table1");
-        table1.insert(Row.fromKeyVals("col1", null));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        table1.insert(Row.fromKeyVals("id", 1, "col1", null));
+        Row row = table1.load(1).get();
         assertEquals(row.get("col1"), null);
     }
 
@@ -43,10 +48,10 @@ public class ConverterTypeTest extends AbstractLSqlTest {
 
     @Test
     public void converterCanHandleClobNullValue() throws SQLException {
-        createTable("CREATE TABLE table1 (col1 TEXT, col2 TEXT)");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, col1 TEXT, col2 TEXT)");
         Table table1 = lSql.table("table1");
-        table1.insert(Row.fromKeyVals("col1", "val1"));
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        table1.insert(Row.fromKeyVals("id", 1, "col1", "val1"));
+        Row row = table1.load(1).get();
         assertEquals(row.get("col1"), "val1");
     }
 
@@ -65,12 +70,23 @@ public class ConverterTypeTest extends AbstractLSqlTest {
         DateTime now = DateTime.now();
         testType("TIMESTAMP", now);
 
-        createTable("CREATE TABLE table1 (datetime TIMESTAMP)");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, datetime TIMESTAMP)");
         Table table1 = lSql.table("table1");
-        Row insert = Row.fromKeyVals("datetime", now.toString());
+        Row insert = Row.fromKeyVals("id", 1, "datetime", now.toString());
         table1.insert(insert);
-        Row row = lSql.executeRawQuery("SELECT * FROM table1").getFirstRow().get();
+        Row row = table1.load(1).get();
         assertEquals(row.get("datetime"), now);
+    }
+
+    @Test
+    public void converterForColumnValue() {
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, yesno1 TEXT, yesno2 TEXT)");
+        Table t1 = lSql.table("table1");
+        t1.column("yesno1").setConverter(javaBoolToSqlYesNoStringConverter);
+        t1.insert(Row.fromKeyVals("id", 1, "yesno1", true, "yesno2", "true"));
+        LinkedRow row = t1.load(1).get();
+        assertEquals(row.get("yesno1"), true);
+        assertEquals(row.get("yesno2"), "true");
     }
 
     private void testType(String sqlTypeName, Object value) {

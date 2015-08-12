@@ -1,9 +1,9 @@
 package com.w11k.lsql.tests;
 
 import com.google.common.base.Function;
-import com.w11k.lsql.QueriedRow;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
+import com.w11k.lsql.Rows;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
         Query rows = lSql.executeRawQuery("SELECT * FROM table1");
         int sum = 0;
-        for (QueriedRow row : rows) {
+        for (Row row : rows) {
             sum += row.getInt("age");
         }
         assertEquals(sum, 50);
@@ -38,7 +38,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
-        List<QueriedRow> rows = lSql.executeRawQuery("SELECT * FROM table1").asList();
+        Rows rows = lSql.executeRawQuery("SELECT * FROM table1").rows();
         assertEquals(rows.size(), 2);
     }
 
@@ -47,10 +47,10 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
-        Query rows = lSql.executeRawQuery("SELECT * FROM table1");
-        List<Integer> ages = rows.map(new Function<QueriedRow, Integer>() {
+        Rows rows = lSql.executeRawQuery("SELECT * FROM table1").rows();
+        List<Integer> ages = rows.map(new Function<Row, Integer>() {
             @Override
-            public Integer apply(QueriedRow input) {
+            public Integer apply(Row input) {
                 return input.getInt("age");
             }
         });
@@ -62,8 +62,8 @@ public class QueryTest extends AbstractLSqlTest {
     public void queryGetFirstRow() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Query rows = lSql.executeRawQuery("SELECT * FROM table1");
-        QueriedRow row = rows.getFirstRow().get();
+        Rows rows = lSql.executeRawQuery("SELECT * FROM table1").rows();
+        Row row = rows.first().get();
         assertNotNull(row);
         assertEquals(row.getString("name"), "cus1");
         assertEquals(row.getInt("age"), (Integer) 20);
@@ -74,8 +74,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Query rows = lSql.executeRawQuery("SELECT count(*) AS c FROM table1");
-        Row row = rows.getFirstRow().get();
+        Row row = lSql.executeRawQuery("SELECT count(*) AS c FROM table1").rows().first().get();
         assertEquals(row.getInt("c"), (Integer) 2);
     }
 
@@ -83,8 +82,7 @@ public class QueryTest extends AbstractLSqlTest {
     public void canUseCalculatedColumnsTogetherWithNormalColumnsOneTable() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Query rows = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1");
-        Row row = rows.getFirstRow().get();
+        Row row = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1").rows().first().get();
         assertEquals(row.getString("name"), "cus1");
         assertEquals(row.getInt("age"), (Integer) 20);
         assertEquals(row.getInt("c"), (Integer) 1);
@@ -97,7 +95,7 @@ public class QueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table2 (name, age) VALUES ('cus2', 30)");
         Query query = lSql.executeRawQuery("SELECT *, count(*) AS c FROM table1, table2");
-        query.asList();
+        query.rows();
     }
 
 }
