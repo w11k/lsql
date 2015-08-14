@@ -31,8 +31,6 @@ public class Table {
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
-    private final Optional<PreparedStatement> loadPreparedStatement;
-
     private Optional<String> primaryKeyColumn = absent();
 
     private Optional<Column> revisionColumn = absent();
@@ -45,18 +43,15 @@ public class Table {
         this.lSql = lSql;
         this.tableName = tableName;
         fetchMeta();
-        this.loadPreparedStatement = createLoadPreparedStatement();
     }
 
-    private Optional<PreparedStatement> createLoadPreparedStatement() {
-        Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
-        if (!primaryKeyColumn.isPresent()) {
-            return absent();
+    public Map<String, Converter> getColumnConverters() {
+        Map<String, Converter> converters = Maps.newLinkedHashMap();
+        for (String name : this.columns.keySet()) {
+            Column column = this.columns.get(name);
+            converters.put(name, column.getConverter());
         }
-        String pkColumn = primaryKeyColumn.get();
-        Column column = column(pkColumn);
-        String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
-        return of(ConnectionUtils.prepareStatement(lSql, psString, false));
+        return converters;
     }
 
     public LSql getlSql() {
@@ -264,10 +259,6 @@ public class Table {
         }
     }
 
-//    public Optional<?> save(P pojo) {
-//        return save(pojoToRow(pojo));
-//    }
-
     /**
      * Deletes the row with the given primary key value.
      * <p/>
@@ -280,6 +271,10 @@ public class Table {
         row.put(primaryKeyColumn.get(), id);
         delete(row);
     }
+
+//    public Optional<?> save(P pojo) {
+//        return save(pojoToRow(pojo));
+//    }
 
     /**
      * Deletes the row that matches the primary key value and, if enabled, the revision value in the passed {@link
@@ -319,7 +314,7 @@ public class Table {
         if (!this.primaryKeyColumn.isPresent()) {
             throw new IllegalArgumentException("Can not load by ID, table has no primary column");
         }
-        PreparedStatement ps = this.loadPreparedStatement.get();
+        PreparedStatement ps = createLoadPreparedStatement();
 
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
@@ -330,7 +325,7 @@ public class Table {
         }
         Query query = new Query(lSql, ps);
         for (String columnInTable : this.columns.keySet()) {
-            query.setConverter(columnInTable, this.columns.get(columnInTable).getConverter());
+            query.addConverter(columnInTable, this.columns.get(columnInTable).getConverter());
         }
         Optional<Row> first = query.rows().first();
         if (first.isPresent()) {
@@ -338,6 +333,14 @@ public class Table {
         } else {
             return absent();
         }
+    }
+
+    /**
+     * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
+     */
+    public LinkedRow newLinkedRow() {
+        Map<String, Object> empty = new HashMap<String, Object>();
+        return newLinkedRow(empty);
     }
 
 //    public Optional<P> loadPojo(Object id) {
@@ -349,14 +352,6 @@ public class Table {
 //            }
 //        });
 //    }
-
-    /**
-     * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
-     */
-    public LinkedRow newLinkedRow() {
-        Map<String, Object> empty = new HashMap<String, Object>();
-        return newLinkedRow(empty);
-    }
 
     /**
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
@@ -435,6 +430,17 @@ public class Table {
     @Override
     public String toString() {
         return "Table{tableName='" + tableName + "'}";
+    }
+
+    private PreparedStatement createLoadPreparedStatement() {
+        Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
+        if (!primaryKeyColumn.isPresent()) {
+            throw new IllegalStateException("table has no primary key column");
+        }
+        String pkColumn = primaryKeyColumn.get();
+        Column column = column(pkColumn);
+        String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
+        return ConnectionUtils.prepareStatement(lSql, psString, false);
     }
 
     private List<String> createColumnList(Row row) {

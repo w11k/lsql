@@ -25,7 +25,7 @@ public class QueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
-        Query rows = lSql.executeRawQuery("SELECT * FROM table1");
+        Rows rows = lSql.executeRawQuery("SELECT * FROM table1").rows();
         int sum = 0;
         for (Row row : rows) {
             sum += row.getInt("age");

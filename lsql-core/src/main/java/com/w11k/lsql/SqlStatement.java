@@ -7,6 +7,8 @@ import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +30,30 @@ public class SqlStatement {
         int startIndex;
 
         int endIndex;
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                    .append("name", name)
+                    .append("startIndex", startIndex)
+                    .append("endIndex", endIndex)
+                    .toString();
+        }
     }
 
     class ParameterInPreparedStatement {
         Parameter parameter;
 
         Object value;
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE)
+                    .append("name", parameter.name)
+                    .append("value type", value.getClass().getCanonicalName())
+                    .append("value", value)
+                    .toString();
+        }
     }
 
 
@@ -51,7 +71,11 @@ public class SqlStatement {
 
     private final String sqlString;
 
-    private final Map<String, Parameter> parameters;
+    private final Map<String, List<Parameter>> parameters;
+
+    private Map<String, Converter> inConverters = Maps.newLinkedHashMap();
+
+    private Map<String, Converter> outConverters = Maps.newLinkedHashMap();
 
     public SqlStatement(LSql lSql, String statementName, String sqlString) {
         this.lSql = lSql;
@@ -62,6 +86,32 @@ public class SqlStatement {
 
     public String getSqlString() {
         return sqlString;
+    }
+
+    public SqlStatement addInConverter(String parameterName, Converter converter) {
+        this.inConverters.put(parameterName, converter);
+        return this;
+    }
+
+    public SqlStatement setInConverters(Map<String, Converter> inConverters) {
+        this.inConverters = inConverters;
+        return this;
+    }
+
+    public SqlStatement addOutConverter(String columnName, Converter converter) {
+        this.outConverters.put(columnName, converter);
+        return this;
+    }
+
+    public SqlStatement setOutConverters(Map<String, Converter> outConverters) {
+        this.outConverters = outConverters;
+        return this;
+    }
+
+    public SqlStatement setInAndOutConverters(Map<String, Converter> inAndOutConverters) {
+        this.inConverters = inAndOutConverters;
+        this.outConverters = inAndOutConverters;
+        return this;
     }
 
     public Query query() {
@@ -75,7 +125,9 @@ public class SqlStatement {
     public Query query(Map<String, Object> queryParameters) {
         try {
             PreparedStatement ps = createPreparedStatement(queryParameters);
-            return new Query(lSql, ps);
+            Query query = new Query(lSql, ps);
+            query.setConverters(this.outConverters);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -99,8 +151,8 @@ public class SqlStatement {
         }
     }
 
-    private Map<String, Parameter> parseParameters() {
-        Map<String, Parameter> found = Maps.newHashMap();
+    private Map<String, List<Parameter>> parseParameters() {
+        Map<String, List<Parameter>> found = Maps.newHashMap();
 
         Matcher matcher = QUERY_ARG_START.matcher(sqlString);
 
@@ -125,7 +177,9 @@ public class SqlStatement {
 
             // Placeholder for PreparedStatement
             p.placeholder = "?" + StringUtils.repeat(" ", p.endIndex - p.startIndex - 1);
-            found.put(p.name, p);
+            List<Parameter> parametersForName = found.getOrDefault(p.name, Lists.<Parameter>newLinkedList());
+            parametersForName.add(p);
+            found.put(p.name, parametersForName);
         }
         return found;
     }
@@ -133,16 +187,9 @@ public class SqlStatement {
     private String extractParameterName(String sqlString, int start) {
         String left = sqlString.substring(0, start);
         left = left.trim();
-        String[] leftTokens = left.split("\\s+");
-
-        // column= /*=*/ ...
-        String name = leftTokens[leftTokens.length - 1];
-        if (name.length() > 1 && name.contains("=")) {
-            return name.substring(0, name.indexOf("="));
-        }
-
-        return leftTokens[leftTokens.length - 2];
-    }
+        String[] leftTokens = StringUtils.split(left, "!=<> ");
+        return leftTokens[leftTokens.length - 1];
+     }
 
     private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
         logger.debug("Executing statement '{}' with parameters {}", statementName, queryParameters.keySet());
@@ -150,21 +197,24 @@ public class SqlStatement {
         List<ParameterInPreparedStatement> parameterInPreparedStatements = Lists.newLinkedList();
         String sqlStringCopy = sqlString;
         for (String queryParameter : queryParameters.keySet()) {
-            Parameter parameter = parameters.get(queryParameter);
-            if (parameter == null) {
+            List<Parameter> parametersByName = parameters.get(queryParameter);
+            if (parametersByName == null) {
                 throw new QueryException("Unused query parameter: " + queryParameter);
             }
 
-            String left = sqlStringCopy.substring(0, parameter.startIndex);
-            String right = sqlStringCopy.substring(parameter.endIndex);
-            // TODO 'remove line'-feature
-            // TODO 'raw string replace'-feature
-            sqlStringCopy = left + parameter.placeholder + right;
+            for (Parameter p : parametersByName) {
+                String left = sqlStringCopy.substring(0, p.startIndex);
+                String right = sqlStringCopy.substring(p.endIndex);
+                // TODO 'remove line'-feature
+                // TODO 'raw string replace'-feature
+                sqlStringCopy = left + p.placeholder + right;
 
-            ParameterInPreparedStatement pips = new ParameterInPreparedStatement();
-            pips.parameter = parameter;
-            pips.value = queryParameters.get(queryParameter);
-            parameterInPreparedStatements.add(pips);
+                ParameterInPreparedStatement pips = new ParameterInPreparedStatement();
+                pips.parameter = p;
+                pips.value = queryParameters.get(queryParameter);
+                parameterInPreparedStatements.add(pips);
+            }
+
         }
 
         // sort parameters by their position in the SQL statement
@@ -174,15 +224,24 @@ public class SqlStatement {
             }
         });
 
-        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlStringCopy, true);
+        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlStringCopy, false);
         for (int i = 0; i < parameterInPreparedStatements.size(); i++) {
             ParameterInPreparedStatement pips = parameterInPreparedStatements.get(i);
-            // TODO instanceOf QueryParameter
-            // TODO IN converter
 
-            Converter converter = lSql.getDialect().getConverterRegistry().getConverterForJavaValue(pips.value);
-            converter.setValueInStatement(lSql, ps, i + 1, pips.value, converter.getSqlTypeForNullValues());
+            if (pips.value instanceof QueryParameter) {
+                QueryParameter queryParameter = (QueryParameter) pips.value;
+                queryParameter.set(ps, i + 1);
+            } else {
+                Converter converter = this.inConverters.get(pips.parameter.name);
 
+                if (converter == null) {
+                    converter = lSql.getDialect().getConverterRegistry().getConverterForJavaValue(pips.value);
+                }
+                if (converter == null) {
+                    throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);
+                }
+                converter.setValueInStatement(lSql, ps, i + 1, pips.value, converter.getSqlTypeForNullValues());
+            }
 
         }
 

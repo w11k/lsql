@@ -1,16 +1,14 @@
 package com.w11k.lsql;
 
-import com.google.common.collect.ForwardingList;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
-public class Query extends ForwardingList<Row> {
+public class Query {
 
     private final LSql lSql;
 
@@ -34,8 +32,13 @@ public class Query extends ForwardingList<Row> {
         return lSql;
     }
 
-    public Query setConverter(String columnName, Converter converter) {
+    public Query addConverter(String columnName, Converter converter) {
         this.converters.put(columnName, converter);
+        return this;
+    }
+
+    public Query setConverters(Map<String, Converter> converters) {
+        this.converters = converters;
         return this;
     }
 
@@ -51,10 +54,10 @@ public class Query extends ForwardingList<Row> {
         return executeQuery().rows();
     }
 
-    @Override
-    protected List<Row> delegate() {
-        return rows();
-    }
+//    @Override
+//    protected List<Row> delegate() {
+//        return rows();
+//    }
 
     //    public <T> List<T> map(Function<QueriedRow, T> rowHandler) {
 //        return new QueriedRows(asList()).map(rowHandler);

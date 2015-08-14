@@ -8,7 +8,6 @@ import com.w11k.lsql.exceptions.QueryException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,11 +49,10 @@ public class ExecutedQuery {
                 resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
             }
 
-            List<Row> rows = Lists.newLinkedList();
+            this.rows = Lists.newLinkedList();
             while (resultSet.next()) {
-                rows.add(extractRow(resultSet, resultSetColumns));
+                this.rows.add(extractRow(resultSet, resultSetColumns));
             }
-            this.rows = Collections.unmodifiableList(rows);
         } catch (SQLException e) {
             throw new QueryException(e);
         }
