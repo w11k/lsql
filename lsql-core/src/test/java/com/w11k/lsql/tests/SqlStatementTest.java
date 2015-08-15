@@ -262,8 +262,16 @@ public class SqlStatementTest extends AbstractLSqlTest {
                 .setInAndOutConverters(t.getColumnConverters())
                 .query("yesno", true).rows().first().get();
         assertEquals(row.get("yesno"), true);
+    }
 
-
+    @Test
+    public void removeLine() {
+        setup();
+        Rows rows = statement("SELECT * FROM person \n" +
+                "WHERE id = /*id=*/ -1 /**/ \n" +
+                ";")
+                .query("id", SqlStatement.RAW_REMOVE_LINE).rows();
+        assertEquals(rows.size(), 5);
     }
 
     private void setup() {

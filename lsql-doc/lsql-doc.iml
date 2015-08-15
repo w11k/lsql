@@ -5,7 +5,7 @@
       <configuration sdkName="Python 2.7.6 (/usr/bin/python)" />
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -16,4 +16,3 @@
     <orderEntry type="library" name="Python 2.7.6 (/usr/bin/python) interpreter library" level="application" />
   </component>
 </module>
-
