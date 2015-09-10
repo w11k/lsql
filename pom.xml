@@ -11,7 +11,7 @@
 
   <modules>
     <module>lsql-core</module>
-    <module>lsql-example</module>
+    <!--<module>lsql-example</module>-->
     <module>lsql-doc</module>
   </modules>
 

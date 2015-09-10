@@ -31,21 +31,17 @@ public class LSqlFile {
 
     private final LSql lSql;
 
-    private final String fileName; // without .sql extension
+    private final String nameForDescription; // without .sql extension
 
     private final String path;
 
     private final Map<String, SqlStatement> statements = Maps.newHashMap();
 
-    public LSqlFile(LSql lSql, String fileName, String path) {
+    public LSqlFile(LSql lSql, String nameForDescription, String path) {
         this.lSql = lSql;
-        this.fileName = fileName;
+        this.nameForDescription = nameForDescription;
         this.path = path;
         parseSqlStatements();
-    }
-
-    public String getFileName() {
-        return fileName;
     }
 
     // ----- public -----
@@ -65,7 +61,7 @@ public class LSqlFile {
     // ----- private -----
 
     private void parseSqlStatements() {
-        logger.info("Reading SQL file '" + fileName + "'");
+        logger.info("Reading SQL file '" + nameForDescription + "'");
         statements.clear();
         URL url = getClass().getResource(path);
         try {
@@ -84,7 +80,7 @@ public class LSqlFile {
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
                 logger.debug("Found SQL statement '{}'", name);
-                statements.put(name, new SqlStatement(lSql, fileName + "." + name, sub));
+                statements.put(name, new SqlStatement(lSql, nameForDescription + "." + name, sub));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
