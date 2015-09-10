@@ -1,4 +1,5 @@
 *.dblocal
+*.db
 
 # Maven
 target
@@ -7,9 +8,6 @@ target
 .idea/workspace.xml
 .idea/tasks.xml
 out
-
-# OpenOffice
-*~lock*#
 
 # Sublime
 *.sublime-workspace
