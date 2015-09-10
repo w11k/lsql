@@ -5,9 +5,8 @@
 target
 
 # IntelliJ
-.idea/workspace.xml
-.idea/tasks.xml
-out
+*.iml
+.idea
 
 # Sublime
 *.sublime-workspace
