@@ -47,7 +47,7 @@
                   <arg value="src/index.md"/>
                   <arg value="--smart"/>
                   <arg value="--standalone"/>
-                  <arg value="--template=src/template"/>
+                  <!--<arg value="&#45;&#45;template=src/template"/>-->
                   <arg value="--toc"/>
                   <arg value="-o"/>
                   <arg value="${project.build.outputDirectory}/index.html"/>

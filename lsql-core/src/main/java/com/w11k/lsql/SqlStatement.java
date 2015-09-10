@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -187,7 +188,12 @@ public class SqlStatement {
 
             // Placeholder for PreparedStatement
             p.placeholder = "?" + StringUtils.repeat(" ", p.endIndex - p.startIndex - 1);
-            List<Parameter> parametersForName = found.getOrDefault(p.name, Lists.<Parameter>newLinkedList());
+
+
+//            List<Parameter> parametersForName = found.getOrDefault(p.name, Lists.<Parameter>newLinkedList());
+            List<Parameter> parametersForName = found.containsKey(p.name) ? found.get(p.name) : Lists.<Parameter>newLinkedList();
+
+
             parametersForName.add(p);
             found.put(p.name, parametersForName);
         }
@@ -229,7 +235,7 @@ public class SqlStatement {
         sqlStringCopy = processRawConversions(sqlStringCopy, parameterInPreparedStatements);
 
         // sort parameters by their position in the SQL statement
-        parameterInPreparedStatements.sort(new Comparator<ParameterInPreparedStatement>() {
+        Collections.sort(parameterInPreparedStatements, new Comparator<ParameterInPreparedStatement>() {
             public int compare(ParameterInPreparedStatement o1, ParameterInPreparedStatement o2) {
                 return o1.parameter.startIndex - o2.parameter.startIndex;
             }
