@@ -77,10 +77,10 @@
                   <arg value="bin/extract_snippets.sh"/>
                 </exec>
                 <exec dir="." executable="${pandoc.path}" failonerror="true">
-                  <arg value="src/main/index.md"/>
+                  <arg value="${project.build.outputDirectory}/main/index.md"/>
                   <arg value="--smart"/>
                   <arg value="--standalone"/>
-                  <arg value="--template=src/main/template.html"/>
+                  <arg value="--template=${project.build.outputDirectory}/main/template.html"/>
                   <arg value="--toc"/>
                   <arg value="-o"/>
                   <arg value="${project.build.outputDirectory}/main/index.html"/>

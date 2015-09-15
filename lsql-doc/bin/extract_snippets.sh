@@ -7,7 +7,6 @@ SNIPPETS_DIR=target/snippets
 rm -rf $SNIPPETS_DIR
 mkdir $SNIPPETS_DIR
 
-find src/test/java -type f
-find src/test/java -type f -exec cat {} \; | python bin/extract_snippets.py
+find src/test/java -type f -exec ./bin/process_file.sh {} \;
+find $SNIPPETS_DIR -type f -exec cat {} \; > target/classes/main/index.md
 
-ls -l $SNIPPETS_DIR
