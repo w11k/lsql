@@ -23,7 +23,7 @@ for line in sys.stdin:
 for s in snippets:
     name = s["name"]
     print "writing snippet " + name
-    f = open("snippets/" + name, 'w')
+    f = open("target/snippets/" + name, 'w')
     f.write(s["content"])
 
 
