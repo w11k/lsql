@@ -74,16 +74,16 @@
               <target>
                 <exec dir="." executable="bash" failonerror="true">
                   <arg value="-c"/>
-                  <arg value="src/extract_snippets.sh"/>
+                  <arg value="bin/extract_snippets.sh"/>
                 </exec>
                 <exec dir="." executable="${pandoc.path}" failonerror="true">
-                  <arg value="src/index.md"/>
+                  <arg value="${project.build.outputDirectory}/main/index.md"/>
                   <arg value="--smart"/>
                   <arg value="--standalone"/>
-                  <!--<arg value="&#45;&#45;template=src/template"/>-->
+                  <arg value="--template=${project.build.outputDirectory}/main/template.html"/>
                   <arg value="--toc"/>
                   <arg value="-o"/>
-                  <arg value="${project.build.outputDirectory}/index.html"/>
+                  <arg value="${project.build.outputDirectory}/main/index.html"/>
                 </exec>
               </target>
             </configuration>

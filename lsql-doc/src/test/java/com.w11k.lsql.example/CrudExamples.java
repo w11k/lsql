@@ -46,7 +46,15 @@ public class CrudExamples {
 
     @Test
     public void insert() throws Exception {
-        //----name1
+        /*
+        !(
+        fdsfjdsfdsfdsfds fdsjfk jds lfdsf
+
+        - fsfdsfs
+        - fjdfdslfs
+
+        ```
+        */
         Table personTable = lSql.table("person");
 
         // Option 1: java.util.Map
@@ -68,7 +76,10 @@ public class CrudExamples {
                 "birthday", DateTime.parse("1970-10-1")
         );
         person3.save();
-        //----;
+        /*
+        ```
+        !)
+         */
 
         // Row and LinkedRow are subclasses of java.util.Map
     }
