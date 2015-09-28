@@ -27,18 +27,18 @@ public class Row extends ForwardingMap<String, Object> {
 
     private Map<String, Object> data;
 
-    public static Row fromKeyVals(Object... keyVals) {
-        Row r = new Row();
-        r.addKeyVals(keyVals);
-        return r;
-    }
-
     public Row() {
         this(Maps.<String, Object>newHashMap());
     }
 
     public Row(Map<String, Object> data) {
         this.data = newHashMap(data);
+    }
+
+    public static Row fromKeyVals(Object... keyVals) {
+        Row r = new Row();
+        r.addKeyVals(keyVals);
+        return r;
     }
 
     public void setDelegate(Map<String, Object> data) {
@@ -161,12 +161,30 @@ public class Row extends ForwardingMap<String, Object> {
         return getListOf(Row.class, key);
     }
 
+    public boolean hasNonNullValue(String key) {
+        return get(key) != null;
+    }
+
     public Row pick(String... keys) {
         Row extracted = new Row();
         for (String key : keys) {
-            extracted.put(key, get(key));
+            if (containsKey(key)) {
+                extracted.put(key, get(key));
+            }
         }
         return extracted;
+    }
+
+    public Row putAllIfAbsent(Map<String, Object> source) {
+        Row copiedValues = new Row();
+        for (String key : source.keySet()) {
+            if (!containsKey(key)) {
+                Object value = source.get(key);
+                put(key, value);
+                copiedValues.put(key, value);
+            }
+        }
+        return copiedValues;
     }
 
     public Row copy() {
