@@ -2,11 +2,12 @@ package com.w11k.lsql.tests;
 
 import com.google.common.collect.ImmutableMap;
 import com.w11k.lsql.Row;
-import com.w11k.lsql.Rows;
 import com.w11k.lsql.SqlStatement;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
@@ -26,7 +27,7 @@ public class SqlFileReaderTest extends AbstractLSqlTest {
         table1.insert(Row.fromKeyVals("val", 1));
         table1.insert(Row.fromKeyVals("val", 2));
         table1.insert(Row.fromKeyVals("val", 3));
-        Rows rows = lSql.executeRawQuery("SELECT * FROM table1").rows();
+        List<Row> rows = lSql.executeRawQuery("SELECT * FROM table1").toList();
         assertEquals(rows.size(), 3);
     }
 

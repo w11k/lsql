@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
@@ -16,111 +17,111 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementNoParameter() {
         setup();
-        Rows rows = statement("SELECT * FROM person").query().rows();
+        List<Row> rows = statement("SELECT * FROM person").query().toList();
         assertEquals(rows.size(), 5);
     }
 
     @Test(expectedExceptions = QueryException.class)
     public void statementUnusedParameter() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id = /*xxxxx=*/ -1 /**/;").query(
+        List<Row> rows = statement("SELECT * FROM person WHERE id = /*xxxxx=*/ -1 /**/;").query(
                 "id", 1
-        ).rows();
+        ).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameter() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id = /*id=*/ -1 /**/;").query("id", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE id = /*id=*/ -1 /**/;").query("id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneUnnamed() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id = /*=*/ -1 /**/;").query("id", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE id = /*=*/ -1 /**/;").query("id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneUnnamed2() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id != /*=*/ -1 /**/;").query("id", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE id != /*=*/ -1 /**/;").query("id", 1).toList();
         assertEquals(rows.size(), 4);
     }
 
     @Test
     public void statementOneUnnamed3() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id!= /*=*/ -1 /**/;").query("id", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE id!= /*=*/ -1 /**/;").query("id", 1).toList();
         assertEquals(rows.size(), 4);
     }
 
     @Test
     public void statementOneUnnamedWithTableNameInQuery() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE person.id = /*=*/ -1 /**/;").query("person.id", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE person.id = /*=*/ -1 /**/;").query("person.id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterSpecialName1() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id = /*id_a=*/ -1 /**/;").query("id_a", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE id = /*id_a=*/ -1 /**/;").query("id_a", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterSpecialName2() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id = /*id_1=*/ -1 /**/;").query("id_1", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE id = /*id_1=*/ -1 /**/;").query("id_1", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterSpecialName3() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id = /*person.id=*/ -1 /**/;").query("person.id", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE id = /*person.id=*/ -1 /**/;").query("person.id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterSpecialName4() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE id = /* person.id = */ -1 /**/;").query("person.id", 1).rows();
+        List<Row> rows = statement("SELECT * FROM person WHERE id = /* person.id = */ -1 /**/;").query("person.id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterMultipleOccurence() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE " +
+        List<Row> rows = statement("SELECT * FROM person WHERE " +
                 "id > /*val=*/ 99999 /**/\n" +
                 "AND age > /*val=*/ 99999 /**/" +
                 ";")
-                .query("val", 3).rows();
+                .query("val", 3).toList();
         assertEquals(rows.size(), 2);
     }
 
     @Test
     public void statementTwoParameters() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE " +
+        List<Row> rows = statement("SELECT * FROM person WHERE " +
                 "id = /*id=*/ -1 /**/\n" +
                 "AND age = /*age=*/ -1 /**/" +
                 ";")
                 .query(
                         "id", 2,
                         "age", 12
-                ).rows();
+                ).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementThreeParameters() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE " +
+        List<Row> rows = statement("SELECT * FROM person WHERE " +
                 "id = /*id=*/ -1 /**/\n" +
                 "AND age = /*age=*/ -1 /**/\n" +
                 "AND fullname = /*fullname=*/ 'xxx' /**/" +
@@ -129,38 +130,38 @@ public class SqlStatementTest extends AbstractLSqlTest {
                         "id", 3,
                         "age", 13,
                         "fullname", "c"
-                ).rows();
+                ).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementThreeParametersInOneLine() {
         setup();
-        Rows rows = statement(
+        List<Row> rows = statement(
                 "SELECT * FROM person WHERE " +
                         "id = /*id=*/ -1 /**/ AND age = /*age=*/ -1 /**/ AND fullname = /*fullname=*/ 'xxx' /**/;")
                 .query(
                         "id", 3,
                         "age", 13,
                         "fullname", "c"
-                ).rows();
+                ).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementThreeParametersUnused() {
         setup();
-        Rows rows = statement(
+        List<Row> rows = statement(
                 "SELECT * FROM person WHERE " +
                         "id = /*id=*/ 1 /**/ AND age = /*age=*/ 11 /**/ AND fullname = /*fullname=*/ 'a' /**/;")
-                .query().rows();
+                .query().toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementThreeParametersUnnamed() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE " +
+        List<Row> rows = statement("SELECT * FROM person WHERE " +
                 "id = /*=*/ -1 /**/" +
                 "AND age = /*=*/ -1 /**/" +
                 "AND fullname = /*=*/ 'xxx' /**/" +
@@ -169,14 +170,14 @@ public class SqlStatementTest extends AbstractLSqlTest {
                         "id", 4,
                         "age", 14,
                         "fullname", "d"
-                ).rows();
+                ).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementThreeParametersUnnamedMissingSpace() {
         setup();
-        Rows rows = statement("SELECT * FROM person WHERE " +
+        List<Row> rows = statement("SELECT * FROM person WHERE " +
                 "id = /*=*/ -1 /**/" +
                 "AND age = /*=*/ -1 /**/" +
                 "AND fullname= /*=*/ 'xxx' /**/" +
@@ -185,7 +186,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
                         "id", 4,
                         "age", 14,
                         "fullname", "d"
-                ).rows();
+                ).toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -198,9 +199,9 @@ public class SqlStatementTest extends AbstractLSqlTest {
                 "AND fullname= /*=*/ 'c' /**/" +
                 ";");
 
-        Rows rows = statement.query("val", 3, "fullname", "d").rows();
+        List<Row> rows = statement.query("val", 3, "fullname", "d").toList();
         assertEquals(rows.size(), 1);
-        rows = statement.query("val", 4, "fullname", "e").rows();
+        rows = statement.query("val", 4, "fullname", "e").toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -209,12 +210,12 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         SqlStatement statement = statement("SELECT * FROM person WHERE id = /*=*/ 99999 /**/;");
 
-        Rows rows = statement.query("id", new QueryParameter() {
+        List<Row> rows = statement.query("id", new QueryParameter() {
             @Override
             public void set(PreparedStatement ps, int index) throws SQLException {
                 ps.setInt(index, 1);
             }
-        }).rows();
+        }).toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -228,7 +229,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         t.newLinkedRow("id", 1, "yesno", true).insert();
 
         // Ensure that it was saved as a String
-        Row row = lSql.executeRawQuery("SELECT * FROM T").rows().first().get();
+        Row row = lSql.executeRawQuery("SELECT * FROM T").firstRow().get();
         assertEquals(row.get("yesno"), "positive");
         assertNotEquals(row.get("yesno"), true);
 
@@ -240,37 +241,37 @@ public class SqlStatementTest extends AbstractLSqlTest {
         // Use IN converter
         row = statement("SELECT * FROM T WHERE yesno = /*=*/ 'positive' /**/;")
                 .addInConverter("yesno", converter)
-                .query("yesno", true).rows().first().get();
+                .query("yesno", true).firstRow().get();
         assertEquals(row.get("yesno"), "positive");
 
         // Pass-through OUT converter
         row = statement("SELECT * FROM T WHERE yesno = /*=*/ 'positive' /**/;")
                 .addInConverter("yesno", converter)
                 .addOutConverter("yesno", converter)
-                .query("yesno", true).rows().first().get();
+                .query("yesno", true).firstRow().get();
         assertEquals(row.get("yesno"), true);
 
         // Pass-through table column converters to converters API 1
         row = statement("SELECT * FROM T WHERE yesno = /*=*/ 'positive' /**/;")
                 .setInConverters(t.getColumnConverters())
                 .setOutConverters(t.getColumnConverters())
-                .query("yesno", true).rows().first().get();
+                .query("yesno", true).firstRow().get();
         assertEquals(row.get("yesno"), true);
 
         // Pass-through table column converters to converters API 2
         row = statement("SELECT * FROM T WHERE yesno = /*=*/ 'positive' /**/;")
                 .setInAndOutConverters(t.getColumnConverters())
-                .query("yesno", true).rows().first().get();
+                .query("yesno", true).firstRow().get();
         assertEquals(row.get("yesno"), true);
     }
 
     @Test
     public void removeLine() {
         setup();
-        Rows rows = statement("SELECT * FROM person \n" +
+        List<Row> rows = statement("SELECT * FROM person \n" +
                 "WHERE id = /*id=*/ -1 /**/ \n" +
                 ";")
-                .query("id", SqlStatement.RAW_REMOVE_LINE).rows();
+                .query("id", SqlStatement.RAW_REMOVE_LINE).toList();
         assertEquals(rows.size(), 5);
     }
 

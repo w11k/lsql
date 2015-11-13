@@ -1,12 +1,23 @@
 package com.w11k.lsql;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.base.Optional.of;
 
 public class Query {
 
@@ -16,16 +27,13 @@ public class Query {
 
     private Map<String, Converter> converters = Maps.newHashMap();
 
-//    private final SqlStatement sqlStatement;
-
-    public Query(LSql lSql, PreparedStatement preparedStatement/*, SqlStatement sqlStatement*/) {
+    public Query(LSql lSql, PreparedStatement preparedStatement) {
         this.lSql = lSql;
         this.preparedStatement = preparedStatement;
-//        this.sqlStatement = sqlStatement;
     }
 
     public Query(LSql lSql, String sql) {
-        this(lSql, ConnectionUtils.prepareStatement(lSql, sql, false)/*, new SqlStatement(lSql, "raw query", sql)*/);
+        this(lSql, ConnectionUtils.prepareStatement(lSql, sql, false));
     }
 
     public LSql getlSql() {
@@ -42,99 +50,133 @@ public class Query {
         return this;
     }
 
-    public ExecutedQuery executeQuery() {
+    public List<Row> toList() {
+        final List<Row> rows = Lists.newLinkedList();
+
+        execute(new Function<Row, Object>() {
+            public Object apply(Row input) {
+                rows.add(input);
+                return null;
+            }
+        }, false);
+
+        return rows;
+    }
+
+    /**
+     * Executes the query and calls rowHandler for every row in the result set. Returns a list with all the results of the rowHandler.
+     */
+    public <A> List<A> map(final Function<Row, A> rowHandler) {
+        final List<A> results = Lists.newLinkedList();
+        execute(new Function<Row, Object>() {
+            public Object apply(Row input) {
+                A result = rowHandler.apply(input);
+                results.add(result);
+                return null;
+            }
+        }, false);
+        return results;
+    }
+
+    /**
+     * Executes the query and calls rowHandler for every row in the result set. Returns a list with all the non-null results of the rowHandler. null values returned by the rowHandler are ignored and are not added to the list.
+     */
+    public <A> List<A> flatMap(final Function<Row, A> rowHandler) {
+        final List<A> results = Lists.newLinkedList();
+        execute(new Function<Row, Object>() {
+            public Object apply(Row input) {
+                A result = rowHandler.apply(input);
+                if (result != null) {
+                    results.add(result);
+                }
+                return null;
+            }
+        }, false);
+        return results;
+    }
+
+    /**
+     * Executes the query and calls predicate for every row in the result set. Returns a list with all rows where the predicate returned true.
+     */
+    public List<Row> filter(final Predicate<Row> predicate) {
+        final List<Row> results = Lists.newLinkedList();
+        execute(new Function<Row, Object>() {
+            public Object apply(Row input) {
+                if (predicate.apply(input)) {
+                    results.add(input);
+                }
+                return null;
+            }
+        }, false);
+        return results;
+    }
+
+    /**
+     * Executes the query and returns the first row in the result set. Return absent() if the result set is empty.
+     */
+    public Optional<Row> firstRow() {
+        final List<Row> results = Lists.newLinkedList();
+        execute(new Function<Row, Object>() {
+            public Object apply(Row input) {
+                results.add(input);
+                return null;
+            }
+        }, true);
+
+        return results.size() > 0 ? of(results.get(0)) : Optional.<Row>absent();
+    }
+
+    private <A> void execute(Function<Row, A> rowHandler, boolean onlyFirst) {
         try {
-            return new ExecutedQuery(lSql, preparedStatement.executeQuery(), this.converters);
+            ResultSet resultSet = this.preparedStatement.executeQuery();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+
+            // used to find duplicates
+            Set<String> processedColumnLabels = Sets.newLinkedHashSet();
+
+            // queryConverters for columns
+            List<ResultSetColumn> resultSetColumns = Lists.newLinkedList();
+
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                String columnLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
+
+                // check dublicates
+                if (processedColumnLabels.contains(columnLabel)) {
+                    throw new IllegalStateException("Dublicate column '" + columnLabel + "' in query.");
+                }
+                processedColumnLabels.add(columnLabel);
+
+                Converter converter = this.converters.containsKey(columnLabel)
+                        ? this.converters.get(columnLabel)
+                        : getConverter(metaData, i);
+                resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
+            }
+
+            while (resultSet.next()) {
+                Row row = extractRow(resultSet, resultSetColumns);
+                rowHandler.apply(row);
+                if (onlyFirst) {
+                    return;
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Rows rows() {
-        return executeQuery().rows();
+
+    private Row extractRow(ResultSet resultSet, List<ResultSetColumn> columnConverters) throws SQLException {
+        Row row = new Row();
+        for (ResultSetColumn column : columnConverters) {
+            row.put(column.getName(),
+                    column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
+        }
+        return row;
     }
 
-//    @Override
-//    protected List<Row> delegate() {
-//        return rows();
-//    }
-
-    //    public <T> List<T> map(Function<QueriedRow, T> rowHandler) {
-//        return new QueriedRows(asList()).map(rowHandler);
-//    }
-
-
-    /*
-    private Column getColumnForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
-        String sqlColumnName = metaData.getColumnName(position);
-        String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
-        String sqlColumnLabel = metaData.getColumnLabel(position);
-        String javaColumnLabel = lSql.getDialect().identifierSqlToJava(sqlColumnLabel);
-        Optional<Table> table = getTable(metaData, position);
-
-        // JDBC returned all required information
-        if (table.isPresent()) {
-            if (table.get().getColumns().containsKey(javaColumnName)) {
-                return table.get().column(javaColumnName);
-            }
-        }
-
-        // Table lookup failed. Check SQL string for aliases.
-        Optional<? extends Column> columnOptional = sqlStatement.getColumnFromSqlStatement(javaColumnLabel);
-        if (columnOptional.isPresent()) {
-            return columnOptional.get();
-        }
-
-        // Alias search in SQL string failed. Create column based on type.
-        Converter converter = getConverter(metaData, position);
-        return Column.create(
-                table.orNull(),
-                javaColumnName,
-                metaData.getColumnType(position),
-                converter,
-                -1);
+    private Converter getConverter(ResultSetMetaData metaData, int position) throws SQLException {
+        int columnSqlType = metaData.getColumnType(position);
+        return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
     }
-    */
-
-
-
-    /*
-    private Map<String, ResultSetColumn<?>> createResultSetColums(ResultSetMetaData metaData)
-            throws SQLException {
-
-        // used to find duplicates
-        Set<String> processedColumnLabels = Sets.newLinkedHashSet();
-
-        Map<String, ResultSetColumn<?>> columnList = Maps.newLinkedHashMap();
-
-        for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            String columnLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
-
-            // check dublicates
-            if (processedColumnLabels.contains(columnLabel)) {
-                throw new IllegalStateException("Dublicate column '" + columnLabel + "' in query.");
-            }
-            processedColumnLabels.add(columnLabel);
-
-            Converter converter = getConverter(metaData, i);
-
-            columnList.put(columnLabel, rsc);
-        }
-        return columnList;
-    }
-    */
-
-//    private Optional<Table> getTable(ResultSetMetaData metaData, int position) throws SQLException {
-//        String sqlTableName = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, position);
-//        Optional<Table> table;
-//        if (sqlTableName == null || "".equals(sqlTableName)) {
-//            table = absent();
-//        } else {
-//            String javaTable = lSql.getDialect().identifierSqlToJava(sqlTableName);
-//            table = of(lSql.table(javaTable));
-//        }
-//        return table;
-//    }
-
 }
 

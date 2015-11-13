@@ -133,7 +133,7 @@ public class Table {
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
-                throw new InsertException(rowsAffected + " rows were affected by insert operation. Expected: 1");
+                throw new InsertException(rowsAffected + " toList were affected by insert operation. Expected: 1");
             }
             if (primaryKeyColumn.isPresent()) {
                 Object id = null;
@@ -327,7 +327,7 @@ public class Table {
         for (String columnInTable : this.columns.keySet()) {
             query.addConverter(columnInTable, this.columns.get(columnInTable).getConverter());
         }
-        Optional<Row> first = query.rows().first();
+        Optional<Row> first = query.firstRow();
         if (first.isPresent()) {
             return of(newLinkedRow(first.get()));
         } else {
@@ -460,7 +460,7 @@ public class Table {
         int rowsAffected = ps.executeUpdate();
         if (rowsAffected != 1) {
             throw new UpdateException(rowsAffected +
-                    " rows were affected by update operation (expected 1). Either the ID or the revision (if enabled) is wrong.");
+                    " toList were affected by update operation (expected 1). Either the ID or the revision (if enabled) is wrong.");
         }
     }
 

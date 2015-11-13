@@ -3,7 +3,6 @@ package com.w11k.lsql.tests;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.Row;
-import com.w11k.lsql.Rows;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.InsertException;
@@ -14,6 +13,7 @@ import com.w11k.lsql.validation.TypeError;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import static org.testng.Assert.*;
@@ -69,10 +69,11 @@ public class TableTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         Object newId = table1.insert(new Row().addKeyVals("age", 1)).get();
 
-        Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).rows().first().get();
+        Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).firstRow().get();
         assertEquals(query.getInt("age"), (Integer) 1);
     }
 
+    @SuppressWarnings("Duplicates")
     @Test
     public void insertShouldPutIdIntoRowObject() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, age INT)");
@@ -83,6 +84,7 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(optional.get(), row.get("id"));
     }
 
+    @SuppressWarnings("Duplicates")
     @Test(expectedExceptions = InsertException.class)
     public void insertShouldFailOnWrongKeys() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
@@ -186,7 +188,7 @@ public class TableTest extends AbstractLSqlTest {
         queriedRow = table1.load(id).get();
         assertEquals(queriedRow, row);
 
-        Rows rows = lSql.executeRawQuery("SELECT * FROM table1").rows();
+        List<Row> rows = lSql.executeRawQuery("SELECT * FROM table1").toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -200,7 +202,7 @@ public class TableTest extends AbstractLSqlTest {
         table1.insert(row).get();
 
         // Verify insert
-        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").rows().size();
+        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").toList().size();
         assertEquals(tableSize, 1);
 
         // Insert 2nd row
@@ -210,7 +212,7 @@ public class TableTest extends AbstractLSqlTest {
         table1.delete(row);
 
         // Verify delete
-        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").rows().size();
+        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").toList().size();
         assertEquals(tableSize, 1);
     }
 

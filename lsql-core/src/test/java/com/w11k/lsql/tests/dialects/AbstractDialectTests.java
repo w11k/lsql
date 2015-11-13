@@ -82,7 +82,7 @@ public abstract class AbstractDialectTests {
         Object id2 = table1.insert(row2).get();
 
         // Verify insert
-        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").rows().size();
+        int tableSize = lSql.executeRawQuery("SELECT * FROM table1;").toList().size();
         assertEquals(tableSize, 2);
 
         LinkedRow queried1 = table1.load(id1).get();
@@ -99,7 +99,7 @@ public abstract class AbstractDialectTests {
         table1.delete(row2);
 
         // Verify delete
-        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").rows().size();
+        tableSize = lSql.executeRawQuery("SELECT * FROM table1;").toList().size();
         assertEquals(tableSize, 1);
     }
 
@@ -116,7 +116,7 @@ public abstract class AbstractDialectTests {
     public void resolveTableAliasWhenReadingResultSet() {
 //        skipOnConfigError();
 //        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
-//        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWhenReadingResultSet").query().rows();
+//        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWhenReadingResultSet").query().toList();
 //        assertEquals(list.size(), 2);
 //
 //        QueriedRow row1 = list.get(0);
@@ -133,7 +133,7 @@ public abstract class AbstractDialectTests {
 //        skipOnConfigError();
 //        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
 //        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWhenReadingResultSetWithSpecialCharsInTableName")
-//                .query("t1.id", 1).rows();
+//                .query("t1.id", 1).toList();
 //        assertEquals(list.size(), 1);
 //
 //        QueriedRow row1 = list.get(0);
@@ -146,7 +146,7 @@ public abstract class AbstractDialectTests {
 //        skipOnConfigError();
 //        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
 //        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWithWildcardWhenReadingResultSet").query()
-//                .rows();
+//                .toList();
 //        assertEquals(list.size(), 2);
 //
 //        QueriedRow row1 = list.get(0);
@@ -162,7 +162,7 @@ public abstract class AbstractDialectTests {
     public void resolveJoinedTableAliasWhenReadingResultSet() {
 //        skipOnConfigError();
 //        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
-//        List<QueriedRow> list = lSqlFile.statement("resolveJoinedTableAliasWhenReadingResultSet").query().rows();
+//        List<QueriedRow> list = lSqlFile.statement("resolveJoinedTableAliasWhenReadingResultSet").query().toList();
 //        assertEquals(list.size(), 2);
 //
 //        QueriedRow row1 = list.get(0);
@@ -182,7 +182,7 @@ public abstract class AbstractDialectTests {
     public void resolveColumnAliasWhenReadingResultSet() {
 //        skipOnConfigError();
 //        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
-//        List<QueriedRow> list = lSqlFile.statement("resolveColumnAliasWhenReadingResultSet").query().rows();
+//        List<QueriedRow> list = lSqlFile.statement("resolveColumnAliasWhenReadingResultSet").query().toList();
 //        assertEquals(list.size(), 2);
 //
 //        QueriedRow row1 = list.get(0);
@@ -198,7 +198,7 @@ public abstract class AbstractDialectTests {
     public void resolveTableAndColumnAliasWhenReadingResultSet() {
 //        skipOnConfigError();
 //        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
-//        List<QueriedRow> list = lSqlFile.statement("resolveTableAndColumnAliasWhenReadingResultSet").query().rows();
+//        List<QueriedRow> list = lSqlFile.statement("resolveTableAndColumnAliasWhenReadingResultSet").query().toList();
 //        assertEquals(list.size(), 2);
 //
 //        QueriedRow row1 = list.get(0);
@@ -216,7 +216,7 @@ public abstract class AbstractDialectTests {
 //        LSqlFile lSqlFile = lSql.readSqlFileRelativeToClass(getClass(), "aliases.sql");
 //        List<QueriedRow> list = lSqlFile.statement("resolveTableAliasWhenSettingParameter").query(
 //                "t1.yesno", false
-//        ).rows();
+//        ).toList();
 //        assertEquals(list.size(), 1);
 //
 //        QueriedRow row1 = list.get(0);
