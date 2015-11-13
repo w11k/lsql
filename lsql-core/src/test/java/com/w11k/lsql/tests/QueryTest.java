@@ -3,6 +3,7 @@ package com.w11k.lsql.tests;
 import com.google.common.base.Function;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
+import com.w11k.lsql.RowConsumer;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -116,6 +117,22 @@ public class QueryTest extends AbstractLSqlTest {
         });
         assertEquals(ages.size(), 1);
         assertEquals(ages.get(0).intValue(), 20);
+    }
+
+    @Test
+    public void forEach() {
+        createTable("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 10)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus2', 20)");
+
+        Query query = lSql.executeRawQuery("SELECT * FROM table1");
+        final AtomicInteger ai = new AtomicInteger();
+        query.forEach(new RowConsumer() {
+            public void each(Row row) {
+                ai.incrementAndGet();
+            }
+        });
+        assertEquals(ai.get(), 2);
     }
 
 }

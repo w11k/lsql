@@ -63,6 +63,15 @@ public class Query {
         return rows;
     }
 
+    public void forEach(final RowConsumer rowConsumer) {
+        execute(new Function<Row, Object>() {
+            public Object apply(Row input) {
+                rowConsumer.each(input);
+                return null;
+            }
+        }, false);
+    }
+
     /**
      * Executes the query and calls rowHandler for every row in the result set. Returns a list with all the results of the rowHandler.
      */
