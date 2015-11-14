@@ -77,9 +77,7 @@ public class Row extends ForwardingMap<String, Object> {
             return null;
         }
         if (!type.isAssignableFrom(value.getClass())) {
-            A converted = convertWithJackson(type, value);
-            put(key, converted);
-            return converted;
+            return convertWithJackson(type, value);
         }
         return type.cast(value);
     }
@@ -152,14 +150,14 @@ public class Row extends ForwardingMap<String, Object> {
         return (TreeSet<A>) get(key);
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Row> List<T> getJoined(String key) {
-        return (List<T>) getListOf(Row.class, key);
-    }
+//    @SuppressWarnings("unchecked")
+//    public <T extends Row> List<T> getJoined(String key) {
+//        return (List<T>) getListOf(Row.class, key);
+//    }
 
-    public List<Row> getJoinedRows(String key) {
-        return getListOf(Row.class, key);
-    }
+//    public List<Row> getJoinedRows(String key) {
+//        return getListOf(Row.class, key);
+//    }
 
     public boolean hasNonNullValue(String key) {
         return get(key) != null;

@@ -47,14 +47,6 @@ public class RowTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void aConversionRemembersTheResult() {
-        Row r = new Row().addKeyVals("a", "1");
-        assertEquals(r.get("a"), "1");
-        assertEquals(r.getInt("a"), (Integer) 1);
-        assertEquals(r.get("a"), 1);
-    }
-
-    @Test
     public void stringToIntConversion() {
         Row r = new Row().addKeyVals("a", "1");
         assertEquals(r.getInt("a"), (Integer) 1);
