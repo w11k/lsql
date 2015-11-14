@@ -5,6 +5,13 @@ import java.util.concurrent.Callable;
 
 public class TransactionUtils {
 
+    /**
+     * Wraps a Callable in a transaction.
+     *
+     * @param connectionFactory returns the connection used for the transaction control
+     * @param from the Callable to wrap
+     * @return the wrapped Callable
+     */
     public static <T> Callable<T> makeTransactional(final Callable<Connection> connectionFactory, final Callable<T> from) {
         return new Callable<T>() {
             @Override public T call() throws Exception {
@@ -23,6 +30,13 @@ public class TransactionUtils {
         };
     }
 
+    /**
+     * Wraps a Runnable in a transaction.
+     *
+     * @param connectionFactory returns the connection used for the transaction control
+     * @param from the Runnable to wrap
+     * @return the wrapped Runnable
+     */
     public static Runnable makeTransactional(final Callable<Connection> connectionFactory, final Runnable from) {
         return new Runnable() {
             @Override public void run() {
