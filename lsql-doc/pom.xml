@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.w11k.lsql</groupId>
     <artifactId>lsql-parent</artifactId>
-    <version>0.11.2</version>
+    <version>0.12</version>
   </parent>
   <packaging>jar</packaging>
 
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>com.w11k.lsql</groupId>
       <artifactId>lsql-core</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
