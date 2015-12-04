@@ -20,17 +20,17 @@ while read LINE; do
 if [[ $EXTRACT_ON == 1 ]] \
     && [[ $LINE != *"*/"* ]] \
     && [[ $LINE != *"/*"* ]] \
-    && [[ $LINE != *"!)"* ]]
+    && [[ $LINE != *")))"* ]]
 then
     echo ${LINE:$INDENT} >> $FILE
 fi
 
-if [[ $LINE == *"!("* ]]; then
+if [[ $LINE == *"((("* ]]; then
     EXTRACT_ON=1
     INDENT=`echo $LINE | awk '{t=length($0);sub("^ *","");print t-length($0)}'`
 fi
 
-if [[ $LINE == *"!)"* ]]; then
+if [[ $LINE == *")))"* ]]; then
     EXTRACT_ON=0
     INDENT=0
 fi

@@ -12,6 +12,7 @@
   <packaging>jar</packaging>
 
   <artifactId>lsql-doc</artifactId>
+  <name>LSql Doc</name>
 
   <properties>
     <github.global.server>github</github.global.server>
@@ -78,9 +79,8 @@
                 </exec>
                 <exec dir="." executable="${pandoc.path}" failonerror="true">
                   <arg value="${project.build.outputDirectory}/main/index.md"/>
-                  <arg value="--smart"/>
                   <arg value="--standalone"/>
-                  <arg value="--template=${project.build.outputDirectory}/main/template.html"/>
+                  <!--<arg value="&#45;&#45;template=${project.build.outputDirectory}/main/template.html"/>-->
                   <arg value="--toc"/>
                   <arg value="-o"/>
                   <arg value="${project.build.outputDirectory}/main/index.html"/>

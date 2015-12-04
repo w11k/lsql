@@ -11,6 +11,7 @@
   </parent>
 
   <artifactId>lsql-core</artifactId>
+  <name>LSql Core</name>
 
   <dependencies>
     <!-- compile -->
