@@ -1,6 +1,8 @@
 
 # Literate SQL - A Java Database Library
 
+[![Join the chat at https://gitter.im/w11k/lsql](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/w11k/lsql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 LSql (Literate SQL) is a pragmatic Java database access library on top of JDBC.
 
 Our philosophy:
