@@ -8,6 +8,7 @@ import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import rx.Observable;
 import rx.Subscriber;
+import rx.annotations.Experimental;
 import rx.functions.Func1;
 import rx.subjects.Subject;
 
@@ -38,6 +39,14 @@ public class Query {
 
     public LSql getlSql() {
         return lSql;
+    }
+
+    public PreparedStatement getPreparedStatement() {
+        return preparedStatement;
+    }
+
+    public Map<String, Converter> getConverters() {
+        return converters;
     }
 
     public Query addConverter(String columnName, Converter converter) {
@@ -164,7 +173,7 @@ public class Query {
 
                         Converter converter = converters.containsKey(columnLabel)
                           ? converters.get(columnLabel)
-                          : getConverter(metaData, i);
+                          : getConverterForResultSetColumn(metaData, i);
                         resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
                     }
 
@@ -181,6 +190,10 @@ public class Query {
         });
     }
 
+    @Experimental
+    public Object toTree() {
+        return new QueryToTreeConverter(this).getTree();
+    }
 
     public Row extractRow(ResultSetWithColumns resultSetWithColumns) {
         ResultSet resultSet = resultSetWithColumns.getResultSet();
@@ -197,7 +210,7 @@ public class Query {
         return row;
     }
 
-    private Converter getConverter(ResultSetMetaData metaData, int position) throws SQLException {
+    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
         int columnSqlType = metaData.getColumnType(position);
         return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
     }

@@ -142,47 +142,6 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(result.size(), 1);
     }
 
-    //@Test
-    public void groupBy() {
-        // TODO
-
-        createTable("CREATE TABLE table1 (id INT, name1 TEXT)");
-        lSql.executeRawSql("INSERT INTO table1 VALUES (1, 'a')");
-        lSql.executeRawSql("INSERT INTO table1 VALUES (2, 'b')");
-
-        createTable("CREATE TABLE table2 (id INT, table1_id INT, name2 TEXT)");
-        lSql.executeRawSql("INSERT INTO table2 VALUES (1, 1, 'a-2-a')");
-        lSql.executeRawSql("INSERT INTO table2 VALUES (2, 1, 'a-2-b')");
-        lSql.executeRawSql("INSERT INTO table2 VALUES (3, 2, 'b-2-a')");
-        lSql.executeRawSql("INSERT INTO table2 VALUES (4, 2, 'b-2-b')");
-
-        createTable("CREATE TABLE table3 (id INT, table1_id INT, name3 TEXT)");
-        lSql.executeRawSql("INSERT INTO table3 VALUES (1, 1, 'a-3-a')");
-        lSql.executeRawSql("INSERT INTO table3 VALUES (2, 1, 'a-3-b')");
-        lSql.executeRawSql("INSERT INTO table3 VALUES (1, 2, 'b-3-a')");
-        lSql.executeRawSql("INSERT INTO table3 VALUES (2, 2, 'b-3-b')");
-
-        Query query = lSql.executeRawQuery("SELECT table1.*,  '|', table2.* FROM table1 " +
-          "LEFT JOIN table2 on table2.table1_id = table1.id " +
-          "LEFT JOIN table3 on table3.table1_id = table1.id");
-        List<Row> rows = query.toList();
-
-
-        for (Row row : rows) {
-            System.out.println(row);
-        }
-
-
-        query.rxResultSet().subscribe(new Action1<ResultSetWithColumns>() {
-            @Override
-            public void call(ResultSetWithColumns resultSetWithColumns) {
-                System.out.println("resultSetWithColumns = " + resultSetWithColumns);
-            }
-        });
-
-
-    }
-
     @Test
     public void rxApiTests() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
