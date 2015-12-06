@@ -174,7 +174,6 @@ public class Query {
                     }
                     resultSet.close();
                     subscriber.onCompleted();
-                    System.out.println("QUERY: close/onCompleted");
                 } catch (SQLException e) {
                     subscriber.onError(e);
                 }
