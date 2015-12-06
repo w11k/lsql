@@ -1,14 +1,15 @@
 package com.w11k.lsql;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +45,12 @@ public class SqlStatement {
 
         @Override
         public String toString() {
-            return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                    .append("name", name)
-                    .append("startIndex", startIndex)
-                    .append("endIndex", endIndex)
-                    .toString();
+            return "Parameter{" +
+              "placeholder='" + placeholder + '\'' +
+              ", name='" + name + '\'' +
+              ", startIndex=" + startIndex +
+              ", endIndex=" + endIndex +
+              '}';
         }
     }
 
@@ -59,11 +61,10 @@ public class SqlStatement {
 
         @Override
         public String toString() {
-            return new ToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE)
-                    .append("name", parameter.name)
-                    .append("value type", value.getClass().getCanonicalName())
-                    .append("value", value)
-                    .toString();
+            return "ParameterInPreparedStatement{" +
+              "parameter=" + parameter +
+              ", value=" + value +
+              '}';
         }
     }
 
@@ -187,10 +188,10 @@ public class SqlStatement {
             p.endIndex = paramEnd;
 
             // Placeholder for PreparedStatement
-            p.placeholder = "?" + StringUtils.repeat(" ", p.endIndex - p.startIndex - 1);
+//            p.placeholder = "?" + StringUtils.repeat(" ", p.endIndex - p.startIndex - 1);
+            p.placeholder = "?" + Strings.repeat(" ", p.endIndex - p.startIndex - 1);
 
 
-//            List<Parameter> parametersForName = found.getOrDefault(p.name, Lists.<Parameter>newLinkedList());
             List<Parameter> parametersForName = found.containsKey(p.name) ? found.get(p.name) : Lists.<Parameter>newLinkedList();
 
 
@@ -203,8 +204,12 @@ public class SqlStatement {
     private String extractParameterName(String sqlString, int start) {
         String left = sqlString.substring(0, start);
         left = left.trim();
-        String[] leftTokens = StringUtils.split(left, "!=<> ");
-        return leftTokens[leftTokens.length - 1];
+
+//        String[] leftTokens = StringUtils.split(left, "!=<> ");
+//        String apache = leftTokens[leftTokens.length - 1];
+
+        Iterable<String> splitIter = Splitter.on(CharMatcher.anyOf("!=<> ")).omitEmptyStrings().split(left);
+        return Iterables.getLast(splitIter);
     }
 
     private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
@@ -274,13 +279,16 @@ public class SqlStatement {
             if (pips.value.equals(RAW_REMOVE_LINE)) {
 
                 int startIndex = pips.parameter.startIndex;
-                int beginLine = StringUtils.lastIndexOf(sql.substring(0, startIndex), "\n");
+//                int beginLine = StringUtils.lastIndexOf(sql.substring(0, startIndex), "\n");
+                int beginLine = sql.substring(0, startIndex).lastIndexOf("\n");
 
                 int endIndex = pips.parameter.endIndex;
-                int endLine = StringUtils.indexOf(sql, "\n", endIndex);
+//                int endLine = StringUtils.indexOf(sql, "\n", endIndex);
+                int endLine = sql.indexOf("\n", endIndex);
 
                 sql = sql.substring(0, beginLine);
-                sql += StringUtils.repeat(" ", endLine - beginLine);
+//                sql += StringUtils.repeat(" ", endLine - beginLine);
+                sql += Strings.repeat(" ", endLine - beginLine);
                 sql += sql.substring(endLine);
             }
         }

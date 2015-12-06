@@ -47,12 +47,6 @@ public class RowTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void stringToIntConversion() {
-        Row r = new Row().addKeyVals("a", "1");
-        assertEquals(r.getInt("a"), (Integer) 1);
-    }
-
-    @Test
     public void stringToDateTimeConversion() {
         LocalDateTime dt = new DateTime().toLocalDateTime();
         Row r = Row.fromKeyVals(
@@ -70,6 +64,11 @@ public class RowTest extends AbstractLSqlTest {
         r.put("date", dt1.getMillis());
         DateTime dt2 = r.getDateTime("date");
         assertEquals(dt1, dt2);
+    }
+
+    @Test(expectedExceptions = ClassCastException.class)
+    public void exceptionOnGetAsWithWrongType() {
+        Row.fromKeyVals("a", 1).getString("a");
     }
 
 }

@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.w11k.lsql</groupId>
     <artifactId>lsql-parent</artifactId>
-    <version>0.12</version>
+    <version>0.12.1</version>
   </parent>
 
   <artifactId>lsql-core</artifactId>
@@ -18,10 +18,12 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
-    </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>com.google.inject</groupId>-->
+      <!--<artifactId>guice</artifactId>-->
+    <!--</dependency>-->
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -49,22 +51,24 @@
       <artifactId>jackson-datatype-joda</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.javassist</groupId>
-      <artifactId>javassist</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.google.code.findbugs</groupId>-->
+      <!--<artifactId>jsr305</artifactId>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.javassist</groupId>-->
+      <!--<artifactId>javassist</artifactId>-->
+    <!--</dependency>-->
+
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>org.apache.commons</groupId>-->
+      <!--<artifactId>commons-lang3</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>com.h2database</groupId>

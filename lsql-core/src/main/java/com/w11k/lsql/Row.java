@@ -1,7 +1,5 @@
 package com.w11k.lsql;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
@@ -10,7 +8,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +44,7 @@ public class Row extends ForwardingMap<String, Object> {
 
     public Row addKeyVals(Object... keyVals) {
         checkArgument(
-                keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
+          keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
 
         Iterable<List<Object>> partition = Iterables.partition(newArrayList(keyVals), 2);
         for (List<Object> objects : partition) {
@@ -76,10 +73,18 @@ public class Row extends ForwardingMap<String, Object> {
         if (value == null) {
             return null;
         }
-        if (!type.isAssignableFrom(value.getClass())) {
-            return convertWithJackson(type, value);
+//        if (!type.isAssignableFrom(value.getClass())) {
+//            return convertWithJackson(type, value);
+//        }
+
+        if (type.isAssignableFrom(value.getClass())) {
+            return type.cast(value);
+        } else {
+            throw new ClassCastException("Row entry for key: '" + key
+              + "', value: '" + value
+              + "', type: '" + value.getClass().getCanonicalName()
+              + "' is not assignable to type '" + type.getCanonicalName() + "'");
         }
-        return type.cast(value);
     }
 
     public <A> A getAsOr(Class<A> type, String key, A defaultValue) {
@@ -196,24 +201,24 @@ public class Row extends ForwardingMap<String, Object> {
         return Objects.toStringHelper(this).add("content", delegate()).toString();
     }
 
-    protected ObjectMapper getObjectMapper() {
-        return LSql.OBJECT_MAPPER;
-    }
+//    protected ObjectMapper getObjectMapper() {
+//        return LSql.OBJECT_MAPPER;
+//    }
 
     @Override
     protected Map<String, Object> delegate() {
         return data;
     }
 
-    private <A> A convertWithJackson(Class<A> expectedType, Object value) {
-        ObjectMapper mapper = getObjectMapper();
-        String valString = "\"" + value + "\"";
-        try {
-            JsonNode rootNode = mapper.readValue(valString, JsonNode.class);
-            return mapper.treeToValue(rootNode, expectedType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    private <A> A convertWithJackson(Class<A> expectedType, Object value) {
+//        ObjectMapper mapper = getObjectMapper();
+//        String valString = "\"" + value + "\"";
+//        try {
+//            JsonNode rootNode = mapper.readValue(valString, JsonNode.class);
+//            return mapper.treeToValue(rootNode, expectedType);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 }

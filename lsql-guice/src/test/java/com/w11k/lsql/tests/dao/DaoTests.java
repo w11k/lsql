@@ -1,6 +1,5 @@
 package com.w11k.lsql.tests.dao;
 
-import com.w11k.lsql.tests.AbstractLSqlTest;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertNotNull;
@@ -19,7 +18,7 @@ public class DaoTests extends AbstractLSqlTest {
 
     private TestDao createTestDao() {
         TestDao t = new TestDao();
-        t.setlSql(lSql);
+        t.setlSql(this.lSql);
         return t;
     }
 

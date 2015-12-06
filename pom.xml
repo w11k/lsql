@@ -6,12 +6,12 @@
 
   <groupId>com.w11k.lsql</groupId>
   <artifactId>lsql-parent</artifactId>
-  <version>0.12</version>
+  <version>0.12.1</version>
   <packaging>pom</packaging>
 
   <modules>
     <module>lsql-core</module>
-    <!--<module>lsql-example</module>-->
+    <module>lsql-guice</module>
     <module>lsql-doc</module>
   </modules>
 
@@ -66,27 +66,30 @@
         <version>2.3.1</version>
       </dependency>
 
-      <dependency>
-        <groupId>com.google.code.findbugs</groupId>
-        <artifactId>jsr305</artifactId>
-        <version>2.0.1</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.javassist</groupId>
-        <artifactId>javassist</artifactId>
-        <version>3.18.0-GA</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.google.code.findbugs</groupId>-->
+        <!--<artifactId>jsr305</artifactId>-->
+        <!--<version>2.0.1</version>-->
+        <!--<scope>provided</scope>-->
+      <!--</dependency>-->
+
+      <!--<dependency>-->
+        <!--<groupId>org.javassist</groupId>-->
+        <!--<artifactId>javassist</artifactId>-->
+        <!--<version>3.18.0-GA</version>-->
+      <!--</dependency>-->
+
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>2.2</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.4</version>
-      </dependency>
+
+      <!--<dependency>-->
+        <!--<groupId>org.apache.commons</groupId>-->
+        <!--<artifactId>commons-lang3</artifactId>-->
+        <!--<version>3.4</version>-->
+      <!--</dependency>-->
 
       <!-- for dialect -->
       <dependency>

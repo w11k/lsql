@@ -72,7 +72,7 @@ public class ConverterTypeTest extends AbstractLSqlTest {
 
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, datetime TIMESTAMP)");
         Table table1 = lSql.table("table1");
-        Row insert = Row.fromKeyVals("id", 1, "datetime", now.toString());
+        Row insert = Row.fromKeyVals("id", 1, "datetime", now);
         table1.insert(insert);
         Row row = table1.load(1).get();
         assertEquals(row.get("datetime"), now);

@@ -7,7 +7,6 @@ import com.w11k.lsql.Column;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 
-import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -50,9 +49,8 @@ public class PreparedStatementCreator {
         sql += Joiner.on(",").join(Lists.transform(
                 createSqlColumnNames(table, columns),
                 new Function<String, Object>() {
-                    @Nullable
                     @Override
-                    public Object apply(@Nullable String input) {
+                    public Object apply(String input) {
                         return input + "=?";
                     }
                 }));
