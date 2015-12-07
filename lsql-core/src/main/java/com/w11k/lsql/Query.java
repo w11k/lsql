@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,13 +50,13 @@ public class Query {
         return converters;
     }
 
-    public Query addConverter(String columnName, Converter converter) {
-        this.converters.put(columnName, converter);
+    public Query setConverters(Map<String, Converter> converters) {
+        this.converters = converters;
         return this;
     }
 
-    public Query setConverters(Map<String, Converter> converters) {
-        this.converters = converters;
+    public Query addConverter(String columnName, Converter converter) {
+        this.converters.put(columnName, converter);
         return this;
     }
 
@@ -143,7 +144,7 @@ public class Query {
 
     /**
      * Turns this query into an Observable. Each subscription will trigger the underlying database operation.
-     *
+     * <p/>
      * This is a low-level API to directly work with the JDBC ResultSet.
      *
      * @return the Observable
@@ -171,9 +172,12 @@ public class Query {
                         }
                         processedColumnLabels.add(columnLabel);
 
-                        Converter converter = converters.containsKey(columnLabel)
-                          ? converters.get(columnLabel)
-                          : getConverterForResultSetColumn(metaData, i);
+//                        Converter converter = converters.containsKey(columnLabel)
+//                          ? converters.get(columnLabel)
+//                          : getConverterForResultSetColumn(metaData, i);
+
+                        Converter converter = getConverterForResultSetColumn(metaData, i, columnLabel);
+
                         resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
                     }
 
@@ -191,7 +195,7 @@ public class Query {
     }
 
     @Experimental
-    public Object toTree() {
+    public LinkedHashMap<String, Row> toTree() {
         return new QueryToTreeConverter(this).getTree();
     }
 
@@ -210,9 +214,13 @@ public class Query {
         return row;
     }
 
-    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position) throws SQLException {
+    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
+      throws SQLException {
+        if (converters.containsKey(columnLabel)) {
+            return converters.get(columnLabel);
+        }
+
         int columnSqlType = metaData.getColumnType(position);
         return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
     }
 }
-

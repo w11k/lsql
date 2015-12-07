@@ -8,10 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
@@ -155,6 +152,12 @@ public class Row extends ForwardingMap<String, Object> {
         return (TreeSet<A>) get(key);
     }
 
+    @SuppressWarnings("unchecked")
+    public LinkedHashMap<String, Row> getTree(String key) {
+        return getAs(LinkedHashMap.class, key);
+    }
+
+
 //    @SuppressWarnings("unchecked")
 //    public <T extends Row> List<T> getJoined(String key) {
 //        return (List<T>) getListOf(Row.class, key);
@@ -198,7 +201,7 @@ public class Row extends ForwardingMap<String, Object> {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("content", delegate()).toString();
+        return Objects.toStringHelper(this).addValue(delegate()).toString();
     }
 
 //    protected ObjectMapper getObjectMapper() {
