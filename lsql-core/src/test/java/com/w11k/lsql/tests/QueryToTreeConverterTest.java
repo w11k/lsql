@@ -1,6 +1,5 @@
 package com.w11k.lsql.tests;
 
-import com.w11k.lsql.LSql;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.SqlStatement;
@@ -153,7 +152,6 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
     public void tree2Nested2bAnd3() {
         Query query = statement("tree2Nested2bAnd3").query();
         LinkedHashMap<Number, Row> tree = query.toTree();
-        LSql.prettyPrint(tree);
 
         assertEquals(tree.size(), 2);
         assertEquals(tree.get(1).getTree("table2").get(1).size(), 4);

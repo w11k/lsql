@@ -1,8 +1,6 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
@@ -13,25 +11,42 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
 class QueryToTreeConverter {
 
+    private static class MarkerColumnValue {
+
+        private final ResultSetColumn resultSetColumn;
+        private final Number id;
+
+        public MarkerColumnValue(ResultSetColumn resultSetColumn, Number id) {
+            this.resultSetColumn = resultSetColumn;
+            this.id = id;
+        }
+
+
+        public ResultSetColumn getResultSetColumn() {
+            return resultSetColumn;
+        }
+
+        public Number getId() {
+            return id;
+        }
+    }
+
     private final Query query;
+
     private final ResultSet resultSet;
+
     private final ResultSetMetaData metaData;
+
+    private String markerColumnPrefix = "/";
+
     private Map<Integer, ResultSetColumn> resultSetColumns = Maps.newHashMap();
-    private Pattern markerFirstColumn = Pattern.compile("(.+)/(:.+)?");
-    /**
-     * group 1: value
-     * group 2: field
-     * group 3: table
-     */
-    private Pattern markerColumn = Pattern.compile("(.+?)/(.+)(:.+)?");
+
+
     private LinkedHashMap<Number, Row> tree;
 
     public QueryToTreeConverter(Query query) {
@@ -39,41 +54,33 @@ class QueryToTreeConverter {
         try {
             this.resultSet = query.getPreparedStatement().executeQuery();
             this.metaData = resultSet.getMetaData();
+
+            createResultSetColumns();
             createTree();
+
             resultSet.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Optional<ResultSetColumn> getResultSetColumn(int columnNumber) throws SQLException {
-        if (resultSetColumns.containsKey(columnNumber)) {
-            return of(resultSetColumns.get(columnNumber));
+    private void createResultSetColumns() throws SQLException {
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+            String label = query.getlSql().getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
+
+            // Marker column?
+            if (label.startsWith(markerColumnPrefix)) {
+                String fullPath = label.substring(markerColumnPrefix.length());
+                ResultSetColumn rsc = new ResultSetColumn(i, "marker column " + i + " [" + label + "]", fullPath);
+                resultSetColumns.put(i, rsc);
+                continue;
+            }
+
+            // Registered Converter
+            Converter converter = query.getConverterForResultSetColumn(metaData, i, label);
+            ResultSetColumn rsc = new ResultSetColumn(i, label, converter);
+            resultSetColumns.put(i, rsc);
         }
-
-        String columnValue = resultSet.getString(columnNumber);
-        if (columnValue == null) {
-            return absent();
-        }
-
-        // Marker Column?
-        Pattern pattern = columnNumber == 1 ? markerFirstColumn : markerColumn;
-        Matcher matcher = pattern.matcher(columnValue);
-        if (matcher.find()) {
-            ResultSetColumn rsc = new ResultSetColumn(columnNumber, "marker column " + columnNumber, pattern);
-            resultSetColumns.put(columnNumber, rsc);
-            return of(rsc);
-        }
-
-        String columnLabel = query.getlSql().getDialect().identifierSqlToJava(metaData.getColumnLabel(columnNumber));
-
-        // Registered Converter
-        Converter converter = query.getConverterForResultSetColumn(metaData, columnNumber, columnLabel);
-        ResultSetColumn rsc = new ResultSetColumn(columnNumber, columnLabel, converter);
-        resultSetColumns.put(columnNumber, rsc);
-        return of(rsc);
-
-
     }
 
     private void createTree() throws SQLException {
@@ -84,12 +91,7 @@ class QueryToTreeConverter {
             Row row = null;
 
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                Optional<ResultSetColumn> rscOpt = getResultSetColumn(i);
-                if (!rscOpt.isPresent()) {
-                    continue;
-                }
-
-                ResultSetColumn rsc = rscOpt.get();
+                ResultSetColumn rsc = resultSetColumns.get(i);
 
                 if (rsc.isMarkerColumn()) {
                     Optional<MarkerColumnValue> markerOpt = getMarkerColumnValue(i, rsc);
@@ -113,18 +115,29 @@ class QueryToTreeConverter {
         this.tree = tree;
     }
 
+    private Optional<MarkerColumnValue> getMarkerColumnValue(int i, ResultSetColumn rsc) throws SQLException {
+        String markerValue = resultSet.getString(i);
+        if (markerValue == null) {
+            return Optional.absent();
+        }
+
+        String idString = resultSet.getString(rsc.getPosition());
+        int id = Integer.parseInt(idString);
+        return of(new MarkerColumnValue(rsc, id));
+    }
+
     private Row getTargetRow(LinkedHashMap<Number, Row> tree, List<MarkerColumnValue> markers) {
         MarkerColumnValue lastMarkerColumnValue = markers.get(markers.size() - 1);
         List<MarkerColumnValue> path = getMarkerPathTo(markers, lastMarkerColumnValue);
 
         Row row = null;
         for (MarkerColumnValue marker : path) {
-            if (!marker.getField().equals("")) {
+            if (!marker.getResultSetColumn().getField().equals("")) {
                 //noinspection ConstantConditions Never happens, Root Marker will trigger first
-                if (row.get(marker.getField()) == null) {
-                    row.put(marker.getField(), Maps.newLinkedHashMap());
+                if (row.get(marker.getResultSetColumn().getField()) == null) {
+                    row.put(marker.getResultSetColumn().getField(), Maps.newLinkedHashMap());
                 }
-                tree = row.getTree(marker.getField());
+                tree = row.getTree(marker.getResultSetColumn().getField());
             }
 
             if (tree.get(marker.getId()) == null) {
@@ -137,80 +150,22 @@ class QueryToTreeConverter {
     }
 
     private List<MarkerColumnValue> getMarkerPathTo(List<MarkerColumnValue> markers, MarkerColumnValue target) {
-        int lastLevel = 0;
+        int lastLevel = -1;
         List<MarkerColumnValue> path = Lists.newLinkedList();
 
         for (MarkerColumnValue marker : markers) {
-            if (marker.getLevel() == lastLevel + 1 && target.getPath().startsWith(marker.getPath())) {
+            if (marker.getResultSetColumn().getLevel() == lastLevel + 1
+              && target.getResultSetColumn().getFullPath().startsWith(marker.getResultSetColumn().getFullPath())) {
                 path.add(marker);
-                lastLevel = marker.getLevel();
+                lastLevel = marker.getResultSetColumn().getLevel();
             }
         }
 
         return path;
     }
 
-    private Optional<MarkerColumnValue> getMarkerColumnValue(int i, ResultSetColumn rsc) throws SQLException {
-        String markerValue = resultSet.getString(i);
-        if (markerValue == null) {
-            return Optional.absent();
-        }
-        Matcher matcher = rsc.getPattern().matcher(markerValue);
-        if (!matcher.find()) {
-            // should never happen
-            throw new IllegalStateException();
-        }
-
-        String idString = matcher.group(1);
-        int id = Integer.parseInt(idString);
-        if (i == 1) {
-            return of(new MarkerColumnValue(id, "", 1, matcher.group(2)));
-        } else {
-            String path = matcher.group(2);
-            return of(new MarkerColumnValue(id, path, Iterables.size(Splitter.on("/").split(path)) + 1, matcher.group(3)));
-        }
-    }
-
     public LinkedHashMap<Number, Row> getTree() {
         return tree;
-    }
-
-    private static class MarkerColumnValue {
-
-        private final int level;
-        private Number id;
-        private String path;
-        private String field;
-        private String table;
-
-        public MarkerColumnValue(Number id, String path, int level, String table) {
-            this.id = id;
-            this.path = path;
-            int lastSlash = path.lastIndexOf('/') + 1;
-            this.field = path.substring(lastSlash);
-            this.level = level;
-            this.table = table;
-        }
-
-        public Number getId() {
-            return id;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public String getField() {
-            return field;
-        }
-
-        public String getTable() {
-            return table;
-        }
-
-        public int getLevel() {
-            return level;
-        }
     }
 
 }

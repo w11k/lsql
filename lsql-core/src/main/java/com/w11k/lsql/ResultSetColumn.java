@@ -1,8 +1,8 @@
 package com.w11k.lsql;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.w11k.lsql.converter.Converter;
-
-import java.util.regex.Pattern;
 
 public class ResultSetColumn {
 
@@ -12,23 +12,39 @@ public class ResultSetColumn {
 
     private final Converter converter;
 
-    private boolean markerColumn = false;
+    // Tree Marker columns
 
-    private final Pattern pattern;
+    private final boolean markerColumn;
+
+    private final int level;
+
+    private final String fullPath;
+
+    private final String field;
 
     public ResultSetColumn(int position, String name, Converter converter) {
         this.position = position;
         this.name = name;
         this.converter = converter;
-        this.pattern = null;
+        this.markerColumn = false;
+        this.level = -1;
+        this.fullPath = null;
+        this.field = null;
     }
 
-    public ResultSetColumn(int position, String name, Pattern pattern) {
+    public ResultSetColumn(int position, String name, String fullPath) {
+        fullPath = fullPath.trim();
+
         this.position = position;
         this.name = name;
         this.converter = null;
         this.markerColumn = true;
-        this.pattern = pattern;
+
+        this.level = Iterables.size(Splitter.on("/").omitEmptyStrings().split(fullPath));
+        this.fullPath = fullPath;
+
+        int lastSlash = fullPath.lastIndexOf('/') + 1;
+        this.field = fullPath.substring(lastSlash).trim();
     }
 
     public int getPosition() {
@@ -47,11 +63,15 @@ public class ResultSetColumn {
         return markerColumn;
     }
 
-    public void setMarkerColumn(boolean markerColumn) {
-        this.markerColumn = markerColumn;
+    public int getLevel() {
+        return level;
     }
 
-    public Pattern getPattern() {
-        return pattern;
+    public String getField() {
+        return field;
+    }
+
+    public String getFullPath() {
+        return fullPath;
     }
 }
