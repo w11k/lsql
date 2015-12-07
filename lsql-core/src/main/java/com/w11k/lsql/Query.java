@@ -77,57 +77,6 @@ public class Query {
         }
     }
 
-
-
-
-
-/*
-
-    public Observable<Row> rx() {
-        return Subject.create(new Observable.OnSubscribe<Row>() {
-            @Override
-            public void call(Subscriber<? super Row> subscriber) {
-                try {
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                    ResultSetMetaData metaData = resultSet.getMetaData();
-
-                    // used to find duplicates
-                    Set<String> processedColumnLabels = Sets.newLinkedHashSet();
-
-                    // queryConverters for columns
-                    List<ResultSetColumn> resultSetColumns = Lists.newLinkedList();
-
-                    for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                        String columnLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
-
-                        // check duplicates
-                        if (processedColumnLabels.contains(columnLabel)) {
-                            throw new IllegalStateException("Duplicate column '" + columnLabel + "' in query.");
-                        }
-                        processedColumnLabels.add(columnLabel);
-
-                        Converter converter = converters.containsKey(columnLabel)
-                          ? converters.get(columnLabel)
-                          : getConverter(metaData, i);
-                        resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
-                    }
-
-                    while (resultSet.next() && !subscriber.isUnsubscribed()) {
-                        System.out.println("QUERY: new row");
-                        Row row = extractRow(resultSet, resultSetColumns);
-                        subscriber.onNext(row);
-                    }
-                    resultSet.close();
-                    subscriber.onCompleted();
-                } catch (SQLException e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
-    }
-*/
-
-
     /**
      * Turns this query into an Observable of {@code Row}s.  Each subscription will trigger the underlying database operation.
      *
@@ -172,10 +121,6 @@ public class Query {
                         }
                         processedColumnLabels.add(columnLabel);
 
-//                        Converter converter = converters.containsKey(columnLabel)
-//                          ? converters.get(columnLabel)
-//                          : getConverterForResultSetColumn(metaData, i);
-
                         Converter converter = getConverterForResultSetColumn(metaData, i, columnLabel);
 
                         resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
@@ -195,7 +140,7 @@ public class Query {
     }
 
     @Experimental
-    public LinkedHashMap<String, Row> toTree() {
+    public LinkedHashMap<Number, Row> toTree() {
         return new QueryToTreeConverter(this).getTree();
     }
 

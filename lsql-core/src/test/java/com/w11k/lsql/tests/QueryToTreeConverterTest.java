@@ -1,5 +1,6 @@
 package com.w11k.lsql.tests;
 
+import com.w11k.lsql.LSql;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.SqlStatement;
@@ -42,7 +43,6 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table3 VALUES (2, 1, 'table3-b')");
         lSql.executeRawSql("INSERT INTO table3 VALUES (3, 2, 'table3-c')");
         lSql.executeRawSql("INSERT INTO table3 VALUES (4, 2, 'table3-d')");
-
     }
 
     private SqlStatement statement(String name) {
@@ -52,122 +52,129 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
     @Test
     public void toTree1() {
         Query query = statement("tree1").query();
-        LinkedHashMap<String, Row> tree = query.toTree();
+        LinkedHashMap<Number, Row> tree = query.toTree();
         assertEquals(tree.size(), 2);
-        assertEquals(tree.get("1"), Row.fromKeyVals("id", 1, "name1", "table1-a"));
-        assertEquals(tree.get("2"), Row.fromKeyVals("id", 2, "name1", "table1-b"));
+        assertEquals(tree.get(1), Row.fromKeyVals("id", 1, "name1", "table1-a"));
+        assertEquals(tree.get(2), Row.fromKeyVals("id", 2, "name1", "table1-b"));
     }
 
     @Test
     public void toTree2() {
         Query query = statement("tree2").query();
-        LinkedHashMap<String, Row> tree = query.toTree();
+        LinkedHashMap<Number, Row> tree = query.toTree();
 
         assertEquals(tree.size(), 2);
 
         // Table1
-        assertEquals(tree.get("1").getInt("id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getString("name1"), "table1-a");
-        assertEquals(tree.get("2").getInt("id"), Integer.valueOf(2));
-        assertEquals(tree.get("2").getString("name1"), "table1-b");
+        assertEquals(tree.get(1).getInt("id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getString("name1"), "table1-a");
+        assertEquals(tree.get(2).getInt("id"), Integer.valueOf(2));
+        assertEquals(tree.get(2).getString("name1"), "table1-b");
 
         // Table2
-        assertEquals(tree.get("1").getTree("table2").get("1").size(), 3);
-        assertEquals(tree.get("1").getTree("table2").get("1").getInt("id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table2").get("1").getInt("table1_id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table2").get("1").getString("name2"), "table2-a");
+        assertEquals(tree.get(1).getTree("table2").get(1).size(), 3);
+        assertEquals(tree.get(1).getTree("table2").get(1).getInt("id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(1).getInt("table1_id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(1).getString("name2"), "table2-a");
 
-        assertEquals(tree.get("1").getTree("table2").get("2").size(), 3);
-        assertEquals(tree.get("1").getTree("table2").get("2").getInt("id"), Integer.valueOf(2));
-        assertEquals(tree.get("1").getTree("table2").get("2").getInt("table1_id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table2").get("2").getString("name2"), "table2-b");
+        assertEquals(tree.get(1).getTree("table2").get(2).size(), 3);
+        assertEquals(tree.get(1).getTree("table2").get(2).getInt("id"), Integer.valueOf(2));
+        assertEquals(tree.get(1).getTree("table2").get(2).getInt("table1_id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(2).getString("name2"), "table2-b");
 
-        assertEquals(tree.get("2").getTree("table2").get("3").size(), 3);
-        assertEquals(tree.get("2").getTree("table2").get("3").getInt("id"), Integer.valueOf(3));
-        assertEquals(tree.get("2").getTree("table2").get("3").getInt("table1_id"), Integer.valueOf(2));
-        assertEquals(tree.get("2").getTree("table2").get("3").getString("name2"), "table2-c");
+        assertEquals(tree.get(2).getTree("table2").get(3).size(), 3);
+        assertEquals(tree.get(2).getTree("table2").get(3).getInt("id"), Integer.valueOf(3));
+        assertEquals(tree.get(2).getTree("table2").get(3).getInt("table1_id"), Integer.valueOf(2));
+        assertEquals(tree.get(2).getTree("table2").get(3).getString("name2"), "table2-c");
 
-        assertEquals(tree.get("2").getTree("table2").get("4").size(), 3);
-        assertEquals(tree.get("2").getTree("table2").get("4").getInt("id"), Integer.valueOf(4));
-        assertEquals(tree.get("2").getTree("table2").get("4").getInt("table1_id"), Integer.valueOf(2));
-        assertEquals(tree.get("2").getTree("table2").get("4").getString("name2"), "table2-d");
+        assertEquals(tree.get(2).getTree("table2").get(4).size(), 3);
+        assertEquals(tree.get(2).getTree("table2").get(4).getInt("id"), Integer.valueOf(4));
+        assertEquals(tree.get(2).getTree("table2").get(4).getInt("table1_id"), Integer.valueOf(2));
+        assertEquals(tree.get(2).getTree("table2").get(4).getString("name2"), "table2-d");
     }
 
     @Test
     public void toTree3() {
         Query query = statement("tree2and3").query();
-        LinkedHashMap<String, Row> tree = query.toTree();
+        LinkedHashMap<Number, Row> tree = query.toTree();
 
         assertEquals(tree.size(), 2);
 
         // Table1
-        assertEquals(tree.get("1").getInt("id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getString("name1"), "table1-a");
-        assertEquals(tree.get("2").getInt("id"), Integer.valueOf(2));
-        assertEquals(tree.get("2").getString("name1"), "table1-b");
+        assertEquals(tree.get(1).getInt("id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getString("name1"), "table1-a");
+        assertEquals(tree.get(2).getInt("id"), Integer.valueOf(2));
+        assertEquals(tree.get(2).getString("name1"), "table1-b");
 
         // Table2
-        assertEquals(tree.get("1").getTree("table2").get("1").size(), 3);
-        assertEquals(tree.get("1").getTree("table2").get("1").getInt("id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table2").get("1").getInt("table1_id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table2").get("1").getString("name2"), "table2-a");
+        assertEquals(tree.get(1).getTree("table2").get(1).size(), 3);
+        assertEquals(tree.get(1).getTree("table2").get(1).getInt("id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(1).getInt("table1_id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(1).getString("name2"), "table2-a");
 
-        assertEquals(tree.get("1").getTree("table2").get("2").size(), 3);
-        assertEquals(tree.get("1").getTree("table2").get("2").getInt("id"), Integer.valueOf(2));
-        assertEquals(tree.get("1").getTree("table2").get("2").getInt("table1_id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table2").get("2").getString("name2"), "table2-b");
+        assertEquals(tree.get(1).getTree("table2").get(2).size(), 3);
+        assertEquals(tree.get(1).getTree("table2").get(2).getInt("id"), Integer.valueOf(2));
+        assertEquals(tree.get(1).getTree("table2").get(2).getInt("table1_id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(2).getString("name2"), "table2-b");
 
-        assertEquals(tree.get("2").getTree("table2").get("3").size(), 3);
-        assertEquals(tree.get("2").getTree("table2").get("3").getInt("id"), Integer.valueOf(3));
-        assertEquals(tree.get("2").getTree("table2").get("3").getInt("table1_id"), Integer.valueOf(2));
-        assertEquals(tree.get("2").getTree("table2").get("3").getString("name2"), "table2-c");
+        assertEquals(tree.get(2).getTree("table2").get(3).size(), 3);
+        assertEquals(tree.get(2).getTree("table2").get(3).getInt("id"), Integer.valueOf(3));
+        assertEquals(tree.get(2).getTree("table2").get(3).getInt("table1_id"), Integer.valueOf(2));
+        assertEquals(tree.get(2).getTree("table2").get(3).getString("name2"), "table2-c");
 
-        assertEquals(tree.get("2").getTree("table2").get("4").size(), 3);
-        assertEquals(tree.get("2").getTree("table2").get("4").getInt("id"), Integer.valueOf(4));
-        assertEquals(tree.get("2").getTree("table2").get("4").getInt("table1_id"), Integer.valueOf(2));
-        assertEquals(tree.get("2").getTree("table2").get("4").getString("name2"), "table2-d");
+        assertEquals(tree.get(2).getTree("table2").get(4).size(), 3);
+        assertEquals(tree.get(2).getTree("table2").get(4).getInt("id"), Integer.valueOf(4));
+        assertEquals(tree.get(2).getTree("table2").get(4).getInt("table1_id"), Integer.valueOf(2));
+        assertEquals(tree.get(2).getTree("table2").get(4).getString("name2"), "table2-d");
 
         // Table3
-        assertEquals(tree.get("1").getTree("table2").get("1").size(), 3);
-        assertEquals(tree.get("1").getTree("table3").get("1").getInt("id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table3").get("1").getInt("table1_id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table3").get("1").getString("name3"), "table3-a");
+        assertEquals(tree.get(1).getTree("table2").get(1).size(), 3);
+        assertEquals(tree.get(1).getTree("table3").get(1).getInt("id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table3").get(1).getInt("table1_id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table3").get(1).getString("name3"), "table3-a");
 
-        assertEquals(tree.get("1").getTree("table2").get("2").size(), 3);
-        assertEquals(tree.get("1").getTree("table3").get("2").getInt("id"), Integer.valueOf(2));
-        assertEquals(tree.get("1").getTree("table3").get("2").getInt("table1_id"), Integer.valueOf(1));
-        assertEquals(tree.get("1").getTree("table3").get("2").getString("name3"), "table3-b");
+        assertEquals(tree.get(1).getTree("table2").get(2).size(), 3);
+        assertEquals(tree.get(1).getTree("table3").get(2).getInt("id"), Integer.valueOf(2));
+        assertEquals(tree.get(1).getTree("table3").get(2).getInt("table1_id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table3").get(2).getString("name3"), "table3-b");
 
-        assertEquals(tree.get("2").getTree("table2").get("3").size(), 3);
-        assertEquals(tree.get("2").getTree("table3").get("3").getInt("id"), Integer.valueOf(3));
-        assertEquals(tree.get("2").getTree("table3").get("3").getInt("table1_id"), Integer.valueOf(2));
-        assertEquals(tree.get("2").getTree("table3").get("3").getString("name3"), "table3-c");
+        assertEquals(tree.get(2).getTree("table2").get(3).size(), 3);
+        assertEquals(tree.get(2).getTree("table3").get(3).getInt("id"), Integer.valueOf(3));
+        assertEquals(tree.get(2).getTree("table3").get(3).getInt("table1_id"), Integer.valueOf(2));
+        assertEquals(tree.get(2).getTree("table3").get(3).getString("name3"), "table3-c");
 
-        assertEquals(tree.get("2").getTree("table2").get("4").size(), 3);
-        assertEquals(tree.get("2").getTree("table3").get("4").getInt("id"), Integer.valueOf(4));
-        assertEquals(tree.get("2").getTree("table3").get("4").getInt("table1_id"), Integer.valueOf(2));
-        assertEquals(tree.get("2").getTree("table3").get("4").getString("name3"), "table3-d");
+        assertEquals(tree.get(2).getTree("table2").get(4).size(), 3);
+        assertEquals(tree.get(2).getTree("table3").get(4).getInt("id"), Integer.valueOf(4));
+        assertEquals(tree.get(2).getTree("table3").get(4).getInt("table1_id"), Integer.valueOf(2));
+        assertEquals(tree.get(2).getTree("table3").get(4).getString("name3"), "table3-d");
     }
 
     @Test
     public void tree2Nested2bAnd3() {
         Query query = statement("tree2Nested2bAnd3").query();
-        LinkedHashMap<String, Row> tree = query.toTree();
+        LinkedHashMap<Number, Row> tree = query.toTree();
+        LSql.prettyPrint(tree);
 
         assertEquals(tree.size(), 2);
+        assertEquals(tree.get(1).getTree("table2").get(1).size(), 4);
+        assertEquals(tree.get(1).getTree("table2").get(1).getTree("table2b").size(), 2);
+        assertEquals(tree.get(2).getTree("table2").get(3).getTree("table2b").size(), 2);
 
-        System.out.println(tree.get("1").getTree("table2"));
+        assertEquals(tree.get(1).getTree("table2").get(1).getTree("table2b").get(1).getInt("id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(1).getTree("table2b").get(1).getInt("table2_id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(1).getTree("table2b").get(1).getString("name2b"), "table2b-a");
 
-        assertEquals(tree.get("1").getTree("table2").get("1").size(), 4);
-//        assertEquals(tree.get("1").getTree("table2").get("1").getInt("id"), Integer.valueOf(1));
-//        assertEquals(tree.get("1").getTree("table2").get("1").getInt("table1_id"), Integer.valueOf(1));
-//        assertEquals(tree.get("1").getTree("table2").get("1").getString("name2"), "table2-a");
+        assertEquals(tree.get(1).getTree("table2").get(1).getTree("table2b").get(2).getInt("id"), Integer.valueOf(2));
+        assertEquals(tree.get(1).getTree("table2").get(1).getTree("table2b").get(2).getInt("table2_id"), Integer.valueOf(1));
+        assertEquals(tree.get(1).getTree("table2").get(1).getTree("table2b").get(2).getString("name2b"), "table2b-b");
 
-//        assertEquals(tree.get("2").getTree("table2").get("3").size(), 4);
-//        assertEquals(tree.get("2").getTree("table2").get("3").getInt("id"), Integer.valueOf(3));
-//        assertEquals(tree.get("2").getTree("table2").get("3").getInt("table1_id"), Integer.valueOf(2));
-//        assertEquals(tree.get("2").getTree("table2").get("3").getString("name2"), "table2-c");
+        assertEquals(tree.get(2).getTree("table2").get(3).getTree("table2b").get(3).getInt("id"), Integer.valueOf(3));
+        assertEquals(tree.get(2).getTree("table2").get(3).getTree("table2b").get(3).getInt("table2_id"), Integer.valueOf(3));
+        assertEquals(tree.get(2).getTree("table2").get(3).getTree("table2b").get(3).getString("name2b"), "table2b-c");
 
+        assertEquals(tree.get(2).getTree("table2").get(3).getTree("table2b").get(4).getInt("id"), Integer.valueOf(4));
+        assertEquals(tree.get(2).getTree("table2").get(3).getTree("table2b").get(4).getInt("table2_id"), Integer.valueOf(3));
+        assertEquals(tree.get(2).getTree("table2").get(3).getTree("table2b").get(4).getString("name2b"), "table2b-d");
     }
 
 

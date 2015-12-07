@@ -32,7 +32,7 @@ class QueryToTreeConverter {
      * group 3: table
      */
     private Pattern markerColumn = Pattern.compile("(.+?)/(.+)(:.+)?");
-    private LinkedHashMap<String, Row> tree;
+    private LinkedHashMap<Number, Row> tree;
 
     public QueryToTreeConverter(Query query) {
         this.query = query;
@@ -77,7 +77,7 @@ class QueryToTreeConverter {
     }
 
     private void createTree() throws SQLException {
-        LinkedHashMap<String, Row> tree = Maps.newLinkedHashMap();
+        LinkedHashMap<Number, Row> tree = Maps.newLinkedHashMap();
 
         while (resultSet.next()) {
             List<MarkerColumnValue> markers = Lists.newLinkedList();
@@ -113,7 +113,7 @@ class QueryToTreeConverter {
         this.tree = tree;
     }
 
-    private Row getTargetRow(LinkedHashMap<String, Row> tree, List<MarkerColumnValue> markers) {
+    private Row getTargetRow(LinkedHashMap<Number, Row> tree, List<MarkerColumnValue> markers) {
         MarkerColumnValue lastMarkerColumnValue = markers.get(markers.size() - 1);
         List<MarkerColumnValue> path = getMarkerPathTo(markers, lastMarkerColumnValue);
 
@@ -161,7 +161,8 @@ class QueryToTreeConverter {
             throw new IllegalStateException();
         }
 
-        String id = matcher.group(1);
+        String idString = matcher.group(1);
+        int id = Integer.parseInt(idString);
         if (i == 1) {
             return of(new MarkerColumnValue(id, "", 1, matcher.group(2)));
         } else {
@@ -170,19 +171,19 @@ class QueryToTreeConverter {
         }
     }
 
-    public LinkedHashMap<String, Row> getTree() {
+    public LinkedHashMap<Number, Row> getTree() {
         return tree;
     }
 
     private static class MarkerColumnValue {
 
         private final int level;
-        private String id;
+        private Number id;
         private String path;
         private String field;
         private String table;
 
-        public MarkerColumnValue(String id, String path, int level, String table) {
+        public MarkerColumnValue(Number id, String path, int level, String table) {
             this.id = id;
             this.path = path;
             int lastSlash = path.lastIndexOf('/') + 1;
@@ -191,7 +192,7 @@ class QueryToTreeConverter {
             this.table = table;
         }
 
-        public String getId() {
+        public Number getId() {
             return id;
         }
 

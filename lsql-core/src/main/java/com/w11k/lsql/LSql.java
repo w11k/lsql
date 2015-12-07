@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.collect.Iterables;
@@ -38,12 +39,6 @@ public class LSql {
 
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
 
-    private static ObjectMapper CREATE_JSON_MAPPER_INSTANCE() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JodaModule());
-        return mapper;
-    }
-
     /**
      * Creates a new LSql instance.
      * <p/>
@@ -60,6 +55,7 @@ public class LSql {
         dialect.setlSql(this);
     }
 
+
     /**
      * Creates a new LSql instance.
      * <p/>
@@ -70,6 +66,20 @@ public class LSql {
      */
     public LSql(BaseDialect dialect, DataSource dataSource) {
         this(dialect, ConnectionProviders.fromDataSource(dataSource));
+    }
+
+    private static ObjectMapper CREATE_JSON_MAPPER_INSTANCE() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+        return mapper;
+    }
+
+    public static void prettyPrint(Object object) {
+        try {
+            System.out.println(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(object));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public BaseDialect getDialect() {
@@ -101,7 +111,6 @@ public class LSql {
      *
      * @param clazz    the class from which the basedir will be used
      * @param fileName the SQL file name
-     *
      * @return the {@code LSqlFile} instance
      */
     public LSqlFile readSqlFile(Class clazz, String fileName) {
@@ -116,7 +125,6 @@ public class LSql {
      * Instead of '.class', the file extension '.sql' will be used.
      *
      * @param clazz the class which location and name will be used for the lookup
-     *
      * @return the {@code LSqlFile} instance
      */
     public LSqlFile readSqlFile(Class<?> clazz) {
@@ -128,7 +136,6 @@ public class LSql {
      * Returns a Table instance.
      *
      * @param tableName the table name (Java identifier format)
-     *
      * @return the Table instance
      */
     @SuppressWarnings("unchecked")
@@ -161,7 +168,6 @@ public class LSql {
      * {@link LSqlFile}s should be used for complex queries.
      *
      * @param sql the SQL SELECT string
-     *
      * @return the Query instance
      */
     public Query executeRawQuery(String sql) {
@@ -171,8 +177,8 @@ public class LSql {
     @Override
     public String toString() {
         return "LSql{" +
-                "dialect=" + dialect +
-                '}';
+          "dialect=" + dialect +
+          '}';
     }
 
 }

@@ -153,7 +153,7 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     @SuppressWarnings("unchecked")
-    public LinkedHashMap<String, Row> getTree(String key) {
+    public LinkedHashMap<Number, Row> getTree(String key) {
         return getAs(LinkedHashMap.class, key);
     }
 
