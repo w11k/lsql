@@ -67,6 +67,7 @@ class QueryToTreeConverter {
     private void createResultSetColumns() throws SQLException {
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             String label = query.getlSql().getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
+            label = label.trim();
 
             // Marker column?
             if (label.startsWith(markerColumnPrefix)) {

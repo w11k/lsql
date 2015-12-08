@@ -43,3 +43,19 @@ FROM table1
     LEFT OUTER JOIN table2b ON table2.id = table2b.table2_id
     LEFT OUTER JOIN table3 ON table1.id = table3.table1_id;
 
+
+--syntax1
+SELECT
+    table1.id  AS " /    ",
+    table1.*,
+    table2.id  AS "/   table2 ",
+    table2.*,
+    table2b.id AS "/table2          /    table2b          ",
+    table2b.*,
+    table3.id  AS "               /table3",
+    table3.*
+FROM table1
+    LEFT JOIN table2 ON table1.id = table2.table1_id
+    LEFT OUTER JOIN table2b ON table2.id = table2b.table2_id
+    LEFT OUTER JOIN table3 ON table1.id = table3.table1_id;
+

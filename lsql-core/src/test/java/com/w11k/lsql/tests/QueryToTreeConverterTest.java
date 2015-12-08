@@ -151,8 +151,17 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
     @Test
     public void tree2Nested2bAnd3() {
         Query query = statement("tree2Nested2bAnd3").query();
-        LinkedHashMap<Number, Row> tree = query.toTree();
+        internalTestTree2Nested2bAnd3(query);
+    }
 
+    @Test
+    public void syntax1() {
+        Query query = statement("syntax1").query();
+        internalTestTree2Nested2bAnd3(query);
+    }
+
+    private void internalTestTree2Nested2bAnd3(Query query) {
+        LinkedHashMap<Number, Row> tree = query.toTree();
         assertEquals(tree.size(), 2);
         assertEquals(tree.get(1).getTree("table2").get(1).size(), 4);
         assertEquals(tree.get(1).getTree("table2").get(1).getTree("table2b").size(), 2);
