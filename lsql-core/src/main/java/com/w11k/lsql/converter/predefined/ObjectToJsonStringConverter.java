@@ -1,8 +1,8 @@
-package com.w11k.lsql.converter;
+package com.w11k.lsql.converter.predefined;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.converter.Converter;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -15,28 +15,19 @@ public class ObjectToJsonStringConverter extends Converter {
     private Class<?> clazz;
     private TypeReference typeReference;
 
-    public <A> ObjectToJsonStringConverter(Class<A> clazz) {
-        this.clazz = clazz;
-    }
+//    public <A> ObjectToJsonStringConverter(Class<A> clazz) {
+//        this.clazz = clazz;
+//    }
 
     public <A> ObjectToJsonStringConverter(Class<A> clazz, TypeReference typeReference) {
+        super(
+          typeReference.getType().getClass(),
+          new int[]{Types.VARCHAR},
+          Types.VARCHAR
+        );
+
         this.clazz = clazz;
         this.typeReference = typeReference;
-    }
-
-    @Override
-    public Optional<? extends Class<?>> getSupportedJavaClass() {
-        return Optional.of(clazz);
-    }
-
-    @Override
-    public int[] getSupportedSqlTypes() {
-        return new int[]{Types.VARCHAR};
-    }
-
-    @Override
-    public boolean convertWithJacksonOnWrongType() {
-        return false;
     }
 
     @Override
@@ -47,7 +38,7 @@ public class ObjectToJsonStringConverter extends Converter {
             return false;
         }
 
-        return getSupportedJavaClass().get().isAssignableFrom(value.getClass());
+        return clazz.isAssignableFrom(value.getClass());
     }
 
     @Override

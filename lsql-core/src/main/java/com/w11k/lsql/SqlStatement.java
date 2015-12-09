@@ -267,7 +267,7 @@ public class SqlStatement {
                 if (converter == null) {
                     throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);
                 }
-                converter.setValueInStatement(lSql, ps, i + 1, pips.value, converter.getSqlTypeForNullValues());
+                converter.setValueInStatement(lSql, ps, i + 1, pips.value);
             }
         }
 

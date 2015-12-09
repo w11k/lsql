@@ -3,9 +3,9 @@ package com.w11k.lsql.dialects;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.PreparedStatementCreator;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.ByTypeConverterRegistry;
+import com.w11k.lsql.converter.sqltypes.*;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -16,11 +16,37 @@ import static com.google.common.base.Optional.of;
 
 public class BaseDialect {
 
-    private LSql lSql;
+    protected LSql lSql;
 
-    private PreparedStatementCreator preparedStatementCreator = new PreparedStatementCreator();
+    protected PreparedStatementCreator preparedStatementCreator = new PreparedStatementCreator();
 
-    private ByTypeConverterRegistry converterRegistry = new ByTypeConverterRegistry();
+    protected ByTypeConverterRegistry converterRegistry = new ByTypeConverterRegistry();
+
+    public BaseDialect() {
+        converterRegistry.addConverter(new BinaryConverter());
+        converterRegistry.addConverter(new BlobConverter());
+        converterRegistry.addConverter(new BooleanConverter());
+        converterRegistry.addConverter(new ClobConverter());
+        converterRegistry.addConverter(new DoubleConverter());
+        converterRegistry.addConverter(new FloatConverter());
+        converterRegistry.addConverter(new IntConverter());
+        converterRegistry.addConverter(new JodaDateConverter());
+        converterRegistry.addConverter(new StringConverter());
+
+        // TODO add more types
+        // static int 	DATALINK;
+        // static int 	DISTINCT;
+        // static int 	JAVA_OBJECT;
+        // static int 	LONGVARBINARY;
+        // static int 	NULL;
+        // static int 	NUMERIC;
+        // static int 	OTHER;
+        // static int 	REF;
+        // static int 	STRUCT;
+        // static int 	TIME;
+        // static int 	DATE;
+        // static int 	VARBINARY;
+    }
 
     public LSql getlSql() {
         return lSql;
@@ -36,10 +62,6 @@ public class BaseDialect {
 
     public PreparedStatementCreator getPreparedStatementCreator() {
         return preparedStatementCreator;
-    }
-
-    public void setPreparedStatementCreator(PreparedStatementCreator preparedStatementCreator) {
-        this.preparedStatementCreator = preparedStatementCreator;
     }
 
     public CaseFormat getJavaCaseFormat() {
@@ -71,7 +93,7 @@ public class BaseDialect {
             String label = metaData.getColumnLabel(i);
             if (identifierSqlToJava(label).equals(pkName)) {
                 return of(table.column(pkName).getConverter()
-                        .getValueFromResultSet(getlSql(), resultSet, i));
+                  .getValueFromResultSet(getlSql(), resultSet, i));
             }
         }
         return absent();

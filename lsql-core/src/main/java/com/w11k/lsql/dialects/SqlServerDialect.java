@@ -2,93 +2,13 @@ package com.w11k.lsql.dialects;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
-import com.google.common.io.CharStreams;
-import com.w11k.lsql.*;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.Table;
 
-import javax.sql.rowset.serial.SerialClob;
-import java.io.IOException;
-import java.io.Reader;
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 public class SqlServerDialect extends BaseDialect {
-
-    public SqlServerDialect() {
-        getConverterRegistry().addConverter(
-                new Converter() {
-                    public int[] getSupportedSqlTypes() {
-                        return new int[]{Types.NUMERIC};
-                    }
-
-                    public Optional<Class<Double>> getSupportedJavaClass() {
-                        return Optional.of(Double.class);
-                    }
-
-                    public void setValue(LSql lSql, PreparedStatement ps,
-                                         int index,
-                                         Object val) throws SQLException {
-                        ps.setDouble(index, (Double) val);
-                    }
-
-                    public Object getValue(LSql lSql, ResultSet rs,
-                                           int index) throws SQLException {
-                        return rs.getDouble(index);
-                    }
-                });
-        getConverterRegistry().addConverter(
-                new Converter() {
-                    public int[] getSupportedSqlTypes() {
-                        return new int[]{Types.CLOB};
-                    }
-
-                    public Optional<Class<String>> getSupportedJavaClass() {
-                        return Optional.of(String.class);
-                    }
-
-                    public void setValue(LSql lSql, PreparedStatement ps,
-                                         int index,
-                                         Object val) throws SQLException {
-                        ps.setClob(index, new SerialClob(val.toString().toCharArray()));
-                    }
-
-                    public Object getValue(LSql lSql, ResultSet rs,
-                                           int index) throws SQLException {
-                        Clob clob = rs.getClob(index);
-                        if (clob != null) {
-                            Reader reader = clob.getCharacterStream();
-                            try {
-                                return CharStreams.toString(reader);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        } else {
-                            return null;
-                        }
-                    }
-                });
-        getConverterRegistry().addConverter(
-                new Converter() {
-                    public int[] getSupportedSqlTypes() {
-                        return new int[]{Types.VARBINARY, Types.BINARY};
-                    }
-
-                    public Optional<Class<com.w11k.lsql.Blob>> getSupportedJavaClass() {
-                        return Optional.of(com.w11k.lsql.Blob.class);
-                    }
-
-                    public void setValue(LSql lSql, PreparedStatement ps,
-                                         int index,
-                                         Object val) throws SQLException {
-                        com.w11k.lsql.Blob blob = (com.w11k.lsql.Blob) val;
-                        ps.setBytes(index, blob.getData());
-                    }
-
-                    public Object getValue(LSql lSql, ResultSet rs,
-                                           int index) throws SQLException {
-                        return new com.w11k.lsql.Blob(rs.getBytes(index));
-                    }
-                });
-    }
 
     @Override
     public CaseFormat getSqlCaseFormat() {

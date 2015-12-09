@@ -1,7 +1,7 @@
 package com.w11k.lsql.tests.dialects;
 
 import com.w11k.lsql.*;
-import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
+import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.tests.TestUtils;

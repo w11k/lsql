@@ -196,13 +196,13 @@ public class Table {
             String pkColumn = getPrimaryKeyColumn().get();
             Object id = row.get(pkColumn);
             Column column = column(pkColumn);
-            column.getConverter().setValueInStatement(lSql, ps, columns.size() + 1, id, column.getSqlType());
+            column.getConverter().setValueInStatement(lSql, ps, columns.size() + 1, id);
 
             // Set Revision
             if (revisionColumn.isPresent()) {
                 Column col = revisionColumn.get();
                 Object revision = row.get(col.getColumnName());
-                col.getConverter().setValueInStatement(lSql, ps, columns.size() + 2, revision, col.getSqlType());
+                col.getConverter().setValueInStatement(lSql, ps, columns.size() + 2, revision);
             }
 
             executeUpdate(ps);
@@ -240,7 +240,7 @@ public class Table {
                 PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
                         .createCountForIdStatement(this);
                 Column column = column(getPrimaryKeyColumn().get());
-                column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
+                column.getConverter().setValueInStatement(lSql, ps, 1, id);
                 ps.setObject(1, id);
                 ResultSet rs = ps.executeQuery();
                 rs.next();
@@ -287,14 +287,14 @@ public class Table {
         try {
             Column column = column(getPrimaryKeyColumn().get());
             Object id = row.get(getPrimaryKeyColumn().get());
-            column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
+            column.getConverter().setValueInStatement(lSql, ps, 1, id);
             if (revisionColumn.isPresent()) {
                 Column revCol = revisionColumn.get();
                 Object revVal = row.get(revCol.getColumnName());
                 if (revVal == null) {
                     throw new IllegalStateException("Row must contain a revision.");
                 }
-                revCol.getConverter().setValueInStatement(lSql, ps, 2, revVal, revCol.getSqlType());
+                revCol.getConverter().setValueInStatement(lSql, ps, 2, revVal);
             }
             executeUpdate(ps);
         } catch (Exception e) {
@@ -319,7 +319,7 @@ public class Table {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         try {
-            column.getConverter().setValueInStatement(lSql, ps, 1, id, column.getSqlType());
+            column.getConverter().setValueInStatement(lSql, ps, 1, id);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -475,7 +475,7 @@ public class Table {
         Column revCol = revisionColumn.get();
         PreparedStatement revQuery =
                 lSql.getDialect().getPreparedStatementCreator().createRevisionQueryStatement(this, id);
-        revCol.getConverter().setValueInStatement(lSql, revQuery, 1, id, revCol.getSqlType());
+        revCol.getConverter().setValueInStatement(lSql, revQuery, 1, id);
         ResultSet resultSet = revQuery.executeQuery();
         resultSet.next();
         return resultSet.getObject(1);
@@ -520,7 +520,7 @@ public class Table {
             for (int i = 0; i < columns.size(); i++) {
                 Converter converter = column(columns.get(i)).getConverter();
                 Column column = column(columns.get(i));
-                converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)), column.getSqlType());
+                converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)));
             }
             return ps;
         } catch (SQLException e) {

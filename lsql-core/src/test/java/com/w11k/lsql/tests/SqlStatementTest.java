@@ -1,7 +1,7 @@
 package com.w11k.lsql.tests;
 
 import com.w11k.lsql.*;
-import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
+import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.exceptions.QueryException;
 import org.testng.annotations.Test;
 

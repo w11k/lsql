@@ -4,7 +4,7 @@ import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.converter.JavaBoolToSqlStringConverter;
+import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
 import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 
