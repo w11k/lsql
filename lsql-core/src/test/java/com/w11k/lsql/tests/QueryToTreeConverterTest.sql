@@ -1,61 +1,62 @@
 -- noinspection SqlResolveForFile
 
---tree1
+--continents
 SELECT
-    table1.id AS "/",
-    table1.*
-FROM table1;
+    continent.id AS "/",
+    continent.*
+FROM continent;
 
---tree2
+--continentsWithFacts
 SELECT
-    table1.id AS "/",
-    table1.*,
-    table2.id AS "/table2",
-    table2.*
-FROM table1
-    LEFT JOIN table2 ON table1.id = table2.table1_id;
+    continent.id      AS "/",
+    continent.*,
+    continent_fact.id AS "/facts",
+    continent_fact.*
+FROM continent
+    LEFT JOIN continent_fact ON continent.id = continent_fact.continent_id;
 
---tree2and3
+--continentsWithFactsAndCountries
 SELECT
-    table1.id AS "/",
-    table1.*,
-    table2.id AS "/table2",
-    table2.*,
-    table3.id AS "/table3",
-    table3.*
-FROM table1
-    LEFT JOIN table2 ON table1.id = table2.table1_id
-    LEFT JOIN table3 ON table1.id = table3.table1_id;
+    continent.id      AS "/",
+    continent.*,
+    continent_fact.id AS "/facts",
+    continent_fact.*,
+    country.id        AS "/countries",
+    country.*
+FROM continent
+    LEFT JOIN continent_fact ON continent.id = continent_fact.continent_id
+    LEFT JOIN country ON continent.id = country.continent_id;
 
 
---tree2Nested2bAnd3
+--continentsWithFactsAndCountriesAndCities_1
 SELECT
-    table1.id  AS "/",
-    table1.*,
-    table2.id  AS "/table2",
-    table2.*,
-    table2b.id AS "/table2/table2b",
-    table2b.*,
-    table3.id  AS "/table3",
-    table3.*
-FROM table1
-    LEFT JOIN table2 ON table1.id = table2.table1_id
-    LEFT OUTER JOIN table2b ON table2.id = table2b.table2_id
-    LEFT OUTER JOIN table3 ON table1.id = table3.table1_id;
+    continent.id      AS "/",
+    continent.*,
+    continent_fact.id AS "/facts",
+    continent_fact.*,
+    country.id        AS "/countries",
+    country.*,
+    city.id           AS "/countries/cities",
+    city.*
+FROM continent
+    LEFT JOIN continent_fact ON continent.id = continent_fact.continent_id
+    LEFT JOIN country ON continent.id = country.continent_id
+    LEFT JOIN city ON country.id = city.country_id;
 
-
---syntax1
+--continentsWithFactsAndCountriesAndCities_2
 SELECT
-    table1.id  AS " /    ",
-    table1.*,
-    table2.id  AS "/   table2 ",
-    table2.*,
-    table2b.id AS "/table2          /    table2b          ",
-    table2b.*,
-    table3.id  AS "               /table3",
-    table3.*
-FROM table1
-    LEFT JOIN table2 ON table1.id = table2.table1_id
-    LEFT OUTER JOIN table2b ON table2.id = table2b.table2_id
-    LEFT OUTER JOIN table3 ON table1.id = table3.table1_id;
+    continent.id      AS "     /       ",
+    continent.*,
+    continent_fact.id AS "/       facts    ",
+    continent_fact.*,
+    country.id        AS "         /countries",
+    country.*,
+    city.id           AS "  /  countries  /  cities  ",
+    city.*
+FROM continent
+    LEFT JOIN continent_fact ON continent.id = continent_fact.continent_id
+    LEFT JOIN country ON continent.id = country.continent_id
+    LEFT JOIN city ON country.id = city.country_id;
+
+
 
