@@ -1,10 +1,8 @@
-package com.w11k.lsql.dialects;
+package com.w11k.lsql;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.w11k.lsql.Column;
-import com.w11k.lsql.Table;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 
 import java.sql.PreparedStatement;

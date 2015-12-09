@@ -8,8 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-// TODO getSupportedJavaClass is no longer option. Check!
-
 public abstract class Converter {
 
     public void setValueInStatement(LSql lSql, PreparedStatement ps, int index,
