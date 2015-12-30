@@ -8,9 +8,10 @@ import com.w11k.lsql.SqlStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,10 +64,9 @@ public class LSqlFile {
     private void parseSqlStatements() {
         logger.info("Reading SQL file '" + nameForDescription + "'");
         statements.clear();
-        URL url = getClass().getResource(path);
+        InputStream is = getClass().getResourceAsStream(path);
         try {
-            File file = new File(url.toURI());
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String content = CharStreams.toString(reader);
             Matcher startMatcher = STMT_BLOCK_BEGIN.matcher(content);
             while (startMatcher.find()) {
@@ -83,8 +83,6 @@ public class LSqlFile {
                 statements.put(name, new SqlStatement(lSql, nameForDescription + "." + name, sub));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
