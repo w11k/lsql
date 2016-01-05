@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 
 import java.util.Map;
 
-public class ByTypeConverterRegistry {
+public class  ByTypeConverterRegistry {
 
     private final Map<Class<?>, Converter> javaValueToSqlConverters = Maps.newHashMap();
 

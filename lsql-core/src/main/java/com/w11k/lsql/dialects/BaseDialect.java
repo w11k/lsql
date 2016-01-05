@@ -18,7 +18,7 @@ public class BaseDialect {
 
     protected LSql lSql;
 
-    protected PreparedStatementCreator preparedStatementCreator = new PreparedStatementCreator();
+    protected StatementCreator statementCreator = new StatementCreator();
 
     protected ByTypeConverterRegistry converterRegistry = new ByTypeConverterRegistry();
 
@@ -60,8 +60,8 @@ public class BaseDialect {
         return converterRegistry;
     }
 
-    public PreparedStatementCreator getPreparedStatementCreator() {
-        return preparedStatementCreator;
+    public StatementCreator getStatementCreator() {
+        return statementCreator;
     }
 
     public CaseFormat getJavaCaseFormat() {

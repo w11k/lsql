@@ -70,10 +70,6 @@ public class Table {
         return ImmutableMap.copyOf(columns);
     }
 
-    public boolean exists() {
-        return columns.size() != 0;
-    }
-
     /**
      * @param columnName the name of the column
      *
@@ -127,7 +123,7 @@ public class Table {
         try {
             List<String> columns = createColumnList(row);
 
-            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
+            PreparedStatement ps = lSql.getDialect().getStatementCreator()
                     .createInsertStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
 
@@ -154,7 +150,7 @@ public class Table {
                 // Set new revision
                 applyNewRevision(row, id);
 
-                return of(id);
+                return Optional.fromNullable(id);
             }
         } catch (Exception e) {
             throw new InsertException(e);
@@ -188,7 +184,7 @@ public class Table {
                 columns.remove(getRevisionColumn().get().getColumnName());
             }
 
-            PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
+            PreparedStatement ps = lSql.getDialect().getStatementCreator()
                     .createUpdateStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
 
@@ -237,7 +233,7 @@ public class Table {
             // Check if insert or update
             Object id = row.get(primaryKeyColumn.get());
             try {
-                PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator()
+                PreparedStatement ps = lSql.getDialect().getStatementCreator()
                         .createCountForIdStatement(this);
                 Column column = column(getPrimaryKeyColumn().get());
                 column.getConverter().setValueInStatement(lSql, ps, 1, id);
@@ -272,10 +268,6 @@ public class Table {
         delete(row);
     }
 
-//    public Optional<?> save(P pojo) {
-//        return save(pojoToRow(pojo));
-//    }
-
     /**
      * Deletes the row that matches the primary key value and, if enabled, the revision value in the passed {@link
      * Row} instance.
@@ -283,7 +275,7 @@ public class Table {
      * @throws com.w11k.lsql.exceptions.DeleteException
      */
     public void delete(Row row) {
-        PreparedStatement ps = lSql.getDialect().getPreparedStatementCreator().createDeleteByIdStatement(this);
+        PreparedStatement ps = lSql.getDialect().getStatementCreator().createDeleteByIdStatement(this);
         try {
             Column column = column(getPrimaryKeyColumn().get());
             Object id = row.get(getPrimaryKeyColumn().get());
@@ -342,16 +334,6 @@ public class Table {
         Map<String, Object> empty = new HashMap<String, Object>();
         return newLinkedRow(empty);
     }
-
-//    public Optional<P> loadPojo(Object id) {
-//        return load(id).transform(new Function<LinkedRow, P>() {
-//            @Nullable
-//            @Override
-//            public P apply(LinkedRow input) {
-//                return rowToPojo(input);
-//            }
-//        });
-//    }
 
     /**
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
@@ -439,8 +421,8 @@ public class Table {
         }
         String pkColumn = primaryKeyColumn.get();
         Column column = column(pkColumn);
-        String psString = lSql.getDialect().getPreparedStatementCreator().createSelectByIdStatement(this, column);
-        return ConnectionUtils.prepareStatement(lSql, psString, false);
+        String psString = lSql.getDialect().getStatementCreator().createSelectByIdStatement(this, column);
+        return lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, psString, false);
     }
 
     private List<String> createColumnList(Row row) {
@@ -474,7 +456,7 @@ public class Table {
     private Object queryRevision(Object id) throws SQLException {
         Column revCol = revisionColumn.get();
         PreparedStatement revQuery =
-                lSql.getDialect().getPreparedStatementCreator().createRevisionQueryStatement(this, id);
+                lSql.getDialect().getStatementCreator().createRevisionQueryStatement(this);
         revCol.getConverter().setValueInStatement(lSql, revQuery, 1, id);
         ResultSet resultSet = revQuery.executeQuery();
         resultSet.next();
@@ -519,7 +501,6 @@ public class Table {
         try {
             for (int i = 0; i < columns.size(); i++) {
                 Converter converter = column(columns.get(i)).getConverter();
-                Column column = column(columns.get(i));
                 converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)));
             }
             return ps;

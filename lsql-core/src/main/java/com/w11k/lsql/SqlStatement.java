@@ -9,7 +9,6 @@ import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
-import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -246,7 +245,7 @@ public class SqlStatement {
             }
         });
 
-        PreparedStatement ps = ConnectionUtils.prepareStatement(lSql, sqlStringCopy, false);
+        PreparedStatement ps = lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, sqlStringCopy, false);
         for (int i = 0; i < parameterInPreparedStatements.size(); i++) {
             ParameterInPreparedStatement pips = parameterInPreparedStatements.get(i);
 

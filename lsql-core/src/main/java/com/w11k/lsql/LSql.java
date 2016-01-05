@@ -1,13 +1,11 @@
 package com.w11k.lsql;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
-import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.sqlfile.LSqlFile;
 
 import javax.sql.DataSource;
@@ -72,14 +70,6 @@ public class LSql {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JodaModule());
         return mapper;
-    }
-
-    public static void prettyPrint(Object object) {
-        try {
-            System.out.println(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(object));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public BaseDialect getDialect() {
@@ -155,7 +145,7 @@ public class LSql {
      * @param sql the SQL string
      */
     public void executeRawSql(String sql) {
-        Statement st = ConnectionUtils.createStatement(this);
+        Statement st = getDialect().getStatementCreator().createStatement(this);
         try {
             st.execute(sql);
         } catch (SQLException e) {

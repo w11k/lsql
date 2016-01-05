@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.jdbc.ConnectionUtils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.annotations.Experimental;
@@ -35,7 +34,7 @@ public class Query {
     }
 
     public Query(LSql lSql, String sql) {
-        this(lSql, ConnectionUtils.prepareStatement(lSql, sql, false));
+        this(lSql, lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, sql, false));
     }
 
     public LSql getlSql() {
