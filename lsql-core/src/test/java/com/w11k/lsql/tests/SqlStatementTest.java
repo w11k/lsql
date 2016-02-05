@@ -25,7 +25,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementUnusedParameter() {
         setup();
         List<Row> rows = statement("SELECT * FROM person WHERE id = /*xxxxx=*/ -1 /**/;").query(
-                "id", 1
+          "id", 1
         ).toList();
         assertEquals(rows.size(), 1);
     }
@@ -97,10 +97,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementOneParameterMultipleOccurence() {
         setup();
         List<Row> rows = statement("SELECT * FROM person WHERE " +
-                "id > /*val=*/ 99999 /**/\n" +
-                "AND age > /*val=*/ 99999 /**/" +
-                ";")
-                .query("val", 3).toList();
+          "id > /*val=*/ 99999 /**/\n" +
+          "AND age > /*val=*/ 99999 /**/" +
+          ";")
+          .query("val", 3).toList();
         assertEquals(rows.size(), 2);
     }
 
@@ -108,13 +108,13 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementTwoParameters() {
         setup();
         List<Row> rows = statement("SELECT * FROM person WHERE " +
-                "id = /*id=*/ -1 /**/\n" +
-                "AND age = /*age=*/ -1 /**/" +
-                ";")
-                .query(
-                        "id", 2,
-                        "age", 12
-                ).toList();
+          "id = /*id=*/ -1 /**/\n" +
+          "AND age = /*age=*/ -1 /**/" +
+          ";")
+          .query(
+            "id", 2,
+            "age", 12
+          ).toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -122,15 +122,15 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementThreeParameters() {
         setup();
         List<Row> rows = statement("SELECT * FROM person WHERE " +
-                "id = /*id=*/ -1 /**/\n" +
-                "AND age = /*age=*/ -1 /**/\n" +
-                "AND fullname = /*fullname=*/ 'xxx' /**/" +
-                ";")
-                .query(
-                        "id", 3,
-                        "age", 13,
-                        "fullname", "c"
-                ).toList();
+          "id = /*id=*/ -1 /**/\n" +
+          "AND age = /*age=*/ -1 /**/\n" +
+          "AND fullname = /*fullname=*/ 'xxx' /**/" +
+          ";")
+          .query(
+            "id", 3,
+            "age", 13,
+            "fullname", "c"
+          ).toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -138,13 +138,13 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementThreeParametersInOneLine() {
         setup();
         List<Row> rows = statement(
-                "SELECT * FROM person WHERE " +
-                        "id = /*id=*/ -1 /**/ AND age = /*age=*/ -1 /**/ AND fullname = /*fullname=*/ 'xxx' /**/;")
-                .query(
-                        "id", 3,
-                        "age", 13,
-                        "fullname", "c"
-                ).toList();
+          "SELECT * FROM person WHERE " +
+            "id = /*id=*/ -1 /**/ AND age = /*age=*/ -1 /**/ AND fullname = /*fullname=*/ 'xxx' /**/;")
+          .query(
+            "id", 3,
+            "age", 13,
+            "fullname", "c"
+          ).toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -152,9 +152,9 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementThreeParametersUnused() {
         setup();
         List<Row> rows = statement(
-                "SELECT * FROM person WHERE " +
-                        "id = /*id=*/ 1 /**/ AND age = /*age=*/ 11 /**/ AND fullname = /*fullname=*/ 'a' /**/;")
-                .query().toList();
+          "SELECT * FROM person WHERE " +
+            "id = /*id=*/ 1 /**/ AND age = /*age=*/ 11 /**/ AND fullname = /*fullname=*/ 'a' /**/;")
+          .query().toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -162,15 +162,15 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementThreeParametersUnnamed() {
         setup();
         List<Row> rows = statement("SELECT * FROM person WHERE " +
-                "id = /*=*/ -1 /**/" +
-                "AND age = /*=*/ -1 /**/" +
-                "AND fullname = /*=*/ 'xxx' /**/" +
-                ";")
-                .query(
-                        "id", 4,
-                        "age", 14,
-                        "fullname", "d"
-                ).toList();
+          "id = /*=*/ -1 /**/" +
+          "AND age = /*=*/ -1 /**/" +
+          "AND fullname = /*=*/ 'xxx' /**/" +
+          ";")
+          .query(
+            "id", 4,
+            "age", 14,
+            "fullname", "d"
+          ).toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -178,15 +178,15 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementThreeParametersUnnamedMissingSpace() {
         setup();
         List<Row> rows = statement("SELECT * FROM person WHERE " +
-                "id = /*=*/ -1 /**/" +
-                "AND age = /*=*/ -1 /**/" +
-                "AND fullname= /*=*/ 'xxx' /**/" +
-                ";")
-                .query(
-                        "id", 4,
-                        "age", 14,
-                        "fullname", "d"
-                ).toList();
+          "id = /*=*/ -1 /**/" +
+          "AND age = /*=*/ -1 /**/" +
+          "AND fullname= /*=*/ 'xxx' /**/" +
+          ";")
+          .query(
+            "id", 4,
+            "age", 14,
+            "fullname", "d"
+          ).toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -194,10 +194,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void statementThreeParametersMultipleOccurences() {
         setup();
         SqlStatement statement = statement("SELECT * FROM person WHERE " +
-                "id > /*val=*/ 99999 /**/" +
-                "AND age > /*val=*/ 99999 /**/" +
-                "AND fullname= /*=*/ 'c' /**/" +
-                ";");
+          "id > /*val=*/ 99999 /**/" +
+          "AND age > /*val=*/ 99999 /**/" +
+          "AND fullname= /*=*/ 'c' /**/" +
+          ";");
 
         List<Row> rows = statement.query("val", 3, "fullname", "d").toList();
         assertEquals(rows.size(), 1);
@@ -240,28 +240,28 @@ public class SqlStatementTest extends AbstractLSqlTest {
 
         // Use IN converter
         row = statement("SELECT * FROM T WHERE yesno = /*=*/ 'positive' /**/;")
-                .addInConverter("yesno", converter)
-                .query("yesno", true).firstRow().get();
+          .addInConverter("yesno", converter)
+          .query("yesno", true).firstRow().get();
         assertEquals(row.get("yesno"), "positive");
 
         // Pass-through OUT converter
         row = statement("SELECT * FROM T WHERE yesno = /*=*/ 'positive' /**/;")
-                .addInConverter("yesno", converter)
-                .addOutConverter("yesno", converter)
-                .query("yesno", true).firstRow().get();
+          .addInConverter("yesno", converter)
+          .addOutConverter("yesno", converter)
+          .query("yesno", true).firstRow().get();
         assertEquals(row.get("yesno"), true);
 
         // Pass-through table column converters to converters API 1
         row = statement("SELECT * FROM T WHERE yesno = /*=*/ 'positive' /**/;")
-                .setInConverters(t.getColumnConverters())
-                .setOutConverters(t.getColumnConverters())
-                .query("yesno", true).firstRow().get();
+          .setInConverters(t.getColumnConverters())
+          .setOutConverters(t.getColumnConverters())
+          .query("yesno", true).firstRow().get();
         assertEquals(row.get("yesno"), true);
 
         // Pass-through table column converters to converters API 2
         row = statement("SELECT * FROM T WHERE yesno = /*=*/ 'positive' /**/;")
-                .setInAndOutConverters(t.getColumnConverters())
-                .query("yesno", true).firstRow().get();
+          .setInAndOutConverters(t.getColumnConverters())
+          .query("yesno", true).firstRow().get();
         assertEquals(row.get("yesno"), true);
     }
 
@@ -269,10 +269,27 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void removeLine() {
         setup();
         List<Row> rows = statement("SELECT * FROM person \n" +
-                "WHERE id = /*id=*/ -1 /**/ \n" +
-                ";")
-                .query("id", SqlStatement.RAW_REMOVE_LINE).toList();
+          "WHERE id = /*id=*/ -1 /**/ \n" +
+          ";")
+          .query("id", SqlStatement.RAW_REMOVE_LINE).toList();
         assertEquals(rows.size(), 5);
+    }
+
+    @Test
+    public void dynamicParameters() {
+        setup();
+        SqlStatement statement = statement("select * from person where" +
+          " age in (/*ages=*/ 11, 12, 13 /**/) " +
+          "and 1 = /*param=*/ 1 /**/;");
+        List<Row> rows = statement.query().toList();
+        assertEquals(rows.size(), 3);
+
+        rows = statement.query("param", 1).toList();
+        assertEquals(rows.size(), 3);
+
+        int[] ages = new int[]{11, 12};
+        rows = statement.query("ages", ages, "param", 1).toList();
+        assertEquals(rows.size(), 2);
     }
 
     private void setup() {
@@ -286,10 +303,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
 
     private void createTable() {
         lSql.executeRawSql("CREATE TABLE person (" +
-                "id INT PRIMARY KEY," +
-                "age INT," +
-                "fullname VARCHAR(100)" +
-                ")");
+          "id INT PRIMARY KEY," +
+          "age INT," +
+          "fullname VARCHAR(100)" +
+          ")");
     }
 
     private void insert(int id, int age, String fullname) {
