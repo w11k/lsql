@@ -70,7 +70,7 @@ public class SqlStatement {
 
     // ..... /*name=*/ 123 /**/
     private static final Pattern QUERY_ARG_START = Pattern.compile(
-            "/\\*\\s*(\\S*)\\s*=\\s*\\*/");
+      "/\\*\\s*(\\S*)\\s*=\\s*\\*/");
 
     private static final String QUERY_ARG_END = "/**/";
 
@@ -187,9 +187,7 @@ public class SqlStatement {
             p.endIndex = paramEnd;
 
             // Placeholder for PreparedStatement
-//            p.placeholder = "?" + StringUtils.repeat(" ", p.endIndex - p.startIndex - 1);
             p.placeholder = "?" + Strings.repeat(" ", p.endIndex - p.startIndex - 1);
-
 
             List<Parameter> parametersForName = found.containsKey(p.name) ? found.get(p.name) : Lists.<Parameter>newLinkedList();
 
@@ -203,9 +201,6 @@ public class SqlStatement {
     private String extractParameterName(String sqlString, int start) {
         String left = sqlString.substring(0, start);
         left = left.trim();
-
-//        String[] leftTokens = StringUtils.split(left, "!=<> ");
-//        String apache = leftTokens[leftTokens.length - 1];
 
         Iterable<String> splitIter = Splitter.on(CharMatcher.anyOf("!=<> ")).omitEmptyStrings().split(left);
         return Iterables.getLast(splitIter);
@@ -225,7 +220,6 @@ public class SqlStatement {
             for (Parameter p : parametersByName) {
                 String left = sqlStringCopy.substring(0, p.startIndex);
                 String right = sqlStringCopy.substring(p.endIndex);
-                // TODO 'raw string replace'-feature
                 sqlStringCopy = left + p.placeholder + right;
 
                 ParameterInPreparedStatement pips = new ParameterInPreparedStatement();
@@ -235,9 +229,6 @@ public class SqlStatement {
             }
         }
 
-        // RAW conversions
-        sqlStringCopy = processRawConversions(sqlStringCopy, parameterInPreparedStatements);
-
         // sort parameters by their position in the SQL statement
         Collections.sort(parameterInPreparedStatements, new Comparator<ParameterInPreparedStatement>() {
             public int compare(ParameterInPreparedStatement o1, ParameterInPreparedStatement o2) {
@@ -245,7 +236,12 @@ public class SqlStatement {
             }
         });
 
+        // RAW conversions
+        sqlStringCopy = processRawConversions(sqlStringCopy, parameterInPreparedStatements);
+
         PreparedStatement ps = lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, sqlStringCopy, false);
+
+        int offset = 0;
         for (int i = 0; i < parameterInPreparedStatements.size(); i++) {
             ParameterInPreparedStatement pips = parameterInPreparedStatements.get(i);
 
@@ -257,6 +253,14 @@ public class SqlStatement {
             if (pips.value instanceof QueryParameter) {
                 QueryParameter queryParameter = (QueryParameter) pips.value;
                 queryParameter.set(ps, i + 1);
+            } else if (pips.value instanceof DynamicQueryParameter) {
+                DynamicQueryParameter dqp = (DynamicQueryParameter) pips.value;
+                for (int localIndex = 0; localIndex < dqp.getNumberOfQueryParameters(); localIndex++) {
+                    dqp.set(ps, i + 1 + offset + localIndex, localIndex);
+                }
+
+                // -1 because one ? was already set
+                offset += dqp.getNumberOfQueryParameters() - 1;
             } else {
                 Converter converter = this.inConverters.get(pips.parameter.name);
 
@@ -266,7 +270,7 @@ public class SqlStatement {
                 if (converter == null) {
                     throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);
                 }
-                converter.setValueInStatement(lSql, ps, i + 1, pips.value);
+                converter.setValueInStatement(lSql, ps, i + offset + 1, pips.value);
             }
         }
 
@@ -276,22 +280,33 @@ public class SqlStatement {
     private String processRawConversions(String sql, List<ParameterInPreparedStatement> parameterInPreparedStatements) {
         for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
             if (pips.value.equals(RAW_REMOVE_LINE)) {
-
                 int startIndex = pips.parameter.startIndex;
-//                int beginLine = StringUtils.lastIndexOf(sql.substring(0, startIndex), "\n");
                 int beginLine = sql.substring(0, startIndex).lastIndexOf("\n");
 
                 int endIndex = pips.parameter.endIndex;
-//                int endLine = StringUtils.indexOf(sql, "\n", endIndex);
                 int endLine = sql.indexOf("\n", endIndex);
 
                 sql = sql.substring(0, beginLine);
-//                sql += StringUtils.repeat(" ", endLine - beginLine);
                 sql += Strings.repeat(" ", endLine - beginLine);
                 sql += sql.substring(endLine);
             }
         }
-        return sql;
+
+        int lastIndex = 0;
+        String sqlCopy = "";
+
+        // Separate iteration because the following iteration will destroy the indexes
+        for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
+            if (pips.value instanceof DynamicQueryParameter) {
+                DynamicQueryParameter dynamicQueryParameter = (DynamicQueryParameter) pips.value;
+                sqlCopy += sql.substring(lastIndex, pips.parameter.startIndex);
+                sqlCopy += dynamicQueryParameter.getSqlString();
+                lastIndex = pips.parameter.endIndex;
+            }
+        }
+        sqlCopy += sql.substring(lastIndex);
+
+        return sqlCopy;
     }
 
 }

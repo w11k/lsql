@@ -1,5 +1,6 @@
 package com.w11k.lsql.tests;
 
+import com.google.common.collect.Lists;
 import com.w11k.lsql.*;
 import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.exceptions.QueryException;
@@ -276,20 +277,81 @@ public class SqlStatementTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void dynamicParameters() {
+    public void dynamicQueryParameter() {
         setup();
+        List<Row> rows;
+
         SqlStatement statement = statement("select * from person where" +
           " age in (/*ages=*/ 11, 12, 13 /**/) " +
           "and 1 = /*param=*/ 1 /**/;");
-        List<Row> rows = statement.query().toList();
-        assertEquals(rows.size(), 3);
 
-        rows = statement.query("param", 1).toList();
-        assertEquals(rows.size(), 3);
+        final int[] ages = new int[]{11, 12};
 
-        int[] ages = new int[]{11, 12};
-        rows = statement.query("ages", ages, "param", 1).toList();
+        // Manual String concat
+        rows = statement.query(
+          "ages", new DynamicQueryParameter() {
+              @Override
+              public String getSqlString() {
+                  return "11, 12";
+              }
+          },
+          "param", 1
+        ).toList();
         assertEquals(rows.size(), 2);
+
+        // Use parameters
+        rows = statement.query(
+          "ages", new DynamicQueryParameter() {
+              @Override
+              public String getSqlString() {
+                  return "?, ?";
+              }
+
+              @Override
+              public int getNumberOfQueryParameters() {
+                  return 2;
+              }
+
+              @Override
+              public void set(PreparedStatement ps, int preparedStatementIndex, int localIndex) throws SQLException {
+                  ps.setInt(preparedStatementIndex, ages[localIndex]);
+              }
+          },
+          "param", 1
+        ).toList();
+        assertEquals(rows.size(), 2);
+    }
+
+    @Test
+    public void literalListQueryParameter() {
+        setup();
+        List<Row> rows;
+
+        SqlStatement statement = statement("select * from person where" +
+          " age in (/*ages=*/ 11, 12, 13 /**/) " +
+          "and 1 = /*param=*/ 1 /**/;");
+
+        // API Version 1
+        List<Integer> ages = Lists.newArrayList(11, 12);
+        rows = statement.query(
+          "ages", LiteralListQueryParameter.of(ages),
+          "param", 1
+        ).toList();
+        assertEquals(rows.size(), 2);
+
+        // API Version 2
+        rows = statement.query(
+          "ages", LiteralListQueryParameter.of(11, 12),
+          "param", 1
+        ).toList();
+        assertEquals(rows.size(), 2);
+
+        // API Version 2, empty
+        rows = statement.query(
+          "ages", LiteralListQueryParameter.of(),
+          "param", 1
+        ).toList();
+        assertEquals(rows.size(), 0);
     }
 
     private void setup() {
