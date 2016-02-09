@@ -3,9 +3,7 @@ package com.w11k.lsql;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
@@ -34,13 +32,25 @@ public class SqlStatement {
     public static final RAW_REMOVE_LINE RAW_REMOVE_LINE = new RAW_REMOVE_LINE();
 
     class Parameter {
-        public String placeholder;
+        String placeholder;
 
         String name;
 
         int startIndex;
 
         int endIndex;
+
+        public String getName() {
+            return name;
+        }
+
+        public int getStartIndex() {
+            return startIndex;
+        }
+
+        public int getEndIndex() {
+            return endIndex;
+        }
 
         @Override
         public String toString() {
@@ -97,6 +107,10 @@ public class SqlStatement {
 
     public String getSqlString() {
         return sqlString;
+    }
+
+    public ImmutableMap<String, List<Parameter>> getParameters() {
+        return ImmutableMap.copyOf(this.parameters);
     }
 
     public SqlStatement addInConverter(String parameterName, Converter converter) {

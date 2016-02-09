@@ -9,7 +9,7 @@ import java.util.List;
 
 public class LiteralListQueryParameter<T> extends DynamicQueryParameter {
 
-    public static <A> LiteralListQueryParameter<A> of(List<A> values) {
+    public static <A> LiteralListQueryParameter<A> of(Iterable<A> values) {
         return new LiteralListQueryParameter<A>(values);
     }
 
@@ -19,8 +19,8 @@ public class LiteralListQueryParameter<T> extends DynamicQueryParameter {
 
     private List<T> values;
 
-    public LiteralListQueryParameter(List<T> values) {
-        this.values = values;
+    public LiteralListQueryParameter(Iterable<T> values) {
+        this.values = Lists.newCopyOnWriteArrayList(values);
     }
 
     @Override
