@@ -1,6 +1,7 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.validation.AbstractValidationError;
 
 import java.util.Map;
@@ -80,11 +81,11 @@ public class LinkedRow extends Row {
             if (table.getColumns().containsKey(key)) {
                 Object val = from.get(key);
 
-//                Converter converter = table.getColumns().get(key).getConverter();
-//                Optional<? extends Class<?>> supportedJavaClass = converter.getJavaType();
-//                if (supportedJavaClass.isPresent() && !supportedJavaClass.get().equals(val)) {
-//                    val = converter.convertValueToTargetType(val);
-//                }
+                Converter converter = table.getColumns().get(key).getConverter();
+                Class<?> supportedJavaClass = converter.getJavaType();
+                if (!supportedJavaClass.isAssignableFrom(val.getClass())) {
+                    val = Row.OBJECT_MAPPER.convertValue(val, supportedJavaClass);
+                }
 
                 put(key, val);
             }
