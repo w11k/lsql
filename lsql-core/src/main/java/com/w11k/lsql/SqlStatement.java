@@ -18,16 +18,6 @@ import java.util.regex.Pattern;
 
 public class SqlStatement {
 
-//    static class RawConverter {
-//    }
-//
-//    static final class RAW_REMOVE_LINE extends RawConverter {
-//        private RAW_REMOVE_LINE() {
-//        }
-//    }
-//
-//    public static final RAW_REMOVE_LINE RAW_REMOVE_LINE = new RAW_REMOVE_LINE();
-
     class Parameter {
         String placeholder;
 
@@ -308,20 +298,6 @@ public class SqlStatement {
     }
 
     private String processRawConversions(String sql, List<ParameterInPreparedStatement> parameterInPreparedStatements) {
-//        for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
-//            if (pips.value.equals(RAW_REMOVE_LINE)) {
-//                int startIndex = pips.parameter.startIndex;
-//                int beginLine = sql.substring(0, startIndex).lastIndexOf("\n");
-//
-//                int endIndex = pips.parameter.endIndex;
-//                int endLine = sql.indexOf("\n", endIndex);
-//
-//                sql = sql.substring(0, beginLine);
-//                sql += Strings.repeat(" ", endLine - beginLine);
-//                sql += sql.substring(endLine);
-//            }
-//        }
-
         int lastIndex = 0;
         String sqlCopy = "";
 
