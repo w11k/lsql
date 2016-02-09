@@ -313,7 +313,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void literalListQueryParameter() {
+    public void listLiteralQueryParameter() {
         setup();
         List<Row> rows;
 

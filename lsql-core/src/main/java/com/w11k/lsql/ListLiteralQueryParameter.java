@@ -44,6 +44,6 @@ public class ListLiteralQueryParameter<T> extends LiteralQueryParameter {
 
     @Override
     public String toString() {
-        return "LiteralListQueryParameter[" + Joiner.on(",").join(values) + "]";
+        return getClass().getSimpleName() + "[" + Joiner.on(",").join(values) + "]";
     }
 }
