@@ -266,15 +266,15 @@ public class SqlStatementTest extends AbstractLSqlTest {
         assertEquals(row.get("yesno"), true);
     }
 
-    @Test
-    public void removeLine() {
-        setup();
-        List<Row> rows = statement("SELECT * FROM person \n" +
-          "WHERE id = /*id=*/ -1 /**/ \n" +
-          ";")
-          .query("id", SqlStatement.RAW_REMOVE_LINE).toList();
-        assertEquals(rows.size(), 5);
-    }
+//    @Test
+//    public void removeLine() {
+//        setup();
+//        List<Row> rows = statement("SELECT * FROM person \n" +
+//          "WHERE id = /*id=*/ -1 /**/ \n" +
+//          ";")
+//          .query("id", SqlStatement.RAW_REMOVE_LINE).toList();
+//        assertEquals(rows.size(), 5);
+//    }
 
     @Test
     public void dynamicQueryParameter() {

@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -17,7 +18,7 @@ public class LiteralListQueryParameter<T> extends DynamicQueryParameter {
         return new LiteralListQueryParameter<A>(Lists.newArrayList(values));
     }
 
-    private List<T> values;
+    protected List<T> values;
 
     public LiteralListQueryParameter(Iterable<T> values) {
         this.values = Lists.newCopyOnWriteArrayList(values);
@@ -39,5 +40,10 @@ public class LiteralListQueryParameter<T> extends DynamicQueryParameter {
     @Override
     public void set(PreparedStatement ps, int preparedStatementIndex, int localIndex) throws SQLException {
         ps.setObject(preparedStatementIndex, this.values.get(localIndex));
+    }
+
+    @Override
+    public String toString() {
+        return "LiteralListQueryParameter[" + Joiner.on(",").join(values) + "]";
     }
 }

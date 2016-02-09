@@ -12,24 +12,21 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SqlStatement {
 
-    static class RawConverter {
-    }
-
-    static final class RAW_REMOVE_LINE extends RawConverter {
-        private RAW_REMOVE_LINE() {
-        }
-    }
-
-    public static final RAW_REMOVE_LINE RAW_REMOVE_LINE = new RAW_REMOVE_LINE();
+//    static class RawConverter {
+//    }
+//
+//    static final class RAW_REMOVE_LINE extends RawConverter {
+//        private RAW_REMOVE_LINE() {
+//        }
+//    }
+//
+//    public static final RAW_REMOVE_LINE RAW_REMOVE_LINE = new RAW_REMOVE_LINE();
 
     class Parameter {
         String placeholder;
@@ -221,7 +218,7 @@ public class SqlStatement {
     }
 
     private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
-        logger.debug("Executing statement '{}' with parameters {}", statementName, queryParameters.keySet());
+        log(queryParameters);
 
         List<ParameterInPreparedStatement> parameterInPreparedStatements = Lists.newLinkedList();
         String sqlStringCopy = sqlString;
@@ -260,9 +257,9 @@ public class SqlStatement {
             ParameterInPreparedStatement pips = parameterInPreparedStatements.get(i);
 
             // Skip raw conversions
-            if (pips.value instanceof RawConverter) {
-                continue;
-            }
+//            if (pips.value instanceof RawConverter) {
+//                continue;
+//            }
 
             if (pips.value instanceof QueryParameter) {
                 QueryParameter queryParameter = (QueryParameter) pips.value;
@@ -291,20 +288,39 @@ public class SqlStatement {
         return ps;
     }
 
-    private String processRawConversions(String sql, List<ParameterInPreparedStatement> parameterInPreparedStatements) {
-        for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
-            if (pips.value.equals(RAW_REMOVE_LINE)) {
-                int startIndex = pips.parameter.startIndex;
-                int beginLine = sql.substring(0, startIndex).lastIndexOf("\n");
-
-                int endIndex = pips.parameter.endIndex;
-                int endLine = sql.indexOf("\n", endIndex);
-
-                sql = sql.substring(0, beginLine);
-                sql += Strings.repeat(" ", endLine - beginLine);
-                sql += sql.substring(endLine);
+    private void log(Map<String, Object> queryParameters) {
+        if (logger.isTraceEnabled()) {
+            ArrayList<String> keys = Lists.newArrayList(queryParameters.keySet());
+            Collections.sort(keys, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    return o1.compareToIgnoreCase(o2);
+                }
+            });
+            String msg = "Executing statement '" + statementName + "' with parameters:\n";
+            for (String key : keys) {
+                msg += String.format("%15s = %s\n", key, queryParameters.get(key));
             }
+            logger.trace(msg);
+        } else if (logger.isDebugEnabled()) {
+            logger.debug("Executing statement '{}' with parameters {}", statementName, queryParameters.keySet());
         }
+    }
+
+    private String processRawConversions(String sql, List<ParameterInPreparedStatement> parameterInPreparedStatements) {
+//        for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
+//            if (pips.value.equals(RAW_REMOVE_LINE)) {
+//                int startIndex = pips.parameter.startIndex;
+//                int beginLine = sql.substring(0, startIndex).lastIndexOf("\n");
+//
+//                int endIndex = pips.parameter.endIndex;
+//                int endLine = sql.indexOf("\n", endIndex);
+//
+//                sql = sql.substring(0, beginLine);
+//                sql += Strings.repeat(" ", endLine - beginLine);
+//                sql += sql.substring(endLine);
+//            }
+//        }
 
         int lastIndex = 0;
         String sqlCopy = "";
