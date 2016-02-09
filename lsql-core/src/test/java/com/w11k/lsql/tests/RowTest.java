@@ -66,9 +66,4 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(dt1, dt2);
     }
 
-    @Test(expectedExceptions = ClassCastException.class)
-    public void exceptionOnGetAsWithWrongType() {
-        Row.fromKeyVals("a", 1).getString("a");
-    }
-
 }

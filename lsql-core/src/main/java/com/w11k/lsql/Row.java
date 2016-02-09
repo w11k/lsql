@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
@@ -19,6 +20,14 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class Row extends ForwardingMap<String, Object> {
 
+    public static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    public static Row fromKeyVals(Object... keyVals) {
+        Row r = new Row();
+        r.addKeyVals(keyVals);
+        return r;
+    }
+
     private Map<String, Object> data;
 
     public Row() {
@@ -29,19 +38,13 @@ public class Row extends ForwardingMap<String, Object> {
         this.data = newHashMap(data);
     }
 
-    public static Row fromKeyVals(Object... keyVals) {
-        Row r = new Row();
-        r.addKeyVals(keyVals);
-        return r;
-    }
-
     public void setDelegate(Map<String, Object> data) {
         this.data = data;
     }
 
     public Row addKeyVals(Object... keyVals) {
         checkArgument(
-          keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
+            keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
 
         Iterable<List<Object>> partition = Iterables.partition(newArrayList(keyVals), 2);
         for (List<Object> objects : partition) {
@@ -77,10 +80,15 @@ public class Row extends ForwardingMap<String, Object> {
         if (type.isAssignableFrom(value.getClass())) {
             return type.cast(value);
         } else {
-            throw new ClassCastException("Row entry for key: '" + key
-              + "', value: '" + value
-              + "', type: '" + value.getClass().getCanonicalName()
-              + "' is not assignable to type '" + type.getCanonicalName() + "'");
+            try {
+                return OBJECT_MAPPER.convertValue(value, type);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Row entry for key: '" + key
+                                                       + "', value: '" + value
+                                                       + "', type: '" + value.getClass().getCanonicalName()
+                                                       + "' can not be converted to type '" + type.getCanonicalName() + "'",
+                                                      e);
+            }
         }
     }
 
