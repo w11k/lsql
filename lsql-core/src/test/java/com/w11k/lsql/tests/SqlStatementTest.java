@@ -271,8 +271,8 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         List<Row> rows;
 
-        SqlStatement statement = statement("select * from person where" +
-          " age in (/*ages=*/ 11, 12, 13 /**/) " +
+        SqlStatement statement = statement("select * from person where " +
+          "age in (/*ages=*/ 11, 12, 13 /**/) " +
           "and 1 = /*param=*/ 1 /**/;");
 
         final int[] ages = new int[]{11, 12};
