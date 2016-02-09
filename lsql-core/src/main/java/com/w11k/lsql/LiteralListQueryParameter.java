@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class LiteralListQueryParameter<T> extends DynamicQueryParameter {
+public class LiteralListQueryParameter<T> extends LiteralQueryParameter {
 
     public static <A> LiteralListQueryParameter<A> of(Iterable<A> values) {
         return new LiteralListQueryParameter<A>(values);

@@ -279,7 +279,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
 
         // Manual String concat
         rows = statement.query(
-          "ages", new DynamicQueryParameter() {
+          "ages", new LiteralQueryParameter() {
               @Override
               public String getSqlString() {
                   return "11, 12";
@@ -291,7 +291,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
 
         // Use parameters
         rows = statement.query(
-          "ages", new DynamicQueryParameter() {
+          "ages", new LiteralQueryParameter() {
               @Override
               public String getSqlString() {
                   return "?, ?";

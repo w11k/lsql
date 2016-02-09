@@ -254,8 +254,8 @@ public class SqlStatement {
             if (pips.value instanceof QueryParameter) {
                 QueryParameter queryParameter = (QueryParameter) pips.value;
                 queryParameter.set(ps, i + 1);
-            } else if (pips.value instanceof DynamicQueryParameter) {
-                DynamicQueryParameter dqp = (DynamicQueryParameter) pips.value;
+            } else if (pips.value instanceof LiteralQueryParameter) {
+                LiteralQueryParameter dqp = (LiteralQueryParameter) pips.value;
                 for (int localIndex = 0; localIndex < dqp.getNumberOfQueryParameters(); localIndex++) {
                     dqp.set(ps, i + 1 + offset + localIndex, localIndex);
                 }
@@ -303,10 +303,10 @@ public class SqlStatement {
 
         // Separate iteration because the following iteration will destroy the indexes
         for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
-            if (pips.value instanceof DynamicQueryParameter) {
-                DynamicQueryParameter dynamicQueryParameter = (DynamicQueryParameter) pips.value;
+            if (pips.value instanceof LiteralQueryParameter) {
+                LiteralQueryParameter literalQueryParameter = (LiteralQueryParameter) pips.value;
                 sqlCopy += sql.substring(lastIndex, pips.parameter.startIndex);
-                sqlCopy += dynamicQueryParameter.getSqlString();
+                sqlCopy += literalQueryParameter.getSqlString();
                 lastIndex = pips.parameter.endIndex;
             }
         }

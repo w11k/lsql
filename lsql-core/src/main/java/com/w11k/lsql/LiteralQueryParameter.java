@@ -3,7 +3,7 @@ package com.w11k.lsql;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class DynamicQueryParameter {
+public class LiteralQueryParameter {
 
     public String getSqlString() {
         return "";
