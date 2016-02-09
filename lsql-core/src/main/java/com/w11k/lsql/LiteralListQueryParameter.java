@@ -20,7 +20,7 @@ public class LiteralListQueryParameter<T> extends DynamicQueryParameter {
     private List<T> values;
 
     public LiteralListQueryParameter(List<T> values) {
-        this.values = Lists.newCopyOnWriteArrayList(values);
+        this.values = values;
     }
 
     @Override
