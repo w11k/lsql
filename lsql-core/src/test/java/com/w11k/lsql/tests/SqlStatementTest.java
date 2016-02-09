@@ -324,21 +324,21 @@ public class SqlStatementTest extends AbstractLSqlTest {
         // API Version 1
         List<Integer> ages = Lists.newArrayList(11, 12);
         rows = statement.query(
-          "ages", LiteralListQueryParameter.of(ages),
+          "ages", ListLiteralQueryParameter.of(ages),
           "param", 1
         ).toList();
         assertEquals(rows.size(), 2);
 
         // API Version 2
         rows = statement.query(
-          "ages", LiteralListQueryParameter.of(11, 12),
+          "ages", ListLiteralQueryParameter.of(11, 12),
           "param", 1
         ).toList();
         assertEquals(rows.size(), 2);
 
         // API Version 2, empty
         rows = statement.query(
-          "ages", LiteralListQueryParameter.of(),
+          "ages", ListLiteralQueryParameter.of(),
           "param", 1
         ).toList();
         assertEquals(rows.size(), 0);

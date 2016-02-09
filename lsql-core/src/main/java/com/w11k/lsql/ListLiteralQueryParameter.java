@@ -8,19 +8,19 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class LiteralListQueryParameter<T> extends LiteralQueryParameter {
+public class ListLiteralQueryParameter<T> extends LiteralQueryParameter {
 
-    public static <A> LiteralListQueryParameter<A> of(Iterable<A> values) {
-        return new LiteralListQueryParameter<A>(values);
+    public static <A> ListLiteralQueryParameter<A> of(Iterable<A> values) {
+        return new ListLiteralQueryParameter<A>(values);
     }
 
-    public static <A> LiteralListQueryParameter<A> of(A... values) {
-        return new LiteralListQueryParameter<A>(Lists.newArrayList(values));
+    public static <A> ListLiteralQueryParameter<A> of(A... values) {
+        return new ListLiteralQueryParameter<A>(Lists.newArrayList(values));
     }
 
     protected List<T> values;
 
-    public LiteralListQueryParameter(Iterable<T> values) {
+    public ListLiteralQueryParameter(Iterable<T> values) {
         this.values = Lists.newCopyOnWriteArrayList(values);
     }
 
