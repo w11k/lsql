@@ -1,6 +1,7 @@
 package com.w11k.lsql.converter;
 
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.Row;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,6 +30,7 @@ public abstract class Converter {
                 val = convertValueToTargetType(val);
             }
             */
+            val = convertValueToTargetType(val);
 
             setValue(lSql, ps, index, val);
         } else {
@@ -36,9 +38,9 @@ public abstract class Converter {
         }
     }
 
-//    public Object convertValueToTargetType(Object val) {
-//        return Row.fromKeyVals("v", val).getAs(getSupportedJavaClass().get(), "v");
-//    }
+    public Object convertValueToTargetType(Object val) {
+        return Row.OBJECT_MAPPER.convertValue(val, javaType);
+    }
 
     public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
         rs.getObject(index);

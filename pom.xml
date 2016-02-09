@@ -12,7 +12,7 @@
   <modules>
     <module>lsql-core</module>
     <module>lsql-guice</module>
-    <module>lsql-doc</module>
+    <!--<module>lsql-doc</module>-->
   </modules>
 
   <properties>
