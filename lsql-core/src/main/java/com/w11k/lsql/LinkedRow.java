@@ -81,13 +81,11 @@ public class LinkedRow extends Row {
             if (table.getColumns().containsKey(key)) {
                 Object val = from.get(key);
 
-
                 Converter converter = table.getColumns().get(key).getConverter();
-                Class<?> supportedJavaClass = converter.getJavaType();
-                if (!supportedJavaClass.equals(val)) {
+//                Class<?> supportedJavaClass = converter.getJavaType();
+//                if (!supportedJavaClass.equals(val)) {
                     val = converter.convertValueToTargetType(val);
-                }
-
+//                }
 
                 put(key, val);
             }
