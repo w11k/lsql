@@ -1,6 +1,5 @@
 package com.w11k.lsql;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
@@ -19,8 +18,6 @@ import static com.google.common.collect.Maps.newHashMap;
  *
  */
 public class Row extends ForwardingMap<String, Object> {
-
-    public static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
@@ -81,7 +78,7 @@ public class Row extends ForwardingMap<String, Object> {
             return type.cast(value);
         } else {
             try {
-                return OBJECT_MAPPER.convertValue(value, type);
+                return LSql.OBJECT_MAPPER.convertValue(value, type);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Row entry for key: '" + key
                                                        + "', value: '" + value

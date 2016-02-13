@@ -15,7 +15,7 @@
 
   <properties>
     <github.global.server>github</github.global.server>
-    <pandoc.path>${env.HOME}/.cabal/bin/pandoc</pandoc.path>
+    <pandoc.path>/usr/bin/pandoc</pandoc.path>
   </properties>
 
   <dependencies>

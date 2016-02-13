@@ -2,7 +2,6 @@ package com.w11k.lsql.converter.predefined;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.Row;
 import com.w11k.lsql.converter.Converter;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ public class ObjectToJsonStringConverter extends Converter {
 
     @Override
     public Object convertValueToTargetType(Object val) {
-        return Row.OBJECT_MAPPER.convertValue(val, typeReference);
+        return LSql.OBJECT_MAPPER.convertValue(val, typeReference);
     }
 
     @Override
