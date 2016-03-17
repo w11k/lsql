@@ -35,10 +35,6 @@ public class Table {
 
     private Optional<Column> revisionColumn = absent();
 
-    public static Table create(LSql lSql, String tableName) {
-        return new Table(lSql, tableName);
-    }
-
     public Table(LSql lSql, String tableName) {
         this.lSql = lSql;
         this.tableName = tableName;
@@ -129,7 +125,7 @@ public class Table {
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
-                throw new InsertException(rowsAffected + " toList were affected by insert operation. Expected: 1");
+                throw new InsertException(rowsAffected + " rows were affected by insert operation. Expected: 1");
             }
             if (primaryKeyColumn.isPresent()) {
                 Object id = null;

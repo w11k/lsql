@@ -70,9 +70,6 @@ public class Row extends ForwardingMap<String, Object> {
         if (value == null) {
             return null;
         }
-//        if (!type.isAssignableFrom(value.getClass())) {
-//            return convertWithJackson(type, value);
-//        }
 
         if (type.isAssignableFrom(value.getClass())) {
             return type.cast(value);
@@ -208,10 +205,6 @@ public class Row extends ForwardingMap<String, Object> {
     public String toString() {
         return Objects.toStringHelper(this).addValue(delegate()).toString();
     }
-
-//    protected ObjectMapper getObjectMapper() {
-//        return LSql.OBJECT_MAPPER;
-//    }
 
     @Override
     protected Map<String, Object> delegate() {
