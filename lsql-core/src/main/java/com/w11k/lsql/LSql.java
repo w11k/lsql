@@ -2,6 +2,7 @@ package com.w11k.lsql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.dialects.BaseDialect;
@@ -29,7 +30,9 @@ public class LSql {
 
     public static final ObjectMapper OBJECT_MAPPER = CREATE_JSON_MAPPER_INSTANCE();
 
-    private final Map<String, Object> tables = Maps.newHashMap();
+    private final Map<String, Table> rowTables = Maps.newHashMap();
+
+    private final Map<String, PojoTable> pojoTables = Maps.newHashMap();
 
     private final BaseDialect dialect;
 
@@ -98,8 +101,12 @@ public class LSql {
         this.failOnDuplicateTableDefinition = failOnDuplicateTableDefinition;
     }
 
-    public Iterable<Object> getTables() {
-        return Iterables.unmodifiableIterable(tables.values());
+    public Iterable<Table> getRowTables() {
+
+        return Iterables.unmodifiableIterable(rowTables.values());
+    }
+    public Iterable<PojoTable> getPojoTables() {
+        return Iterables.unmodifiableIterable(pojoTables.values());
     }
 
     /**
@@ -138,26 +145,30 @@ public class LSql {
     public Table table(String tableName) {
         Table table;
 
-        synchronized (tables) {
-            if (tables.containsKey(tableName) && failOnDuplicateTableDefinition) {
-                throw new IllegalStateException("table " + tableName + " already defined");
+        synchronized (rowTables) {
+            if (rowTables.containsKey(tableName) && failOnDuplicateTableDefinition) {
+                throw new IllegalStateException("Table " + tableName + " already defined");
             }
             table = new Table(this, tableName);
-            tables.put(tableName, table);
+            rowTables.put(tableName, table);
         }
 
         return table;
     }
 
     public <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
+        return this.table(tableName, pojoClass, null);
+    }
+
+    public <T> PojoTable<T> table(String tableName, Class<T> pojoClass, Function<String, String> propertyNameConverter) {
         PojoTable<T> table;
 
-        synchronized (tables) {
-            if (tables.containsKey(tableName) && failOnDuplicateTableDefinition) {
-                throw new IllegalStateException("table " + tableName + " already defined");
+        synchronized (pojoTables) {
+            if (pojoTables.containsKey(tableName) && failOnDuplicateTableDefinition) {
+                throw new IllegalStateException("PojoTable " + tableName + " already defined");
             }
-            table = new PojoTable<T>(this, tableName, pojoClass);
-            tables.put(tableName, table);
+            table = new PojoTable<T>(this, tableName, pojoClass, propertyNameConverter);
+            pojoTables.put(tableName, table);
         }
 
         return table;

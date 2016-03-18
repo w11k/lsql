@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
@@ -422,7 +423,7 @@ public class Table {
     }
 
     private List<String> createColumnList(Row row) {
-        List<String> columns = row.getKeyList();
+        List<String> columns = Lists.newLinkedList(row.keySet());
         columns = newLinkedList(filter(columns, new Predicate<String>() {
             public boolean apply(String input) {
                 if (column(input) == null) {
