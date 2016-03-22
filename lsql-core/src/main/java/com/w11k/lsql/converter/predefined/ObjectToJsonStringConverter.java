@@ -27,8 +27,8 @@ public class ObjectToJsonStringConverter extends Converter {
     }
 
     @Override
-    public Object convertValueToTargetType(Object val) {
-        return LSql.OBJECT_MAPPER.convertValue(val, typeReference);
+    public Object convertValueToTargetType(LSql lSql, Object val) {
+        return lSql.getObjectMapper().convertValue(val, typeReference);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ObjectToJsonStringConverter extends Converter {
     public void setValue(LSql lSql, PreparedStatement ps, int index,
                          Object val) throws SQLException {
         try {
-            String json = LSql.OBJECT_MAPPER.writer().writeValueAsString(val);
+            String json = lSql.getObjectMapper().writer().writeValueAsString(val);
             ps.setString(index, json);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -59,9 +59,9 @@ public class ObjectToJsonStringConverter extends Converter {
         String json = rs.getString(index);
         try {
             if (typeReference != null) {
-                return LSql.OBJECT_MAPPER.readValue(json, typeReference);
+                return lSql.getObjectMapper().readValue(json, typeReference);
             } else {
-                return LSql.OBJECT_MAPPER.readValue(json, clazz);
+                return lSql.getObjectMapper().readValue(json, clazz);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

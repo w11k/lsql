@@ -10,6 +10,27 @@ import static org.testng.Assert.*;
 
 public class LinkedRowTest extends AbstractLSqlTest {
 
+    static class Table1Pojo {
+        private int id;
+        private int age;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+    }
+
     @Test
     public void save() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
@@ -28,6 +49,20 @@ public class LinkedRowTest extends AbstractLSqlTest {
         queriedRow1.save();
         LinkedRow queriedRow1b = table1.load(1).get();
         assertEquals(queriedRow1b.getInt("age"), (Integer) 99);
+    }
+
+    @Test
+    public void toObject() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");
+        Table table1 = lSql.table("table1");
+
+        LinkedRow row1 = table1.newLinkedRow();
+        row1.addKeyVals("id", 1, "age", 50);
+        table1.insert(row1);
+        LinkedRow queriedRow1 = table1.load(1).get();
+        Table1Pojo table1Pojo = queriedRow1.convertTo(Table1Pojo.class);
+        assertEquals(table1Pojo.id, 1);
+        assertEquals(table1Pojo.age, 50);
     }
 
     @Test

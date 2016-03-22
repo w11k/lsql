@@ -1,7 +1,14 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
+import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -28,8 +35,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
-    public static final ObjectMapper OBJECT_MAPPER = CREATE_JSON_MAPPER_INSTANCE();
-
     private final Map<String, Table> rowTables = Maps.newHashMap();
 
     private final Map<String, PojoTable> pojoTables = Maps.newHashMap();
@@ -41,6 +46,8 @@ public class LSql {
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
 
     private boolean failOnDuplicateTableDefinition;
+
+    private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
     /**
      * Creates a new LSql instance.
@@ -71,9 +78,36 @@ public class LSql {
         this(dialect, ConnectionProviders.fromDataSource(dataSource));
     }
 
-    private static ObjectMapper CREATE_JSON_MAPPER_INSTANCE() {
+    public static ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JodaModule());
+        final Function<String, String> propertyNameConverter = new Function<String, String>() {
+            @Override
+            public String apply(String input) {
+                return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, input);
+            }
+        };
+        mapper.setPropertyNamingStrategy(new PropertyNamingStrategy() {
+            @Override
+            public String nameForField(MapperConfig<?> config, AnnotatedField field, String defaultName) {
+                return propertyNameConverter.apply(defaultName);
+            }
+
+            @Override
+            public String nameForGetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
+                return propertyNameConverter.apply(defaultName);
+            }
+
+            @Override
+            public String nameForSetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
+                return propertyNameConverter.apply(defaultName);
+            }
+
+            @Override
+            public String nameForConstructorParameter(MapperConfig<?> config, AnnotatedParameter ctorParam, String defaultName) {
+                return propertyNameConverter.apply(defaultName);
+            }
+        });
         return mapper;
     }
 
@@ -105,8 +139,30 @@ public class LSql {
 
         return Iterables.unmodifiableIterable(rowTables.values());
     }
+
     public Iterable<PojoTable> getPojoTables() {
         return Iterables.unmodifiableIterable(pojoTables.values());
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public void setObjectMapper(ObjectMapper objectMapper, boolean useForStaticRowObjectMapper) {
+        this.objectMapper = objectMapper.copy();
+        if (useForStaticRowObjectMapper) {
+            Row.OBJECT_MAPPER = this.objectMapper;
+        }
+    }
+
+    public ObjectMapper registerObjectMapperModule(Module module, boolean useForStaticRowObjectMapper) {
+        ObjectMapper copy = this.objectMapper.copy();
+        copy.registerModule(module);
+        this.objectMapper = copy;
+        if (useForStaticRowObjectMapper) {
+            Row.OBJECT_MAPPER = this.objectMapper;
+        }
+        return this.objectMapper;
     }
 
     /**
@@ -157,17 +213,13 @@ public class LSql {
     }
 
     public <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
-        return this.table(tableName, pojoClass, null);
-    }
-
-    public <T> PojoTable<T> table(String tableName, Class<T> pojoClass, Function<String, String> propertyNameConverter) {
         PojoTable<T> table;
 
         synchronized (pojoTables) {
             if (pojoTables.containsKey(tableName) && failOnDuplicateTableDefinition) {
                 throw new IllegalStateException("PojoTable " + tableName + " already defined");
             }
-            table = new PojoTable<T>(this, tableName, pojoClass, propertyNameConverter);
+            table = new PojoTable<T>(this, tableName, pojoClass);
             pojoTables.put(tableName, table);
         }
 
@@ -202,8 +254,8 @@ public class LSql {
     @Override
     public String toString() {
         return "LSql{" +
-          "dialect=" + dialect +
-          '}';
+                   "dialect=" + dialect +
+                   '}';
     }
 
 }

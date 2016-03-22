@@ -21,24 +21,15 @@ public abstract class Converter {
 
     public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         if (val != null) {
-            /*
-            if (convertWithJacksonOnWrongType()
-                    && getSupportedJavaClass().isPresent()
-                    && !val.getClass().equals(getSupportedJavaClass().get())) {
-                // If type is not correct, try to convert
-                val = convertValueToTargetType(val);
-            }
-            */
-            val = convertValueToTargetType(val);
-
+            val = convertValueToTargetType(lSql, val);
             setValue(lSql, ps, index, val);
         } else {
             ps.setNull(index, sqlTypeForNullValues);
         }
     }
 
-    public Object convertValueToTargetType(Object val) {
-        return LSql.OBJECT_MAPPER.convertValue(val, javaType);
+    public Object convertValueToTargetType(LSql lSql, Object val) {
+        return lSql.getObjectMapper().convertValue(val, javaType);
     }
 
     public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
