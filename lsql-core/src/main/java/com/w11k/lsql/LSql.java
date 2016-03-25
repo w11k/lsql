@@ -1,15 +1,7 @@
 package com.w11k.lsql;
 
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.cfg.MapperConfig;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
-import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.dialects.BaseDialect;
@@ -49,6 +41,8 @@ public class LSql {
 
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
+    private ToPojoConverter toPojoConverter;
+
     /**
      * Creates a new LSql instance.
      * <p/>
@@ -63,6 +57,7 @@ public class LSql {
         this.connectionProvider = connectionProvider;
 
         dialect.setlSql(this);
+        this.toPojoConverter = new ToPojoConverter(this);
     }
 
 
@@ -81,33 +76,6 @@ public class LSql {
     public static ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JodaModule());
-        final Function<String, String> propertyNameConverter = new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, input);
-            }
-        };
-        mapper.setPropertyNamingStrategy(new PropertyNamingStrategy() {
-            @Override
-            public String nameForField(MapperConfig<?> config, AnnotatedField field, String defaultName) {
-                return propertyNameConverter.apply(defaultName);
-            }
-
-            @Override
-            public String nameForGetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-                return propertyNameConverter.apply(defaultName);
-            }
-
-            @Override
-            public String nameForSetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-                return propertyNameConverter.apply(defaultName);
-            }
-
-            @Override
-            public String nameForConstructorParameter(MapperConfig<?> config, AnnotatedParameter ctorParam, String defaultName) {
-                return propertyNameConverter.apply(defaultName);
-            }
-        });
         return mapper;
     }
 
@@ -136,7 +104,6 @@ public class LSql {
     }
 
     public Iterable<Table> getRowTables() {
-
         return Iterables.unmodifiableIterable(rowTables.values());
     }
 
@@ -144,25 +111,16 @@ public class LSql {
         return Iterables.unmodifiableIterable(pojoTables.values());
     }
 
-    public ObjectMapper getObjectMapper() {
+    public Iterable<ITable> getTables() {
+        return Iterables.concat(getRowTables(), getPojoTables());
+    }
+
+    public ObjectMapper getPlainObjectMapper() {
         return objectMapper;
     }
 
-    public void setObjectMapper(ObjectMapper objectMapper, boolean useForStaticRowObjectMapper) {
-        this.objectMapper = objectMapper.copy();
-        if (useForStaticRowObjectMapper) {
-            Row.OBJECT_MAPPER = this.objectMapper;
-        }
-    }
-
-    public ObjectMapper registerObjectMapperModule(Module module, boolean useForStaticRowObjectMapper) {
-        ObjectMapper copy = this.objectMapper.copy();
-        copy.registerModule(module);
-        this.objectMapper = copy;
-        if (useForStaticRowObjectMapper) {
-            Row.OBJECT_MAPPER = this.objectMapper;
-        }
-        return this.objectMapper;
+    public ToPojoConverter getToPojoConverter() {
+        return toPojoConverter;
     }
 
     /**

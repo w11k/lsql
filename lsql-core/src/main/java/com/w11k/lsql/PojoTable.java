@@ -5,22 +5,22 @@ import com.google.common.base.Optional;
 import java.util.Iterator;
 import java.util.Map;
 
-public class PojoTable<T> {
+public class PojoTable<T> implements ITable {
 
-    private final LSql lSql;
+    private final ToPojoConverter toPojoConverter;
 
     private final Class<T> pojoClass;
 
     private final Table table;
 
     public PojoTable(LSql lSql, String tableName, Class<T> pojoClass) {
-        this.lSql = lSql;
+        this.toPojoConverter = lSql.getToPojoConverter();
         this.pojoClass = pojoClass;
         this.table = new Table(lSql, tableName);
     }
 
     public T insert(T pojo) {
-        Row row = lSql.getObjectMapper().convertValue(pojo, Row.class);
+        Row row = toPojoConverter.convert(pojo, Row.class);
         Iterator<Map.Entry<String, Object>> entryIterator = row.entrySet().iterator();
         while (entryIterator.hasNext()) {
             Map.Entry<String, Object> entry = entryIterator.next();
@@ -42,17 +42,22 @@ public class PojoTable<T> {
             return Optional.absent();
         }
 
-        T t = lSql.getObjectMapper().convertValue(row.get(), pojoClass);
+        T t = toPojoConverter.convert(row.get(), pojoClass);
         return Optional.of(t);
     }
 
     public void delete(T pojo) {
-        Row row = this.lSql.getObjectMapper().convertValue(pojo, Row.class);
+        Row row = toPojoConverter.convert(pojo, Row.class);
         this.table.delete(row);
     }
 
     public void update(T pojo) {
-        Row row = this.lSql.getObjectMapper().convertValue(pojo, Row.class);
+        Row row = toPojoConverter.convert(pojo, Row.class);
         this.table.update(row);
+    }
+
+    @Override
+    public String getTableName() {
+        return table.getTableName();
     }
 }

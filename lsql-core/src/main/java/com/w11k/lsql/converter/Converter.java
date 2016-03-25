@@ -29,7 +29,7 @@ public abstract class Converter {
     }
 
     public Object convertValueToTargetType(LSql lSql, Object val) {
-        return lSql.getObjectMapper().convertValue(val, javaType);
+        return lSql.getPlainObjectMapper().convertValue(val, javaType);
     }
 
     public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {

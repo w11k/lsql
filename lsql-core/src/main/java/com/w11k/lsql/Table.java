@@ -24,7 +24,7 @@ import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class Table {
+public class Table implements ITable {
 
     private final LSql lSql;
 
@@ -55,6 +55,7 @@ public class Table {
         return lSql;
     }
 
+    @Override
     public String getTableName() {
         return tableName;
     }
