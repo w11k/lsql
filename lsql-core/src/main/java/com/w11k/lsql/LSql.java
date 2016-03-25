@@ -27,6 +27,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
+    public static ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+        return mapper;
+    }
+
     private final Map<String, Table> rowTables = Maps.newHashMap();
 
     private final Map<String, PojoTable> pojoTables = Maps.newHashMap();
@@ -37,11 +43,12 @@ public class LSql {
 
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
 
-    private boolean failOnDuplicateTableDefinition;
+    private boolean failOnDuplicateTableDefinition = true;
 
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
     private ToPojoConverter toPojoConverter;
+
 
     /**
      * Creates a new LSql instance.
@@ -60,7 +67,6 @@ public class LSql {
         this.toPojoConverter = new ToPojoConverter(this);
     }
 
-
     /**
      * Creates a new LSql instance.
      * <p/>
@@ -73,10 +79,9 @@ public class LSql {
         this(dialect, ConnectionProviders.fromDataSource(dataSource));
     }
 
-    public static ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JodaModule());
-        return mapper;
+    public void clearTables() {
+        rowTables.clear();
+        pojoTables.clear();
     }
 
     public BaseDialect getDialect() {
@@ -212,8 +217,8 @@ public class LSql {
     @Override
     public String toString() {
         return "LSql{" +
-                   "dialect=" + dialect +
-                   '}';
+            "dialect=" + dialect +
+            '}';
     }
 
 }

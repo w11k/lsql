@@ -181,7 +181,7 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
         assertEquals(tree.get(2).getTree("facts").get(4).getString("fact_value"), "Mexico City");
     }
 
-    @Test
+    @Test(enabled = false)
     public void continentsWithFactsToPojo() {
         Query query = statement("continentsWithFacts").query();
         List<ContinentWithFacts> tree = query.toPojo(ContinentWithFacts.class);
