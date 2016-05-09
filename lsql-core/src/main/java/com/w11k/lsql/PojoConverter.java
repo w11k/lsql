@@ -9,11 +9,11 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 
-public class ToPojoConverter {
+public class PojoConverter {
 
     private ObjectMapper mapper;
 
-    public ToPojoConverter(LSql lSql) {
+    public PojoConverter(LSql lSql) {
         ObjectMapper copy = lSql.getPlainObjectMapper().copy();
 
         final Function<String, String> propertyNameConverter = new Function<String, String>() {

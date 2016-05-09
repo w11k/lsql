@@ -7,20 +7,20 @@ import java.util.Map;
 
 public class PojoTable<T> implements ITable {
 
-    private final ToPojoConverter toPojoConverter;
+    private final PojoConverter pojoConverter;
 
     private final Class<T> pojoClass;
 
     private final Table table;
 
     public PojoTable(LSql lSql, String tableName, Class<T> pojoClass) {
-        this.toPojoConverter = lSql.getToPojoConverter();
+        this.pojoConverter = lSql.getPojoConverter();
         this.pojoClass = pojoClass;
         this.table = new Table(lSql, tableName);
     }
 
     public T insert(T pojo) {
-        Row row = toPojoConverter.convert(pojo, Row.class);
+        Row row = pojoConverter.convert(pojo, Row.class);
         Iterator<Map.Entry<String, Object>> entryIterator = row.entrySet().iterator();
         while (entryIterator.hasNext()) {
             Map.Entry<String, Object> entry = entryIterator.next();
@@ -42,17 +42,17 @@ public class PojoTable<T> implements ITable {
             return Optional.absent();
         }
 
-        T t = toPojoConverter.convert(row.get(), pojoClass);
+        T t = pojoConverter.convert(row.get(), pojoClass);
         return Optional.of(t);
     }
 
     public void delete(T pojo) {
-        Row row = toPojoConverter.convert(pojo, Row.class);
+        Row row = pojoConverter.convert(pojo, Row.class);
         this.table.delete(row);
     }
 
     public void update(T pojo) {
-        Row row = toPojoConverter.convert(pojo, Row.class);
+        Row row = pojoConverter.convert(pojo, Row.class);
         this.table.update(row);
     }
 

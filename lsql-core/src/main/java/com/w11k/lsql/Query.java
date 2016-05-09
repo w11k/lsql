@@ -141,12 +141,12 @@ public class Query {
     }
 
     @Experimental
-    public <T> List<T> toPojo(Class<T> pojoClass) {
+    public <T> List<T> toPojo(Class<T> classForTopLevelRows) {
         LinkedHashMap<Number, Row> tree = this.toTree();
         Collection<Row> roots = tree.values();
         List<T> rootPojos = Lists.newLinkedList();
         for (Row root : roots) {
-            T rootPojo = this.lSql.getPlainObjectMapper().convertValue(root, pojoClass);
+            T rootPojo = this.lSql.getPlainObjectMapper().convertValue(root, classForTopLevelRows);
             rootPojos.add(rootPojo);
         }
         return rootPojos;

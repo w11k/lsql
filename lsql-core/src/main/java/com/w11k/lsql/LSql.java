@@ -47,7 +47,7 @@ public class LSql {
 
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
-    private ToPojoConverter toPojoConverter;
+    private PojoConverter pojoConverter;
 
 
     /**
@@ -64,7 +64,7 @@ public class LSql {
         this.connectionProvider = connectionProvider;
 
         dialect.setlSql(this);
-        this.toPojoConverter = new ToPojoConverter(this);
+        this.pojoConverter = new PojoConverter(this);
     }
 
     /**
@@ -124,8 +124,8 @@ public class LSql {
         return objectMapper;
     }
 
-    public ToPojoConverter getToPojoConverter() {
-        return toPojoConverter;
+    public PojoConverter getPojoConverter() {
+        return pojoConverter;
     }
 
     /**
