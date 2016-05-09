@@ -14,7 +14,7 @@ public class PojoConverter {
     private ObjectMapper mapper;
 
     public PojoConverter(LSql lSql) {
-        ObjectMapper copy = lSql.getPlainObjectMapper().copy();
+        ObjectMapper copy = lSql.getObjectMapper().copy();
 
         final Function<String, String> propertyNameConverter = new Function<String, String>() {
             @Override

@@ -146,7 +146,7 @@ public class Query {
         Collection<Row> roots = tree.values();
         List<T> rootPojos = Lists.newLinkedList();
         for (Row root : roots) {
-            T rootPojo = this.lSql.getPlainObjectMapper().convertValue(root, classForTopLevelRows);
+            T rootPojo = this.lSql.getObjectMapper().convertValue(root, classForTopLevelRows);
             rootPojos.add(rootPojo);
         }
         return rootPojos;

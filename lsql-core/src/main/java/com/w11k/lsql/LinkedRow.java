@@ -121,7 +121,7 @@ public class LinkedRow extends Row {
     }
 
     public <T> T convertTo(Class<T> pojoClass) {
-        return this.table.getlSql().getPlainObjectMapper().convertValue(this, pojoClass);
+        return this.table.getlSql().getObjectMapper().convertValue(this, pojoClass);
     }
 
     void setData(Map<String, Object> row) {
@@ -132,6 +132,6 @@ public class LinkedRow extends Row {
 
     @Override
     protected ObjectMapper getObjectMapper() {
-        return this.table.getlSql().getPlainObjectMapper();
+        return this.table.getlSql().getObjectMapper();
     }
 }
