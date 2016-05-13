@@ -23,53 +23,76 @@ public class TreeToPojoNoCaseConversionTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void continentsToPojo() {
-        Query query = this.treeTestData.continents();
-        List<Continent> continents = query.toPojo(Continent.class);
-        assertEquals(continents.size(), 2);
-        assertEquals(continents.get(0).getId(), 1);
-        assertEquals(continents.get(0).getName(), "Europe");
-        assertEquals(continents.get(1).getId(), 2);
-        assertEquals(continents.get(1).getName(), "North America");
-    }
+    public void continentsWithFactsAndCountriesAndCities() {
+        Query query = this.treeTestData.continentsWithFactsAndCountriesAndCities();
+        List<QueryContinent> continent = query.toPojo(QueryContinent.class);
 
-    @Test
-    public void continentsWithFactsToPojo() {
-        Query query = this.treeTestData.continentsWithFacts();
-        List<ContinentWithFacts> tree = query.toPojo(ContinentWithFacts.class);
-
-        assertEquals(tree.size(), 2);
+        assertEquals(continent.size(), 2);
 
         // Continent
-        assertEquals(tree.get(1).getId(), 1);
-        assertEquals(tree.get(1).getName(), "Europe");
-        assertEquals(tree.get(2).getId(), 2);
-        assertEquals(tree.get(2).getName(), "North America");
+        assertEquals(continent.get(0).getId(), 1);
+        assertEquals(continent.get(0).getName(), "Europe");
+        assertEquals(continent.get(1).getId(), 2);
+        assertEquals(continent.get(1).getName(), "North America");
 
-        // Continent Facts
-//        assertEquals(tree.get(1).getTree("facts").get(1).size(), 4);
-//        assertEquals(tree.get(1).getTree("facts").get(1).getInt("id"), Integer.valueOf(1));
-//        assertEquals(tree.get(1).getTree("facts").get(1).getInt("continent_id"), Integer.valueOf(1));
-//        assertEquals(tree.get(1).getTree("facts").get(1).getString("fact_name"), "Area");
-//        assertEquals(tree.get(1).getTree("facts").get(1).getString("fact_value"), "10,180,000 km2");
-//
-//        assertEquals(tree.get(1).getTree("facts").get(2).size(), 4);
-//        assertEquals(tree.get(1).getTree("facts").get(2).getInt("id"), Integer.valueOf(2));
-//        assertEquals(tree.get(1).getTree("facts").get(2).getInt("continent_id"), Integer.valueOf(1));
-//        assertEquals(tree.get(1).getTree("facts").get(2).getString("fact_name"), "Population");
-//        assertEquals(tree.get(1).getTree("facts").get(2).getString("fact_value"), "742,452,000");
-//
-//        assertEquals(tree.get(2).getTree("facts").get(3).size(), 4);
-//        assertEquals(tree.get(2).getTree("facts").get(3).getInt("id"), Integer.valueOf(3));
-//        assertEquals(tree.get(2).getTree("facts").get(3).getInt("continent_id"), Integer.valueOf(2));
-//        assertEquals(tree.get(2).getTree("facts").get(3).getString("fact_name"), "Area");
-//        assertEquals(tree.get(2).getTree("facts").get(3).getString("fact_value"), "24,709,000 km2");
-//
-//        assertEquals(tree.get(2).getTree("facts").get(4).size(), 4);
-//        assertEquals(tree.get(2).getTree("facts").get(4).getInt("id"), Integer.valueOf(4));
-//        assertEquals(tree.get(2).getTree("facts").get(4).getInt("continent_id"), Integer.valueOf(2));
-//        assertEquals(tree.get(2).getTree("facts").get(4).getString("fact_name"), "Largest city");
-//        assertEquals(tree.get(2).getTree("facts").get(4).getString("fact_value"), "Mexico City");
+        // Facts
+        assertEquals(continent.get(0).getFacts().size(), 2);
+
+        assertEquals(continent.get(0).getFacts().get(1).getId(), 1);
+        assertEquals(continent.get(0).getFacts().get(1).getContinent_id(), 1);
+        assertEquals(continent.get(0).getFacts().get(1).getFact_name(), "Area");
+        assertEquals(continent.get(0).getFacts().get(1).getFact_value(), "10,180,000 km2");
+
+        assertEquals(continent.get(0).getFacts().get(2).getId(), 2);
+        assertEquals(continent.get(0).getFacts().get(2).getContinent_id(), 1);
+        assertEquals(continent.get(0).getFacts().get(2).getFact_name(), "Population");
+        assertEquals(continent.get(0).getFacts().get(2).getFact_value(), "742,452,000");
+
+        assertEquals(continent.get(1).getFacts().get(3).getId(), 3);
+        assertEquals(continent.get(1).getFacts().get(3).getContinent_id(), 2);
+        assertEquals(continent.get(1).getFacts().get(3).getFact_name(), "Area");
+        assertEquals(continent.get(1).getFacts().get(3).getFact_value(), "24,709,000 km2");
+
+        assertEquals(continent.get(1).getFacts().get(4).getId(), 4);
+        assertEquals(continent.get(1).getFacts().get(4).getContinent_id(), 2);
+        assertEquals(continent.get(1).getFacts().get(4).getFact_name(), "Largest city");
+        assertEquals(continent.get(1).getFacts().get(4).getFact_value(), "Mexico City");
+
+        // Countries
+        assertEquals(continent.get(0).getCountries().size(), 2);
+
+        assertEquals(continent.get(0).getCountries().get(1).getId(), 1);
+        assertEquals(continent.get(0).getCountries().get(1).getContinent_id(), 1);
+        assertEquals(continent.get(0).getCountries().get(1).getName(), "Germany");
+
+        assertEquals(continent.get(0).getCountries().get(2).getId(), 2);
+        assertEquals(continent.get(0).getCountries().get(2).getContinent_id(), 1);
+        assertEquals(continent.get(0).getCountries().get(2).getName(), "Netherlands");
+
+        assertEquals(continent.get(1).getCountries().get(3).getId(), 3);
+        assertEquals(continent.get(1).getCountries().get(3).getContinent_id(), 2);
+        assertEquals(continent.get(1).getCountries().get(3).getName(), "USA");
+
+        assertEquals(continent.get(1).getCountries().get(4).getId(), 4);
+        assertEquals(continent.get(1).getCountries().get(4).getContinent_id(), 2);
+        assertEquals(continent.get(1).getCountries().get(4).getName(), "Canada");
+
+        // Cities
+        assertEquals(continent.get(0).getCountries().get(1).getCities().get(1).getId(), 1);
+        assertEquals(continent.get(0).getCountries().get(1).getCities().get(1).getCountry_id(), 1);
+        assertEquals(continent.get(0).getCountries().get(1).getCities().get(1).getName(), "Esslingen");
+
+        assertEquals(continent.get(0).getCountries().get(1).getCities().get(2).getId(), 2);
+        assertEquals(continent.get(0).getCountries().get(1).getCities().get(2).getCountry_id(), 1);
+        assertEquals(continent.get(0).getCountries().get(1).getCities().get(2).getName(), "Bonn");
+
+        assertEquals(continent.get(1).getCountries().get(3).getCities().get(3).getId(), 3);
+        assertEquals(continent.get(1).getCountries().get(3).getCities().get(3).getCountry_id(), 3);
+        assertEquals(continent.get(1).getCountries().get(3).getCities().get(3).getName(), "Boston");
+
+        assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getId(), 4);
+        assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getCountry_id(), 3);
+        assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getName(), "New York");
     }
 
 }
