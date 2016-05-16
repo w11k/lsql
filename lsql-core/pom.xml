@@ -7,16 +7,16 @@
   <parent>
     <groupId>com.w11k.lsql</groupId>
     <artifactId>lsql-parent</artifactId>
-    <version>0.15.4</version>
+    <version>0.15.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>lsql-core</artifactId>
 
   <dependencies>
-    <!-- compile -->
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!--<dependency>-->
