@@ -28,6 +28,8 @@ public class Query {
 
     private Map<String, Converter> converters = Maps.newHashMap();
 
+    private boolean ignoreDuplicateColumns = false;
+
     public Query(LSql lSql, PreparedStatement preparedStatement) {
         this.lSql = lSql;
         this.preparedStatement = preparedStatement;
@@ -39,6 +41,11 @@ public class Query {
 
     public LSql getlSql() {
         return lSql;
+    }
+
+    public Query ignoreDuplicateColumns() {
+        this.ignoreDuplicateColumns = true;
+        return this;
     }
 
     public PreparedStatement getPreparedStatement() {
@@ -115,7 +122,7 @@ public class Query {
                         String columnLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
 
                         // check duplicates
-                        if (processedColumnLabels.contains(columnLabel)) {
+                        if (!ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel)) {
                             throw new IllegalStateException("Duplicate column '" + columnLabel + "' in query.");
                         }
                         processedColumnLabels.add(columnLabel);

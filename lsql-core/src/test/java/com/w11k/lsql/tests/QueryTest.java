@@ -50,6 +50,20 @@ public class QueryTest extends AbstractLSqlTest {
         assertTrue(ages.contains(30));
     }
 
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void failOnDuplicateColumnsInTheResultSet() {
+        createTable("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+        lSql.executeRawQuery("SELECT name, name, age FROM table1").firstRow().get();
+    }
+
+    @Test
+    public void ignoreDuplicateColumnsInTheResultSet() {
+        createTable("CREATE TABLE table1 (name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
+        lSql.executeRawQuery("SELECT name, name, age FROM table1").ignoreDuplicateColumns().firstRow().get();
+    }
+
     @Test
     public void queryGetFirstRow() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
