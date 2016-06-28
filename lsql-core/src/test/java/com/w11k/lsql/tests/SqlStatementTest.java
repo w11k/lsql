@@ -267,7 +267,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void dynamicQueryParameter() {
+    public void literalQueryParameter() {
         setup();
         List<Row> rows;
 
