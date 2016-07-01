@@ -15,10 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Query {
 
@@ -148,6 +145,18 @@ public class Query {
     @Experimental
     public LinkedHashMap<Number, Row> toTree() {
         return new QueryToTreeConverter(this).getTree();
+    }
+
+    @Experimental
+    public <T> List<T> toPojo(Class<T> classForTopLevelRows) {
+        LinkedHashMap<Number, Row> tree = this.toTree();
+        Collection<Row> roots = tree.values();
+        List<T> rootPojos = Lists.newLinkedList();
+        for (Row root : roots) {
+            T rootPojo = this.lSql.getObjectMapper().convertValue(root, classForTopLevelRows);
+            rootPojos.add(rootPojo);
+        }
+        return rootPojos;
     }
 
     public Row extractRow(ResultSetWithColumns resultSetWithColumns) {

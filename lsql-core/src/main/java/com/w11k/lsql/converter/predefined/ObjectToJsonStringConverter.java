@@ -27,8 +27,8 @@ public class ObjectToJsonStringConverter extends Converter {
     }
 
     @Override
-    public Object convertValueToTargetType(Object val) {
-        return LSql.OBJECT_MAPPER.convertValue(val, typeReference);
+    public Object convertValueToTargetType(LSql lSql, Object val) {
+        return lSql.getObjectMapper().convertValue(val, typeReference);
     }
 
     @Override

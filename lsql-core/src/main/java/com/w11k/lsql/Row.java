@@ -1,10 +1,10 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
@@ -18,6 +18,8 @@ import static com.google.common.collect.Maps.newHashMap;
  *
  */
 public class Row extends ForwardingMap<String, Object> {
+
+    public static ObjectMapper OBJECT_MAPPER = LSql.CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
@@ -58,10 +60,6 @@ public class Row extends ForwardingMap<String, Object> {
         return super.put(key, value);
     }
 
-    public List<String> getKeyList() {
-        return Lists.newLinkedList(keySet());
-    }
-
     public <A> A getAs(Class<A> type, String key) {
         if (!containsKey(key)) {
             throw new IllegalArgumentException("No entry for key '" + key + "'.");
@@ -70,15 +68,12 @@ public class Row extends ForwardingMap<String, Object> {
         if (value == null) {
             return null;
         }
-//        if (!type.isAssignableFrom(value.getClass())) {
-//            return convertWithJackson(type, value);
-//        }
 
         if (type.isAssignableFrom(value.getClass())) {
             return type.cast(value);
         } else {
             try {
-                return LSql.OBJECT_MAPPER.convertValue(value, type);
+                return getObjectMapper().convertValue(value, type);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Row entry for key: '" + key
                                                        + "', value: '" + value
@@ -87,6 +82,10 @@ public class Row extends ForwardingMap<String, Object> {
                                                       e);
             }
         }
+    }
+
+    protected ObjectMapper getObjectMapper() {
+        return OBJECT_MAPPER;
     }
 
     public <A> A getAsOr(Class<A> type, String key, A defaultValue) {
@@ -162,16 +161,6 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(LinkedHashMap.class, key);
     }
 
-
-//    @SuppressWarnings("unchecked")
-//    public <T extends Row> List<T> getJoined(String key) {
-//        return (List<T>) getListOf(Row.class, key);
-//    }
-
-//    public List<Row> getJoinedRows(String key) {
-//        return getListOf(Row.class, key);
-//    }
-
     public boolean hasNonNullValue(String key) {
         return get(key) != null;
     }
@@ -209,24 +198,9 @@ public class Row extends ForwardingMap<String, Object> {
         return Objects.toStringHelper(this).addValue(delegate()).toString();
     }
 
-//    protected ObjectMapper getObjectMapper() {
-//        return LSql.OBJECT_MAPPER;
-//    }
-
     @Override
     protected Map<String, Object> delegate() {
         return data;
     }
-
-//    private <A> A convertWithJackson(Class<A> expectedType, Object value) {
-//        ObjectMapper mapper = getObjectMapper();
-//        String valString = "\"" + value + "\"";
-//        try {
-//            JsonNode rootNode = mapper.readValue(valString, JsonNode.class);
-//            return mapper.treeToValue(rootNode, expectedType);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
 }

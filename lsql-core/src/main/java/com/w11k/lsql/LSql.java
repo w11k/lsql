@@ -27,15 +27,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
-    public static final ObjectMapper OBJECT_MAPPER = CREATE_JSON_MAPPER_INSTANCE();
+    static ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+        return mapper;
+    }
 
-    private final Map<String, Table> tables = Maps.newHashMap();
+    private final Map<String, Table> rowTables = Maps.newHashMap();
+
+    private final Map<String, PojoTable> pojoTables = Maps.newHashMap();
 
     private final BaseDialect dialect;
 
     private final Callable<Connection> connectionProvider;
 
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
+
+    private boolean failOnDuplicateTableDefinition = true;
+
+    private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
+
+    private PojoConverter pojoConverter;
+
 
     /**
      * Creates a new LSql instance.
@@ -51,8 +64,8 @@ public class LSql {
         this.connectionProvider = connectionProvider;
 
         dialect.setlSql(this);
+        this.pojoConverter = new PojoConverter(this);
     }
-
 
     /**
      * Creates a new LSql instance.
@@ -66,10 +79,9 @@ public class LSql {
         this(dialect, ConnectionProviders.fromDataSource(dataSource));
     }
 
-    private static ObjectMapper CREATE_JSON_MAPPER_INSTANCE() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JodaModule());
-        return mapper;
+    public void clearTables() {
+        rowTables.clear();
+        pojoTables.clear();
     }
 
     public BaseDialect getDialect() {
@@ -80,10 +92,6 @@ public class LSql {
         return connectionProvider;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return OBJECT_MAPPER;
-    }
-
     public InitColumnCallback getInitColumnCallback() {
         return initColumnCallback;
     }
@@ -92,8 +100,36 @@ public class LSql {
         this.initColumnCallback = initColumnCallback;
     }
 
-    public Iterable<Table> getTables() {
-        return Iterables.unmodifiableIterable(tables.values());
+    public boolean isFailOnDuplicateTableDefinition() {
+        return failOnDuplicateTableDefinition;
+    }
+
+    public void setFailOnDuplicateTableDefinition(boolean failOnDuplicateTableDefinition) {
+        this.failOnDuplicateTableDefinition = failOnDuplicateTableDefinition;
+    }
+
+    public Iterable<Table> getRowTables() {
+        return Iterables.unmodifiableIterable(rowTables.values());
+    }
+
+    public Iterable<PojoTable> getPojoTables() {
+        return Iterables.unmodifiableIterable(pojoTables.values());
+    }
+
+    public Iterable<ITable> getTables() {
+        return Iterables.concat(getRowTables(), getPojoTables());
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public PojoConverter getPojoConverter() {
+        return pojoConverter;
     }
 
     /**
@@ -129,14 +165,22 @@ public class LSql {
      * @return the Table instance
      */
     @SuppressWarnings("unchecked")
-    public Table table(String tableName) {
-        synchronized (tables) {
-            if (!tables.containsKey(tableName)) {
-                tables.put(tableName, Table.create(this, tableName));
-            }
+    public synchronized Table table(String tableName) {
+        if (rowTables.containsKey(tableName) && failOnDuplicateTableDefinition) {
+            throw new IllegalStateException("Table " + tableName + " already defined");
         }
+        Table table = new Table(this, tableName);
+        rowTables.put(tableName, table);
+        return table;
+    }
 
-        return tables.get(tableName);
+    public synchronized <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
+        if (pojoTables.containsKey(tableName) && failOnDuplicateTableDefinition) {
+            throw new IllegalStateException("PojoTable " + tableName + " already defined");
+        }
+        PojoTable<T> table = new PojoTable<T>(this, tableName, pojoClass);
+        pojoTables.put(tableName, table);
+        return table;
     }
 
     /**
@@ -167,8 +211,8 @@ public class LSql {
     @Override
     public String toString() {
         return "LSql{" +
-          "dialect=" + dialect +
-          '}';
+                "dialect=" + dialect +
+                '}';
     }
 
 }

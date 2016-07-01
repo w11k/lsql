@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
@@ -23,7 +24,7 @@ import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class Table {
+public class Table implements ITable {
 
     private final LSql lSql;
 
@@ -34,10 +35,6 @@ public class Table {
     private Optional<String> primaryKeyColumn = absent();
 
     private Optional<Column> revisionColumn = absent();
-
-    public static Table create(LSql lSql, String tableName) {
-        return new Table(lSql, tableName);
-    }
 
     public Table(LSql lSql, String tableName) {
         this.lSql = lSql;
@@ -58,6 +55,7 @@ public class Table {
         return lSql;
     }
 
+    @Override
     public String getTableName() {
         return tableName;
     }
@@ -129,7 +127,7 @@ public class Table {
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
-                throw new InsertException(rowsAffected + " toList were affected by insert operation. Expected: 1");
+                throw new InsertException(rowsAffected + " rows were affected by insert operation. Expected: 1");
             }
             if (primaryKeyColumn.isPresent()) {
                 Object id = null;
@@ -426,7 +424,7 @@ public class Table {
     }
 
     private List<String> createColumnList(Row row) {
-        List<String> columns = row.getKeyList();
+        List<String> columns = Lists.newLinkedList(row.keySet());
         columns = newLinkedList(filter(columns, new Predicate<String>() {
             public boolean apply(String input) {
                 if (column(input) == null) {

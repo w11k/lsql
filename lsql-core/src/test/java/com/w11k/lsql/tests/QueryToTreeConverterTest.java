@@ -2,8 +2,6 @@ package com.w11k.lsql.tests;
 
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
-import com.w11k.lsql.SqlStatement;
-import com.w11k.lsql.sqlfile.LSqlFile;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -13,45 +11,19 @@ import static org.testng.Assert.assertEquals;
 
 public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
-    private LSqlFile lSqlFile;
+    private TreeTestData treeTestData;
 
     @SuppressWarnings("SqlResolve")
     @BeforeMethod
     public void beforeMethod() {
         super.beforeMethod();
-        this.lSqlFile = lSql.readSqlFile(getClass());
-
-        createTable("CREATE TABLE continent (id INT, name TEXT)");
-        lSql.executeRawSql("INSERT INTO continent VALUES (1, 'Europe')");
-        lSql.executeRawSql("INSERT INTO continent VALUES (2, 'North America')");
-
-        createTable("CREATE TABLE continent_fact (id INT, continent_id INT, fact_name TEXT, fact_value TEXT)");
-        lSql.executeRawSql("INSERT INTO continent_fact VALUES (1, 1, 'Area', '10,180,000 km2')");
-        lSql.executeRawSql("INSERT INTO continent_fact VALUES (2, 1, 'Population', '742,452,000')");
-        lSql.executeRawSql("INSERT INTO continent_fact VALUES (3, 2, 'Area', '24,709,000 km2')");
-        lSql.executeRawSql("INSERT INTO continent_fact VALUES (4, 2, 'Largest city', 'Mexico City')");
-
-        createTable("CREATE TABLE country (id INT, continent_id INT, name TEXT)");
-        lSql.executeRawSql("INSERT INTO country VALUES (1, 1, 'Germany')");
-        lSql.executeRawSql("INSERT INTO country VALUES (2, 1, 'Netherlands')");
-        lSql.executeRawSql("INSERT INTO country VALUES (3, 2, 'USA')");
-        lSql.executeRawSql("INSERT INTO country VALUES (4, 2, 'Canada')");
-
-        createTable("CREATE TABLE city (id INT, country_id INT, name TEXT)");
-        lSql.executeRawSql("INSERT INTO city VALUES (1, 1, 'Esslingen')");
-        lSql.executeRawSql("INSERT INTO city VALUES (2, 1, 'Bonn')");
-        lSql.executeRawSql("INSERT INTO city VALUES (3, 3, 'Boston')");
-        lSql.executeRawSql("INSERT INTO city VALUES (4, 3, 'New York')");
-
-    }
-
-    private SqlStatement statement(String name) {
-        return lSqlFile.statement(name);
+        this.treeTestData = new TreeTestData(this.lSql);
+        this.treeTestData.insert();
     }
 
     @Test
     public void continents() {
-        Query query = statement("continents").query();
+        Query query = this.treeTestData.continents();
         LinkedHashMap<Number, Row> tree = query.toTree();
         assertEquals(tree.size(), 2);
         assertEquals(tree.get(1), Row.fromKeyVals("id", 1, "name", "Europe"));
@@ -60,7 +32,7 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
     @Test
     public void continentsWithFacts() {
-        Query query = statement("continentsWithFacts").query();
+        Query query = this.treeTestData.continentsWithFacts();
         LinkedHashMap<Number, Row> tree = query.toTree();
 
         assertEquals(tree.size(), 2);
@@ -99,7 +71,7 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
     @Test
     public void continentsWithFactsAndCountries() {
-        Query query = statement("continentsWithFactsAndCountries").query();
+        Query query = this.treeTestData.continentsWithFactsAndCountries();
         LinkedHashMap<Number, Row> tree = query.toTree();
 
         assertEquals(tree.size(), 2);
@@ -159,13 +131,13 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
     @Test
     public void continentsWithFactsAndCountriesAndCities_1() {
-        Query query = statement("continentsWithFactsAndCountriesAndCities_1").query();
+        Query query = this.treeTestData.continentsWithFactsAndCountriesAndCities();
         internalContinentsWithFactsAndCountriesAndCities(query);
     }
 
     @Test
     public void continentsWithFactsAndCountriesAndCities_2() {
-        Query query = statement("continentsWithFactsAndCountriesAndCities_2").query();
+        Query query = this.treeTestData.continentsWithFactsAndCountriesAndCities_2();
         internalContinentsWithFactsAndCountriesAndCities(query);
     }
 
