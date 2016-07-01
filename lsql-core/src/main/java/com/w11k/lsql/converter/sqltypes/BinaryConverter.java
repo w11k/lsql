@@ -7,6 +7,8 @@ import java.sql.*;
 
 public class BinaryConverter extends Converter {
 
+    public static final BinaryConverter INSTANCE = new BinaryConverter();
+
     public BinaryConverter() {
         super(
           com.w11k.lsql.Blob.class,

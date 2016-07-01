@@ -10,6 +10,8 @@ import java.sql.Types;
 
 public class DoubleConverter extends Converter {
 
+    public static final DoubleConverter INSTANCE = new DoubleConverter();
+
     public DoubleConverter() {
         super(
           Double.class,

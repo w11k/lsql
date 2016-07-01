@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
@@ -420,12 +421,16 @@ public class Table implements ITable {
         return lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, psString, false);
     }
 
-    private List<String> createColumnList(Row row) {
+    private List<String> createColumnList(final Row row) {
         List<String> columns = Lists.newLinkedList(row.keySet());
         columns = newLinkedList(filter(columns, new Predicate<String>() {
             public boolean apply(String input) {
                 if (column(input) == null) {
-                    throw new RuntimeException("Column " + input + " does not exist in table " + tableName);
+                    String message = "Column '" + input + "' does not exist in table '" + tableName + "'. ";
+                    message += "Known columns: [";
+                    message += Joiner.on(",").join(row.keySet());
+                    message += "]";
+                    throw new RuntimeException(message);
                 }
                 return true;
             }
@@ -462,6 +467,12 @@ public class Table implements ITable {
         Connection con = ConnectionUtils.getConnection(lSql);
         try {
             DatabaseMetaData md = con.getMetaData();
+
+            // Check table name
+            ResultSet tables = md.getTables(null, null, lSql.getDialect().identifierJavaToSql(this.tableName), null);
+            if (!tables.next()) {
+                throw new IllegalArgumentException("Unknown table '" + tableName + "'");
+            }
 
             // Fetch Primary Key
             ResultSet primaryKeys =

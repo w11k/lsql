@@ -11,6 +11,8 @@ import java.sql.*;
 
 public class ClobConverter extends Converter {
 
+    public static final ClobConverter INSTANCE = new ClobConverter();
+
     public ClobConverter() {
         super(
           String.class,

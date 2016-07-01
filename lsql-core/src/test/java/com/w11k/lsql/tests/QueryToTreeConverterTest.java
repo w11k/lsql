@@ -2,7 +2,6 @@ package com.w11k.lsql.tests;
 
 import com.w11k.lsql.Query;
 import com.w11k.lsql.Row;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.LinkedHashMap;
@@ -13,10 +12,8 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
     private TreeTestData treeTestData;
 
-    @SuppressWarnings("SqlResolve")
-    @BeforeMethod
-    public void beforeMethod() {
-        super.beforeMethod();
+    @Override
+    public void beforeMethodHook() {
         this.treeTestData = new TreeTestData(this.lSql);
         this.treeTestData.insert();
     }

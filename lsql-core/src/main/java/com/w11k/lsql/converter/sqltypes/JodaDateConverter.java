@@ -8,6 +8,8 @@ import java.sql.*;
 
 public class JodaDateConverter extends Converter {
 
+    public static final JodaDateConverter INSTANCE = new JodaDateConverter();
+
     public JodaDateConverter() {
         super(
           DateTime.class,

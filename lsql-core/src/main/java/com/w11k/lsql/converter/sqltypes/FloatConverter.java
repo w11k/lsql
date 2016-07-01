@@ -10,6 +10,8 @@ import java.sql.Types;
 
 public class FloatConverter extends Converter {
 
+    public static final FloatConverter INSTANCE = new FloatConverter();
+
     public FloatConverter() {
         super(
           Float.class,

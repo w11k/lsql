@@ -3,7 +3,6 @@ package com.w11k.lsql.tests.pojo.tree;
 import com.w11k.lsql.Query;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import com.w11k.lsql.tests.TreeTestData;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -14,10 +13,8 @@ public class TreeToPojoNoCaseConversionTest extends AbstractLSqlTest {
 
     private TreeTestData treeTestData;
 
-    @SuppressWarnings("SqlResolve")
-    @BeforeMethod
-    public void beforeMethod() {
-        super.beforeMethod();
+    @Override
+    public void beforeMethodHook() {
         this.treeTestData = new TreeTestData(this.lSql);
         this.treeTestData.insert();
     }

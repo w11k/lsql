@@ -74,25 +74,6 @@ public class QueryTest extends AbstractLSqlTest {
         assertEquals(row.getInt("age"), (Integer) 20);
     }
 
-    @Test
-    public void canUseCalculatedColumns() {
-        createTable("CREATE TABLE table1 (name TEXT, age INT)");
-        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Row row = lSql.executeRawQuery("SELECT count(*) AS c FROM table1").firstRow().get();
-        assertEquals(row.getInt("c"), (Integer) 2);
-    }
-
-    @Test
-    public void canUseCalculatedColumnsTogetherWithNormalColumnsOneTable() {
-        createTable("CREATE TABLE table1 (name TEXT, age INT)");
-        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Row row = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1").firstRow().get();
-        assertEquals(row.getString("name"), "cus1");
-        assertEquals(row.getInt("age"), (Integer) 20);
-        assertEquals(row.getInt("c"), (Integer) 1);
-    }
-
     @Test(expectedExceptions = IllegalStateException.class)
     public void failsOnDublicateColumnsInResultSet() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");

@@ -23,15 +23,15 @@ public class BaseDialect {
     protected ByTypeConverterRegistry converterRegistry = new ByTypeConverterRegistry();
 
     public BaseDialect() {
-        converterRegistry.addConverter(new BinaryConverter());
-        converterRegistry.addConverter(new BlobConverter());
-        converterRegistry.addConverter(new BooleanConverter());
-        converterRegistry.addConverter(new ClobConverter());
-        converterRegistry.addConverter(new DoubleConverter());
-        converterRegistry.addConverter(new FloatConverter());
-        converterRegistry.addConverter(new IntConverter());
-        converterRegistry.addConverter(new JodaDateConverter());
-        converterRegistry.addConverter(new StringConverter());
+        converterRegistry.addConverter(BinaryConverter.INSTANCE);
+        converterRegistry.addConverter(BlobConverter.INSTANCE);
+        converterRegistry.addConverter(BooleanConverter.INSTANCE);
+        converterRegistry.addConverter(ClobConverter.INSTANCE);
+        converterRegistry.addConverter(DoubleConverter.INSTANCE);
+        converterRegistry.addConverter(FloatConverter.INSTANCE);
+        converterRegistry.addConverter(IntConverter.INSTANCE);
+        converterRegistry.addConverter(JodaDateConverter.INSTANCE);
+        converterRegistry.addConverter(StringConverter.INSTANCE);
 
         // TODO add more types
         // static int 	DATALINK;
@@ -72,10 +72,15 @@ public class BaseDialect {
         return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, javaName);
     }
 
-//    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
-//                                                    int columnIndex) throws SQLException {
-//        return metaData.getTableName(columnIndex);
-//    }
+    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                    int columnIndex) throws SQLException {
+        return identifierSqlToJava(metaData.getTableName(columnIndex));
+    }
+
+    public String getColumnNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                     int columnIndex) throws SQLException {
+        return identifierSqlToJava(metaData.getColumnName(columnIndex));
+    }
 
     public Optional<Object> extractGeneratedPk(Table table,
                                                ResultSet resultSet) throws SQLException {

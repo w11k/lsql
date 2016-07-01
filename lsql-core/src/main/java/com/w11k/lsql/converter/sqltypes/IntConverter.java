@@ -10,6 +10,8 @@ import java.sql.Types;
 
 public class IntConverter extends Converter {
 
+    public static final IntConverter INSTANCE = new IntConverter();
+
     public IntConverter() {
         super(
           Integer.class,

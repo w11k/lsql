@@ -20,6 +20,12 @@ import static org.testng.Assert.*;
 
 public class TableTest extends AbstractLSqlTest {
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void failOnWrongTableName() {
+        createTable("CREATE TABLE namenamenamenamename (id INTEGER PRIMARY KEY, age INT)");
+        lSql.table("wrongwrongwrongwrongwrong");
+    }
+
     @Test
     public void getById() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, age INT)");

@@ -1,0 +1,33 @@
+<suite name="All Tests">
+
+  <test name="H2 In Memory">
+
+    <parameter name="jdbcDriverClassName" value="org.h2.Driver"/>
+    <parameter name="jdbcUrl" value="jdbc:h2:mem:testdb;mode=postgresql"/>
+    <parameter name="jdbcUsername" value=""/>
+    <parameter name="jdbcPassword" value=""/>
+
+    <packages>
+      <package name="com.w11k.lsql.tests.*"/>
+    </packages>
+  </test>
+
+  <!--
+  sudo -u postgres createuser -P lsqltestsuser
+  Password: lsqltestspass
+  sudo -u postgres dropdb lsqltests
+  sudo -u postgres createdb -O lsqltestsuser lsqltests
+  -->
+  <test name="PostgreSQL">
+
+    <parameter name="jdbcDriverClassName" value="org.postgresql.Driver"/>
+    <parameter name="jdbcUrl" value="jdbc:postgresql://localhost/lsqltests"/>
+    <parameter name="jdbcUsername" value="lsqltestsuser"/>
+    <parameter name="jdbcPassword" value="lsqltestspass"/>
+
+    <packages>
+      <package name="com.w11k.lsql.tests.*"/>
+    </packages>
+  </test>
+
+</suite>

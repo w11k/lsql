@@ -166,7 +166,7 @@ public class Query {
         for (ResultSetColumn column : columnList) {
             try {
                 row.put(column.getName(),
-                  column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
+                        column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -174,13 +174,38 @@ public class Query {
         return row;
     }
 
-    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
-      throws SQLException {
+    Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
+            throws SQLException {
+
+        // Check for user provided Converter
         if (converters.containsKey(columnLabel)) {
-            return converters.get(columnLabel);
+            Converter converter = converters.get(columnLabel);
+            if (converter != null) {
+                return converter;
+            }
         }
 
-        int columnSqlType = metaData.getColumnType(position);
-        return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
+        // Determine source table and column from ResultSet
+        String tableName = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, position);
+        String columnName = lSql.getDialect().getColumnNameFromResultSetMetaData(metaData, position);
+        if (tableName != null
+                && tableName.length() > 0
+                && columnName != null
+                && columnName.length() > 0) {
+            return lSql.table(tableName).column(columnName).getConverter();
+        }
+
+        // Check if the user registered null as a Converter to use a type-based Converter
+        if (converters.containsKey(columnLabel)
+                && converters.get(columnLabel) == null) {
+
+            int columnSqlType = metaData.getColumnType(position);
+            return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
+        }
+
+        // Error
+        String msg = "Unable to determine a Converter instance for column '" + columnLabel + "'. ";
+        msg += "Register a converter with Query#addConverter() / Query#setConverters().";
+        throw new IllegalStateException(msg);
     }
 }

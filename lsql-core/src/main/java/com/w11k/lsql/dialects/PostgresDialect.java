@@ -2,11 +2,9 @@ package com.w11k.lsql.dialects;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
+import org.postgresql.jdbc4.Jdbc4ResultSetMetaData;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class PostgresDialect extends BaseDialect {
 
@@ -14,8 +12,8 @@ public class PostgresDialect extends BaseDialect {
 
         public BooleanConverter() {
             super(Boolean.class,
-              new int[]{Types.BIT, Types.BOOLEAN},
-              Types.BIT);
+                    new int[]{Types.BIT, Types.BOOLEAN},
+                    Types.BIT);
         }
 
         @Override
@@ -39,11 +37,18 @@ public class PostgresDialect extends BaseDialect {
         getConverterRegistry().addConverter(new BooleanConverter());
     }
 
-//    @Override
-//    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
-//                                                    int columnIndex) throws SQLException {
-//        Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
-//        return postgresMetaData.getBaseTableName(columnIndex);
-//    }
+    @Override
+    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                    int columnIndex) throws SQLException {
+        Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
+        return postgresMetaData.getBaseTableName(columnIndex);
+    }
+
+    @Override
+    public String getColumnNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                    int columnIndex) throws SQLException {
+        Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
+        return postgresMetaData.getBaseColumnName(columnIndex);
+    }
 
 }

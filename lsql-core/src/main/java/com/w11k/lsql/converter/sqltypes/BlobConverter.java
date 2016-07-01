@@ -7,6 +7,8 @@ import java.sql.*;
 
 public class BlobConverter extends Converter {
 
+    public static final BlobConverter INSTANCE = new BlobConverter();
+
     public BlobConverter() {
         super(
           com.w11k.lsql.Blob.class,

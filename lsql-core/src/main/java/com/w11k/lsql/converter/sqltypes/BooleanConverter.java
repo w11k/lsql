@@ -10,6 +10,8 @@ import java.sql.Types;
 
 public class BooleanConverter extends Converter {
 
+    public static final BooleanConverter INSTANCE = new BooleanConverter();
+
     public BooleanConverter() {
         super(
           Boolean.class,
