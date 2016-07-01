@@ -1,7 +1,9 @@
 package com.w11k.lsql.tests;
 
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.dialects.BaseDialect;
 import com.w11k.lsql.dialects.H2Dialect;
+import com.w11k.lsql.dialects.PostgresDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.annotations.AfterMethod;
@@ -42,7 +44,14 @@ public abstract class AbstractLSqlTest {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        this.lSql = new LSql(new H2Dialect(), ConnectionProviders.fromInstance(connection));
+
+        BaseDialect dialect = null;
+        if (driverClassName.equals("org.h2.Driver")) {
+            dialect = new H2Dialect();
+        } else if (driverClassName.equals("org.postgresql.Driver")) {
+            dialect = new PostgresDialect();
+        }
+        this.lSql = new LSql(dialect, ConnectionProviders.fromInstance(connection));
         this.beforeMethodHook();
     }
 

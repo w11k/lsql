@@ -1,0 +1,20 @@
+<suite name="All Tests">
+
+  <test name="PostgreSQL">
+
+    <parameter name="jdbcDriverClassName" value="org.postgresql.Driver"/>
+    <parameter name="jdbcUrl" value="jdbc:postgresql://localhost/lsqltests"/>
+    <parameter name="jdbcUsername" value="lsqltestsuser"/>
+    <parameter name="jdbcPassword" value="lsqltestspass"/>
+
+    <classes>
+      <class name="com.w11k.lsql.tests.TableTest">
+        <methods>
+          <include name="getById" />
+        </methods>
+      </class>
+    </classes>
+
+  </test>
+
+</suite>
