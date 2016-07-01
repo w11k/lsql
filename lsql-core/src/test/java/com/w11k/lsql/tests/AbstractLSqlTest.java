@@ -28,7 +28,6 @@ public abstract class AbstractLSqlTest {
             throw new RuntimeException(e);
         }
         this.lSql = new LSql(new H2Dialect(), ConnectionProviders.fromInstance(connection));
-        this.lSql.setFailOnDuplicateTableDefinition(false);
     }
 
     @AfterMethod

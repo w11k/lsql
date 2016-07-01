@@ -1,6 +1,10 @@
-package com.w11k.lsql;
+package com.w11k.lsql.tests.pojo;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.LinkedRow;
+import com.w11k.lsql.PojoTable;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import org.testng.annotations.Test;
 

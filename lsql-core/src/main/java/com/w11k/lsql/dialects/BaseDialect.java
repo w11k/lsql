@@ -64,20 +64,12 @@ public class BaseDialect {
         return statementCreator;
     }
 
-    public CaseFormat getJavaCaseFormat() {
-        return CaseFormat.LOWER_UNDERSCORE;
-    }
-
-    public CaseFormat getSqlCaseFormat() {
-        return CaseFormat.LOWER_UNDERSCORE;
-    }
-
     public String identifierSqlToJava(String sqlName) {
-        return getSqlCaseFormat().to(getJavaCaseFormat(), sqlName);
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, sqlName.toLowerCase());
     }
 
     public String identifierJavaToSql(String javaName) {
-        return getJavaCaseFormat().to(getSqlCaseFormat(), javaName);
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, javaName);
     }
 
 //    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
@@ -93,7 +85,7 @@ public class BaseDialect {
             String label = metaData.getColumnLabel(i);
             if (identifierSqlToJava(label).equals(pkName)) {
                 return of(table.column(pkName).getConverter()
-                  .getValueFromResultSet(getlSql(), resultSet, i));
+                        .getValueFromResultSet(getlSql(), resultSet, i));
             }
         }
         return absent();

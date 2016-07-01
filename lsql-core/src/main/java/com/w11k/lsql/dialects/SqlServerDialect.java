@@ -1,6 +1,5 @@
 package com.w11k.lsql.dialects;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.w11k.lsql.Table;
 
@@ -9,11 +8,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 public class SqlServerDialect extends BaseDialect {
-
-    @Override
-    public CaseFormat getSqlCaseFormat() {
-        return CaseFormat.UPPER_UNDERSCORE;
-    }
 
     public Optional<Object> extractGeneratedPk(Table table,
                                                ResultSet resultSet) throws SQLException {

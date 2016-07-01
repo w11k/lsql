@@ -33,9 +33,9 @@ public class LSql {
         return mapper;
     }
 
-    private final Map<String, Table> rowTables = Maps.newHashMap();
+    private final Map<String, Table> tables = Maps.newHashMap();
 
-    private final Map<String, PojoTable> pojoTables = Maps.newHashMap();
+    private final Map<String, PojoTable<?>> pojoTables = Maps.newHashMap();
 
     private final BaseDialect dialect;
 
@@ -43,11 +43,9 @@ public class LSql {
 
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
 
-    private boolean failOnDuplicateTableDefinition = true;
-
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
-    private PojoConverter pojoConverter;
+//    private PojoConverter pojoConverter;
 
 
     /**
@@ -64,7 +62,7 @@ public class LSql {
         this.connectionProvider = connectionProvider;
 
         dialect.setlSql(this);
-        this.pojoConverter = new PojoConverter(this);
+//        this.pojoConverter = new PojoConverter(this);
     }
 
     /**
@@ -80,7 +78,7 @@ public class LSql {
     }
 
     public void clearTables() {
-        rowTables.clear();
+        tables.clear();
         pojoTables.clear();
     }
 
@@ -100,24 +98,12 @@ public class LSql {
         this.initColumnCallback = initColumnCallback;
     }
 
-    public boolean isFailOnDuplicateTableDefinition() {
-        return failOnDuplicateTableDefinition;
+    public Iterable<Table> getTables() {
+        return Iterables.unmodifiableIterable(tables.values());
     }
 
-    public void setFailOnDuplicateTableDefinition(boolean failOnDuplicateTableDefinition) {
-        this.failOnDuplicateTableDefinition = failOnDuplicateTableDefinition;
-    }
-
-    public Iterable<Table> getRowTables() {
-        return Iterables.unmodifiableIterable(rowTables.values());
-    }
-
-    public Iterable<PojoTable> getPojoTables() {
+    public Iterable<PojoTable<?>> getPojoTables() {
         return Iterables.unmodifiableIterable(pojoTables.values());
-    }
-
-    public Iterable<ITable> getTables() {
-        return Iterables.concat(getRowTables(), getPojoTables());
     }
 
     public ObjectMapper getObjectMapper() {
@@ -128,9 +114,9 @@ public class LSql {
         this.objectMapper = objectMapper;
     }
 
-    public PojoConverter getPojoConverter() {
-        return pojoConverter;
-    }
+//    public PojoConverter getPojoConverter() {
+//        return pojoConverter;
+//    }
 
     /**
      * Loads an SQL file relative to a class.
@@ -164,23 +150,22 @@ public class LSql {
      * @param tableName the table name (Java identifier format)
      * @return the Table instance
      */
-    @SuppressWarnings("unchecked")
     public synchronized Table table(String tableName) {
-        if (rowTables.containsKey(tableName) && failOnDuplicateTableDefinition) {
-            throw new IllegalStateException("Table " + tableName + " already defined");
+        if (!tables.containsKey(tableName)) {
+            tables.put(tableName, new Table(this, tableName));
         }
-        Table table = new Table(this, tableName);
-        rowTables.put(tableName, table);
-        return table;
+        return tables.get(tableName);
     }
 
+    @SuppressWarnings("unchecked")
     public synchronized <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
-        if (pojoTables.containsKey(tableName) && failOnDuplicateTableDefinition) {
-            throw new IllegalStateException("PojoTable " + tableName + " already defined");
+        if (!pojoTables.containsKey(tableName)) {
+            pojoTables.put(tableName, new PojoTable<T>(this, tableName, pojoClass));
         }
-        PojoTable<T> table = new PojoTable<T>(this, tableName, pojoClass);
-        pojoTables.put(tableName, table);
-        return table;
+
+        PojoTable<T> pojoTable = (PojoTable<T>) pojoTables.get(tableName);
+        assert pojoTable.getPojoClass().equals(pojoClass);
+        return pojoTable;
     }
 
     /**

@@ -11,11 +11,16 @@ import java.sql.SQLException;
 public class H2Dialect extends BaseDialect {
 
     @Override
-    public CaseFormat getSqlCaseFormat() {
-        return CaseFormat.UPPER_UNDERSCORE;
+    public String identifierJavaToSql(String javaName) {
+        return super.identifierJavaToSql(javaName).toUpperCase();
     }
 
-//    @Override
+    @Override
+    public String identifierSqlToJava(String sqlName) {
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, sqlName.toLowerCase());
+    }
+
+    //    @Override
 //    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData, int columnIndex) throws SQLException {
 //        JdbcResultSetMetaData h2meta = (JdbcResultSetMetaData) metaData;
 //        return h2meta.getTableName(columnIndex);

@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import java.util.Iterator;
@@ -7,20 +8,28 @@ import java.util.Map;
 
 public class PojoTable<T> implements ITable {
 
-    private final PojoConverter pojoConverter;
+//    private final PojoConverter pojoConverter;
+
+    private final ObjectMapper mapper;
 
     private final Class<T> pojoClass;
 
     private final Table table;
 
     public PojoTable(LSql lSql, String tableName, Class<T> pojoClass) {
-        this.pojoConverter = lSql.getPojoConverter();
+        this.table = lSql.table(tableName);
+        this.mapper = lSql.getObjectMapper();
+//        this.pojoConverter = table.getlSql().getPojoConverter();
         this.pojoClass = pojoClass;
-        this.table = new Table(lSql, tableName);
+    }
+
+    public Class<T> getPojoClass() {
+        return pojoClass;
     }
 
     public T insert(T pojo) {
-        Row row = pojoConverter.convert(pojo, Row.class);
+        Row row = mapper.convertValue(pojo, Row.class);
+//        Row row = pojoConverter.convert(pojo, Row.class);
         Iterator<Map.Entry<String, Object>> entryIterator = row.entrySet().iterator();
         while (entryIterator.hasNext()) {
             Map.Entry<String, Object> entry = entryIterator.next();
@@ -42,17 +51,17 @@ public class PojoTable<T> implements ITable {
             return Optional.absent();
         }
 
-        T t = pojoConverter.convert(row.get(), pojoClass);
+        T t = mapper.convertValue(row.get(), pojoClass);
         return Optional.of(t);
     }
 
     public void delete(T pojo) {
-        Row row = pojoConverter.convert(pojo, Row.class);
+        Row row = mapper.convertValue(pojo, Row.class);
         this.table.delete(row);
     }
 
     public void update(T pojo) {
-        Row row = pojoConverter.convert(pojo, Row.class);
+        Row row = mapper.convertValue(pojo, Row.class);
         this.table.update(row);
     }
 

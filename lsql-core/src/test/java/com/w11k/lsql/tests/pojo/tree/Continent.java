@@ -1,4 +1,4 @@
-package com.w11k.lsql.tests.pojo.no_case_conversion;
+package com.w11k.lsql.tests.pojo.tree;
 
 class Continent {
 

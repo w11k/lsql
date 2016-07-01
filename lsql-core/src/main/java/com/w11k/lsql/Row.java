@@ -19,7 +19,7 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class Row extends ForwardingMap<String, Object> {
 
-    public static ObjectMapper OBJECT_MAPPER = LSql.CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
+    private static ObjectMapper OBJECT_MAPPER = LSql.CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();

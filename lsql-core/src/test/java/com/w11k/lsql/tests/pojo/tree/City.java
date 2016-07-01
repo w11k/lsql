@@ -1,9 +1,11 @@
-package com.w11k.lsql.tests.pojo.no_case_conversion;
+package com.w11k.lsql.tests.pojo.tree;
 
-public class Country {
+public class City {
 
     private int id;
-    private int continent_id;
+
+    private int countryId;
+
     private String name;
 
     public int getId() {
@@ -14,12 +16,12 @@ public class Country {
         this.id = id;
     }
 
-    public int getContinent_id() {
-        return continent_id;
+    public int getCountryId() {
+        return countryId;
     }
 
-    public void setContinent_id(int continent_id) {
-        this.continent_id = continent_id;
+    public void setCountryId(int countryId) {
+        this.countryId = countryId;
     }
 
     public String getName() {

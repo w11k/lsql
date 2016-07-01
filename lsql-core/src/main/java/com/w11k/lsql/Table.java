@@ -70,7 +70,6 @@ public class Table implements ITable {
 
     /**
      * @param columnName the name of the column
-     *
      * @return the column instance
      */
     public synchronized Column column(String columnName) {
@@ -114,15 +113,15 @@ public class Table implements ITable {
      * will be queried after the insert operation and be put into the passed row.
      *
      * @param row the values to be inserted
-     *
      * @throws InsertException
      */
     public Optional<Object> insert(Row row) {
         try {
             List<String> columns = createColumnList(row);
 
-            PreparedStatement ps = lSql.getDialect().getStatementCreator()
-                    .createInsertStatement(this, columns);
+            PreparedStatement ps =
+                    lSql.getDialect().getStatementCreator().createInsertStatement(this, columns);
+
             setValuesInPreparedStatement(ps, columns, row);
 
             int rowsAffected = ps.executeUpdate();
@@ -167,7 +166,6 @@ public class Table implements ITable {
      * @param row The values used to update the database. The row instance must contain a primary key value and,
      *            if
      *            revision support is enabled, a revision value.
-     *
      * @throws UpdateException
      */
     public void update(Row row) {
@@ -296,7 +294,6 @@ public class Table implements ITable {
      * Loads the row with the given primary key value.
      *
      * @param id the primary key
-     *
      * @return a {@link com.google.common.base.Present} with a {@link Row} instance if the passed primary key
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
@@ -467,8 +464,9 @@ public class Table implements ITable {
             DatabaseMetaData md = con.getMetaData();
 
             // Fetch Primary Key
-            ResultSet primaryKeys = md.getPrimaryKeys(null, null, lSql.getDialect()
-                    .identifierJavaToSql(tableName));
+            ResultSet primaryKeys =
+                    md.getPrimaryKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
+
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
             } else {
@@ -477,8 +475,9 @@ public class Table implements ITable {
             }
 
             // Fetch all columns
-            ResultSet columnsMetaData = md.getColumns(null, null, lSql.getDialect()
-                    .identifierJavaToSql(tableName), null);
+            ResultSet columnsMetaData =
+                    md.getColumns(null, null, lSql.getDialect().identifierJavaToSql(tableName), null);
+
             while (columnsMetaData.next()) {
                 String sqlColumnName = columnsMetaData.getString(4);
                 int columnSize = columnsMetaData.getInt(7);
