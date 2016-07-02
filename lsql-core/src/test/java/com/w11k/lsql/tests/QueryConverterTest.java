@@ -43,6 +43,20 @@ public class QueryConverterTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void settingNullAsConverterUsesTypeBasedConverter() {
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field INT)");
+
+        lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 2)");
+        Query query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
+
+        // Set converter for aliased column
+        query.addConverter("aaa", null);
+
+        Row row = query.firstRow().get();
+        assertEquals(row.getInt("aaa"), new Integer(2));
+    }
+
+    @Test
     public void aliasedColumnForAggregationFunction() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
@@ -63,6 +77,18 @@ public class QueryConverterTest extends AbstractLSqlTest {
         assertEquals(row.getString("name"), "cus1");
         assertEquals(row.getInt("age"), (Integer) 20);
         assertEquals(row.getInt("c"), (Integer) 1);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void failOnUnusedConverter() {
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field INT)");
+
+        lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 2)");
+        Query query = lSql.executeRawQuery("SELECT id, field FROM table1");
+
+        query.addConverter("aaa", null);
+
+        query.firstRow().get();
     }
 
 }

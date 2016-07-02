@@ -1,8 +1,5 @@
 package com.w11k.lsql.tests.dialects;
 
-import com.w11k.lsql.dialects.BaseDialect;
-import com.w11k.lsql.dialects.H2Dialect;
-
 public class H2Test extends AbstractDialectTests {
 
 //    @Override

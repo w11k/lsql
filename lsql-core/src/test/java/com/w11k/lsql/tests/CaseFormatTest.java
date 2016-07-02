@@ -4,7 +4,7 @@ import com.google.common.base.CaseFormat;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.dialects.BaseDialect;
+import com.w11k.lsql.dialects.GenericDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.annotations.Test;
@@ -16,19 +16,7 @@ import static org.testng.Assert.assertEquals;
 
 public class CaseFormatTest extends AbstractLSqlTest {
 
-    private BaseDialect underscoreDialect = new BaseDialect() {
-        @Override
-        public String identifierSqlToJava(String sqlName) {
-            return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_UNDERSCORE, sqlName.toLowerCase());
-        }
-
-        @Override
-        public String identifierJavaToSql(String javaName) {
-            return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_UNDERSCORE, javaName.toLowerCase()).toUpperCase();
-        }
-    };
-
-    private void initLSql(BaseDialect dialect) {
+    private void initLSql(GenericDialect dialect) {
         try {
             super.afterMethod();
         } catch (Exception e) {
@@ -58,7 +46,7 @@ public class CaseFormatTest extends AbstractLSqlTest {
 
     @Test
     public void testTableNameUnderscore() {
-        initLSql(underscoreDialect);
+        lSql.getDialect().setJavaCaseFormat(CaseFormat.LOWER_UNDERSCORE);
         createTable("CREATE TABLE aaa_bbb (ccc_ddd INT NULL)");
         lSql.table("aaa_bbb");
     }
@@ -73,7 +61,7 @@ public class CaseFormatTest extends AbstractLSqlTest {
 
     @Test
     public void testColumnNameUnderscore() {
-        initLSql(underscoreDialect);
+        lSql.getDialect().setJavaCaseFormat(CaseFormat.LOWER_UNDERSCORE);
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, ccc_ddd INT NULL)");
         Table table1 = lSql.table("table1");
         table1.insert(Row.fromKeyVals("id", 1, "ccc_ddd", 2));

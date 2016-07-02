@@ -5,7 +5,6 @@ import java.util.List;
 
 public class ResultSetWithColumns {
 
-
     private final ResultSet resultSet;
     private final List<ResultSetColumn> resultSetColumns;
 

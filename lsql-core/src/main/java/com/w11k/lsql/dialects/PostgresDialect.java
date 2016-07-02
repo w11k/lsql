@@ -6,7 +6,7 @@ import org.postgresql.jdbc4.Jdbc4ResultSetMetaData;
 
 import java.sql.*;
 
-public class PostgresDialect extends BaseDialect {
+public class PostgresDialect extends GenericDialect {
 
     private static class BooleanConverter extends Converter {
 

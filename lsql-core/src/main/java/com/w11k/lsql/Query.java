@@ -110,6 +110,7 @@ public class Query {
                     ResultSetMetaData metaData = resultSet.getMetaData();
 
                     // used to find duplicates
+                    // or unused converter
                     Set<String> processedColumnLabels = Sets.newLinkedHashSet();
 
                     // queryConverters for columns
@@ -129,7 +130,17 @@ public class Query {
                         resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
                     }
 
-                    ResultSetWithColumns resultSetWithColumns = new ResultSetWithColumns(resultSet, resultSetColumns);
+                    // Check for unused converters
+                    for (String converterFor : converters.keySet()) {
+                        if (!processedColumnLabels.contains(converterFor)) {
+                            throw new IllegalArgumentException(
+                                    "unused converter for column '" + converterFor + "'");
+                        }
+                    }
+
+                    ResultSetWithColumns resultSetWithColumns =
+                            new ResultSetWithColumns(resultSet, resultSetColumns);
+
                     while (resultSet.next() && !subscriber.isUnsubscribed()) {
                         subscriber.onNext(resultSetWithColumns);
                     }

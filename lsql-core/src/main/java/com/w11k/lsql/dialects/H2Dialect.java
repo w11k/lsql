@@ -8,24 +8,11 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-public class H2Dialect extends BaseDialect {
+public class H2Dialect extends GenericDialect {
 
-    @Override
-    public String identifierJavaToSql(String javaName) {
-        return super.identifierJavaToSql(javaName).toUpperCase();
+    public H2Dialect() {
+        setSqlCaseFormat(CaseFormat.UPPER_UNDERSCORE);
     }
-
-    @Override
-    public String identifierSqlToJava(String sqlName) {
-        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, sqlName.toLowerCase());
-    }
-
-    //    @Override
-//    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData, int columnIndex) throws SQLException {
-//        JdbcResultSetMetaData h2meta = (JdbcResultSetMetaData) metaData;
-//        return h2meta.getTableName(columnIndex);
-//        return super.getTableNameFromResultSetMetaData(metaData, columnIndex);
-//    }
 
     public Optional<Object> extractGeneratedPk(Table table,
                                                ResultSet resultSet) throws SQLException {

@@ -4,7 +4,7 @@ import com.w11k.lsql.LSql;
 
 import java.sql.PreparedStatement;
 
-public class DB2Dialect extends BaseDialect {
+public class DB2Dialect extends GenericDialect {
 
     private class DB2StatementCreator extends StatementCreator {
         @Override

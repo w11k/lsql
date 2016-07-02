@@ -14,15 +14,19 @@ import java.sql.SQLException;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
-public class BaseDialect {
+public class GenericDialect {
 
-    protected LSql lSql;
+    private LSql lSql;
 
-    protected StatementCreator statementCreator = new StatementCreator();
+    private StatementCreator statementCreator = new StatementCreator();
 
-    protected ByTypeConverterRegistry converterRegistry = new ByTypeConverterRegistry();
+    private ByTypeConverterRegistry converterRegistry = new ByTypeConverterRegistry();
 
-    public BaseDialect() {
+    private CaseFormat javaCaseFormat = CaseFormat.LOWER_CAMEL;
+
+    private CaseFormat sqlCaseFormat = CaseFormat.LOWER_UNDERSCORE;
+
+    public GenericDialect() {
         converterRegistry.addConverter(BinaryConverter.INSTANCE);
         converterRegistry.addConverter(BlobConverter.INSTANCE);
         converterRegistry.addConverter(BooleanConverter.INSTANCE);
@@ -64,12 +68,35 @@ public class BaseDialect {
         return statementCreator;
     }
 
+    public CaseFormat getJavaCaseFormat() {
+        return javaCaseFormat;
+    }
+
+    public void setJavaCaseFormat(CaseFormat javaCaseFormat) {
+        this.javaCaseFormat = javaCaseFormat;
+    }
+
+    public CaseFormat getSqlCaseFormat() {
+        return sqlCaseFormat;
+    }
+
+    public void setSqlCaseFormat(CaseFormat sqlCaseFormat) {
+        this.sqlCaseFormat = sqlCaseFormat;
+    }
+
     public String identifierSqlToJava(String sqlName) {
-        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, sqlName.toLowerCase());
+        CaseFormat sqlStyle = getSqlCaseFormat();
+        if (sqlStyle.equals(CaseFormat.LOWER_UNDERSCORE)) {
+            sqlName = sqlName.toLowerCase();
+        }
+        CaseFormat javaStyle = getJavaCaseFormat();
+        return sqlStyle.to(javaStyle, sqlName);
     }
 
     public String identifierJavaToSql(String javaName) {
-        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, javaName);
+        CaseFormat sqlStyle = getSqlCaseFormat();
+        CaseFormat javaStyle = getJavaCaseFormat();
+        return javaStyle.to(sqlStyle, javaName);
     }
 
     public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,

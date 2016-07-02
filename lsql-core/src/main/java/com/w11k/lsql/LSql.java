@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.dialects.BaseDialect;
+import com.w11k.lsql.dialects.GenericDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.sqlfile.LSqlFile;
 
@@ -37,16 +37,13 @@ public class LSql {
 
     private final Map<String, PojoTable<?>> pojoTables = Maps.newHashMap();
 
-    private final BaseDialect dialect;
+    private final GenericDialect dialect;
 
     private final Callable<Connection> connectionProvider;
 
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
 
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
-
-//    private PojoConverter pojoConverter;
-
 
     /**
      * Creates a new LSql instance.
@@ -56,13 +53,12 @@ public class LSql {
      * @param dialect            the database dialect
      * @param connectionProvider provider to load a Connection instance
      */
-    public LSql(BaseDialect dialect, Callable<Connection> connectionProvider) {
+    public LSql(GenericDialect dialect, Callable<Connection> connectionProvider) {
         checkNotNull(connectionProvider);
         this.dialect = dialect;
         this.connectionProvider = connectionProvider;
 
         dialect.setlSql(this);
-//        this.pojoConverter = new PojoConverter(this);
     }
 
     /**
@@ -73,7 +69,7 @@ public class LSql {
      * @param dialect    the database dialect
      * @param dataSource data source to load a Connection instance
      */
-    public LSql(BaseDialect dialect, DataSource dataSource) {
+    public LSql(GenericDialect dialect, DataSource dataSource) {
         this(dialect, ConnectionProviders.fromDataSource(dataSource));
     }
 
@@ -82,7 +78,7 @@ public class LSql {
         pojoTables.clear();
     }
 
-    public BaseDialect getDialect() {
+    public GenericDialect getDialect() {
         return dialect;
     }
 
@@ -113,10 +109,6 @@ public class LSql {
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-
-//    public PojoConverter getPojoConverter() {
-//        return pojoConverter;
-//    }
 
     /**
      * Loads an SQL file relative to a class.
