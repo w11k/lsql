@@ -19,13 +19,13 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class Row extends ForwardingMap<String, Object> {
 
-    private static ObjectMapper OBJECT_MAPPER = LSql.CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
-
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
         r.addKeyVals(keyVals);
         return r;
     }
+
+    private static ObjectMapper OBJECT_MAPPER = LSql.CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
     private Map<String, Object> data;
 
@@ -43,7 +43,7 @@ public class Row extends ForwardingMap<String, Object> {
 
     public Row addKeyVals(Object... keyVals) {
         checkArgument(
-            keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
+                keyVals.length == 0 || keyVals.length % 2 == 0, "content must be a list of iterant key value pairs.");
 
         Iterable<List<Object>> partition = Iterables.partition(newArrayList(keyVals), 2);
         for (List<Object> objects : partition) {
@@ -61,6 +61,10 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     public <A> A getAs(Class<A> type, String key) {
+        return getAs(type, key, false);
+    }
+
+    public <A> A getAs(Class<A> type, String key, boolean convert) {
         if (!containsKey(key)) {
             throw new IllegalArgumentException("No entry for key '" + key + "'.");
         }
@@ -71,21 +75,24 @@ public class Row extends ForwardingMap<String, Object> {
 
         if (type.isAssignableFrom(value.getClass())) {
             return type.cast(value);
-        } else {
+        } else if (convert) {
             try {
                 return getObjectMapper().convertValue(value, type);
             } catch (Exception e) {
-                throw new IllegalArgumentException("Row entry for key: '" + key
-                                                       + "', value: '" + value
-                                                       + "', type: '" + value.getClass().getCanonicalName()
-                                                       + "' can not be converted to type '" + type.getCanonicalName() + "'",
-                                                      e);
+                throw new IllegalArgumentException("Row entry for " +
+                        "key: '" + key + "', " +
+                        "value: '" + value + "', " +
+                        "type: '" + value.getClass().getCanonicalName() + "' " +
+                        "can not be converted to type '" + type.getCanonicalName() + "'",
+                        e);
             }
+        } else {
+            throw new IllegalArgumentException("Row entry for " +
+                    "key: '" + key + "', " +
+                    "value: '" + value + "', " +
+                    "type: '" + value.getClass().getCanonicalName() + "' " +
+                    "can not be converted to type '" + type.getCanonicalName() + "'");
         }
-    }
-
-    protected ObjectMapper getObjectMapper() {
-        return OBJECT_MAPPER;
     }
 
     public <A> A getAsOr(Class<A> type, String key, A defaultValue) {
@@ -196,6 +203,10 @@ public class Row extends ForwardingMap<String, Object> {
     @Override
     public String toString() {
         return Objects.toStringHelper(this).addValue(delegate()).toString();
+    }
+
+    protected ObjectMapper getObjectMapper() {
+        return OBJECT_MAPPER;
     }
 
     @Override

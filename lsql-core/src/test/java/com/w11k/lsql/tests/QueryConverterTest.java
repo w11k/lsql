@@ -69,9 +69,9 @@ public class QueryConverterTest extends AbstractLSqlTest {
 
     @Test
     public void canUseCalculatedColumnsTogetherWithNormalColumnsOneTable() {
-        createTable("CREATE TABLE table1 (name TEXT, age INT)");
-        lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        Query query = lSql.executeRawQuery("SELECT name, age, count(*) AS c FROM table1");
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT, age INT)");
+        lSql.executeRawSql("INSERT INTO table1 (id, name, age) VALUES (1, 'cus1', 20)");
+        Query query = lSql.executeRawQuery("SELECT id, name, age, count(*) AS c FROM table1 GROUP BY id;");
         query.addConverter("c", IntConverter.INSTANCE);
         Row row = query.firstRow().get();
         assertEquals(row.getString("name"), "cus1");

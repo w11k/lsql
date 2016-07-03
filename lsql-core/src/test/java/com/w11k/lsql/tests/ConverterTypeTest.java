@@ -38,7 +38,7 @@ public class ConverterTypeTest extends AbstractLSqlTest {
 
     @Test
     public void testDouble() {
-        TestUtils.testType(lSql, "DOUBLE", 123d, 123d);
+        TestUtils.testType(lSql, "DECIMAL", 123d, 123d);
     }
 
     @Test

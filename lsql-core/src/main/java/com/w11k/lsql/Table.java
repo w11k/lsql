@@ -428,7 +428,7 @@ public class Table implements ITable {
                 if (column(input) == null) {
                     String message = "Column '" + input + "' does not exist in table '" + tableName + "'. ";
                     message += "Known columns: [";
-                    message += Joiner.on(",").join(row.keySet());
+                    message += Joiner.on(",").join(Table.this.columns.keySet());
                     message += "]";
                     throw new RuntimeException(message);
                 }

@@ -1,6 +1,6 @@
 <suite name="All Tests">
 
-  <test name="PostgreSQL">
+  <test name="Debugs">
 
     <parameter name="jdbcDriverClassName" value="org.postgresql.Driver"/>
     <parameter name="jdbcUrl" value="jdbc:postgresql://localhost/lsqltests"/>
@@ -8,9 +8,9 @@
     <parameter name="jdbcPassword" value="lsqltestspass"/>
 
     <classes>
-      <class name="com.w11k.lsql.tests.TableTest">
+      <class name="com.w11k.lsql.tests.SqlStatementTest">
         <methods>
-          <include name="getById" />
+          <include name="listLiteralQueryParameter" />
         </methods>
       </class>
     </classes>

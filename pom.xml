@@ -28,6 +28,7 @@
         <artifactId>logback-classic</artifactId>
         <version>1.0.13</version>
       </dependency>
+
       <dependency>
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
@@ -43,6 +44,18 @@
         <groupId>io.reactivex</groupId>
         <artifactId>rxjava</artifactId>
         <version>1.0.16</version>
+      </dependency>
+
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>1.9.2</version>
       </dependency>
 
       <dependency>
@@ -77,18 +90,6 @@
         <!--<groupId>org.javassist</groupId>-->
         <!--<artifactId>javassist</artifactId>-->
         <!--<version>3.18.0-GA</version>-->
-      <!--</dependency>-->
-
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>2.2</version>
-      </dependency>
-
-      <!--<dependency>-->
-        <!--<groupId>org.apache.commons</groupId>-->
-        <!--<artifactId>commons-lang3</artifactId>-->
-        <!--<version>3.4</version>-->
       <!--</dependency>-->
 
       <!-- for dialect -->

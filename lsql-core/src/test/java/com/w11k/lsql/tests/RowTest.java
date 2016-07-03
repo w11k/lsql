@@ -52,7 +52,7 @@ public class RowTest extends AbstractLSqlTest {
         Row r = Row.fromKeyVals(
                 "dateTime", dt.toString()
         );
-
+        assertTrue(r.get("dateTime") instanceof String);
         LocalDateTime dateTime = r.getDateTime("dateTime").toLocalDateTime();
         assertEquals(dt, dateTime);
     }
@@ -62,6 +62,7 @@ public class RowTest extends AbstractLSqlTest {
         Row r = new Row();
         DateTime dt1 = new DateTime();
         r.put("date", dt1.getMillis());
+        assertTrue(r.get("date") instanceof Long);
         DateTime dt2 = r.getDateTime("date");
         assertEquals(dt1, dt2);
     }
