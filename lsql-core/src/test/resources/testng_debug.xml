@@ -8,9 +8,9 @@
     <parameter name="jdbcPassword" value="lsqltestspass"/>
 
     <classes>
-      <class name="com.w11k.lsql.tests.SqlStatementTest">
+      <class name="com.w11k.lsql.tests.QueryConverterTest">
         <methods>
-          <include name="listLiteralQueryParameter" />
+          <include name="failOnUnusedConverter" />
         </methods>
       </class>
     </classes>

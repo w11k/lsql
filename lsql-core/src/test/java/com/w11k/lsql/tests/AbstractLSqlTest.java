@@ -18,12 +18,17 @@ public abstract class AbstractLSqlTest {
 
     protected LSql lSql;
 
-    @Parameters({"jdbcDriverClassName", "jdbcUrl", "jdbcUsername", "jdbcPassword"})
+    @Parameters({
+            TestParameter.jdbcDriverClassName,
+            TestParameter.jdbcUrl,
+            TestParameter.jdbcUsername,
+            TestParameter.jdbcPassword
+    })
     @BeforeMethod()
-    public void beforeMethod(@Optional String driverClassName,
-                             @Optional String url,
-                             @Optional String username,
-                             @Optional String password) {
+    public final void beforeMethod(@Optional String driverClassName,
+                                   @Optional String url,
+                                   @Optional String username,
+                                   @Optional String password) {
 
         driverClassName = driverClassName != null ? driverClassName : "org.h2.Driver";
         url = url != null ? url : "jdbc:h2:mem:testdb;mode=postgresql";
@@ -55,15 +60,13 @@ public abstract class AbstractLSqlTest {
         this.beforeMethodHook();
     }
 
-    protected void beforeMethodHook() {
-
+    @AfterMethod
+    public final void afterMethod() throws Exception {
+        lSql.getConnectionProvider().call().close();
     }
 
-    @AfterMethod
-    public void afterMethod() throws Exception {
-        if (lSql != null) {
-            lSql.getConnectionProvider().call().close();
-        }
+    protected void beforeMethodHook() {
+
     }
 
     protected void createTable(String sql) {

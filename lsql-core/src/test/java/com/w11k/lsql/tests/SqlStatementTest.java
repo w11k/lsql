@@ -3,7 +3,9 @@ package com.w11k.lsql.tests;
 import com.google.common.collect.Lists;
 import com.w11k.lsql.*;
 import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
+import com.w11k.lsql.dialects.PostgresDialect;
 import com.w11k.lsql.exceptions.QueryException;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.sql.PreparedStatement;
@@ -335,6 +337,21 @@ public class SqlStatementTest extends AbstractLSqlTest {
           "param", 1
         ).toList();
         assertEquals(rows.size(), 2);
+    }
+
+    @Test()
+    public void listLiteralQueryParameterEmptyArray() {
+        boolean skipTest = lSql.getDialect() instanceof PostgresDialect;
+        if (skipTest) {
+            throw new SkipException("empty list literal not support");
+        }
+
+        setup();
+        List<Row> rows;
+
+        SqlStatement statement = statement("select * from person where" +
+          " age in (/*ages=*/ 11, 12, 13 /**/) " +
+          "and 1 = /*param=*/ 1 /**/;");
 
         // API Version 2, empty
         rows = statement.query(
