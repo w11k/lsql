@@ -1,13 +1,15 @@
 package com.w11k.lsql.tests.pojo;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.LinkedRow;
-import com.w11k.lsql.PojoTable;
-import com.w11k.lsql.Row;
-import com.w11k.lsql.Table;
+import com.w11k.lsql.*;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import org.testng.annotations.Test;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.testng.Assert.assertEquals;
@@ -151,27 +153,33 @@ public class PojoTableTest extends AbstractLSqlTest {
         table1Pojo.insert(t1);
     }
 
-//    @Test
-//    public void fieldsUseConverterRegistry() {
-//        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT)");
-//        this.lSql.getDialect().getConverterRegistry().addConverter(new Converter(AtomicInteger.class, new int[]{Types.INTEGER}, Types.INTEGER) {
-//            @Override
-//            protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
-//
-//            }
-//
-//            @Override
-//            protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
-//                return null;
-//            }
-//        });
-//        this.lSql.table("table1", Table1WithInvalidField.class);
-//    }
-//
-//    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*No converter.*")
-//    public void failOnFieldsWithMissingConverters() {
-//        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT)");
-//        this.lSql.table("table1", Table1WithInvalidField.class);
-//    }
+    @Test
+    public void fieldsUseConverterRegistry() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai INTEGER)");
+        this.lSql.getDialect().getConverterRegistry().addConverter(new Converter(AtomicInteger.class, new int[]{}, Types.INTEGER) {
+            @Override
+            protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+                ps.setInt(index, ((AtomicInteger) val).get());
+            }
+
+            @Override
+            protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+                return new AtomicInteger((int) rs.getInt(index));
+            }
+        });
+        PojoTable<Table1WithInvalidField> table1 = this.lSql.table("table1", Table1WithInvalidField.class);
+        Table1WithInvalidField t1 = new Table1WithInvalidField();
+        t1.setId(1);
+        t1.setAi(new AtomicInteger(2));
+        t1.setFirstName("Max");
+        table1.insert(t1);
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*No converter.*")
+    public void failOnFieldsWithMissingConverters() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT)");
+        this.lSql.table("table1", Table1WithInvalidField.class);
+    }
 
 }
