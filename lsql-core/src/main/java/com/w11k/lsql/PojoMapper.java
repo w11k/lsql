@@ -11,9 +11,13 @@ public class PojoMapper<T> {
 
     private final Map<String, PropertyDescriptor> propertyDescriptors = Maps.newHashMap();
 
+    private final LSql lSql;
+
     private final Constructor<T> constructor;
 
-    public PojoMapper(Class<T> pojoClass) {
+    public PojoMapper(LSql lSql, Class<T> pojoClass, boolean checkForConverters) {
+        this.lSql = lSql;
+
         // Find constructor
         this.constructor = getConstructor(pojoClass);
 
@@ -26,7 +30,17 @@ public class PojoMapper<T> {
             }
             setPropertyAccessible(desc);
             this.propertyDescriptors.put(desc.getName(), desc);
+
+            // Check for a converter registration
+            if (checkForConverters) {
+                this.lSql.getDialect().getConverterRegistry().getConverterForJavaType(
+                        desc.getReadMethod().getReturnType());
+            }
         }
+    }
+
+    public PropertyDescriptor getPropertyDescriptor(String fieldName) {
+        return this.propertyDescriptors.get(fieldName);
     }
 
     public T newInstance() {

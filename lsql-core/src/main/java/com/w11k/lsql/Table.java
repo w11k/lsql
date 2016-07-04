@@ -15,6 +15,7 @@ import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
+import rx.functions.Func3;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -38,6 +39,13 @@ public class Table {
 
     private Optional<Column> revisionColumn = absent();
 
+    private Func3<LSql, String, Integer, Converter> converterProvider = new Func3<LSql, String, Integer, Converter>() {
+        @Override
+        public Converter call(LSql lSql, String javaColumnName, Integer sqlType) {
+            return lSql.getDialect().getConverterRegistry().getConverterForSqlType(sqlType);
+        }
+    };
+
     public Table(LSql lSql, String tableName) {
         this.lSql = lSql;
         this.tableName = tableName;
@@ -59,6 +67,14 @@ public class Table {
 
     public String getTableName() {
         return this.tableName;
+    }
+
+    public Func3<LSql, String, Integer, Converter> getConverterProvider() {
+        return this.converterProvider;
+    }
+
+    public void setConverterProvider(Func3<LSql, String, Integer, Converter> converterProvider) {
+        this.converterProvider = converterProvider;
     }
 
     public Optional<String> getPrimaryKeyColumn() {
@@ -493,9 +509,9 @@ public class Table {
                 String sqlColumnName = columnsMetaData.getString(4);
                 int columnSize = columnsMetaData.getInt(7);
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
-                int dataType = columnsMetaData.getInt(5);
-                Converter converter = lSql.getDialect().getConverterRegistry().getConverterForSqlType(dataType);
-                Column column = new Column(of(this), javaColumnName, dataType, converter, columnSize);
+                int sqlType = columnsMetaData.getInt(5);
+                Converter converter = this.converterProvider.call(this.lSql, javaColumnName, sqlType);
+                Column column = new Column(of(this), javaColumnName, sqlType, converter, columnSize);
                 lSql.getInitColumnCallback().onNewColumn(column);
                 columns.put(javaColumnName, column);
             }

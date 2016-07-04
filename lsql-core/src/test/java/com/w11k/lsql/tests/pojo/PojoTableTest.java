@@ -8,6 +8,8 @@ import com.w11k.lsql.Table;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import org.testng.annotations.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -15,6 +17,7 @@ public class PojoTableTest extends AbstractLSqlTest {
 
     public static class Table1Pojo {
         private int id;
+
         private String firstName;
 
         public int getId() {
@@ -43,6 +46,19 @@ public class PojoTableTest extends AbstractLSqlTest {
 
         public void setIgnore(int ignore) {
             this.ignore = ignore;
+        }
+    }
+
+    public static class Table1WithInvalidField extends Table1Pojo {
+
+        private AtomicInteger ai = new AtomicInteger(1);
+
+        public AtomicInteger getAi() {
+            return this.ai;
+        }
+
+        public void setAi(AtomicInteger ai) {
+            this.ai = ai;
         }
     }
 
@@ -114,8 +130,8 @@ public class PojoTableTest extends AbstractLSqlTest {
     public void loadById() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT)");
         lSql.table("table1").insert(Row.fromKeyVals(
-            "id", 1,
-            "firstName", "name1"
+                "id", 1,
+                "firstName", "name1"
         )).get();
 
         PojoTable<Table1Pojo> table1 = lSql.table("table1", Table1Pojo.class);
@@ -134,5 +150,28 @@ public class PojoTableTest extends AbstractLSqlTest {
         t1.setIgnore(123);
         table1Pojo.insert(t1);
     }
+
+//    @Test
+//    public void fieldsUseConverterRegistry() {
+//        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT)");
+//        this.lSql.getDialect().getConverterRegistry().addConverter(new Converter(AtomicInteger.class, new int[]{Types.INTEGER}, Types.INTEGER) {
+//            @Override
+//            protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+//
+//            }
+//
+//            @Override
+//            protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+//                return null;
+//            }
+//        });
+//        this.lSql.table("table1", Table1WithInvalidField.class);
+//    }
+//
+//    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*No converter.*")
+//    public void failOnFieldsWithMissingConverters() {
+//        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT)");
+//        this.lSql.table("table1", Table1WithInvalidField.class);
+//    }
 
 }

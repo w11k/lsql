@@ -113,6 +113,11 @@ public class LinkedRow extends Row {
         table.delete(this);
     }
 
+    public <T> T convertTo(Class<T> pojoClass) {
+        PojoMapper<T> mapper = new PojoMapper<T>(this.getTable().getlSql(), pojoClass, true);
+        return mapper.rowToPojo(this);
+    }
+
     @Override
     public LinkedRow addKeyVals(Object... keyVals) {
         super.addKeyVals(keyVals);

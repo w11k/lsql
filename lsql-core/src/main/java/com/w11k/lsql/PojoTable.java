@@ -1,6 +1,8 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.converter.Converter;
+import rx.functions.Func3;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -13,10 +15,19 @@ public class PojoTable<T> {
 
     private final PojoMapper<T> pojoMapper;
 
-    public PojoTable(LSql lSql, String tableName, Class<T> pojoClass) {
-        this.table = lSql.table(tableName);
+    public PojoTable(LSql lSql, String tableName, final Class<T> pojoClass) {
         this.pojoClass = pojoClass;
-        this.pojoMapper = new PojoMapper<T>(pojoClass);
+        this.pojoMapper = new PojoMapper<T>(lSql, pojoClass, true);
+
+        this.table = lSql.table(tableName);
+        this.table.setConverterProvider(new Func3<LSql, String, Integer, Converter>() {
+            @Override
+            public Converter call(LSql lSql, String javaColumnName, Integer sqlType) {
+                Class<?> returnType = PojoTable.this.pojoMapper.getPropertyDescriptor(javaColumnName)
+                        .getReadMethod().getReturnType();
+                return lSql.getDialect().getConverterRegistry().getConverterForJavaType(returnType);
+            }
+        });
     }
 
     public String getTableName() {

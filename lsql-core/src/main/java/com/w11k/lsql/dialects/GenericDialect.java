@@ -27,29 +27,41 @@ public class GenericDialect {
     private CaseFormat sqlCaseFormat = CaseFormat.LOWER_UNDERSCORE;
 
     public GenericDialect() {
-        converterRegistry.addConverter(BinaryConverter.INSTANCE);
-        converterRegistry.addConverter(BlobConverter.INSTANCE);
-        converterRegistry.addConverter(BooleanConverter.INSTANCE);
-        converterRegistry.addConverter(ClobConverter.INSTANCE);
-        converterRegistry.addConverter(DoubleConverter.INSTANCE);
-        converterRegistry.addConverter(FloatConverter.INSTANCE);
-        converterRegistry.addConverter(IntConverter.INSTANCE);
-        converterRegistry.addConverter(JodaDateConverter.INSTANCE);
-        converterRegistry.addConverter(StringConverter.INSTANCE);
+        // http://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html
+
+        this.converterRegistry.addConverter(IntConverter.INSTANCE);
+        this.converterRegistry.addConverter(Integer.TYPE, IntConverter.INSTANCE);
+
+        this.converterRegistry.addConverter(DoubleConverter.INSTANCE);
+        this.converterRegistry.addConverter(Double.TYPE, DoubleConverter.INSTANCE);
+
+        this.converterRegistry.addConverter(FloatConverter.INSTANCE);
+        this.converterRegistry.addConverter(Float.TYPE, FloatConverter.INSTANCE);
+
+
+        this.converterRegistry.addConverter(BooleanConverter.INSTANCE);
+        this.converterRegistry.addConverter(Boolean.TYPE, BooleanConverter.INSTANCE);
+
+
+        this.converterRegistry.addConverter(StringConverter.INSTANCE);
+
+        this.converterRegistry.addConverter(BinaryConverter.INSTANCE);
+        this.converterRegistry.addConverter(ByteConverter.INSTANCE);
+        this.converterRegistry.addConverter(Byte.TYPE, ByteConverter.INSTANCE);
+
+        this.converterRegistry.addConverter(BlobConverter.INSTANCE);
+
+        this.converterRegistry.addConverter(ClobConverter.INSTANCE);
+
+        this.converterRegistry.addConverter(JodaDateConverter.INSTANCE);
+
+        // TODO Missing primitives
 
         // TODO add more types
-        // static int 	DATALINK;
-        // static int 	DISTINCT;
-        // static int 	JAVA_OBJECT;
         // static int 	LONGVARBINARY;
-        // static int 	NULL;
-        // static int 	NUMERIC;
-        // static int 	OTHER;
-        // static int 	REF;
         // static int 	STRUCT;
         // static int 	TIME;
         // static int 	DATE;
-        // static int 	VARBINARY;
     }
 
     public LSql getlSql() {

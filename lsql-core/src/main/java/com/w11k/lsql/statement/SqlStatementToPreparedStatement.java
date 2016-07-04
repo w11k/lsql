@@ -216,7 +216,7 @@ public class SqlStatementToPreparedStatement {
     }
 
     private void log(Map<String, Object> queryParameters) {
-        if (logger.isTraceEnabled()) {
+        if (this.logger.isTraceEnabled()) {
             ArrayList<String> keys = Lists.newArrayList(queryParameters.keySet());
             Collections.sort(keys, new Comparator<String>() {
                 @Override
@@ -224,13 +224,13 @@ public class SqlStatementToPreparedStatement {
                     return o1.compareToIgnoreCase(o2);
                 }
             });
-            String msg = "Executing statement '" + statementName + "' with parameters:\n";
+            String msg = "Executing statement '" + this.statementName + "' with parameters:\n";
             for (String key : keys) {
                 msg += String.format("%15s = %s\n", key, queryParameters.get(key));
             }
-            logger.trace(msg);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug("Executing statement '{}' with parameters {}", statementName, queryParameters.keySet());
+            this.logger.trace(msg);
+        } else if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Executing statement '{}' with parameters {}", this.statementName, queryParameters.keySet());
         }
     }
 
@@ -256,9 +256,9 @@ public class SqlStatementToPreparedStatement {
         log(queryParameters);
 
         List<ParameterInPreparedStatement> parameterInPreparedStatements = Lists.newLinkedList();
-        String sqlStringCopy = sqlString;
+        String sqlStringCopy = this.sqlString;
         for (String queryParameter : queryParameters.keySet()) {
-            List<Parameter> parametersByName = parameters.get(queryParameter);
+            List<Parameter> parametersByName = this.parameters.get(queryParameter);
             if (parametersByName == null) {
                 throw new QueryException("Unused query parameter: " + queryParameter);
             }
@@ -285,7 +285,7 @@ public class SqlStatementToPreparedStatement {
         // RAW conversions
         sqlStringCopy = processRawConversions(sqlStringCopy, parameterInPreparedStatements);
 
-        PreparedStatement ps = lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, sqlStringCopy, false);
+        PreparedStatement ps = this.lSql.getDialect().getStatementCreator().createPreparedStatement(this.lSql, sqlStringCopy, false);
 
         int offset = 0;
         for (int i = 0; i < parameterInPreparedStatements.size(); i++) {
@@ -303,12 +303,9 @@ public class SqlStatementToPreparedStatement {
                 // -1 because one ? was already set
                 offset += dqp.getNumberOfQueryParameters() - 1;
             } else {
-                Converter converter;// = this.inConverters.get(pips.parameter.name);
+                Converter converter = this.lSql.getDialect().getConverterRegistry()
+                        .getConverterForJavaType(pips.value.getClass());
 
-//                if (converter == null) {
-                converter = this.lSql.getDialect().getConverterRegistry()
-                        .getConverterForJavaValue(pips.value);
-//                }
                 if (converter == null) {
                     throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);
                 }

@@ -165,11 +165,6 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(LinkedHashMap.class, key);
     }
 
-    public <T> T convertTo(Class<T> pojoClass) {
-        PojoMapper<T> mapper = new PojoMapper<T>(pojoClass);
-        return mapper.rowToPojo(this);
-    }
-
     public boolean hasNonNullValue(String key) {
         return get(key) != null;
     }

@@ -20,7 +20,7 @@ public class PojoQuery<T> extends AbstractQuery<T> {
 
     public PojoQuery(LSql lSql, PreparedStatement preparedStatement, Class<T> pojoClass) {
         super(lSql, preparedStatement);
-        this.pojoMapper = new PojoMapper<T>(pojoClass);
+        this.pojoMapper = new PojoMapper<T>(lSql, pojoClass, false);
         this.pojoClass = pojoClass;
     }
 
