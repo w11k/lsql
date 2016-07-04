@@ -15,7 +15,7 @@ public class PojoMapper<T> {
 
     public PojoMapper(Class<T> pojoClass) {
         // Find constructor
-        constructor = getConstructor(pojoClass);
+        this.constructor = getConstructor(pojoClass);
 
         // Extract property names
         PropertyDescriptor[] descs = PropertyUtils.getPropertyDescriptors(pojoClass);
@@ -25,20 +25,20 @@ public class PojoMapper<T> {
                 continue;
             }
             setPropertyAccessible(desc);
-            propertyDescriptors.put(desc.getName(), desc);
+            this.propertyDescriptors.put(desc.getName(), desc);
         }
     }
 
     public T newInstance() {
         try {
-            return constructor.newInstance();
+            return this.constructor.newInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public void setValue(T instance, String fieldName, Object value) {
-        PropertyDescriptor descriptor = propertyDescriptors.get(fieldName);
+        PropertyDescriptor descriptor = this.propertyDescriptors.get(fieldName);
         try {
             descriptor.getWriteMethod().invoke(instance, value);
         } catch (Exception e) {
@@ -49,7 +49,7 @@ public class PojoMapper<T> {
     public Row pojoToRow(T pojo) {
         try {
             Row row = new Row();
-            for (PropertyDescriptor desc : propertyDescriptors.values()) {
+            for (PropertyDescriptor desc : this.propertyDescriptors.values()) {
                 Object value = desc.getReadMethod().invoke(pojo);
                 row.put(desc.getName(), value);
             }
@@ -61,11 +61,15 @@ public class PojoMapper<T> {
 
     public T rowToPojo(Row row) {
         T pojo = newInstance();
-        for (PropertyDescriptor desc : propertyDescriptors.values()) {
+        assignRowToPojo(row, pojo);
+        return pojo;
+    }
+
+    public void assignRowToPojo(Row row, T pojo) {
+        for (PropertyDescriptor desc : this.propertyDescriptors.values()) {
             Object value = row.get(desc.getName());
             setValue(pojo, desc.getName(), value);
         }
-        return pojo;
     }
 
     private Constructor<T> getConstructor(Class<T> pojoClass) {

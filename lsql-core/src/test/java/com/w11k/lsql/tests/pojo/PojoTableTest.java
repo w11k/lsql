@@ -91,13 +91,23 @@ public class PojoTableTest extends AbstractLSqlTest {
     }
 
     @Test
-    public void insertReturnsPojoWithMissingValues() {
+    public void insertAssignsDefaultValue() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, first_name TEXT DEFAULT 'default value')");
         PojoTable<Table1Pojo> table1 = lSql.table("table1", Table1Pojo.class);
         Table1Pojo t1 = new Table1Pojo();
         t1.setId(1);
-        t1 = table1.insert(t1);
+        table1.insert(t1);
         assertEquals(t1.getFirstName(), "default value");
+    }
+
+    @Test
+    public void insertIgnoresDefaultValueOnPureInsert() {
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, first_name TEXT DEFAULT 'default value')");
+        PojoTable<Table1Pojo> table1 = lSql.table("table1", Table1Pojo.class);
+        Table1Pojo t1 = new Table1Pojo();
+        t1.setId(1);
+        table1.insert(t1, true);
+        assertEquals(t1.getFirstName(), null);
     }
 
     @Test
