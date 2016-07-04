@@ -1,15 +1,15 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.typemapper.sqltypes;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import java.sql.*;
 
-public class BinaryConverter extends Converter {
+public class BinaryTypeMapper extends TypeMapper {
 
-    public static final BinaryConverter INSTANCE = new BinaryConverter();
+    public static final BinaryTypeMapper INSTANCE = new BinaryTypeMapper();
 
-    public BinaryConverter() {
+    public BinaryTypeMapper() {
         super(
           com.w11k.lsql.Blob.class,
           new int[]{Types.VARBINARY, Types.BINARY},

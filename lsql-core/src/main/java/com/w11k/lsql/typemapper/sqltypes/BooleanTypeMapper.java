@@ -1,18 +1,18 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.typemapper.sqltypes;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class BooleanConverter extends Converter {
+public class BooleanTypeMapper extends TypeMapper {
 
-    public static final BooleanConverter INSTANCE = new BooleanConverter();
+    public static final BooleanTypeMapper INSTANCE = new BooleanTypeMapper();
 
-    public BooleanConverter() {
+    public BooleanTypeMapper() {
         super(
           Boolean.class,
           new int[]{Types.BIT, Types.BOOLEAN},

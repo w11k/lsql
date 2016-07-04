@@ -1,15 +1,15 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.typemapper.sqltypes;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import java.sql.*;
 
-public class BlobConverter extends Converter {
+public class BlobTypeMapper extends TypeMapper {
 
-    public static final BlobConverter INSTANCE = new BlobConverter();
+    public static final BlobTypeMapper INSTANCE = new BlobTypeMapper();
 
-    public BlobConverter() {
+    public BlobTypeMapper() {
         super(
           com.w11k.lsql.Blob.class,
           new int[]{Types.BLOB},

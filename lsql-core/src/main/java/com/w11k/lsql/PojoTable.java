@@ -1,8 +1,8 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.converter.Converter;
-import rx.functions.Func3;
+import com.w11k.lsql.typemapper.TypeMapper;
+import com.w11k.lsql.utils.SqlTypesNames;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -15,27 +15,34 @@ public class PojoTable<T> {
 
     private final PojoMapper<T> pojoMapper;
 
-    public PojoTable(LSql lSql, String tableName, final Class<T> pojoClass) {
+    public PojoTable(final LSql lSql, String tableName, final Class<T> pojoClass) {
         this.pojoClass = pojoClass;
         this.pojoMapper = new PojoMapper<T>(lSql, pojoClass, true);
 
-        this.table = lSql.table(tableName);
-        this.table.setConverterProvider(new Func3<LSql, String, Integer, Converter>() {
+        this.table = new Table(lSql, tableName) {
             @Override
-            public Converter call(LSql lSql, String javaColumnName, Integer sqlType) {
+            protected TypeMapper getConverter(String javaColumnName, int sqlType) {
                 Class<?> returnType = PojoTable.this.pojoMapper.getPropertyDescriptor(javaColumnName)
                         .getReadMethod().getReturnType();
-                return lSql.getDialect().getConverterRegistry().getConverterForJavaType(returnType);
-            }
-        });
-    }
+                TypeMapper typeMapper = lSql.getDialect().getConverterRegistry().getConverterForJavaType(returnType);
 
-    public String getTableName() {
-        return this.table.getTableName();
+                if (!typeMapper.supportsSqlType(sqlType)) {
+                    String msg = "converter for Java type '" + typeMapper.getJavaType().getCanonicalName() + "' " +
+                            "does not support SQL type '" + SqlTypesNames.getName(sqlType) + "'";
+                    throw new IllegalArgumentException(msg);
+                }
+
+                return typeMapper;
+            }
+        };
     }
 
     public Class<T> getPojoClass() {
         return this.pojoClass;
+    }
+
+    public Table getTable() {
+        return this.table;
     }
 
     public void insert(T pojo) {

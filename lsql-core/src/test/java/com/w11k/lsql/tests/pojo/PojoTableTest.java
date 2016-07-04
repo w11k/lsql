@@ -2,7 +2,7 @@ package com.w11k.lsql.tests.pojo;
 
 import com.google.common.base.Optional;
 import com.w11k.lsql.*;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import org.testng.annotations.Test;
 
@@ -51,7 +51,7 @@ public class PojoTableTest extends AbstractLSqlTest {
         }
     }
 
-    public static class Table1WithInvalidField extends Table1Pojo {
+    public static class Table1WithAtomicInteger extends Table1Pojo {
 
         private AtomicInteger ai = new AtomicInteger(1);
 
@@ -63,6 +63,18 @@ public class PojoTableTest extends AbstractLSqlTest {
             this.ai = ai;
         }
     }
+
+    private TypeMapper atomicIntegerTypeMapper = new TypeMapper(AtomicInteger.class, new int[]{Types.INTEGER}, Types.INTEGER) {
+        @Override
+        protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+            ps.setInt(index, ((AtomicInteger) val).get());
+        }
+
+        @Override
+        protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+            return new AtomicInteger((int) rs.getInt(index));
+        }
+    };
 
     @Test
     public void insert() {
@@ -156,30 +168,28 @@ public class PojoTableTest extends AbstractLSqlTest {
     @Test
     public void fieldsUseConverterRegistry() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai INTEGER)");
-        this.lSql.getDialect().getConverterRegistry().addConverter(new Converter(AtomicInteger.class, new int[]{}, Types.INTEGER) {
-            @Override
-            protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
-                ps.setInt(index, ((AtomicInteger) val).get());
-            }
-
-            @Override
-            protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
-                return new AtomicInteger((int) rs.getInt(index));
-            }
-        });
-        PojoTable<Table1WithInvalidField> table1 = this.lSql.table("table1", Table1WithInvalidField.class);
-        Table1WithInvalidField t1 = new Table1WithInvalidField();
+        this.lSql.getDialect().getConverterRegistry()
+                .addConverter(this.atomicIntegerTypeMapper);
+        PojoTable<Table1WithAtomicInteger> table1 = this.lSql.table("table1", Table1WithAtomicInteger.class);
+        Table1WithAtomicInteger t1 = new Table1WithAtomicInteger();
         t1.setId(1);
         t1.setAi(new AtomicInteger(2));
         t1.setFirstName("Max");
         table1.insert(t1);
-
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*No converter.*")
     public void failOnFieldsWithMissingConverters() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT)");
-        this.lSql.table("table1", Table1WithInvalidField.class);
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai INTEGER)");
+        this.lSql.table("table1", Table1WithAtomicInteger.class);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*converter.*not support.*")
+    public void failWhenConverterCanNotConvertBetweenJavaAndSqlType() {
+        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai VARCHAR(10))");
+        this.lSql.getDialect().getConverterRegistry()
+                .addConverter(this.atomicIntegerTypeMapper);
+        this.lSql.table("table1", Table1WithAtomicInteger.class);
     }
 
 }

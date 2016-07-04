@@ -5,7 +5,7 @@ import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.converter.predefined.ObjectToJsonStringConverter;
+import com.w11k.lsql.typemapper.predefined.ObjectToJsonStringTypeMapper;
 import com.w11k.lsql.tests.utils.Person;
 import org.testng.annotations.Test;
 
@@ -14,13 +14,13 @@ import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 
-public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
+public class ObjectToJsonStringTypeMapperTest extends AbstractLSqlTest {
 
     @Test
     public void pojo() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, sometext TEXT, person TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("person").setConverter(new ObjectToJsonStringConverter(Person.class, new TypeReference<Person>(){}));
+        t1.column("person").setTypeMapper(new ObjectToJsonStringTypeMapper(Person.class, new TypeReference<Person>(){}));
 
         Person p = new Person("John", "Doe");
         t1.insert(Row.fromKeyVals("id", 1, "person", p, "sometext", "test"));
@@ -32,7 +32,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfString() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class, new TypeReference<List<String>>() {
+        t1.column("data").setTypeMapper(new ObjectToJsonStringTypeMapper(List.class, new TypeReference<List<String>>() {
         }));
 
         List<String> list = Lists.newLinkedList();
@@ -48,7 +48,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfMapStringString() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
+        t1.column("data").setTypeMapper(new ObjectToJsonStringTypeMapper(List.class, new TypeReference<List<Map<String, String>>>() {
         }));
 
         List<Map<String, String>> list = Lists.newLinkedList();
@@ -67,7 +67,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfMapStringStringInALinkedRow() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class,
+        t1.column("data").setTypeMapper(new ObjectToJsonStringTypeMapper(List.class,
                 new TypeReference<List<Map<String, String>>>() {
                 }));
 

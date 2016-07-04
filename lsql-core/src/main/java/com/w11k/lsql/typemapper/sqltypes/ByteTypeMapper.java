@@ -1,33 +1,32 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.typemapper.sqltypes;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class FloatConverter extends Converter {
+public class ByteTypeMapper extends TypeMapper {
 
-    public static final FloatConverter INSTANCE = new FloatConverter();
+    public static final ByteTypeMapper INSTANCE = new ByteTypeMapper();
 
-    public FloatConverter() {
+    public ByteTypeMapper() {
         super(
-          Float.class,
-          new int[]{Types.FLOAT},
-          Types.FLOAT
+          com.w11k.lsql.Blob.class,
+          new int[]{},
+          Types.BINARY
         );
     }
 
     @Override
     protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
-        ps.setFloat(index, (Integer) val);
+        ps.setByte(index, (Byte) val);
     }
 
     @Override
     protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
-        return rs.getFloat(index);
-
+        return rs.getByte(index);
     }
 }

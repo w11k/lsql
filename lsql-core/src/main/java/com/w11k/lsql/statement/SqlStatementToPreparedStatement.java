@@ -10,7 +10,7 @@ import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.LiteralQueryParameter;
 import com.w11k.lsql.QueryParameter;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 import com.w11k.lsql.exceptions.QueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -303,13 +303,13 @@ public class SqlStatementToPreparedStatement {
                 // -1 because one ? was already set
                 offset += dqp.getNumberOfQueryParameters() - 1;
             } else {
-                Converter converter = this.lSql.getDialect().getConverterRegistry()
+                TypeMapper typeMapper = this.lSql.getDialect().getConverterRegistry()
                         .getConverterForJavaType(pips.value.getClass());
 
-                if (converter == null) {
+                if (typeMapper == null) {
                     throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);
                 }
-                converter.setValueInStatement(this.lSql, ps, i + offset + 1, pips.value);
+                typeMapper.setValueInStatement(this.lSql, ps, i + offset + 1, pips.value);
             }
         }
 

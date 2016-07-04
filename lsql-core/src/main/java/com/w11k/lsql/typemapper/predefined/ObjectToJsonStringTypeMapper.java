@@ -1,8 +1,8 @@
-package com.w11k.lsql.converter.predefined;
+package com.w11k.lsql.typemapper.predefined;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -10,12 +10,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class ObjectToJsonStringConverter extends Converter {
+public class ObjectToJsonStringTypeMapper extends TypeMapper {
 
     private Class<?> clazz;
     private TypeReference typeReference;
 
-    public <A> ObjectToJsonStringConverter(Class<A> clazz, TypeReference typeReference) {
+    public <A> ObjectToJsonStringTypeMapper(Class<A> clazz, TypeReference typeReference) {
         super(
           clazz,
           new int[]{Types.VARCHAR},
@@ -24,11 +24,6 @@ public class ObjectToJsonStringConverter extends Converter {
 
         this.clazz = clazz;
         this.typeReference = typeReference;
-    }
-
-    @Override
-    public Object convertValueToTargetType(LSql lSql, Object val) {
-        return lSql.getObjectMapper().convertValue(val, typeReference);
     }
 
     @Override

@@ -1,19 +1,19 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.typemapper.sqltypes;
 
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import javax.sql.rowset.serial.SerialClob;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.*;
 
-public class ClobConverter extends Converter {
+public class ClobTypeMapper extends TypeMapper {
 
-    public static final ClobConverter INSTANCE = new ClobConverter();
+    public static final ClobTypeMapper INSTANCE = new ClobTypeMapper();
 
-    public ClobConverter() {
+    public ClobTypeMapper() {
         super(
           String.class,
           new int[]{Types.CLOB},

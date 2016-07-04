@@ -1,7 +1,7 @@
-package com.w11k.lsql.converter.predefined;
+package com.w11k.lsql.typemapper.predefined;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,14 +10,14 @@ import java.sql.Types;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class JavaBoolToSqlStringConverter extends Converter {
+public class JavaBoolToSqlStringTypeMapper extends TypeMapper {
 
     private final String sqlStringValueForTrue;
 
     private final String sqlStringValueForFalse;
 
-    public JavaBoolToSqlStringConverter(String sqlStringValueForTrue,
-                                        String sqlStringValueForFalse) {
+    public JavaBoolToSqlStringTypeMapper(String sqlStringValueForTrue,
+                                         String sqlStringValueForFalse) {
         super(
           Boolean.class,
           new int[]{Types.VARCHAR},

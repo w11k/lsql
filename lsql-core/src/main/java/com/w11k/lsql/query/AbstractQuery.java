@@ -7,7 +7,7 @@ import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.ResultSetColumn;
 import com.w11k.lsql.ResultSetWithColumns;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -27,7 +27,7 @@ public abstract class AbstractQuery<T> {
 
     private final PreparedStatement preparedStatement;
 
-    private Map<String, Converter> converters = Maps.newHashMap();
+    private Map<String, TypeMapper> converters = Maps.newHashMap();
 
     private boolean ignoreDuplicateColumns = false;
 
@@ -49,17 +49,17 @@ public abstract class AbstractQuery<T> {
         return preparedStatement;
     }
 
-    public Map<String, Converter> getConverters() {
+    public Map<String, TypeMapper> getConverters() {
         return converters;
     }
 
-    public AbstractQuery setConverters(Map<String, Converter> converters) {
+    public AbstractQuery setConverters(Map<String, TypeMapper> converters) {
         this.converters = converters;
         return this;
     }
 
-    public AbstractQuery addConverter(String columnName, Converter converter) {
-        this.converters.put(columnName, converter);
+    public AbstractQuery addConverter(String columnName, TypeMapper typeMapper) {
+        this.converters.put(columnName, typeMapper);
         return this;
     }
 
@@ -125,9 +125,9 @@ public abstract class AbstractQuery<T> {
                         }
                         processedColumnLabels.add(columnLabel);
 
-                        Converter converter = getConverterForResultSetColumn(metaData, i, columnLabel);
+                        TypeMapper typeMapper = getConverterForResultSetColumn(metaData, i, columnLabel);
 
-                        resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
+                        resultSetColumns.add(new ResultSetColumn(i, columnLabel, typeMapper));
                     }
 
                     // Check for unused converters
@@ -179,7 +179,7 @@ public abstract class AbstractQuery<T> {
                 setValue(
                         entity,
                         column.getName(),
-                        column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
+                        column.getTypeMapper().getValueFromResultSet(lSql, resultSet, column.getPosition()));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -191,14 +191,14 @@ public abstract class AbstractQuery<T> {
 
     abstract protected void setValue(T entity, String name, Object value);
 
-    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
+    public TypeMapper getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
             throws SQLException {
 
         // Check for user provided Converter
         if (converters.containsKey(columnLabel)) {
-            Converter converter = converters.get(columnLabel);
-            if (converter != null) {
-                return converter;
+            TypeMapper typeMapper = converters.get(columnLabel);
+            if (typeMapper != null) {
+                return typeMapper;
             }
         }
 
@@ -209,7 +209,7 @@ public abstract class AbstractQuery<T> {
                 && tableName.length() > 0
                 && columnName != null
                 && columnName.length() > 0) {
-            return lSql.table(tableName).column(columnName).getConverter();
+            return lSql.table(tableName).column(columnName).getTypeMapper();
         }
 
         // Check if the user registered null as a Converter to use a type-based Converter

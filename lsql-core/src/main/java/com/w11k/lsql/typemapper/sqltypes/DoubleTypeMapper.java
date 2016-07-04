@@ -1,18 +1,18 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.typemapper.sqltypes;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class DoubleConverter extends Converter {
+public class DoubleTypeMapper extends TypeMapper {
 
-    public static final DoubleConverter INSTANCE = new DoubleConverter();
+    public static final DoubleTypeMapper INSTANCE = new DoubleTypeMapper();
 
-    public DoubleConverter() {
+    public DoubleTypeMapper() {
         super(
           Double.class,
           new int[]{Types.DOUBLE, Types.REAL, Types.DECIMAL, Types.NUMERIC},

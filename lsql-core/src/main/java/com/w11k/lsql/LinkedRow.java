@@ -1,7 +1,7 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 import com.w11k.lsql.validation.AbstractValidationError;
 
 import java.util.Map;
@@ -80,8 +80,9 @@ public class LinkedRow extends Row {
         for (String key : from.keySet()) {
             if (table.getColumns().containsKey(key)) {
                 Object val = from.get(key);
-                Converter converter = table.getColumns().get(key).getConverter();
-                val = converter.convertValueToTargetType(this.table.getlSql(), val);
+                TypeMapper typeMapper = table.getColumns().get(key).getTypeMapper();
+//                val = converter.convertValueToTargetType(this.table.getlSql(), val);
+                typeMapper.failOnWrongValueType(val);
                 put(key, val);
             }
         }

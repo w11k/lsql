@@ -3,7 +3,7 @@ package com.w11k.lsql;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 import com.w11k.lsql.query.AbstractQuery;
 
 import java.sql.ResultSet;
@@ -79,8 +79,8 @@ public class QueryToTreeConverter {
             }
 
             // Registered Converter
-            Converter converter = this.query.getConverterForResultSetColumn(this.metaData, i, label);
-            ResultSetColumn rsc = new ResultSetColumn(i, label, converter);
+            TypeMapper typeMapper = this.query.getConverterForResultSetColumn(this.metaData, i, label);
+            ResultSetColumn rsc = new ResultSetColumn(i, label, typeMapper);
             this.resultSetColumns.put(i, rsc);
         }
     }
@@ -108,7 +108,7 @@ public class QueryToTreeConverter {
                 if (!rsc.isMarkerColumn()) {
                     if (row != null) {
                         row.put(rsc.getName(),
-                                rsc.getConverter().getValueFromResultSet(
+                                rsc.getTypeMapper().getValueFromResultSet(
                                         this.query.getlSql(),
                                         this.resultSet,
                                         i));

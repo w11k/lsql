@@ -3,8 +3,8 @@ package com.w11k.lsql.tests;
 import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
+import com.w11k.lsql.typemapper.TypeMapper;
+import com.w11k.lsql.typemapper.predefined.JavaBoolToSqlStringTypeMapper;
 import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 
@@ -12,9 +12,9 @@ import java.sql.SQLException;
 
 import static org.testng.Assert.assertEquals;
 
-public class ConverterTypeTest extends AbstractLSqlTest {
+public class TypeMapperTypeTest extends AbstractLSqlTest {
 
-    private final Converter javaBoolToSqlYesNoStringConverter = new JavaBoolToSqlStringConverter("yes", "no");
+    private final TypeMapper javaBoolToSqlYesNoStringTypeMapper = new JavaBoolToSqlStringTypeMapper("yes", "no");
 
     @Test
     public void testBoolean() {
@@ -82,7 +82,7 @@ public class ConverterTypeTest extends AbstractLSqlTest {
     public void converterForColumnValue() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, yesno1 TEXT, yesno2 TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("yesno1").setConverter(javaBoolToSqlYesNoStringConverter);
+        t1.column("yesno1").setTypeMapper(javaBoolToSqlYesNoStringTypeMapper);
         t1.insert(Row.fromKeyVals("id", 1, "yesno1", true, "yesno2", "true"));
         LinkedRow row = t1.load(1).get();
         assertEquals(row.get("yesno1"), true);

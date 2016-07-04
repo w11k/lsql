@@ -1,4 +1,4 @@
-package com.w11k.lsql.converter;
+package com.w11k.lsql.typemapper;
 
 import com.w11k.lsql.LSql;
 
@@ -7,13 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-public abstract class Converter {
+public abstract class TypeMapper {
 
     private final Class<?> javaType;
+
     private final int[] sqlTypes;
+
     private final int sqlTypeForNullValues;
 
-    public Converter(Class<?> javaType, int[] sqlTypes, int sqlTypeForNullValues) {
+    public TypeMapper(Class<?> javaType, int[] sqlTypes, int sqlTypeForNullValues) {
         this.javaType = javaType;
         this.sqlTypes = sqlTypes;
         this.sqlTypeForNullValues = sqlTypeForNullValues;
@@ -21,16 +23,26 @@ public abstract class Converter {
 
     public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         if (val != null) {
-            val = convertValueToTargetType(lSql, val);
+//            val = convertValueToTargetType(lSql, val);
+            failOnWrongValueType(val);
             setValue(lSql, ps, index, val);
         } else {
             ps.setNull(index, sqlTypeForNullValues);
         }
     }
 
-    public Object convertValueToTargetType(LSql lSql, Object val) {
-        return lSql.getObjectMapper().convertValue(val, javaType);
+    public void failOnWrongValueType(Object val) {
+        if (!isValueValid(val)) {
+            throw new IllegalArgumentException(
+                    "value '" + val + "' does not match expected type " +
+                            "'" + getJavaType().getCanonicalName() + "'"
+            );
+        }
     }
+
+//    public Object convertValueToTargetType(LSql lSql, Object val) {
+//        return lSql.getObjectMapper().convertValue(val, javaType);
+//    }
 
     public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
         rs.getObject(index);
@@ -44,12 +56,22 @@ public abstract class Converter {
         if (value == null) {
             return isNullValid();
         }
+
 //        if (getSupportedJavaClass().isPresent()) {
-            return javaType.isAssignableFrom(value.getClass());
+        return javaType.isAssignableFrom(value.getClass());
 //        } else {
 //            return true;
 //        }
     }
+
+//    public boolean supportsSqlType(int sqlType) {
+//        for (int type : this.sqlTypes) {
+//            if (sqlType == type) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
 //    public int[] getSupportedSqlTypes() {
 //        throw new RuntimeException("This converter does not specify the supported SQL types.");
@@ -76,6 +98,15 @@ public abstract class Converter {
         return true;
     }
 
+    public boolean supportsSqlType(int sqlType) {
+        for (int type : this.sqlTypes) {
+            if (type == sqlType) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Class<?> getJavaType() {
         return javaType;
     }
@@ -91,9 +122,9 @@ public abstract class Converter {
     @Override
     public String toString() {
         return "Converter{" +
-          "javaType=" + javaType +
-          ", sqlTypes=" + Arrays.toString(sqlTypes) +
-          ", sqlTypeForNullValues=" + sqlTypeForNullValues +
-          '}';
+                "javaType=" + javaType +
+                ", sqlTypes=" + Arrays.toString(sqlTypes) +
+                ", sqlTypeForNullValues=" + sqlTypeForNullValues +
+                '}';
     }
 }

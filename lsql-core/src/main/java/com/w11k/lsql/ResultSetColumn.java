@@ -2,7 +2,7 @@ package com.w11k.lsql;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 public class ResultSetColumn {
 
@@ -10,7 +10,7 @@ public class ResultSetColumn {
 
     private final String name;
 
-    private final Converter converter;
+    private final TypeMapper typeMapper;
 
     // Tree Marker columns
 
@@ -22,10 +22,10 @@ public class ResultSetColumn {
 
     private final String field;
 
-    public ResultSetColumn(int position, String name, Converter converter) {
+    public ResultSetColumn(int position, String name, TypeMapper typeMapper) {
         this.position = position;
         this.name = name;
-        this.converter = converter;
+        this.typeMapper = typeMapper;
         this.markerColumn = false;
         this.level = -1;
         this.fullPath = null;
@@ -37,7 +37,7 @@ public class ResultSetColumn {
 
         this.position = position;
         this.name = name;
-        this.converter = null;
+        this.typeMapper = null;
         this.markerColumn = true;
 
         this.level = Iterables.size(Splitter.on("/").omitEmptyStrings().split(fullPath));
@@ -55,8 +55,8 @@ public class ResultSetColumn {
         return name;
     }
 
-    public Converter getConverter() {
-        return converter;
+    public TypeMapper getTypeMapper() {
+        return typeMapper;
     }
 
     public boolean isMarkerColumn() {

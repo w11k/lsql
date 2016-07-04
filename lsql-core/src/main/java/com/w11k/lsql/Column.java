@@ -1,7 +1,7 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.StringTooLongError;
 import com.w11k.lsql.validation.TypeError;
@@ -19,16 +19,16 @@ public class Column {
 
     private Optional<Table> table;
 
-    private Converter converter;
+    private TypeMapper typeMapper;
 
     public static Column create(Table table,
                                     String columnName,
                                     int sqlType,
-                                    Converter converter,
+                                    TypeMapper typeMapper,
                                     int columnSize) {
 
         Optional<Table> tableOptional = Optional.fromNullable(table);
-        return new Column(tableOptional, columnName, sqlType, converter, columnSize);
+        return new Column(tableOptional, columnName, sqlType, typeMapper, columnSize);
     }
 
     /**
@@ -36,14 +36,14 @@ public class Column {
      *                   based on a function (e.g. count) or used for a raw list.
      * @param columnName The name of the column.
      * @param sqlType    The java.sql.Types value
-     * @param converter  Converter instance used to convert between SQL and Java values.
+     * @param typeMapper  Converter instance used to convert between SQL and Java values.
      * @param columnSize The maximum column size. -1 if not applicable.
      */
-    public Column(Optional<Table> table, String columnName, int sqlType, Converter converter, int columnSize) {
+    public Column(Optional<Table> table, String columnName, int sqlType, TypeMapper typeMapper, int columnSize) {
         this.table = table;
         this.columnName = columnName;
         this.sqlType = sqlType;
-        this.converter = converter;
+        this.typeMapper = typeMapper;
         this.columnSize = columnSize;
     }
 
@@ -67,23 +67,23 @@ public class Column {
         return sqlType;
     }
 
-    public Converter getConverter() {
-        return converter;
+    public TypeMapper getTypeMapper() {
+        return typeMapper;
     }
 
-    public void setConverter(Converter converter) {
-        this.converter = converter;
+    public void setTypeMapper(TypeMapper typeMapper) {
+        this.typeMapper = typeMapper;
     }
 
     public Optional<? extends AbstractValidationError> validateValue(Object value) {
-        if (!converter.isValueValid(value)) {
+        if (!typeMapper.isValueValid(value)) {
             return of(new TypeError(
               getTableName().get(),
               columnName,
-              converter.getJavaType().getSimpleName(), value.getClass().getSimpleName()));
+              typeMapper.getJavaType().getSimpleName(), value.getClass().getSimpleName()));
         }
 
-        Class<?> targetType = converter.getJavaType();
+        Class<?> targetType = typeMapper.getJavaType();
         if (columnSize != -1 && String.class.isAssignableFrom(targetType)) {
             String string = (String) value;
             if (string != null && string.length() > columnSize) {

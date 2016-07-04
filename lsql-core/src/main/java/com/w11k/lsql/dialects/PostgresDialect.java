@@ -1,16 +1,16 @@
 package com.w11k.lsql.dialects;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 import org.postgresql.jdbc4.Jdbc4ResultSetMetaData;
 
 import java.sql.*;
 
 public class PostgresDialect extends GenericDialect {
 
-    private static class BooleanConverter extends Converter {
+    private static class BooleanTypeMapper extends TypeMapper {
 
-        public BooleanConverter() {
+        public BooleanTypeMapper() {
             super(Boolean.class,
                     new int[]{Types.BIT, Types.BOOLEAN},
                     Types.BIT);
@@ -34,7 +34,7 @@ public class PostgresDialect extends GenericDialect {
     }
 
     public PostgresDialect() {
-        getConverterRegistry().addConverter(new BooleanConverter());
+        getConverterRegistry().addConverter(new BooleanTypeMapper());
     }
 
     @Override

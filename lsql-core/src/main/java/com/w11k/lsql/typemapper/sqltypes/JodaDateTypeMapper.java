@@ -1,16 +1,16 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.typemapper.sqltypes;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 import org.joda.time.DateTime;
 
 import java.sql.*;
 
-public class JodaDateConverter extends Converter {
+public class JodaDateTypeMapper extends TypeMapper {
 
-    public static final JodaDateConverter INSTANCE = new JodaDateConverter();
+    public static final JodaDateTypeMapper INSTANCE = new JodaDateTypeMapper();
 
-    public JodaDateConverter() {
+    public JodaDateTypeMapper() {
         super(
           DateTime.class,
           new int[]{Types.TIMESTAMP},

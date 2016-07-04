@@ -1,18 +1,18 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.typemapper.sqltypes;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.typemapper.TypeMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class IntConverter extends Converter {
+public class IntTypeMapper extends TypeMapper {
 
-    public static final IntConverter INSTANCE = new IntConverter();
+    public static final IntTypeMapper INSTANCE = new IntTypeMapper();
 
-    public IntConverter() {
+    public IntTypeMapper() {
         super(
           Integer.class,
           new int[]{Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT},
