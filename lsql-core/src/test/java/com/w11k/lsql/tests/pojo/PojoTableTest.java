@@ -1,15 +1,14 @@
 package com.w11k.lsql.tests.pojo;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.*;
-import com.w11k.lsql.typemapper.TypeMapper;
+import com.w11k.lsql.LinkedRow;
+import com.w11k.lsql.PojoTable;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import com.w11k.lsql.tests.AbstractLSqlTest;
+import com.w11k.lsql.typemapper.predefined.AtomicIntegerTypeMapper;
 import org.testng.annotations.Test;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.testng.Assert.assertEquals;
@@ -63,18 +62,6 @@ public class PojoTableTest extends AbstractLSqlTest {
             this.ai = ai;
         }
     }
-
-    private TypeMapper atomicIntegerTypeMapper = new TypeMapper(AtomicInteger.class, new int[]{Types.INTEGER}, Types.INTEGER) {
-        @Override
-        protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
-            ps.setInt(index, ((AtomicInteger) val).get());
-        }
-
-        @Override
-        protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
-            return new AtomicInteger((int) rs.getInt(index));
-        }
-    };
 
     @Test
     public void insert() {
@@ -168,8 +155,7 @@ public class PojoTableTest extends AbstractLSqlTest {
     @Test
     public void fieldsUseConverterRegistry() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai INTEGER)");
-        this.lSql.getDialect().getConverterRegistry()
-                .addConverter(this.atomicIntegerTypeMapper);
+        this.lSql.getDialect().getConverterRegistry().addConverter(new AtomicIntegerTypeMapper());
         PojoTable<Table1WithAtomicInteger> table1 = this.lSql.table("table1", Table1WithAtomicInteger.class);
         Table1WithAtomicInteger t1 = new Table1WithAtomicInteger();
         t1.setId(1);
@@ -188,7 +174,7 @@ public class PojoTableTest extends AbstractLSqlTest {
     public void failWhenConverterCanNotConvertBetweenJavaAndSqlType() {
         createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai VARCHAR(10))");
         this.lSql.getDialect().getConverterRegistry()
-                .addConverter(this.atomicIntegerTypeMapper);
+                .addConverter(new AtomicIntegerTypeMapper());
         this.lSql.table("table1", Table1WithAtomicInteger.class);
     }
 
