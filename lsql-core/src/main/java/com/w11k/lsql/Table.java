@@ -512,8 +512,7 @@ public class Table {
                 int sqlType = columnsMetaData.getInt(5);
                 Converter converter = this.converterProvider.call(this.lSql, javaColumnName, sqlType);
                 Column column = new Column(of(this), javaColumnName, sqlType, converter, columnSize);
-                lSql.getInitColumnCallback().onNewColumn(column);
-                columns.put(javaColumnName, column);
+                this.columns.put(javaColumnName, column);
             }
         } catch (SQLException e) {
             e.printStackTrace();
