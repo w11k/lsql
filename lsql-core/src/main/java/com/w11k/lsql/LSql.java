@@ -6,6 +6,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.dialects.GenericDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
+import com.w11k.lsql.query.PojoQuery;
+import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
 
 import javax.sql.DataSource;
@@ -27,11 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
-    static ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
+    static private ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JodaModule());
         return mapper;
     }
+
+    static public final ObjectMapper OBJECT_MAPPER = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
     private final Map<String, Table> tables = Maps.newHashMap();
 
@@ -143,19 +147,19 @@ public class LSql {
      * @return the Table instance
      */
     public synchronized Table table(String tableName) {
-        if (!tables.containsKey(tableName)) {
-            tables.put(tableName, new Table(this, tableName));
+        if (!this.tables.containsKey(tableName)) {
+            this.tables.put(tableName, new Table(this, tableName));
         }
-        return tables.get(tableName);
+        return this.tables.get(tableName);
     }
 
     @SuppressWarnings("unchecked")
     public synchronized <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
-        if (!pojoTables.containsKey(tableName)) {
-            pojoTables.put(tableName, new PojoTable<T>(this, tableName, pojoClass));
+        if (!this.pojoTables.containsKey(tableName)) {
+            this.pojoTables.put(tableName, new PojoTable<T>(this, tableName, pojoClass));
         }
 
-        PojoTable<T> pojoTable = (PojoTable<T>) pojoTables.get(tableName);
+        PojoTable<T> pojoTable = (PojoTable<T>) this.pojoTables.get(tableName);
         assert pojoTable.getPojoClass().equals(pojoClass);
         return pojoTable;
     }
@@ -181,8 +185,25 @@ public class LSql {
      * @param sql the SQL SELECT string
      * @return the Query instance
      */
-    public Query executeRawQuery(String sql) {
-        return new Query(this, sql);
+    public RowQuery executeRawQuery(String sql) {
+        return new RowQuery(
+                this,
+                getDialect().getStatementCreator().createPreparedStatement(this, sql, false));
+    }
+
+    /**
+     * Executes the SQL SELECT string. Useful for simple queries.
+     * {@link LSqlFile}s should be used for complex queries.
+     *
+     * @param sql       the SQL SELECT string
+     * @param pojoClass the POJO class
+     * @return the Query instance
+     */
+    public <T> PojoQuery<T> executeRawQuery(String sql, Class<T> pojoClass) {
+        return new PojoQuery<T>(
+                this,
+                getDialect().getStatementCreator().createPreparedStatement(this, sql, false),
+                pojoClass);
     }
 
     @Override

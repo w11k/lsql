@@ -1,6 +1,6 @@
 package com.w11k.lsql.tests.pojo.tree;
 
-import com.w11k.lsql.Query;
+import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import com.w11k.lsql.tests.TreeTestData;
 import org.testng.annotations.Test;
@@ -21,8 +21,8 @@ public class TreeToPojoNoCaseConversionTest extends AbstractLSqlTest {
 
     @Test
     public void continentsWithFactsAndCountriesAndCities() {
-        Query query = this.treeTestData.continentsWithFactsAndCountriesAndCities();
-        List<QueryContinent> continent = query.toPojo(QueryContinent.class);
+        PojoQuery<QueryContinent> query = statementContinentsWithFactsAndCountriesAndCities();
+        List<QueryContinent> continent = query.toTree();
 
         assertEquals(continent.size(), 2);
 
@@ -90,6 +90,10 @@ public class TreeToPojoNoCaseConversionTest extends AbstractLSqlTest {
         assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getId(), 4);
         assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getCountryId(), 3);
         assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getName(), "New York");
+    }
+
+    private PojoQuery<QueryContinent> statementContinentsWithFactsAndCountriesAndCities() {
+        return this.treeTestData.getlSqlFile().statement("continentsWithFactsAndCountriesAndCities_1", QueryContinent.class).query();
     }
 
 }

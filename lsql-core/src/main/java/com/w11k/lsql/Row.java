@@ -1,6 +1,5 @@
 package com.w11k.lsql;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
@@ -25,8 +24,6 @@ public class Row extends ForwardingMap<String, Object> {
         return r;
     }
 
-    private static ObjectMapper OBJECT_MAPPER = LSql.CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
-
     private Map<String, Object> data;
 
     public Row() {
@@ -37,9 +34,9 @@ public class Row extends ForwardingMap<String, Object> {
         this.data = newHashMap(data);
     }
 
-    public void setDelegate(Map<String, Object> data) {
-        this.data = data;
-    }
+//    public void setDelegate(Map<String, Object> data) {
+//        this.data = data;
+//    }
 
     public Row addKeyVals(Object... keyVals) {
         checkArgument(
@@ -77,7 +74,7 @@ public class Row extends ForwardingMap<String, Object> {
             return type.cast(value);
         } else if (convert) {
             try {
-                return getObjectMapper().convertValue(value, type);
+                return LSql.OBJECT_MAPPER.convertValue(value, type);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Row entry for " +
                         "key: '" + key + "', " +
@@ -168,6 +165,11 @@ public class Row extends ForwardingMap<String, Object> {
         return getAs(LinkedHashMap.class, key);
     }
 
+    public <T> T convertTo(Class<T> pojoClass) {
+        PojoMapper<T> mapper = new PojoMapper<T>(pojoClass);
+        return mapper.rowToPojo(this);
+    }
+
     public boolean hasNonNullValue(String key) {
         return get(key) != null;
     }
@@ -203,10 +205,6 @@ public class Row extends ForwardingMap<String, Object> {
     @Override
     public String toString() {
         return Objects.toStringHelper(this).addValue(delegate()).toString();
-    }
-
-    protected ObjectMapper getObjectMapper() {
-        return OBJECT_MAPPER;
     }
 
     @Override

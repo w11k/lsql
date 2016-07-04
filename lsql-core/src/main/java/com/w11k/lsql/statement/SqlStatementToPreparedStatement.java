@@ -1,11 +1,16 @@
-package com.w11k.lsql;
+package com.w11k.lsql.statement;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.w11k.lsql.LSql;
+import com.w11k.lsql.LiteralQueryParameter;
+import com.w11k.lsql.QueryParameter;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.QueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +21,15 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SqlStatement {
+public class SqlStatementToPreparedStatement {
 
-    class Parameter {
+    // ..... /*name=*/ 123 /**/
+    private static final Pattern QUERY_ARG_START = Pattern.compile(
+            "/\\*\\s*(\\S*)\\s*=\\s*\\*/");
+
+    private static final String QUERY_ARG_END = "/**/";
+
+    private final class Parameter {
         String placeholder;
 
         String name;
@@ -42,15 +53,15 @@ public class SqlStatement {
         @Override
         public String toString() {
             return "Parameter{" +
-              "placeholder='" + placeholder + '\'' +
-              ", name='" + name + '\'' +
-              ", startIndex=" + startIndex +
-              ", endIndex=" + endIndex +
-              '}';
+                    "placeholder='" + placeholder + '\'' +
+                    ", name='" + name + '\'' +
+                    ", startIndex=" + startIndex +
+                    ", endIndex=" + endIndex +
+                    '}';
         }
     }
 
-    class ParameterInPreparedStatement {
+    private final class ParameterInPreparedStatement {
         Parameter parameter;
 
         Object value;
@@ -58,18 +69,11 @@ public class SqlStatement {
         @Override
         public String toString() {
             return "ParameterInPreparedStatement{" +
-              "parameter=" + parameter +
-              ", value=" + value +
-              '}';
+                    "parameter=" + parameter +
+                    ", value=" + value +
+                    '}';
         }
     }
-
-
-    // ..... /*name=*/ 123 /**/
-    private static final Pattern QUERY_ARG_START = Pattern.compile(
-      "/\\*\\s*(\\S*)\\s*=\\s*\\*/");
-
-    private static final String QUERY_ARG_END = "/**/";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -81,15 +85,19 @@ public class SqlStatement {
 
     private final Map<String, List<Parameter>> parameters;
 
-    private Map<String, Converter> inConverters = Maps.newLinkedHashMap();
+//    private Map<String, Converter> inConverters = Maps.newLinkedHashMap();
 
-    private Map<String, Converter> outConverters = Maps.newLinkedHashMap();
+//    private Map<String, Converter> outConverters = Maps.newLinkedHashMap();
 
-    public SqlStatement(LSql lSql, String statementName, String sqlString) {
+    public SqlStatementToPreparedStatement(LSql lSql, String statementName, String sqlString) {
         this.lSql = lSql;
         this.statementName = statementName;
         this.sqlString = sqlString;
-        parameters = parseParameters();
+        this.parameters = parseParameters();
+    }
+
+    public com.w11k.lsql.LSql getlSql() {
+        return this.lSql;
     }
 
     public String getSqlString() {
@@ -100,68 +108,68 @@ public class SqlStatement {
         return ImmutableMap.copyOf(this.parameters);
     }
 
-    public SqlStatement addInConverter(String parameterName, Converter converter) {
-        this.inConverters.put(parameterName, converter);
-        return this;
-    }
+//    public SqlStatement addInConverter(String parameterName, Converter converter) {
+//        this.inConverters.put(parameterName, converter);
+//        return this;
+//    }
+//
+//    public SqlStatement setInConverters(Map<String, Converter> inConverters) {
+//        this.inConverters = inConverters;
+//        return this;
+//    }
+//
+//    public SqlStatement addOutConverter(String columnName, Converter converter) {
+//        this.outConverters.put(columnName, converter);
+//        return this;
+//    }
+//
+//    public SqlStatement setOutConverters(Map<String, Converter> outConverters) {
+//        this.outConverters = outConverters;
+//        return this;
+//    }
+//
+//    public SqlStatement setInAndOutConverters(Map<String, Converter> inAndOutConverters) {
+//        this.inConverters = inAndOutConverters;
+//        this.outConverters = inAndOutConverters;
+//        return this;
+//    }
 
-    public SqlStatement setInConverters(Map<String, Converter> inConverters) {
-        this.inConverters = inConverters;
-        return this;
-    }
-
-    public SqlStatement addOutConverter(String columnName, Converter converter) {
-        this.outConverters.put(columnName, converter);
-        return this;
-    }
-
-    public SqlStatement setOutConverters(Map<String, Converter> outConverters) {
-        this.outConverters = outConverters;
-        return this;
-    }
-
-    public SqlStatement setInAndOutConverters(Map<String, Converter> inAndOutConverters) {
-        this.inConverters = inAndOutConverters;
-        this.outConverters = inAndOutConverters;
-        return this;
-    }
-
-    public Query query() {
-        return query(Maps.<String, Object>newHashMap());
-    }
-
-    public Query query(Object... keyVals) {
-        return query(Row.fromKeyVals(keyVals));
-    }
-
-    public Query query(Map<String, Object> queryParameters) {
-        try {
-            PreparedStatement ps = createPreparedStatement(queryParameters);
-            Query query = new Query(lSql, ps);
-            query.setConverters(this.outConverters);
-            return query;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public void execute() {
-        execute(Maps.<String, Object>newHashMap());
-    }
-
-    public void execute(Object... keyVals) {
-        execute(Row.fromKeyVals(keyVals));
-    }
-
-    public void execute(Map<String, Object> queryParameters) {
-        try {
-            PreparedStatement ps = createPreparedStatement(queryParameters);
-            ps.execute();
-        } catch (SQLException e) {
-            throw new DatabaseAccessException(e);
-        }
-    }
+//    public RowQuery query() {
+//        return query(Maps.<String, Object>newHashMap());
+//    }
+//
+//    public RowQuery query(Object... keyVals) {
+//        return query(Row.fromKeyVals(keyVals));
+//    }
+//
+//    public RowQuery query(Map<String, Object> queryParameters) {
+//        try {
+//            PreparedStatement ps = createPreparedStatement(queryParameters);
+//            RowQuery query = new RowQuery(lSql, ps);
+////            query.setConverters(this.outConverters);
+//            return query;
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
+//
+//    public void execute() {
+//        execute(Maps.<String, Object>newHashMap());
+//    }
+//
+//    public void execute(Object... keyVals) {
+//        execute(Row.fromKeyVals(keyVals));
+//    }
+//
+//    public void execute(Map<String, Object> queryParameters) {
+//        try {
+//            PreparedStatement ps = createPreparedStatement(queryParameters);
+//            ps.execute();
+//        } catch (SQLException e) {
+//            throw new DatabaseAccessException(e);
+//        }
+//    }
 
     private Map<String, List<Parameter>> parseParameters() {
         Map<String, List<Parameter>> found = Maps.newHashMap();
@@ -207,7 +215,44 @@ public class SqlStatement {
         return Iterables.getLast(splitIter);
     }
 
-    private PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
+    private void log(Map<String, Object> queryParameters) {
+        if (logger.isTraceEnabled()) {
+            ArrayList<String> keys = Lists.newArrayList(queryParameters.keySet());
+            Collections.sort(keys, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    return o1.compareToIgnoreCase(o2);
+                }
+            });
+            String msg = "Executing statement '" + statementName + "' with parameters:\n";
+            for (String key : keys) {
+                msg += String.format("%15s = %s\n", key, queryParameters.get(key));
+            }
+            logger.trace(msg);
+        } else if (logger.isDebugEnabled()) {
+            logger.debug("Executing statement '{}' with parameters {}", statementName, queryParameters.keySet());
+        }
+    }
+
+    private String processRawConversions(String sql, List<ParameterInPreparedStatement> parameterInPreparedStatements) {
+        int lastIndex = 0;
+        String sqlCopy = "";
+
+        // Separate iteration because the following iteration will destroy the indexes
+        for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
+            if (pips.value instanceof LiteralQueryParameter) {
+                LiteralQueryParameter literalQueryParameter = (LiteralQueryParameter) pips.value;
+                sqlCopy += sql.substring(lastIndex, pips.parameter.startIndex);
+                sqlCopy += literalQueryParameter.getSqlString();
+                lastIndex = pips.parameter.endIndex;
+            }
+        }
+        sqlCopy += sql.substring(lastIndex);
+
+        return sqlCopy;
+    }
+
+    PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
         log(queryParameters);
 
         List<ParameterInPreparedStatement> parameterInPreparedStatements = Lists.newLinkedList();
@@ -246,11 +291,6 @@ public class SqlStatement {
         for (int i = 0; i < parameterInPreparedStatements.size(); i++) {
             ParameterInPreparedStatement pips = parameterInPreparedStatements.get(i);
 
-            // Skip raw conversions
-//            if (pips.value instanceof RawConverter) {
-//                continue;
-//            }
-
             if (pips.value instanceof QueryParameter) {
                 QueryParameter queryParameter = (QueryParameter) pips.value;
                 queryParameter.set(ps, i + 1);
@@ -263,56 +303,20 @@ public class SqlStatement {
                 // -1 because one ? was already set
                 offset += dqp.getNumberOfQueryParameters() - 1;
             } else {
-                Converter converter = this.inConverters.get(pips.parameter.name);
+                Converter converter;// = this.inConverters.get(pips.parameter.name);
 
-                if (converter == null) {
-                    converter = lSql.getDialect().getConverterRegistry().getConverterForJavaValue(pips.value);
-                }
+//                if (converter == null) {
+                converter = this.lSql.getDialect().getConverterRegistry()
+                        .getConverterForJavaValue(pips.value);
+//                }
                 if (converter == null) {
                     throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);
                 }
-                converter.setValueInStatement(lSql, ps, i + offset + 1, pips.value);
+                converter.setValueInStatement(this.lSql, ps, i + offset + 1, pips.value);
             }
         }
 
         return ps;
-    }
-
-    private void log(Map<String, Object> queryParameters) {
-        if (logger.isTraceEnabled()) {
-            ArrayList<String> keys = Lists.newArrayList(queryParameters.keySet());
-            Collections.sort(keys, new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.compareToIgnoreCase(o2);
-                }
-            });
-            String msg = "Executing statement '" + statementName + "' with parameters:\n";
-            for (String key : keys) {
-                msg += String.format("%15s = %s\n", key, queryParameters.get(key));
-            }
-            logger.trace(msg);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug("Executing statement '{}' with parameters {}", statementName, queryParameters.keySet());
-        }
-    }
-
-    private String processRawConversions(String sql, List<ParameterInPreparedStatement> parameterInPreparedStatements) {
-        int lastIndex = 0;
-        String sqlCopy = "";
-
-        // Separate iteration because the following iteration will destroy the indexes
-        for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
-            if (pips.value instanceof LiteralQueryParameter) {
-                LiteralQueryParameter literalQueryParameter = (LiteralQueryParameter) pips.value;
-                sqlCopy += sql.substring(lastIndex, pips.parameter.startIndex);
-                sqlCopy += literalQueryParameter.getSqlString();
-                lastIndex = pips.parameter.endIndex;
-            }
-        }
-        sqlCopy += sql.substring(lastIndex);
-
-        return sqlCopy;
     }
 
 }

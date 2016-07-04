@@ -2,9 +2,11 @@ package com.w11k.lsql.guice;
 
 import com.google.inject.Inject;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.SqlStatement;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.query.PojoQuery;
+import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
+import com.w11k.lsql.statement.AbstractSqlStatement;
 
 public class LSqlDao {
 
@@ -32,8 +34,12 @@ public class LSqlDao {
         this.lSqlFile = lSqlFile;
     }
 
-    public SqlStatement statement(String name) {
+    public AbstractSqlStatement<RowQuery> statement(String name) {
         return getlSqlFile().statement(name);
+    }
+
+    public <T> AbstractSqlStatement<PojoQuery<T>> statement(String name, Class<T> pojoClass) {
+        return getlSqlFile().statement(name, pojoClass);
     }
 
     private Table table(String tableName) {

@@ -2,7 +2,7 @@ package com.w11k.lsql.tests.pojo.tree;
 
 import java.util.Map;
 
-class QueryContinent extends Continent {
+public class QueryContinent extends Continent {
 
     private Map<Integer, ContinentFact> facts;
 

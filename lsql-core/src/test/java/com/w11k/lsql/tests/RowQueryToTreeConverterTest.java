@@ -1,6 +1,6 @@
 package com.w11k.lsql.tests;
 
-import com.w11k.lsql.Query;
+import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.Row;
 import org.testng.annotations.Test;
 
@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 
 import static org.testng.Assert.assertEquals;
 
-public class QueryToTreeConverterTest extends AbstractLSqlTest {
+public class RowQueryToTreeConverterTest extends AbstractLSqlTest {
 
     private TreeTestData treeTestData;
 
@@ -20,7 +20,7 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
     @Test
     public void continents() {
-        Query query = this.treeTestData.continents();
+        RowQuery query = statementContinents();
         LinkedHashMap<Number, Row> tree = query.toTree();
         assertEquals(tree.size(), 2);
         assertEquals(tree.get(1), Row.fromKeyVals("id", 1, "name", "Europe"));
@@ -29,7 +29,7 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
     @Test
     public void continentsWithFacts() {
-        Query query = this.treeTestData.continentsWithFacts();
+        RowQuery query = statementContinentsWithFacts();
         LinkedHashMap<Number, Row> tree = query.toTree();
 
         assertEquals(tree.size(), 2);
@@ -68,7 +68,7 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
     @Test
     public void continentsWithFactsAndCountries() {
-        Query query = this.treeTestData.continentsWithFactsAndCountries();
+        RowQuery query = statementContinentsWithFactsAndCountries();
         LinkedHashMap<Number, Row> tree = query.toTree();
 
         assertEquals(tree.size(), 2);
@@ -128,17 +128,17 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
 
     @Test
     public void continentsWithFactsAndCountriesAndCities_1() {
-        Query query = this.treeTestData.continentsWithFactsAndCountriesAndCities();
+        RowQuery query = statementContinentsWithFactsAndCountriesAndCities();
         internalContinentsWithFactsAndCountriesAndCities(query);
     }
 
     @Test
     public void continentsWithFactsAndCountriesAndCities_2() {
-        Query query = this.treeTestData.continentsWithFactsAndCountriesAndCities_2();
+        RowQuery query =  statementContinentsWithFactsAndCountriesAndCities_2();
         internalContinentsWithFactsAndCountriesAndCities(query);
     }
 
-    private void internalContinentsWithFactsAndCountriesAndCities(Query query) {
+    private void internalContinentsWithFactsAndCountriesAndCities(RowQuery query) {
         LinkedHashMap<Number, Row> tree = query.toTree();
         assertEquals(tree.size(), 2);
         assertEquals(tree.get(1).getTree("countries").get(1).size(), 4);
@@ -158,5 +158,24 @@ public class QueryToTreeConverterTest extends AbstractLSqlTest {
         assertEquals(tree.get(2).getTree("countries").get(3).getTree("cities").get(4).getString("name"), "New York");
     }
 
+    private RowQuery statementContinents() {
+        return this.treeTestData.getlSqlFile().statement("continents").query();
+    }
+
+    private RowQuery statementContinentsWithFacts() {
+        return this.treeTestData.getlSqlFile().statement("continentsWithFacts").query();
+    }
+
+    private RowQuery statementContinentsWithFactsAndCountries() {
+        return this.treeTestData.getlSqlFile().statement("continentsWithFactsAndCountries").query();
+    }
+
+    private RowQuery statementContinentsWithFactsAndCountriesAndCities() {
+        return this.treeTestData.getlSqlFile().statement("continentsWithFactsAndCountriesAndCities_1").query();
+    }
+
+    private RowQuery statementContinentsWithFactsAndCountriesAndCities_2() {
+        return this.treeTestData.getlSqlFile().statement("continentsWithFactsAndCountriesAndCities_2").query();
+    }
 
 }

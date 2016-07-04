@@ -1,6 +1,5 @@
 package com.w11k.lsql;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.validation.AbstractValidationError;
@@ -120,18 +119,10 @@ public class LinkedRow extends Row {
         return this;
     }
 
-    public <T> T convertTo(Class<T> pojoClass) {
-        return this.table.getlSql().getObjectMapper().convertValue(this, pojoClass);
-    }
-
     void setData(Map<String, Object> row) {
         for (String key : row.keySet()) {
             put(key, row.get(key));
         }
     }
 
-    @Override
-    protected ObjectMapper getObjectMapper() {
-        return this.table.getlSql().getObjectMapper();
-    }
 }

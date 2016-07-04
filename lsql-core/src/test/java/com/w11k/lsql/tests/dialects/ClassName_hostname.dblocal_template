@@ -1,5 +1,0 @@
-
-url=jdbc:postgresql://localhost/lsqltests
-driver=org.postgresql.Driver
-user=username
-password=password

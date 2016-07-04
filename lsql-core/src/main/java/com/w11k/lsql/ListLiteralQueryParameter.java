@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ListLiteralQueryParameter<T> extends LiteralQueryParameter {
+public class ListLiteralQueryParameter<T> implements LiteralQueryParameter {
 
     public static <A> ListLiteralQueryParameter<A> of(Iterable<A> values) {
         return new ListLiteralQueryParameter<A>(values);

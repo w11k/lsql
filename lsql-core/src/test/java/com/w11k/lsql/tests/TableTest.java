@@ -75,7 +75,7 @@ public class TableTest extends AbstractLSqlTest {
         Table table1 = lSql.table("table1");
         Object newId = table1.insert(new Row().addKeyVals("age", 1)).get();
 
-        Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).firstRow().get();
+        Row query = lSql.executeRawQuery("select * from table1 where id = " + newId).first().get();
         assertEquals(query.getInt("age"), (Integer) 1);
     }
 

@@ -10,7 +10,8 @@ import static org.testng.Assert.*;
 
 public class LinkedRowTest extends AbstractLSqlTest {
 
-    static class Table1Pojo {
+    @SuppressWarnings("WeakerAccess")
+    static public class Table1Pojo {
         private int id;
         private int age;
 

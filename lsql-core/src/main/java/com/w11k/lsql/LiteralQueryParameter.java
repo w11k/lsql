@@ -3,17 +3,12 @@ package com.w11k.lsql;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class LiteralQueryParameter {
+public interface LiteralQueryParameter {
 
-    public String getSqlString() {
-        return "";
-    }
+    String getSqlString();
 
-    public int getNumberOfQueryParameters() {
-        return 0;
-    }
+    int getNumberOfQueryParameters();
 
-    public void set(PreparedStatement ps, int preparedStatementIndex, int localIndex) throws SQLException {
-    }
+    void set(PreparedStatement ps, int preparedStatementIndex, int localIndex) throws SQLException;
 
 }

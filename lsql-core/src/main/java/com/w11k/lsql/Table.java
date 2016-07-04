@@ -12,6 +12,7 @@ import com.w11k.lsql.exceptions.DeleteException;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
+import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
 
@@ -25,7 +26,7 @@ import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class Table implements ITable {
+public class Table {
 
     private final LSql lSql;
 
@@ -56,9 +57,8 @@ public class Table implements ITable {
         return lSql;
     }
 
-    @Override
     public String getTableName() {
-        return tableName;
+        return this.tableName;
     }
 
     public Optional<String> getPrimaryKeyColumn() {
@@ -311,11 +311,11 @@ public class Table implements ITable {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        Query query = new Query(lSql, ps);
+        RowQuery query = new RowQuery(lSql, ps);
         for (String columnInTable : this.columns.keySet()) {
             query.addConverter(columnInTable, this.columns.get(columnInTable).getConverter());
         }
-        Optional<Row> first = query.firstRow();
+        Optional<Row> first = query.first();
         if (first.isPresent()) {
             return of(newLinkedRow(first.get()));
         } else {

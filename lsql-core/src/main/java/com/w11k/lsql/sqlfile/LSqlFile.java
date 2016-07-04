@@ -4,7 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.SqlStatement;
+import com.w11k.lsql.query.PojoQuery;
+import com.w11k.lsql.query.RowQuery;
+import com.w11k.lsql.statement.AbstractSqlStatement;
+import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.PreparedStatement;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,7 +40,7 @@ public class LSqlFile {
 
     private final String path;
 
-    private final Map<String, SqlStatement> statements = Maps.newHashMap();
+    private final Map<String, SqlStatementToPreparedStatement> statements = Maps.newHashMap();
 
     public LSqlFile(LSql lSql, String nameForDescription, String path) {
         this.lSql = lSql;
@@ -47,16 +51,36 @@ public class LSqlFile {
 
     // ----- public -----
 
-    public ImmutableMap<String, SqlStatement> getStatements() {
+    public ImmutableMap<String, SqlStatementToPreparedStatement> getStatements() {
         return copyOf(statements);
     }
 
-    public SqlStatement statement(String name) {
-        if (!statements.containsKey(name)) {
+    public AbstractSqlStatement<RowQuery> statement(String name) {
+        final SqlStatementToPreparedStatement stmtToPs = getStatement(name);
+        return new AbstractSqlStatement<RowQuery>(stmtToPs) {
+            @Override
+            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps) {
+                return new RowQuery(LSqlFile.this.lSql, ps);
+            }
+        };
+    }
+
+    public <T> AbstractSqlStatement<PojoQuery<T>> statement(String name, final Class<T> pojoClass) {
+        final SqlStatementToPreparedStatement stmtToPs = getStatement(name);
+        return new AbstractSqlStatement<PojoQuery<T>>(stmtToPs) {
+            @Override
+            protected PojoQuery<T> createQueryInstance(LSql lSql, PreparedStatement ps) {
+                return new PojoQuery<T>(LSqlFile.this.lSql, ps, pojoClass);
+            }
+        };
+    }
+
+    private SqlStatementToPreparedStatement getStatement(String name) {
+        if (!this.statements.containsKey(name)) {
             throw new IllegalArgumentException("No statement with name '" + name +
-                    "' found in file '" + path + "'.");
+                    "' found in file '" + this.path + "'.");
         }
-        return statements.get(name);
+        return this.statements.get(name);
     }
 
     // ----- private -----
@@ -80,7 +104,7 @@ public class LSqlFile {
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
                 logger.debug("Found SQL statement '{}'", name);
-                statements.put(name, new SqlStatement(lSql, nameForDescription + "." + name, sub));
+                statements.put(name, new SqlStatementToPreparedStatement(lSql, nameForDescription + "." + name, sub));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.query.AbstractQuery;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 import static com.google.common.base.Optional.of;
 
-class QueryToTreeConverter {
+public class QueryToTreeConverter {
 
     private static class MarkerColumnValue {
 
@@ -36,7 +37,7 @@ class QueryToTreeConverter {
         }
     }
 
-    private final Query query;
+    private final AbstractQuery<?> query;
 
     private final ResultSet resultSet;
 
@@ -49,50 +50,50 @@ class QueryToTreeConverter {
 
     private LinkedHashMap<Number, Row> tree;
 
-    public QueryToTreeConverter(Query query) {
+    public QueryToTreeConverter(AbstractQuery<?> query) {
         this.query = query;
         try {
             this.resultSet = query.getPreparedStatement().executeQuery();
-            this.metaData = resultSet.getMetaData();
+            this.metaData = this.resultSet.getMetaData();
 
             createResultSetColumns();
             createTree();
 
-            resultSet.close();
+            this.resultSet.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void createResultSetColumns() throws SQLException {
-        for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            String label = query.getlSql().getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
+        for (int i = 1; i <= this.metaData.getColumnCount(); i++) {
+            String label = this.query.getlSql().getDialect().identifierSqlToJava(this.metaData.getColumnLabel(i));
             label = label.trim();
 
             // Marker column?
-            if (label.startsWith(markerColumnPrefix)) {
-                String fullPath = label.substring(markerColumnPrefix.length());
+            if (label.startsWith(this.markerColumnPrefix)) {
+                String fullPath = label.substring(this.markerColumnPrefix.length());
                 ResultSetColumn rsc = new ResultSetColumn(i, "marker column " + i + " [" + label + "]", fullPath);
-                resultSetColumns.put(i, rsc);
+                this.resultSetColumns.put(i, rsc);
                 continue;
             }
 
             // Registered Converter
-            Converter converter = query.getConverterForResultSetColumn(metaData, i, label);
+            Converter converter = this.query.getConverterForResultSetColumn(this.metaData, i, label);
             ResultSetColumn rsc = new ResultSetColumn(i, label, converter);
-            resultSetColumns.put(i, rsc);
+            this.resultSetColumns.put(i, rsc);
         }
     }
 
     private void createTree() throws SQLException {
         LinkedHashMap<Number, Row> tree = Maps.newLinkedHashMap();
 
-        while (resultSet.next()) {
+        while (this.resultSet.next()) {
             List<MarkerColumnValue> markers = Lists.newLinkedList();
             Row row = null;
 
-            for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                ResultSetColumn rsc = resultSetColumns.get(i);
+            for (int i = 1; i <= this.metaData.getColumnCount(); i++) {
+                ResultSetColumn rsc = this.resultSetColumns.get(i);
 
                 if (rsc.isMarkerColumn()) {
                     Optional<MarkerColumnValue> markerOpt = getMarkerColumnValue(i, rsc);
@@ -106,7 +107,11 @@ class QueryToTreeConverter {
 
                 if (!rsc.isMarkerColumn()) {
                     if (row != null) {
-                        row.put(rsc.getName(), rsc.getConverter().getValueFromResultSet(query.getlSql(), resultSet, i));
+                        row.put(rsc.getName(),
+                                rsc.getConverter().getValueFromResultSet(
+                                        this.query.getlSql(),
+                                        this.resultSet,
+                                        i));
                     }
                 }
             }
