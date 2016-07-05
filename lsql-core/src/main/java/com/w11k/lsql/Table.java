@@ -6,7 +6,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.typemapper.TypeMapper;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.DeleteException;
 import com.w11k.lsql.exceptions.InsertException;
@@ -44,11 +44,11 @@ public class Table {
         fetchMeta();
     }
 
-    public Map<String, TypeMapper> getColumnConverters() {
-        Map<String, TypeMapper> converters = Maps.newLinkedHashMap();
+    public Map<String, Converter> getColumnConverters() {
+        Map<String, Converter> converters = Maps.newLinkedHashMap();
         for (String name : this.columns.keySet()) {
             Column column = this.columns.get(name);
-            converters.put(name, column.getTypeMapper());
+            converters.put(name, column.getConverter());
         }
         return converters;
     }
@@ -189,13 +189,13 @@ public class Table {
             String pkColumn = getPrimaryKeyColumn().get();
             Object id = row.get(pkColumn);
             Column column = column(pkColumn);
-            column.getTypeMapper().setValueInStatement(lSql, ps, columns.size() + 1, id);
+            column.getConverter().setValueInStatement(lSql, ps, columns.size() + 1, id);
 
             // Set Revision
             if (revisionColumn.isPresent()) {
                 Column col = revisionColumn.get();
                 Object revision = row.get(col.getColumnName());
-                col.getTypeMapper().setValueInStatement(lSql, ps, columns.size() + 2, revision);
+                col.getConverter().setValueInStatement(lSql, ps, columns.size() + 2, revision);
             }
 
             executeUpdate(ps);
@@ -233,7 +233,7 @@ public class Table {
                 PreparedStatement ps = lSql.getDialect().getStatementCreator()
                         .createCountForIdStatement(this);
                 Column column = column(getPrimaryKeyColumn().get());
-                column.getTypeMapper().setValueInStatement(lSql, ps, 1, id);
+                column.getConverter().setValueInStatement(lSql, ps, 1, id);
                 ps.setObject(1, id);
                 ResultSet rs = ps.executeQuery();
                 rs.next();
@@ -276,14 +276,14 @@ public class Table {
         try {
             Column column = column(getPrimaryKeyColumn().get());
             Object id = row.get(getPrimaryKeyColumn().get());
-            column.getTypeMapper().setValueInStatement(lSql, ps, 1, id);
+            column.getConverter().setValueInStatement(lSql, ps, 1, id);
             if (revisionColumn.isPresent()) {
                 Column revCol = revisionColumn.get();
                 Object revVal = row.get(revCol.getColumnName());
                 if (revVal == null) {
                     throw new IllegalStateException("Row must contain a revision.");
                 }
-                revCol.getTypeMapper().setValueInStatement(lSql, ps, 2, revVal);
+                revCol.getConverter().setValueInStatement(lSql, ps, 2, revVal);
             }
             executeUpdate(ps);
         } catch (Exception e) {
@@ -307,13 +307,13 @@ public class Table {
         String pkColumn = getPrimaryKeyColumn().get();
         Column column = column(pkColumn);
         try {
-            column.getTypeMapper().setValueInStatement(lSql, ps, 1, id);
+            column.getConverter().setValueInStatement(lSql, ps, 1, id);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         RowQuery query = new RowQuery(lSql, ps);
         for (String columnInTable : this.columns.keySet()) {
-            query.addConverter(columnInTable, this.columns.get(columnInTable).getTypeMapper());
+            query.addConverter(columnInTable, this.columns.get(columnInTable).getConverter());
         }
         Optional<Row> first = query.first();
         if (first.isPresent()) {
@@ -410,7 +410,7 @@ public class Table {
         return "Table{tableName='" + tableName + "'}";
     }
 
-    protected TypeMapper getConverter(String javaColumnName, int sqlType) {
+    protected Converter getConverter(String javaColumnName, int sqlType) {
         return this.lSql.getDialect().getConverterRegistry().getConverterForSqlType(sqlType);
     }
 
@@ -461,7 +461,7 @@ public class Table {
         Column revCol = revisionColumn.get();
         PreparedStatement revQuery =
                 lSql.getDialect().getStatementCreator().createRevisionQueryStatement(this);
-        revCol.getTypeMapper().setValueInStatement(lSql, revQuery, 1, id);
+        revCol.getConverter().setValueInStatement(lSql, revQuery, 1, id);
         ResultSet resultSet = revQuery.executeQuery();
         resultSet.next();
         return resultSet.getObject(1);
@@ -498,8 +498,8 @@ public class Table {
                 int columnSize = columnsMetaData.getInt(7);
                 String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
                 int sqlType = columnsMetaData.getInt(5);
-                TypeMapper typeMapper = getConverter(javaColumnName, sqlType);
-                Column column = new Column(of(this), javaColumnName, sqlType, typeMapper, columnSize);
+                Converter converter = getConverter(javaColumnName, sqlType);
+                Column column = new Column(of(this), javaColumnName, sqlType, converter, columnSize);
                 this.columns.put(javaColumnName, column);
             }
         } catch (SQLException e) {
@@ -511,8 +511,8 @@ public class Table {
                                                            List<String> columns, Row row) {
         try {
             for (int i = 0; i < columns.size(); i++) {
-                TypeMapper typeMapper = column(columns.get(i)).getTypeMapper();
-                typeMapper.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)));
+                Converter converter = column(columns.get(i)).getConverter();
+                converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)));
             }
             return ps;
         } catch (SQLException e) {

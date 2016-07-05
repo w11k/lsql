@@ -7,7 +7,7 @@ import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.ResultSetColumn;
 import com.w11k.lsql.ResultSetWithColumns;
-import com.w11k.lsql.typemapper.TypeMapper;
+import com.w11k.lsql.converter.Converter;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -27,7 +27,7 @@ public abstract class AbstractQuery<T> {
 
     private final PreparedStatement preparedStatement;
 
-    private Map<String, TypeMapper> converters = Maps.newHashMap();
+    private Map<String, Converter> converters = Maps.newHashMap();
 
     private boolean ignoreDuplicateColumns = false;
 
@@ -49,17 +49,17 @@ public abstract class AbstractQuery<T> {
         return preparedStatement;
     }
 
-    public Map<String, TypeMapper> getConverters() {
+    public Map<String, Converter> getConverters() {
         return converters;
     }
 
-    public AbstractQuery setConverters(Map<String, TypeMapper> converters) {
+    public AbstractQuery setConverters(Map<String, Converter> converters) {
         this.converters = converters;
         return this;
     }
 
-    public AbstractQuery addConverter(String columnName, TypeMapper typeMapper) {
-        this.converters.put(columnName, typeMapper);
+    public AbstractQuery addConverter(String columnName, Converter converter) {
+        this.converters.put(columnName, converter);
         return this;
     }
 
@@ -106,7 +106,7 @@ public abstract class AbstractQuery<T> {
             @Override
             public void call(Subscriber<? super ResultSetWithColumns> subscriber) {
                 try {
-                    ResultSet resultSet = preparedStatement.executeQuery();
+                    ResultSet resultSet = AbstractQuery.this.preparedStatement.executeQuery();
                     ResultSetMetaData metaData = resultSet.getMetaData();
 
                     // used to find duplicates
@@ -125,9 +125,9 @@ public abstract class AbstractQuery<T> {
                         }
                         processedColumnLabels.add(columnLabel);
 
-                        TypeMapper typeMapper = getConverterForResultSetColumn(metaData, i, columnLabel);
+                        Converter converter = getConverterForResultSetColumn(metaData, i, columnLabel);
 
-                        resultSetColumns.add(new ResultSetColumn(i, columnLabel, typeMapper));
+                        resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
                     }
 
                     // Check for unused converters
@@ -179,7 +179,7 @@ public abstract class AbstractQuery<T> {
                 setValue(
                         entity,
                         column.getName(),
-                        column.getTypeMapper().getValueFromResultSet(lSql, resultSet, column.getPosition()));
+                        column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -191,14 +191,14 @@ public abstract class AbstractQuery<T> {
 
     abstract protected void setValue(T entity, String name, Object value);
 
-    public TypeMapper getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
+    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
             throws SQLException {
 
         // Check for user provided Converter
         if (converters.containsKey(columnLabel)) {
-            TypeMapper typeMapper = converters.get(columnLabel);
-            if (typeMapper != null) {
-                return typeMapper;
+            Converter converter = converters.get(columnLabel);
+            if (converter != null) {
+                return converter;
             }
         }
 
@@ -209,7 +209,7 @@ public abstract class AbstractQuery<T> {
                 && tableName.length() > 0
                 && columnName != null
                 && columnName.length() > 0) {
-            return lSql.table(tableName).column(columnName).getTypeMapper();
+            return lSql.table(tableName).column(columnName).getConverter();
         }
 
         // Check if the user registered null as a Converter to use a type-based Converter

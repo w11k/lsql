@@ -21,7 +21,7 @@ public class SqlServerDialect extends GenericDialect {
         }
 
         Optional<Object> id = Optional.of(table.column(table.getPrimaryKeyColumn().get())
-                .getTypeMapper().getValueFromResultSet(getlSql(), resultSet, 1));
+                .getConverter().getValueFromResultSet(getlSql(), resultSet, 1));
 
         // Weird behaviour in SQL Server. Generated INT PRIMARY KEYS are returned
         // as NUMERIC. Hence we convert double to int because we assume that nobody would

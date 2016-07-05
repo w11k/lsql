@@ -146,7 +146,7 @@ public class LSql {
     @SuppressWarnings("unchecked")
     public synchronized <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
         if (!this.pojoTables.containsKey(tableName)) {
-            this.pojoTables.put(tableName, new PojoTable<T>(this, tableName, pojoClass));
+            this.pojoTables.put(tableName, new PojoTable<T>(table(tableName), pojoClass));
         }
 
         PojoTable<T> pojoTable = (PojoTable<T>) this.pojoTables.get(tableName);

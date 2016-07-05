@@ -1,4 +1,4 @@
-package com.w11k.lsql.typemapper;
+package com.w11k.lsql.converter;
 
 import com.google.common.collect.Maps;
 import com.w11k.lsql.utils.SqlTypesNames;
@@ -43,40 +43,40 @@ public class ConverterRegistry {
     }
 
 
-    private final Map<Class<?>, TypeMapper> defaultJavaToSqlConverters = Maps.newHashMap();
+    private final Map<Class<?>, Converter> defaultJavaToSqlConverters = Maps.newHashMap();
 
-    private final Map<Integer, TypeMapper> defaultSqlToJavaConverters = Maps.newHashMap();
+    private final Map<Integer, Converter> defaultSqlToJavaConverters = Maps.newHashMap();
 
-    private final Map<JavaSqlTypePair, TypeMapper> javaAndSqlTypePairConverters = Maps.newHashMap();
+    private final Map<JavaSqlTypePair, Converter> javaAndSqlTypePairConverters = Maps.newHashMap();
 
-    public TypeMapper getConverterForSqlType(int sqlType) {
-        TypeMapper typeMapper = this.defaultSqlToJavaConverters.get(sqlType);
-        if (typeMapper != null) {
-            return typeMapper;
+    public Converter getConverterForSqlType(int sqlType) {
+        Converter converter = this.defaultSqlToJavaConverters.get(sqlType);
+        if (converter != null) {
+            return converter;
         }
         String msg = "No converter for SQL type '" + SqlTypesNames.getName(sqlType) + "'. ";
         throw new IllegalArgumentException(msg);
     }
 
-    public TypeMapper getConverterForJavaType(Class<?> clazz) {
+    public Converter getConverterForJavaType(Class<?> clazz) {
         clazz = convertPrimitiveClassToWrapperClass(clazz);
-        TypeMapper typeMapper = this.defaultJavaToSqlConverters.get(clazz);
-        if (typeMapper != null) {
-            return typeMapper;
+        Converter converter = this.defaultJavaToSqlConverters.get(clazz);
+        if (converter != null) {
+            return converter;
         }
         String msg = "No converter for Java type '" + clazz + "'. ";
         throw new IllegalArgumentException(msg);
     }
 
-    public void addConverter(TypeMapper typeMapper) {
-        for (int sqlType : typeMapper.getSqlTypes()) {
-            this.defaultSqlToJavaConverters.put(sqlType, typeMapper);
+    public void addConverter(Converter converter) {
+        for (int sqlType : converter.getSqlTypes()) {
+            this.defaultSqlToJavaConverters.put(sqlType, converter);
             this.javaAndSqlTypePairConverters.put(
-                    new JavaSqlTypePair(typeMapper.getJavaType(), sqlType),
-                    typeMapper
+                    new JavaSqlTypePair(converter.getJavaType(), sqlType),
+                    converter
             );
         }
-        this.defaultJavaToSqlConverters.put(typeMapper.getJavaType(), typeMapper);
+        this.defaultJavaToSqlConverters.put(converter.getJavaType(), converter);
     }
 
     private Class<?> convertPrimitiveClassToWrapperClass(Class<?> clazz) {

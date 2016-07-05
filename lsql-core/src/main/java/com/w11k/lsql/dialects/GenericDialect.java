@@ -4,8 +4,8 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.typemapper.ConverterRegistry;
-import com.w11k.lsql.typemapper.sqltypes.*;
+import com.w11k.lsql.converter.ConverterRegistry;
+import com.w11k.lsql.converter.sqltypes.*;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -29,16 +29,16 @@ public class GenericDialect {
     public GenericDialect() {
         // http://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html
 
-        this.converterRegistry.addConverter(IntTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(DoubleTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(FloatTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(BooleanTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(StringTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(BinaryTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(ByteTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(BlobTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(ClobTypeMapper.INSTANCE);
-        this.converterRegistry.addConverter(JodaDateTypeMapper.INSTANCE);
+        this.converterRegistry.addConverter(IntConverter.INSTANCE);
+        this.converterRegistry.addConverter(DoubleConverter.INSTANCE);
+        this.converterRegistry.addConverter(FloatConverter.INSTANCE);
+        this.converterRegistry.addConverter(BooleanConverter.INSTANCE);
+        this.converterRegistry.addConverter(StringConverter.INSTANCE);
+        this.converterRegistry.addConverter(BinaryConverter.INSTANCE);
+        this.converterRegistry.addConverter(ByteConverter.INSTANCE);
+        this.converterRegistry.addConverter(BlobConverter.INSTANCE);
+        this.converterRegistry.addConverter(ClobConverter.INSTANCE);
+        this.converterRegistry.addConverter(JodaDateConverter.INSTANCE);
 
 
         // TODO Missing primitives
@@ -114,7 +114,7 @@ public class GenericDialect {
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             String label = metaData.getColumnLabel(i);
             if (identifierSqlToJava(label).equals(pkName)) {
-                return of(table.column(pkName).getTypeMapper()
+                return of(table.column(pkName).getConverter()
                         .getValueFromResultSet(getlSql(), resultSet, i));
             }
         }

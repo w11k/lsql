@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 
 import static org.testng.Assert.assertEquals;
 
-public class RowQueryToTreeTypeMapperTest extends AbstractLSqlTest {
+public class RowQueryToTreeConverterTest extends AbstractLSqlTest {
 
     private TreeTestData treeTestData;
 

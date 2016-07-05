@@ -1,8 +1,6 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.typemapper.TypeMapper;
-import com.w11k.lsql.utils.SqlTypesNames;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -15,26 +13,27 @@ public class PojoTable<T> {
 
     private final PojoMapper<T> pojoMapper;
 
-    public PojoTable(final LSql lSql, String tableName, final Class<T> pojoClass) {
+    public PojoTable(Table table, final Class<T> pojoClass) {
         this.pojoClass = pojoClass;
-        this.pojoMapper = new PojoMapper<T>(lSql, pojoClass, true);
+        this.table = table;
+        this.pojoMapper = new PojoMapper<T>(table.getlSql(), pojoClass, true);
 
-        this.table = new Table(lSql, tableName) {
-            @Override
-            protected TypeMapper getConverter(String javaColumnName, int sqlType) {
-                Class<?> returnType = PojoTable.this.pojoMapper.getPropertyDescriptor(javaColumnName)
-                        .getReadMethod().getReturnType();
-                TypeMapper typeMapper = lSql.getDialect().getConverterRegistry().getConverterForJavaType(returnType);
-
-                if (!typeMapper.supportsSqlType(sqlType)) {
-                    String msg = "converter for Java type '" + typeMapper.getJavaType().getCanonicalName() + "' " +
-                            "does not support SQL type '" + SqlTypesNames.getName(sqlType) + "'";
-                    throw new IllegalArgumentException(msg);
-                }
-
-                return typeMapper;
-            }
-        };
+//        new Table(lSql, tableName) {
+//            @Override
+//            protected TypeMapper getConverter(String javaColumnName, int sqlType) {
+//                Class<?> returnType = PojoTable.this.pojoMapper.getPropertyDescriptor(javaColumnName)
+//                        .getReadMethod().getReturnType();
+//                TypeMapper typeMapper = lSql.getDialect().getConverterRegistry().getConverterForJavaType(returnType);
+//
+//                if (!typeMapper.supportsSqlType(sqlType)) {
+//                    String msg = "converter for Java type '" + typeMapper.getJavaType().getCanonicalName() + "' " +
+//                            "does not support SQL type '" + SqlTypesNames.getName(sqlType) + "'";
+//                    throw new IllegalArgumentException(msg);
+//                }
+//
+//                return typeMapper;
+//            }
+//        };
     }
 
     public Class<T> getPojoClass() {

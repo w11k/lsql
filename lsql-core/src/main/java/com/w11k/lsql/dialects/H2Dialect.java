@@ -26,7 +26,7 @@ public class H2Dialect extends GenericDialect {
         }
 
         return Optional.of(table.column(table.getPrimaryKeyColumn().get())
-                .getTypeMapper().getValueFromResultSet(getlSql(), resultSet, 1));
+                .getConverter().getValueFromResultSet(getlSql(), resultSet, 1));
     }
 
 }

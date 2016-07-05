@@ -1,77 +1,37 @@
 package com.w11k.lsql.tests.pojo;
 
-import com.w11k.lsql.query.PojoQuery;
+import com.w11k.lsql.converter.predefined.AtomicIntegerConverter;
 import com.w11k.lsql.tests.AbstractLSqlTest;
-import com.w11k.lsql.typemapper.predefined.AtomicIntegerTypeMapper;
+import com.w11k.lsql.tests.testdata.Person;
+import com.w11k.lsql.tests.testdata.PersonTestData;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.testng.Assert.assertEquals;
 
 public class PojoQueryTest extends AbstractLSqlTest {
 
-    public static class Table1 {
-
-        private String name;
-
-        private int age;
-
-        public String getName() {
-            return this.name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getAge() {
-            return this.age;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
-        }
-    }
-
-    public static class Table1WithAtomicInteger extends PojoTableTest.Table1Pojo {
-
-        private AtomicInteger ai = new AtomicInteger(1);
-
-        public AtomicInteger getAi() {
-            return this.ai;
-        }
-
-        public void setAi(AtomicInteger ai) {
-            this.ai = ai;
-        }
-    }
-
     @Test
     public void executeRawQuery() {
-        createTable("CREATE TABLE table1 (name TEXT, age INT)");
-        this.lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('name1', 20)");
-        this.lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('name2', 30)");
+        PersonTestData.init(this.lSql, true);
 
-        List<Table1> rows = this.lSql.executeRawQuery(
-                "SELECT * FROM table1 order by age",
-                Table1.class).toList();
+        List<Person> rows = this.lSql.executeRawQuery(
+                PersonTestData.SELECT_ALL_ORDER_BY_ID,
+                Person.class).toList();
 
         assertEquals(rows.size(), 2);
-        assertEquals(rows.get(0).getAge(), 20);
-        assertEquals(rows.get(0).getName(), "name1");
-        assertEquals(rows.get(1).getAge(), 30);
-        assertEquals(rows.get(1).getName(), "name2");
+        assertEquals(rows.get(0).getFirstName(), "Adam");
+        assertEquals(rows.get(1).getFirstName(), "Eve");
     }
 
     @Test
     public void fieldsUseConverterRegistry() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, name TEXT, ai INTEGER)");
+        createTable("CREATE TABLE table1 (name TEXT, age INT, ai INTEGER)");
         this.lSql.executeRawSql("INSERT INTO table1 (id, name, ai) VALUES (1, 'name1', 88)");
         this.lSql.executeRawSql("INSERT INTO table1 (id, name, ai) VALUES (2, 'name2', 99)");
 
-        this.lSql.getDialect().getConverterRegistry().addConverter(new AtomicIntegerTypeMapper());
+        this.lSql.getDialect().getConverterRegistry().addConverter(new AtomicIntegerConverter());
         PojoQuery<Table1WithAtomicInteger> query =
                 this.lSql.executeRawQuery("select * from table1 order by id", Table1WithAtomicInteger.class);
 
@@ -81,18 +41,33 @@ public class PojoQueryTest extends AbstractLSqlTest {
         assertEquals(list.get(1).getAi().get(), 99);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*No converter.*")
+    @Test(
+            expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp = ".*No converter.*"
+    )
     public void failOnFieldsWithMissingConverters() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai INTEGER)");
-        this.lSql.table("table1", PojoTableTest.Table1WithAtomicInteger.class);
+        createTable("CREATE TABLE table1 (name TEXT, age INT, ai INTEGER)");
+        this.lSql.executeRawSql("INSERT INTO table1 (id, name, ai) VALUES (1, 'name1', 88)");
+        PojoQuery<Table1WithAtomicInteger> query = this.lSql.executeRawQuery(
+                "select * from table1",
+                Table1WithAtomicInteger.class
+        );
+        query.toList();
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*converter.*not support.*")
+    @Test(
+            expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp = ".*converter.*not support.*"
+    )
     public void failWhenConverterCanNotConvertBetweenJavaAndSqlType() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai VARCHAR(10))");
-        this.lSql.getDialect().getConverterRegistry()
-                .addConverter(new AtomicIntegerTypeMapper());
-        this.lSql.table("table1", PojoTableTest.Table1WithAtomicInteger.class);
+        createTable("CREATE TABLE table1 (name TEXT, age INT, ai VARCHAR(10))");
+        this.lSql.table("table1").column("ai").setConverter(new AtomicIntegerConverter());
+        this.lSql.executeRawSql("INSERT INTO table1 (id, name, ai) VALUES (1, 'name1', 88)");
+        PojoQuery<Table1WithAtomicInteger> query = this.lSql.executeRawQuery(
+                "select * from table1",
+                Table1WithAtomicInteger.class
+        );
+        query.toList();
     }
 
 }
