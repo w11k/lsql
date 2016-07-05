@@ -34,7 +34,8 @@ public abstract class Converter {
     public void failOnWrongValueType(Object val) {
         if (!isValueValid(val)) {
             throw new IllegalArgumentException(
-                    "value '" + val + "' does not match expected type " +
+                    "value '" + val + "' of type '" + val.getClass().getCanonicalName() + "' " +
+                            "does not match expected type " +
                             "'" + getJavaType().getCanonicalName() + "'"
             );
         }
@@ -89,15 +90,6 @@ public abstract class Converter {
 //        return true;
 //    }
 
-    protected abstract void setValue(LSql lSql, PreparedStatement ps, int index,
-                                     Object val) throws SQLException;
-
-    protected abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
-
-    protected boolean isNullValid() {
-        return true;
-    }
-
     public boolean supportsSqlType(int sqlType) {
         for (int type : this.sqlTypes) {
             if (type == sqlType) {
@@ -126,5 +118,14 @@ public abstract class Converter {
                 ", sqlTypes=" + Arrays.toString(sqlTypes) +
                 ", sqlTypeForNullValues=" + sqlTypeForNullValues +
                 '}';
+    }
+
+    protected abstract void setValue(LSql lSql, PreparedStatement ps, int index,
+                                     Object val) throws SQLException;
+
+    protected abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
+
+    protected boolean isNullValid() {
+        return true;
     }
 }

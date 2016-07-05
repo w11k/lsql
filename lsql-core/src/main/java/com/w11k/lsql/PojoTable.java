@@ -1,6 +1,8 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
+import com.w11k.lsql.converter.Converter;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -16,24 +18,13 @@ public class PojoTable<T> {
     public PojoTable(Table table, final Class<T> pojoClass) {
         this.pojoClass = pojoClass;
         this.table = table;
-        this.pojoMapper = new PojoMapper<T>(table.getlSql(), pojoClass, true);
+        this.pojoMapper = new PojoMapper<T>(pojoClass);
 
-//        new Table(lSql, tableName) {
-//            @Override
-//            protected TypeMapper getConverter(String javaColumnName, int sqlType) {
-//                Class<?> returnType = PojoTable.this.pojoMapper.getPropertyDescriptor(javaColumnName)
-//                        .getReadMethod().getReturnType();
-//                TypeMapper typeMapper = lSql.getDialect().getConverterRegistry().getConverterForJavaType(returnType);
-//
-//                if (!typeMapper.supportsSqlType(sqlType)) {
-//                    String msg = "converter for Java type '" + typeMapper.getJavaType().getCanonicalName() + "' " +
-//                            "does not support SQL type '" + SqlTypesNames.getName(sqlType) + "'";
-//                    throw new IllegalArgumentException(msg);
-//                }
-//
-//                return typeMapper;
-//            }
-//        };
+        Map<String, Converter> converters = Maps.newHashMap();
+        for (String column : table.getColumns().keySet()) {
+            converters.put(column, table.getColumns().get(column).getConverter());
+        }
+        this.pojoMapper.checkConformity(converters);
     }
 
     public Class<T> getPojoClass() {

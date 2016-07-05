@@ -4,11 +4,12 @@ import com.google.common.base.Optional;
 import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.PojoTable;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.converter.predefined.AtomicIntegerConverter;
 import com.w11k.lsql.tests.AbstractLSqlTest;
-import com.w11k.lsql.tests.testdata.Person;
-import com.w11k.lsql.tests.testdata.PersonSubclass;
-import com.w11k.lsql.tests.testdata.PersonTestData;
+import com.w11k.lsql.tests.testdata.*;
 import org.testng.annotations.Test;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.testng.Assert.*;
 
@@ -94,36 +95,48 @@ public class PojoTableTest extends AbstractLSqlTest {
         personTable.insert(p);
     }
 
-//    @Test
-//    public void fieldsUseConverterRegistry() {
-//        PersonTestData.init(this.lSql, false);
-//        this.lSql.getDialect().getConverterRegistry().addConverter(new AtomicIntegerConverter());
-//        PojoTable<Table1WithAtomicInteger> table1 = this.lSql.table("table1", Table1WithAtomicInteger.class);
-//        Table1WithAtomicInteger t1 = new Table1WithAtomicInteger();
-//        t1.setId(1);
-//        t1.setAi(new AtomicInteger(2));
-//        t1.setFirstName("Max");
-//        table1.insert(t1);
-//    }
-//
-//    @Test(
-//            expectedExceptions = IllegalArgumentException.class,
-//            expectedExceptionsMessageRegExp = ".*No converter.*"
-//    )
-//    public void failOnFieldsWithMissingConverters() {
-//        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai INTEGER)");
-//        this.lSql.table("table1", Table1WithAtomicInteger.class);
-//    }
-//
-//    @Test(
-//            expectedExceptions = IllegalArgumentException.class,
-//            expectedExceptionsMessageRegExp = ".*converter.*not support.*"
-//    )
-//    public void failWhenConverterCanNotConvertBetweenJavaAndSqlType() {
-//        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai VARCHAR(10))");
-//        this.lSql.getDialect().getConverterRegistry()
-//                .addConverter(new AtomicIntegerConverter());
-//        this.lSql.table("table1", Table1WithAtomicInteger.class);
-//    }
+    @Test
+    public void fieldsUsesColumnConverter() {
+        PersonTestData.init(this.lSql, false);
+        this.lSql.table("person").column("age").setConverter(new AtomicIntegerConverter());
+
+        PojoTable<PersonWithAtomicIntegerAge> personTable = this.lSql.table("person", PersonWithAtomicIntegerAge.class);
+        PersonWithAtomicIntegerAge adam1 = new PersonWithAtomicIntegerAge(1, "Adam", new AtomicInteger(30));
+        personTable.insert(adam1);
+
+        PersonWithAtomicIntegerAge adam2 = personTable.load(1).get();
+        assertEquals(adam1, adam2);
+
+        Object ai = this.lSql.table("person").load(1).get().get("age");
+        assertTrue(ai instanceof AtomicInteger);
+        assertEquals(((AtomicInteger) ai).get(), 30);
+    }
+
+    @Test(
+            expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp = ".*missing field.*title.*String.*"
+    )
+    public void errorMessageOnMissingField() {
+        PersonTestData.init(this.lSql, false);
+        this.lSql.table("person", PersonMissingTitle.class);
+    }
+
+    @Test(
+            expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp = ".*title.*wrong type.*Boolean.*String.*"
+    )
+    public void errorMessageOnWrongFieldType() {
+        PersonTestData.init(this.lSql, false);
+        this.lSql.table("person", PersonWrongTitleType.class);
+    }
+
+    @Test(
+            expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp = ".*superfluous field.*oops.*"
+    )
+    public void errorMessageOnSuperfluousType() {
+        PersonTestData.init(this.lSql, false);
+        this.lSql.table("person", PersonWithSuperfluousField.class);
+    }
 
 }

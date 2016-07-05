@@ -10,6 +10,11 @@ public class PersonWithAtomicIntegerAge {
 
     private AtomicInteger age;
 
+    private String title;
+
+    public PersonWithAtomicIntegerAge() {
+    }
+
     public PersonWithAtomicIntegerAge(int id, String firstName, AtomicInteger age) {
         this.id = id;
         this.firstName = firstName;
@@ -38,6 +43,35 @@ public class PersonWithAtomicIntegerAge {
 
     public void setAge(AtomicInteger age) {
         this.age = age;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PersonWithAtomicIntegerAge that = (PersonWithAtomicIntegerAge) o;
+
+        return this.id == that.id
+                && (this.firstName != null ? this.firstName.equals(that.firstName) : that.firstName == null
+                && (this.age != null ? this.age.equals(that.age) : that.age == null));
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = this.id;
+        result = 31 * result + (this.firstName != null ? this.firstName.hashCode() : 0);
+        result = 31 * result + (this.age != null ? this.age.hashCode() : 0);
+        return result;
     }
 
     @Override

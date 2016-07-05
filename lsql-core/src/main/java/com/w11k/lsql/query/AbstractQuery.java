@@ -1,7 +1,6 @@
 package com.w11k.lsql.query;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
@@ -17,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -113,25 +113,26 @@ public abstract class AbstractQuery<T> {
                     // or unused converter
                     Set<String> processedColumnLabels = Sets.newLinkedHashSet();
 
-                    // queryConverters for columns
-                    List<ResultSetColumn> resultSetColumns = Lists.newLinkedList();
+                    Map<String, ResultSetColumn> resultSetColumns = Maps.newLinkedHashMap();
+                    Map<String, Converter> converters = Maps.newLinkedHashMap();
 
                     for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                        String columnLabel = lSql.getDialect().identifierSqlToJava(metaData.getColumnLabel(i));
+                        String columnLabel = AbstractQuery.this.lSql.getDialect()
+                                .identifierSqlToJava(metaData.getColumnLabel(i));
 
                         // check duplicates
-                        if (!ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel)) {
+                        if (!AbstractQuery.this.ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel)) {
                             throw new IllegalStateException("Duplicate column '" + columnLabel + "' in query.");
                         }
                         processedColumnLabels.add(columnLabel);
 
                         Converter converter = getConverterForResultSetColumn(metaData, i, columnLabel);
-
-                        resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
+                        resultSetColumns.put(columnLabel, new ResultSetColumn(i, columnLabel, converter));
+                        converters.put(columnLabel, converter);
                     }
 
                     // Check for unused converters
-                    for (String converterFor : converters.keySet()) {
+                    for (String converterFor : AbstractQuery.this.converters.keySet()) {
                         if (!processedColumnLabels.contains(converterFor)) {
                             throw new IllegalArgumentException(
                                     "unused converter for column '" + converterFor + "'");
@@ -140,6 +141,8 @@ public abstract class AbstractQuery<T> {
 
                     ResultSetWithColumns resultSetWithColumns =
                             new ResultSetWithColumns(resultSet, resultSetColumns);
+
+                    checkConformity(converters);
 
                     while (resultSet.next() && !subscriber.isUnsubscribed()) {
                         subscriber.onNext(resultSetWithColumns);
@@ -152,44 +155,6 @@ public abstract class AbstractQuery<T> {
             }
         });
     }
-
-//    @Experimental
-//    public LinkedHashMap<Number, Row> toTree() {
-//        return new QueryToTreeConverter(this).getTree();
-//    }
-
-//    @Experimental
-//    public <T> List<T> toPojo(Class<T> classForTopLevelRows) {
-//        LinkedHashMap<Number, Row> tree = this.toTree();
-//        Collection<Row> roots = tree.values();
-//        List<T> rootPojos = Lists.newLinkedList();
-//        for (Row root : roots) {
-//            T rootPojo = this.lSql.getObjectMapper().convertValue(root, classForTopLevelRows);
-//            rootPojos.add(rootPojo);
-//        }
-//        return rootPojos;
-//    }
-
-    protected T extractEntity(ResultSetWithColumns resultSetWithColumns) {
-        ResultSet resultSet = resultSetWithColumns.getResultSet();
-        List<ResultSetColumn> columnList = resultSetWithColumns.getResultSetColumns();
-        T entity = createEntity();
-        for (ResultSetColumn column : columnList) {
-            try {
-                setValue(
-                        entity,
-                        column.getName(),
-                        column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return entity;
-    }
-
-    abstract protected T createEntity();
-
-    abstract protected void setValue(T entity, String name, Object value);
 
     public Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
             throws SQLException {
@@ -224,5 +189,28 @@ public abstract class AbstractQuery<T> {
         String msg = "Unable to determine a Converter instance for column '" + columnLabel + "'. ";
         msg += "Register a converter with Query#addConverter() / Query#setConverters().";
         throw new IllegalStateException(msg);
+    }
+
+    protected abstract T createEntity();
+
+    protected abstract void checkConformity(Map<String, Converter> converters);
+
+    protected abstract void setValue(T entity, String name, Object value);
+
+    private T extractEntity(ResultSetWithColumns resultSetWithColumns) {
+        ResultSet resultSet = resultSetWithColumns.getResultSet();
+        Collection<ResultSetColumn> columnList = resultSetWithColumns.getResultSetColumns().values();
+        T entity = createEntity();
+        for (ResultSetColumn column : columnList) {
+            try {
+                setValue(
+                        entity,
+                        column.getName(),
+                        column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return entity;
     }
 }

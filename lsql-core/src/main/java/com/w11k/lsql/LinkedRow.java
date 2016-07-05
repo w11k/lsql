@@ -115,7 +115,7 @@ public class LinkedRow extends Row {
     }
 
     public <T> T convertTo(Class<T> pojoClass) {
-        PojoMapper<T> mapper = new PojoMapper<T>(this.getTable().getlSql(), pojoClass, true);
+        PojoMapper<T> mapper = new PojoMapper<T>(pojoClass);
         return mapper.rowToPojo(this);
     }
 

@@ -22,7 +22,7 @@ public class AtomicIntegerConverter extends Converter {
 
     @Override
     protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
-        return new AtomicInteger((int) rs.getInt(index));
+        return new AtomicInteger(rs.getInt(index));
     }
 
 }

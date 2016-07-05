@@ -1,16 +1,15 @@
 package com.w11k.lsql.query;
 
 import com.google.common.collect.Lists;
-import com.w11k.lsql.LSql;
-import com.w11k.lsql.PojoMapper;
-import com.w11k.lsql.QueryToTreeConverter;
-import com.w11k.lsql.Row;
+import com.w11k.lsql.*;
+import com.w11k.lsql.converter.Converter;
 import rx.annotations.Experimental;
 
 import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PojoQuery<T> extends AbstractQuery<T> {
 
@@ -20,7 +19,7 @@ public class PojoQuery<T> extends AbstractQuery<T> {
 
     public PojoQuery(LSql lSql, PreparedStatement preparedStatement, Class<T> pojoClass) {
         super(lSql, preparedStatement);
-        this.pojoMapper = new PojoMapper<T>(lSql, pojoClass, false);
+        this.pojoMapper = new PojoMapper<T>(pojoClass);
         this.pojoClass = pojoClass;
     }
 
@@ -39,6 +38,11 @@ public class PojoQuery<T> extends AbstractQuery<T> {
     @Override
     protected T createEntity() {
         return this.pojoMapper.newInstance();
+    }
+
+    @Override
+    protected void checkConformity(Map<String, Converter> converters) {
+        this.pojoMapper.checkConformity(converters);
     }
 
     @Override

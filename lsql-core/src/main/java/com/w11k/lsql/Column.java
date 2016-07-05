@@ -17,19 +17,19 @@ public class Column {
 
     private final int sqlType;
 
-    private Optional<Table> table;
+    private Table table;
 
     private Converter converter;
 
-    public static Column create(Table table,
-                                    String columnName,
-                                    int sqlType,
-                                    Converter converter,
-                                    int columnSize) {
-
-        Optional<Table> tableOptional = Optional.fromNullable(table);
-        return new Column(tableOptional, columnName, sqlType, converter, columnSize);
-    }
+//    public static Column create(Table table,
+//                                    String columnName,
+//                                    int sqlType,
+//                                    Converter converter,
+//                                    int columnSize) {
+//
+//        Optional<Table> tableOptional = Optional.fromNullable(table);
+//        return new Column(tableOptional, columnName, sqlType, converter, columnSize);
+//    }
 
     /**
      * @param table      The corresponding table. Optional.absent(), if this column is
@@ -39,7 +39,7 @@ public class Column {
      * @param converter  Converter instance used to convert between SQL and Java values.
      * @param columnSize The maximum column size. -1 if not applicable.
      */
-    public Column(Optional<Table> table, String columnName, int sqlType, Converter converter, int columnSize) {
+    Column(Table table, String columnName, int sqlType, Converter converter, int columnSize) {
         this.table = table;
         this.columnName = columnName;
         this.sqlType = sqlType;
@@ -48,27 +48,19 @@ public class Column {
     }
 
     public String getColumnName() {
-        return columnName;
+        return this.columnName;
     }
 
-    public Optional<Table> getTable() {
-        return table;
-    }
-
-    public Optional<String> getTableName() {
-        if (table.isPresent()) {
-            return of(table.get().getTableName());
-        } else {
-            return absent();
-        }
+    public Table getTable() {
+        return this.table;
     }
 
     public int getSqlType() {
-        return sqlType;
+        return this.sqlType;
     }
 
     public Converter getConverter() {
-        return converter;
+        return this.converter;
     }
 
     public void setConverter(Converter converter) {
@@ -76,19 +68,19 @@ public class Column {
     }
 
     public Optional<? extends AbstractValidationError> validateValue(Object value) {
-        if (!converter.isValueValid(value)) {
+        if (!this.converter.isValueValid(value)) {
             return of(new TypeError(
-              getTableName().get(),
-              columnName,
-              converter.getJavaType().getSimpleName(), value.getClass().getSimpleName()));
+              this.table.getTableName(),
+                    this.columnName,
+                    this.converter.getJavaType().getSimpleName(), value.getClass().getSimpleName()));
         }
 
-        Class<?> targetType = converter.getJavaType();
-        if (columnSize != -1 && String.class.isAssignableFrom(targetType)) {
+        Class<?> targetType = this.converter.getJavaType();
+        if (this.columnSize != -1 && String.class.isAssignableFrom(targetType)) {
             String string = (String) value;
-            if (string != null && string.length() > columnSize) {
+            if (string != null && string.length() > this.columnSize) {
                 return of(new StringTooLongError(
-                        getTableName().get(), columnName, columnSize, string.length()));
+                        this.table.getTableName(), this.columnName, this.columnSize, string.length()));
             }
         }
 
@@ -105,17 +97,14 @@ public class Column {
         }
 
         Column that = (Column) o;
-        if (!columnName.equals(that.columnName)) {
-            return false;
-        }
+        return this.columnName.equals(that.columnName) && this.table.equals(that.table);
 
-        return table.equals(that.table);
     }
 
     @Override
     public int hashCode() {
-        int result = table.hashCode();
-        result = 31 * result + columnName.hashCode();
+        int result = this.table.hashCode();
+        result = 31 * result + this.columnName.hashCode();
         return result;
     }
 

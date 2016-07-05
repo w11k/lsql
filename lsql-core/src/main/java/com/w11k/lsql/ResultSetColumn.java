@@ -48,30 +48,30 @@ public class ResultSetColumn {
     }
 
     public int getPosition() {
-        return position;
+        return this.position;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public Converter getConverter() {
-        return converter;
+        return this.converter;
     }
 
     public boolean isMarkerColumn() {
-        return markerColumn;
+        return this.markerColumn;
     }
 
     public int getLevel() {
-        return level;
+        return this.level;
     }
 
     public String getField() {
-        return field;
+        return this.field;
     }
 
     public String getFullPath() {
-        return fullPath;
+        return this.fullPath;
     }
 }
