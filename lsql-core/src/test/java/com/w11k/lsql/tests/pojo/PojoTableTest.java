@@ -4,14 +4,11 @@ import com.google.common.base.Optional;
 import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.PojoTable;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.converter.predefined.AtomicIntegerConverter;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import com.w11k.lsql.tests.testdata.Person;
 import com.w11k.lsql.tests.testdata.PersonSubclass;
 import com.w11k.lsql.tests.testdata.PersonTestData;
 import org.testng.annotations.Test;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.testng.Assert.*;
 
@@ -97,36 +94,36 @@ public class PojoTableTest extends AbstractLSqlTest {
         personTable.insert(p);
     }
 
-    @Test
-    public void fieldsUseConverterRegistry() {
-        PersonTestData.init(this.lSql, false);
-        this.lSql.getDialect().getConverterRegistry().addConverter(new AtomicIntegerConverter());
-        PojoTable<Table1WithAtomicInteger> table1 = this.lSql.table("table1", Table1WithAtomicInteger.class);
-        Table1WithAtomicInteger t1 = new Table1WithAtomicInteger();
-        t1.setId(1);
-        t1.setAi(new AtomicInteger(2));
-        t1.setFirstName("Max");
-        table1.insert(t1);
-    }
-
-    @Test(
-            expectedExceptions = IllegalArgumentException.class,
-            expectedExceptionsMessageRegExp = ".*No converter.*"
-    )
-    public void failOnFieldsWithMissingConverters() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai INTEGER)");
-        this.lSql.table("table1", Table1WithAtomicInteger.class);
-    }
-
-    @Test(
-            expectedExceptions = IllegalArgumentException.class,
-            expectedExceptionsMessageRegExp = ".*converter.*not support.*"
-    )
-    public void failWhenConverterCanNotConvertBetweenJavaAndSqlType() {
-        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai VARCHAR(10))");
-        this.lSql.getDialect().getConverterRegistry()
-                .addConverter(new AtomicIntegerConverter());
-        this.lSql.table("table1", Table1WithAtomicInteger.class);
-    }
+//    @Test
+//    public void fieldsUseConverterRegistry() {
+//        PersonTestData.init(this.lSql, false);
+//        this.lSql.getDialect().getConverterRegistry().addConverter(new AtomicIntegerConverter());
+//        PojoTable<Table1WithAtomicInteger> table1 = this.lSql.table("table1", Table1WithAtomicInteger.class);
+//        Table1WithAtomicInteger t1 = new Table1WithAtomicInteger();
+//        t1.setId(1);
+//        t1.setAi(new AtomicInteger(2));
+//        t1.setFirstName("Max");
+//        table1.insert(t1);
+//    }
+//
+//    @Test(
+//            expectedExceptions = IllegalArgumentException.class,
+//            expectedExceptionsMessageRegExp = ".*No converter.*"
+//    )
+//    public void failOnFieldsWithMissingConverters() {
+//        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai INTEGER)");
+//        this.lSql.table("table1", Table1WithAtomicInteger.class);
+//    }
+//
+//    @Test(
+//            expectedExceptions = IllegalArgumentException.class,
+//            expectedExceptionsMessageRegExp = ".*converter.*not support.*"
+//    )
+//    public void failWhenConverterCanNotConvertBetweenJavaAndSqlType() {
+//        createTable("CREATE TABLE table1 (id INTEGER PRIMARY KEY, first_name TEXT, ai VARCHAR(10))");
+//        this.lSql.getDialect().getConverterRegistry()
+//                .addConverter(new AtomicIntegerConverter());
+//        this.lSql.table("table1", Table1WithAtomicInteger.class);
+//    }
 
 }

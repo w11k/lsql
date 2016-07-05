@@ -500,6 +500,7 @@ public class Table {
                 int sqlType = columnsMetaData.getInt(5);
                 Converter converter = getConverter(javaColumnName, sqlType);
                 Column column = new Column(of(this), javaColumnName, sqlType, converter, columnSize);
+                lSql.getInitColumnCallback().onNewColumn(column);
                 this.columns.put(javaColumnName, column);
             }
         } catch (SQLException e) {

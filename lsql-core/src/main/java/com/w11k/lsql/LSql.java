@@ -45,6 +45,8 @@ public class LSql {
 
     private final Callable<Connection> connectionProvider;
 
+    private InitColumnCallback initColumnCallback = new InitColumnCallback();
+
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
     /**
@@ -102,6 +104,14 @@ public class LSql {
 
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    public InitColumnCallback getInitColumnCallback() {
+        return this.initColumnCallback;
+    }
+
+    public void setInitColumnCallback(InitColumnCallback initColumnCallback) {
+        this.initColumnCallback = initColumnCallback;
     }
 
     /**
