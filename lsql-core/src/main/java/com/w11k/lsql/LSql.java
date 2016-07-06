@@ -207,11 +207,11 @@ public class LSql {
     }
 
     public String identifierSqlToJava(String sqlName) {
-        return getDialect().getCaseFormatConverter().sqlToJava(sqlName);
+        return getDialect().getIdentifierConverter().sqlToJava(sqlName);
     }
 
     public String identifierJavaToSql(String javaName) {
-        return getDialect().getCaseFormatConverter().javaToSql(javaName);
+        return getDialect().getIdentifierConverter().javaToSql(javaName);
     }
 
     @Override

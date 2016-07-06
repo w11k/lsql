@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class H2Dialect extends GenericDialect {
 
     public H2Dialect() {
-        setCaseFormatConverter(CaseFormatConverter.JAVA_CAMEL_CASE_TO_SQL_UPPER_UNDERSCORE);
+        setIdentifierConverter(IdentifierConverter.JAVA_CAMEL_CASE_TO_SQL_UPPER_UNDERSCORE);
     }
 
     public Optional<Object> extractGeneratedPk(Table table,

@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static com.w11k.lsql.dialects.CaseFormatConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE;
+import static com.w11k.lsql.dialects.IdentifierConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE;
 import static org.testng.Assert.assertEquals;
 
 public class CaseFormatTest extends AbstractLSqlTest {
@@ -46,7 +46,7 @@ public class CaseFormatTest extends AbstractLSqlTest {
 
     @Test
     public void testTableNameUnderscore() {
-        lSql.getDialect().setCaseFormatConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
+        lSql.getDialect().setIdentifierConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
         createTable("CREATE TABLE AAA_BBB (CCC_DDD INT NULL)");
         lSql.table("aaa_bbb");
     }
@@ -61,7 +61,7 @@ public class CaseFormatTest extends AbstractLSqlTest {
 
     @Test
     public void testColumnNameUnderscore() {
-        lSql.getDialect().setCaseFormatConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
+        lSql.getDialect().setIdentifierConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, CCC_DDD INT NULL)");
         Table table1 = lSql.table("table1");
         table1.insert(Row.fromKeyVals("id", 1, "ccc_ddd", 2));
