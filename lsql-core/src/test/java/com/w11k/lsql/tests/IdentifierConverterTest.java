@@ -1,42 +1,13 @@
 package com.w11k.lsql.tests;
 
-import com.w11k.lsql.LSql;
-import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.dialects.GenericDialect;
-import com.w11k.lsql.jdbc.ConnectionProviders;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.annotations.Test;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
+import static com.w11k.lsql.Row.fromKeyVals;
 import static com.w11k.lsql.dialects.IdentifierConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE;
 import static org.testng.Assert.assertEquals;
 
-public class CaseFormatTest extends AbstractLSqlTest {
-
-    private void initLSql(GenericDialect dialect) {
-        try {
-            super.afterMethod();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        BasicDataSource ds = new BasicDataSource();
-        ds.setDriverClassName(org.h2.Driver.class.getName());
-        ds.setUrl("jdbc:h2:mem:testdb;mode=postgresql");
-        ds.setDefaultAutoCommit(false);
-        TestUtils.clear(ds);
-        Connection connection;
-        try {
-            connection = ds.getConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        this.lSql = new LSql(dialect, ConnectionProviders.fromInstance(connection));
-    }
-
+public class IdentifierConverterTest extends AbstractLSqlTest {
 
     @Test
     public void testTableNameCamelCase() {
@@ -55,7 +26,7 @@ public class CaseFormatTest extends AbstractLSqlTest {
     public void testColumnNameCamelCase() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, ccc_ddd INT NULL)");
         Table table1 = lSql.table("table1");
-        table1.insert(Row.fromKeyVals("id", 1, "cccDdd", 2));
+        table1.insert(fromKeyVals("id", 1, "cccDdd", 2));
         assertEquals(table1.load(1).get().getInt("cccDdd"), new Integer(2));
     }
 
@@ -64,7 +35,7 @@ public class CaseFormatTest extends AbstractLSqlTest {
         lSql.getDialect().setIdentifierConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, CCC_DDD INT NULL)");
         Table table1 = lSql.table("table1");
-        table1.insert(Row.fromKeyVals("id", 1, "ccc_ddd", 2));
+        table1.insert(fromKeyVals("id", 1, "ccc_ddd", 2));
         assertEquals(table1.load(1).get().getInt("ccc_ddd"), new Integer(2));
     }
 }

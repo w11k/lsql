@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.dialects.IdentifierConverter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.DeleteException;
 import com.w11k.lsql.exceptions.InsertException;
@@ -34,8 +33,6 @@ public class Table {
     private final String tableName;
 
     private final Map<String, Column> columns = Maps.newHashMap();
-
-    private IdentifierConverter identifierConverter;
 
     private Optional<String> primaryKeyColumn = absent();
 
@@ -70,14 +67,6 @@ public class Table {
 
     public Map<String, Column> getColumns() {
         return ImmutableMap.copyOf(columns);
-    }
-
-    public IdentifierConverter getIdentifierConverter() {
-        return identifierConverter;
-    }
-
-    public void setIdentifierConverter(IdentifierConverter identifierConverter) {
-        this.identifierConverter = identifierConverter;
     }
 
     /**
@@ -402,22 +391,6 @@ public class Table {
             return of(new KeyError(getTableName(), javaColumnName));
         }
         return column(javaColumnName).validateValue(value);
-    }
-
-    public String identifierSqlToJava(String sqlName) {
-        IdentifierConverter ic = getIdentifierConverter() != null
-                ? getIdentifierConverter()
-                : this.lSql.getDialect().getIdentifierConverter();
-
-        return ic.sqlToJava(sqlName);
-    }
-
-    public String identifierJavaToSql(String javaName) {
-        IdentifierConverter ic = getIdentifierConverter() != null
-                ? getIdentifierConverter()
-                : this.lSql.getDialect().getIdentifierConverter();
-
-        return ic.javaToSql(javaName);
     }
 
     @Override

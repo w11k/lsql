@@ -2,7 +2,6 @@ package com.w11k.lsql;
 
 import com.google.common.base.Optional;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.dialects.IdentifierConverter;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.StringTooLongError;
 import com.w11k.lsql.validation.TypeError;
@@ -21,8 +20,6 @@ public class Column {
     private Table table;
 
     private Converter converter;
-
-    private IdentifierConverter identifierConverter;
 
     private boolean ignored = false;
 
@@ -76,14 +73,6 @@ public class Column {
         this.converter = converter;
     }
 
-    public IdentifierConverter getIdentifierConverter() {
-        return identifierConverter;
-    }
-
-    public void setIdentifierConverter(IdentifierConverter identifierConverter) {
-        this.identifierConverter = identifierConverter;
-    }
-
     public boolean isIgnored() {
         return ignored;
     }
@@ -110,22 +99,6 @@ public class Column {
         }
 
         return absent();
-    }
-
-    public String identifierSqlToJava(String sqlName) {
-        IdentifierConverter ic = getIdentifierConverter() != null
-                ? getIdentifierConverter()
-                : this.table.getlSql().getDialect().getIdentifierConverter();
-
-        return ic.sqlToJava(sqlName);
-    }
-
-    public String identifierJavaToSql(String javaName) {
-        IdentifierConverter ic = getIdentifierConverter() != null
-                ? getIdentifierConverter()
-                : this.table.getlSql().getDialect().getIdentifierConverter();
-
-        return ic.javaToSql(javaName);
     }
 
     @Override
