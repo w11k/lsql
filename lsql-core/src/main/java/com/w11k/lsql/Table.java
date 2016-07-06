@@ -178,11 +178,14 @@ public class Table {
             List<String> columns = createColumnList(row);
             columns.remove(getPrimaryKeyColumn().get());
             if (revisionColumn.isPresent()) {
-                columns.remove(getRevisionColumn().get().getColumnName());
+                columns.remove(getRevisionColumn().get().getJavaColumnName());
             }
 
-            PreparedStatement ps = lSql.getDialect().getStatementCreator()
-                    .createUpdateStatement(this, columns);
+            if (columns.isEmpty()) {
+                return;
+            }
+
+            PreparedStatement ps = lSql.getDialect().getStatementCreator().createUpdateStatement(this, columns);
             setValuesInPreparedStatement(ps, columns, row);
 
             // Set ID
@@ -194,7 +197,7 @@ public class Table {
             // Set Revision
             if (revisionColumn.isPresent()) {
                 Column col = revisionColumn.get();
-                Object revision = row.get(col.getColumnName());
+                Object revision = row.get(col.getJavaColumnName());
                 col.getConverter().setValueInStatement(lSql, ps, columns.size() + 2, revision);
             }
 
@@ -279,7 +282,7 @@ public class Table {
             column.getConverter().setValueInStatement(lSql, ps, 1, id);
             if (revisionColumn.isPresent()) {
                 Column revCol = revisionColumn.get();
-                Object revVal = row.get(revCol.getColumnName());
+                Object revVal = row.get(revCol.getJavaColumnName());
                 if (revVal == null) {
                     throw new IllegalStateException("Row must contain a revision.");
                 }
@@ -312,8 +315,12 @@ public class Table {
             throw new RuntimeException(e);
         }
         RowQuery query = new RowQuery(lSql, ps);
-        for (String columnInTable : this.columns.keySet()) {
-            query.addConverter(columnInTable, this.columns.get(columnInTable).getConverter());
+        for (Map.Entry<String, Column> columnInTable : this.columns.entrySet()) {
+            Column value = columnInTable.getValue();
+            if (value.isIgnored()) {
+                continue;
+            }
+            query.addConverter(columnInTable.getKey(), value.getConverter());
         }
         Optional<Row> first = query.first();
         if (first.isPresent()) {
@@ -421,7 +428,7 @@ public class Table {
         }
         String pkColumn = primaryKeyColumn.get();
         Column column = column(pkColumn);
-        String psString = lSql.getDialect().getStatementCreator().createSelectByIdStatement(this, column);
+        String psString = lSql.getDialect().getStatementCreator().createSelectByIdStatement(this, column, this.columns.values());
         return lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, psString, false);
     }
 
@@ -429,14 +436,15 @@ public class Table {
         List<String> columns = Lists.newLinkedList(row.keySet());
         columns = newLinkedList(filter(columns, new Predicate<String>() {
             public boolean apply(String input) {
-                if (column(input) == null) {
+                Column column = column(input);
+                if (column == null) {
                     String message = "Column '" + input + "' does not exist in table '" + tableName + "'. ";
                     message += "Known columns: [";
                     message += Joiner.on(",").join(Table.this.columns.keySet());
                     message += "]";
                     throw new RuntimeException(message);
                 }
-                return true;
+                return !column.isIgnored();
             }
         }));
         return columns;
@@ -453,7 +461,7 @@ public class Table {
     private void applyNewRevision(Row row, Object id) throws SQLException {
         if (revisionColumn.isPresent()) {
             Object revision = queryRevision(id);
-            row.put(revisionColumn.get().getColumnName(), revision);
+            row.put(revisionColumn.get().getJavaColumnName(), revision);
         }
     }
 

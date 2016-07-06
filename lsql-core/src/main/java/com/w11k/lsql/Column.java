@@ -21,6 +21,8 @@ public class Column {
 
     private Converter converter;
 
+    private boolean ignored = false;
+
 //    public static Column create(Table table,
 //                                    String columnName,
 //                                    int sqlType,
@@ -47,8 +49,12 @@ public class Column {
         this.columnSize = columnSize;
     }
 
-    public String getColumnName() {
+    public String getJavaColumnName() {
         return this.columnName;
+    }
+
+    public String getSqlColumnName() {
+        return this.table.getlSql().getDialect().identifierJavaToSql(getJavaColumnName());
     }
 
     public Table getTable() {
@@ -65,6 +71,14 @@ public class Column {
 
     public void setConverter(Converter converter) {
         this.converter = converter;
+    }
+
+    public boolean isIgnored() {
+        return ignored;
+    }
+
+    public void setIgnored(boolean ignored) {
+        this.ignored = ignored;
     }
 
     public Optional<? extends AbstractValidationError> validateValue(Object value) {

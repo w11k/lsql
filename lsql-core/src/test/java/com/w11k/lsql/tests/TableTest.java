@@ -7,6 +7,7 @@ import com.w11k.lsql.Table;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
+import com.w11k.lsql.tests.testdata.PersonTestData;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
 import com.w11k.lsql.validation.TypeError;
@@ -147,6 +148,15 @@ public class TableTest extends AbstractLSqlTest {
         row.put("id", 999);
         row.put("name", "John");
         table1.update(row);
+    }
+
+    @Test
+    public void noopOnEmptyColumnListToUpdate() {
+        PersonTestData.init(this.lSql, true);
+        Table person = this.lSql.table("person");
+        person.update(Row.fromKeyVals(
+                "id", 1
+        ));
     }
 
     @Test

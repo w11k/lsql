@@ -11,6 +11,7 @@ import com.w11k.lsql.exceptions.DatabaseAccessException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -90,18 +91,27 @@ public class StatementCreator {
         return createPreparedStatement(table.getlSql(), sql, false);
     }
 
-    public String createSelectByIdStatement(Table table, Column idColumn) {
-        String sqlTableName = table.getlSql().getDialect()
-          .identifierJavaToSql(table.getTableName());
-        String sqlColumnName = idColumn.getTable().getlSql().getDialect()
-          .identifierJavaToSql(idColumn.getColumnName());
-        return "select * from " + sqlTableName + " where " + sqlColumnName + "=?";
+    public String createSelectByIdStatement(Table table, Column idColumn, Collection<Column> columns) {
+        String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
+        String sqlColumnName = idColumn.getTable().getlSql().getDialect().identifierJavaToSql(idColumn.getJavaColumnName());
+
+        String sql = "SELECT ";
+        for (Column column : columns) {
+            if (column.isIgnored()) {
+                continue;
+            }
+            sql += column.getSqlColumnName();
+            sql += ",";
+        }
+        sql = sql.substring(0, sql.length() - 1);
+        sql += " FROM " + sqlTableName + " WHERE " + sqlColumnName + "=?;";
+        return sql;
     }
 
     public PreparedStatement createDeleteByIdStatement(Table table) {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
-        String sqlIdName = idColumn.getTable().getlSql().getDialect().identifierJavaToSql(idColumn.getColumnName());
+        String sqlIdName = idColumn.getTable().getlSql().getDialect().identifierJavaToSql(idColumn.getJavaColumnName());
 
         String sql = "DELETE FROM ";
         sql += sqlTableName;
@@ -121,14 +131,14 @@ public class StatementCreator {
         String sqlTableName = table.getlSql().getDialect()
           .identifierJavaToSql(table.getTableName());
         String sqlColumnName = idColumn.getTable().getlSql().getDialect()
-          .identifierJavaToSql(idColumn.getColumnName());
+          .identifierJavaToSql(idColumn.getJavaColumnName());
         String sql = "select count(" + sqlColumnName + ") from " + sqlTableName + " where " +
           sqlColumnName + "=?";
         return createPreparedStatement(table.getlSql(), sql, false);
     }
 
     private String getRevisionColumnSqlIdentifier(Table table) {
-        return table.getlSql().getDialect().identifierJavaToSql(table.getRevisionColumn().get().getColumnName());
+        return table.getlSql().getDialect().identifierJavaToSql(table.getRevisionColumn().get().getJavaColumnName());
     }
 
     private List<String> createSqlColumnNames(final Table table, List<String> columns) {
