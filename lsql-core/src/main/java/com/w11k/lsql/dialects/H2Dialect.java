@@ -1,6 +1,5 @@
 package com.w11k.lsql.dialects;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.w11k.lsql.Table;
 
@@ -11,7 +10,7 @@ import java.sql.SQLException;
 public class H2Dialect extends GenericDialect {
 
     public H2Dialect() {
-        setSqlCaseFormat(CaseFormat.UPPER_UNDERSCORE);
+        setCaseFormatConverter(CaseFormatConverter.JAVA_CAMEL_CASE_TO_SQL_UPPER_UNDERSCORE);
     }
 
     public Optional<Object> extractGeneratedPk(Table table,

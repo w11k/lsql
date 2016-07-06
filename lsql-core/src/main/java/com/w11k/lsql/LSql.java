@@ -206,6 +206,14 @@ public class LSql {
                 pojoClass);
     }
 
+    public String identifierSqlToJava(String sqlName) {
+        return getDialect().getCaseFormatConverter().sqlToJava(sqlName);
+    }
+
+    public String identifierJavaToSql(String javaName) {
+        return getDialect().getCaseFormatConverter().javaToSql(javaName);
+    }
+
     @Override
     public String toString() {
         return "LSql{" +

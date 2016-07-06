@@ -481,30 +481,30 @@ public class Table {
             DatabaseMetaData md = con.getMetaData();
 
             // Check table name
-            ResultSet tables = md.getTables(null, null, lSql.getDialect().identifierJavaToSql(this.tableName), null);
+            ResultSet tables = md.getTables(null, null, lSql.identifierJavaToSql(this.tableName), null);
             if (!tables.next()) {
                 throw new IllegalArgumentException("Unknown table '" + tableName + "'");
             }
 
             // Fetch Primary Key
             ResultSet primaryKeys =
-                    md.getPrimaryKeys(null, null, lSql.getDialect().identifierJavaToSql(tableName));
+                    md.getPrimaryKeys(null, null, lSql.identifierJavaToSql(tableName));
 
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
             } else {
                 String idColumn = primaryKeys.getString(4);
-                primaryKeyColumn = of(lSql.getDialect().identifierSqlToJava(idColumn));
+                primaryKeyColumn = of(lSql.identifierSqlToJava(idColumn));
             }
 
             // Fetch all columns
             ResultSet columnsMetaData =
-                    md.getColumns(null, null, lSql.getDialect().identifierJavaToSql(tableName), null);
+                    md.getColumns(null, null, lSql.identifierJavaToSql(tableName), null);
 
             while (columnsMetaData.next()) {
                 String sqlColumnName = columnsMetaData.getString(4);
                 int columnSize = columnsMetaData.getInt(7);
-                String javaColumnName = lSql.getDialect().identifierSqlToJava(sqlColumnName);
+                String javaColumnName = lSql.identifierSqlToJava(sqlColumnName);
                 int sqlType = columnsMetaData.getInt(5);
                 Converter converter = getConverter(javaColumnName, sqlType);
                 Column column = new Column(this, javaColumnName, sqlType, converter, columnSize);

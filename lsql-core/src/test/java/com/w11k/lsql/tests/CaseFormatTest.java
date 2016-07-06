@@ -1,6 +1,5 @@
 package com.w11k.lsql.tests;
 
-import com.google.common.base.CaseFormat;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
@@ -12,6 +11,7 @@ import org.testng.annotations.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static com.w11k.lsql.dialects.CaseFormatConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE;
 import static org.testng.Assert.assertEquals;
 
 public class CaseFormatTest extends AbstractLSqlTest {
@@ -46,8 +46,8 @@ public class CaseFormatTest extends AbstractLSqlTest {
 
     @Test
     public void testTableNameUnderscore() {
-        lSql.getDialect().setJavaCaseFormat(CaseFormat.LOWER_UNDERSCORE);
-        createTable("CREATE TABLE aaa_bbb (ccc_ddd INT NULL)");
+        lSql.getDialect().setCaseFormatConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
+        createTable("CREATE TABLE AAA_BBB (CCC_DDD INT NULL)");
         lSql.table("aaa_bbb");
     }
 
@@ -61,8 +61,8 @@ public class CaseFormatTest extends AbstractLSqlTest {
 
     @Test
     public void testColumnNameUnderscore() {
-        lSql.getDialect().setJavaCaseFormat(CaseFormat.LOWER_UNDERSCORE);
-        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, ccc_ddd INT NULL)");
+        lSql.getDialect().setCaseFormatConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY, CCC_DDD INT NULL)");
         Table table1 = lSql.table("table1");
         table1.insert(Row.fromKeyVals("id", 1, "ccc_ddd", 2));
         assertEquals(table1.load(1).get().getInt("ccc_ddd"), new Integer(2));

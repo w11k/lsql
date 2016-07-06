@@ -40,7 +40,7 @@ public class StatementCreator {
     }
 
     public PreparedStatement createRevisionQueryStatement(Table table) {
-        String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
         String revCol = getRevisionColumnSqlIdentifier(table);
         String sql = "SELECT " + revCol + " FROM " + sqlTableName + " WHERE ";
         sql += table.getPrimaryKeyColumn().get();
@@ -49,7 +49,7 @@ public class StatementCreator {
     }
 
     public PreparedStatement createInsertStatement(final Table table, List<String> columns) {
-        String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
         String sql = "";
         sql += "INSERT INTO " + sqlTableName;
         sql += "(";
@@ -61,7 +61,7 @@ public class StatementCreator {
     }
 
     public PreparedStatement createUpdateStatement(Table table, List<String> columns) {
-        String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
         String sql = "UPDATE " + sqlTableName;
         sql += " SET ";
         if (table.getRevisionColumn().isPresent()) {
@@ -92,8 +92,8 @@ public class StatementCreator {
     }
 
     public String createSelectByIdStatement(Table table, Column idColumn, Collection<Column> columns) {
-        String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
-        String sqlColumnName = idColumn.getTable().getlSql().getDialect().identifierJavaToSql(idColumn.getJavaColumnName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
 
         String sql = "SELECT ";
         for (Column column : columns) {
@@ -110,8 +110,8 @@ public class StatementCreator {
 
     public PreparedStatement createDeleteByIdStatement(Table table) {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
-        String sqlTableName = table.getlSql().getDialect().identifierJavaToSql(table.getTableName());
-        String sqlIdName = idColumn.getTable().getlSql().getDialect().identifierJavaToSql(idColumn.getJavaColumnName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlIdName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
 
         String sql = "DELETE FROM ";
         sql += sqlTableName;
@@ -128,24 +128,22 @@ public class StatementCreator {
 
     public PreparedStatement createCountForIdStatement(Table table) throws SQLException {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
-        String sqlTableName = table.getlSql().getDialect()
-          .identifierJavaToSql(table.getTableName());
-        String sqlColumnName = idColumn.getTable().getlSql().getDialect()
-          .identifierJavaToSql(idColumn.getJavaColumnName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
         String sql = "select count(" + sqlColumnName + ") from " + sqlTableName + " where " +
           sqlColumnName + "=?";
         return createPreparedStatement(table.getlSql(), sql, false);
     }
 
     private String getRevisionColumnSqlIdentifier(Table table) {
-        return table.getlSql().getDialect().identifierJavaToSql(table.getRevisionColumn().get().getJavaColumnName());
+        return table.getlSql().identifierJavaToSql(table.getRevisionColumn().get().getJavaColumnName());
     }
 
     private List<String> createSqlColumnNames(final Table table, List<String> columns) {
         return Lists.transform(columns, new Function<String, String>() {
             @Override
             public String apply(String input) {
-                return table.getlSql().getDialect().identifierJavaToSql(input);
+                return table.getlSql().identifierJavaToSql(input);
             }
         });
     }

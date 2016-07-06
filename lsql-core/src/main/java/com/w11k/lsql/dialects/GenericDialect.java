@@ -1,6 +1,5 @@
 package com.w11k.lsql.dialects;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
@@ -22,9 +21,7 @@ public class GenericDialect {
 
     private ConverterRegistry converterRegistry = new ConverterRegistry();
 
-    private CaseFormat javaCaseFormat = CaseFormat.LOWER_CAMEL;
-
-    private CaseFormat sqlCaseFormat = CaseFormat.LOWER_UNDERSCORE;
+    private CaseFormatConverter caseFormatConverter = CaseFormatConverter.JAVA_CAMEL_CASE_TO_SQL_LOWER_UNDERSCORE;
 
     public GenericDialect() {
         // http://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html
@@ -66,45 +63,22 @@ public class GenericDialect {
         return statementCreator;
     }
 
-    public CaseFormat getJavaCaseFormat() {
-        return javaCaseFormat;
+    public CaseFormatConverter getCaseFormatConverter() {
+        return caseFormatConverter;
     }
 
-    public void setJavaCaseFormat(CaseFormat javaCaseFormat) {
-        this.javaCaseFormat = javaCaseFormat;
-    }
-
-    public CaseFormat getSqlCaseFormat() {
-        return sqlCaseFormat;
-    }
-
-    public void setSqlCaseFormat(CaseFormat sqlCaseFormat) {
-        this.sqlCaseFormat = sqlCaseFormat;
-    }
-
-    public String identifierSqlToJava(String sqlName) {
-        CaseFormat sqlStyle = getSqlCaseFormat();
-        if (sqlStyle.equals(CaseFormat.LOWER_UNDERSCORE)) {
-            sqlName = sqlName.toLowerCase();
-        }
-        CaseFormat javaStyle = getJavaCaseFormat();
-        return sqlStyle.to(javaStyle, sqlName);
-    }
-
-    public String identifierJavaToSql(String javaName) {
-        CaseFormat sqlStyle = getSqlCaseFormat();
-        CaseFormat javaStyle = getJavaCaseFormat();
-        return javaStyle.to(sqlStyle, javaName);
+    public void setCaseFormatConverter(CaseFormatConverter caseFormatConverter) {
+        this.caseFormatConverter = caseFormatConverter;
     }
 
     public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
                                                     int columnIndex) throws SQLException {
-        return identifierSqlToJava(metaData.getTableName(columnIndex));
+        return getCaseFormatConverter().sqlToJava(metaData.getTableName(columnIndex));
     }
 
     public String getColumnNameFromResultSetMetaData(ResultSetMetaData metaData,
                                                      int columnIndex) throws SQLException {
-        return identifierSqlToJava(metaData.getColumnName(columnIndex));
+        return getCaseFormatConverter().sqlToJava(metaData.getColumnName(columnIndex));
     }
 
     public Optional<Object> extractGeneratedPk(Table table,
@@ -113,7 +87,7 @@ public class GenericDialect {
         ResultSetMetaData metaData = resultSet.getMetaData();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             String label = metaData.getColumnLabel(i);
-            if (identifierSqlToJava(label).equals(pkName)) {
+            if (getCaseFormatConverter().sqlToJava(label).equals(pkName)) {
                 return of(table.column(pkName).getConverter()
                         .getValueFromResultSet(getlSql(), resultSet, i));
             }

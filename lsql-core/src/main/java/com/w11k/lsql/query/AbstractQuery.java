@@ -117,8 +117,7 @@ public abstract class AbstractQuery<T> {
                     Map<String, Converter> converters = Maps.newLinkedHashMap();
 
                     for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                        String columnLabel = AbstractQuery.this.lSql.getDialect()
-                                .identifierSqlToJava(metaData.getColumnLabel(i));
+                        String columnLabel = AbstractQuery.this.lSql.identifierSqlToJava(metaData.getColumnLabel(i));
 
                         // check duplicates
                         if (!AbstractQuery.this.ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel)) {

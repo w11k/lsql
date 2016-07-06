@@ -54,7 +54,7 @@ public class Column {
     }
 
     public String getSqlColumnName() {
-        return this.table.getlSql().getDialect().identifierJavaToSql(getJavaColumnName());
+        return this.table.getlSql().identifierJavaToSql(getJavaColumnName());
     }
 
     public Table getTable() {
