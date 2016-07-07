@@ -7,11 +7,11 @@ function exit_on_error {
 cd `dirname $0`/..
 
 # Check if master branch is active
-branch=`git rev-parse --abbrev-ref HEAD`
-if [ $branch != "master" ]; then
-    echo "Not in master branch."
-    exit 1
-fi
+#branch=`git rev-parse --abbrev-ref HEAD`
+#if [ $branch != "master" ]; then
+#    echo "Not in master branch."
+#    exit 1
+#fi
 
 # Test build
 cd lsql-core
