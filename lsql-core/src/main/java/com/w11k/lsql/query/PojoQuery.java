@@ -1,13 +1,12 @@
 package com.w11k.lsql.query;
 
 import com.google.common.collect.Lists;
-import com.w11k.lsql.*;
+import com.w11k.lsql.LSql;
+import com.w11k.lsql.PojoMapper;
 import com.w11k.lsql.converter.Converter;
 import rx.annotations.Experimental;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +24,13 @@ public class PojoQuery<T> extends AbstractQuery<T> {
 
     @Experimental
     public List<T> toTree() {
-        LinkedHashMap<Number, Row> tree = new QueryToTreeConverter(this).getTree();
-        Collection<Row> roots = tree.values();
+//        LinkedHashMap<Number, Row> tree = new QueryToTreeConverter(this).getTree();
+//        Collection<Row> roots = tree.values();
         List<T> rootPojos = Lists.newLinkedList();
-        for (Row root : roots) {
-            T rootPojo = getlSql().getObjectMapper().convertValue(root, this.pojoClass);
-            rootPojos.add(rootPojo);
-        }
+//        for (Row root : roots) {
+//            T rootPojo = getlSql().getObjectMapper().convertValue(root, this.pojoClass);
+//            rootPojos.add(rootPojo);
+//        }
         return rootPojos;
     }
 

@@ -1,8 +1,8 @@
-package com.w11k.lsql.tests.pojo.tree;
+package com.w11k.lsql.tests.tree.pojo;
 
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.tests.AbstractLSqlTest;
-import com.w11k.lsql.tests.TreeTestData;
+import com.w11k.lsql.tests.tree.TreeTestData;
 import org.testng.annotations.Test;
 
 import java.util.List;

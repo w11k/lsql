@@ -1,4 +1,4 @@
-package com.w11k.lsql.tests.pojo.tree;
+package com.w11k.lsql.tests.tree.pojo;
 
 import java.util.Map;
 

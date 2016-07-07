@@ -1,4 +1,4 @@
-package com.w11k.lsql.tests;
+package com.w11k.lsql.tests.tree;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.sqlfile.LSqlFile;

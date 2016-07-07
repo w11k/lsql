@@ -1,11 +1,9 @@
-package com.w11k.lsql.tests.pojo.tree;
+package com.w11k.lsql.tests.tree.pojo;
 
-public class City {
+public class Country {
 
     private int id;
-
-    private int countryId;
-
+    private int continentId;
     private String name;
 
     public int getId() {
@@ -16,12 +14,12 @@ public class City {
         this.id = id;
     }
 
-    public int getCountryId() {
-        return countryId;
+    public int getContinentId() {
+        return continentId;
     }
 
-    public void setCountryId(int countryId) {
-        this.countryId = countryId;
+    public void setContinentId(int continentId) {
+        this.continentId = continentId;
     }
 
     public String getName() {

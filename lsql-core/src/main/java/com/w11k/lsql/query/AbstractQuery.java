@@ -1,6 +1,7 @@
 package com.w11k.lsql.query;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
@@ -16,10 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AbstractQuery<T> {
 
@@ -102,6 +100,7 @@ public abstract class AbstractQuery<T> {
      * @return the Observable
      */
     public Observable<ResultSetWithColumns> rxResultSet() {
+
         return Subject.create(new Observable.OnSubscribe<ResultSetWithColumns>() {
             @Override
             public void call(Subscriber<? super ResultSetWithColumns> subscriber) {
@@ -113,8 +112,8 @@ public abstract class AbstractQuery<T> {
                     // or unused converter
                     Set<String> processedColumnLabels = Sets.newLinkedHashSet();
 
-                    Map<String, ResultSetColumn> resultSetColumns = Maps.newLinkedHashMap();
-                    Map<String, Converter> converters = Maps.newLinkedHashMap();
+                    List<ResultSetColumn> resultSetColumns = Lists.newLinkedList();
+                    LinkedHashMap<String, Converter> converters = Maps.newLinkedHashMap();
 
                     for (int i = 1; i <= metaData.getColumnCount(); i++) {
                         String columnLabel = AbstractQuery.this.lSql.identifierSqlToJava(metaData.getColumnLabel(i));
@@ -125,8 +124,9 @@ public abstract class AbstractQuery<T> {
                         }
                         processedColumnLabels.add(columnLabel);
 
-                        Converter converter = getConverterForResultSetColumn(metaData, i, columnLabel);
-                        resultSetColumns.put(columnLabel, new ResultSetColumn(i, columnLabel, converter));
+                        Converter converter = getConverterForResultSetColumn(metaData, i, columnLabel, false);
+
+                        resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
                         converters.put(columnLabel, converter);
                     }
 
@@ -139,7 +139,7 @@ public abstract class AbstractQuery<T> {
                     }
 
                     ResultSetWithColumns resultSetWithColumns =
-                            new ResultSetWithColumns(resultSet, resultSetColumns);
+                            new ResultSetWithColumns(resultSet, metaData, resultSetColumns);
 
                     checkConformity(converters);
 
@@ -155,7 +155,10 @@ public abstract class AbstractQuery<T> {
         });
     }
 
-    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData, int position, String columnLabel)
+    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData,
+                                                    int position,
+                                                    String columnLabel,
+                                                    boolean getConverterBySqlType)
             throws SQLException {
 
         // Check for user provided Converter
@@ -177,8 +180,9 @@ public abstract class AbstractQuery<T> {
         }
 
         // Check if the user registered null as a Converter to use a type-based Converter
-        if (converters.containsKey(columnLabel)
-                && converters.get(columnLabel) == null) {
+        // or if the default converter was allowed
+        if (getConverterBySqlType
+                || (converters.containsKey(columnLabel) && converters.get(columnLabel) == null)) {
 
             int columnSqlType = metaData.getColumnType(position);
             return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
@@ -198,7 +202,7 @@ public abstract class AbstractQuery<T> {
 
     private T extractEntity(ResultSetWithColumns resultSetWithColumns) {
         ResultSet resultSet = resultSetWithColumns.getResultSet();
-        Collection<ResultSetColumn> columnList = resultSetWithColumns.getResultSetColumns().values();
+        Collection<ResultSetColumn> columnList = resultSetWithColumns.getColumnsByLabel().values();
         T entity = createEntity();
         for (ResultSetColumn column : columnList) {
             try {
