@@ -44,7 +44,7 @@ FROM continent
     LEFT JOIN continent_fact ON continent.id = continent_fact.continent_id
     LEFT JOIN country ON continent.id = country.continent_id
     LEFT JOIN city ON country.id = city.country_id
-ORDER BY continent.id, continent_fact.id, country.id;
+ORDER BY continent.id, continent_fact.id, country.id, city.id;
 
 --continentsWithFactsAndCountriesAndCities_2
 SELECT

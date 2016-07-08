@@ -1,6 +1,6 @@
 package com.w11k.lsql.tests.tree.pojo;
 
-class ContinentFact {
+public class ContinentFact {
 
     private int id;
 

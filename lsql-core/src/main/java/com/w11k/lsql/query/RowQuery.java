@@ -3,7 +3,6 @@ package com.w11k.lsql.query;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.converter.Converter;
-import rx.annotations.Experimental;
 
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -15,9 +14,9 @@ public class RowQuery extends AbstractQuery<Row> {
         super(lSql, preparedStatement);
     }
 
-    @Experimental
+    @SuppressWarnings("unchecked")
     public List<Row> toTree() {
-        return new QueryToTreeConverter(this).getTree();
+        return (List<Row>) new QueryToTreeConverter(this, new RowEntityCreator()).getTree();
     }
 
     @Override

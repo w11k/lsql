@@ -12,6 +12,16 @@ import static com.w11k.lsql.utils.JavaClassUtils.convertPrimitiveClassToWrapperC
 
 public class PojoMapper<T> {
 
+    private final static Map<Class<?>, PojoMapper<?>> CACHE = Maps.newHashMap();
+
+    @SuppressWarnings("unchecked")
+    public static <T> PojoMapper<T> getFor(Class<T> clazz) {
+        if (!CACHE.containsKey(clazz)) {
+            CACHE.put(clazz, new PojoMapper<Object>((Class<Object>) clazz));
+        }
+        return (PojoMapper<T>) CACHE.get(clazz);
+    }
+
     private final Class<T> pojoClass;
 
     private final Map<String, PropertyDescriptor> propertyDescriptors = Maps.newHashMap();
@@ -19,7 +29,6 @@ public class PojoMapper<T> {
     private final Constructor<T> constructor;
 
     public PojoMapper(Class<T> pojoClass) {
-
         // Find constructor
         this.constructor = getConstructor(pojoClass);
         this.pojoClass = pojoClass;
@@ -44,6 +53,15 @@ public class PojoMapper<T> {
         }
     }
 
+    public Object getValue(T instance, String fieldName) {
+        PropertyDescriptor descriptor = this.propertyDescriptors.get(fieldName);
+        try {
+            return descriptor.getReadMethod().invoke(instance);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void setValue(T instance, String fieldName, Object value) {
         PropertyDescriptor descriptor = this.propertyDescriptors.get(fieldName);
         try {
@@ -51,6 +69,10 @@ public class PojoMapper<T> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Class<?> getTypeOfField(String fieldName) {
+        return this.propertyDescriptors.get(fieldName).getPropertyType();
     }
 
     public Row pojoToRow(T pojo) {

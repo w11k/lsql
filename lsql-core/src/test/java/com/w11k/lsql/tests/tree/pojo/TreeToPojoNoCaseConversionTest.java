@@ -1,8 +1,8 @@
 package com.w11k.lsql.tests.tree.pojo;
 
-import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.tests.AbstractLSqlTest;
 import com.w11k.lsql.tests.tree.TreeTestData;
+import com.w11k.lsql.utils.DebugUtils;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -21,79 +21,78 @@ public class TreeToPojoNoCaseConversionTest extends AbstractLSqlTest {
 
     @Test
     public void continentsWithFactsAndCountriesAndCities() {
-        PojoQuery<QueryContinent> query = statementContinentsWithFactsAndCountriesAndCities();
-        List<QueryContinent> continent = query.toTree();
+        List<ContinentWithFactsCountriesCities> tree = this.treeTestData.getlSqlFile()
+                .statement("continentsWithFactsAndCountriesAndCities_1", ContinentWithFactsCountriesCities.class).query().toTree();
 
-        assertEquals(continent.size(), 2);
+        DebugUtils.prettyPrintJson(tree);
+
+        assertEquals(tree.size(), 2);
 
         // Continent
-        assertEquals(continent.get(0).getId(), 1);
-        assertEquals(continent.get(0).getName(), "Europe");
-        assertEquals(continent.get(1).getId(), 2);
-        assertEquals(continent.get(1).getName(), "North America");
+        assertEquals(tree.get(0).getId(), 1);
+        assertEquals(tree.get(0).getName(), "Europe");
+        assertEquals(tree.get(1).getId(), 2);
+        assertEquals(tree.get(1).getName(), "North America");
 
         // Facts
-        assertEquals(continent.get(0).getFacts().size(), 2);
+        assertEquals(tree.get(0).getFacts().size(), 2);
 
-        assertEquals(continent.get(0).getFacts().get(1).getId(), 1);
-        assertEquals(continent.get(0).getFacts().get(1).getContinentId(), 1);
-        assertEquals(continent.get(0).getFacts().get(1).getFactName(), "Area");
-        assertEquals(continent.get(0).getFacts().get(1).getFactValue(), "10,180,000 km2");
+        assertEquals(tree.get(0).getFacts().get(0).getId(), 1);
+        assertEquals(tree.get(0).getFacts().get(0).getContinentId(), 1);
+        assertEquals(tree.get(0).getFacts().get(0).getFactName(), "Area");
+        assertEquals(tree.get(0).getFacts().get(0).getFactValue(), "10,180,000 km2");
 
-        assertEquals(continent.get(0).getFacts().get(2).getId(), 2);
-        assertEquals(continent.get(0).getFacts().get(2).getContinentId(), 1);
-        assertEquals(continent.get(0).getFacts().get(2).getFactName(), "Population");
-        assertEquals(continent.get(0).getFacts().get(2).getFactValue(), "742,452,000");
+        assertEquals(tree.get(0).getFacts().get(1).getId(), 2);
+        assertEquals(tree.get(0).getFacts().get(1).getContinentId(), 1);
+        assertEquals(tree.get(0).getFacts().get(1).getFactName(), "Population");
+        assertEquals(tree.get(0).getFacts().get(1).getFactValue(), "742,452,000");
 
-        assertEquals(continent.get(1).getFacts().get(3).getId(), 3);
-        assertEquals(continent.get(1).getFacts().get(3).getContinentId(), 2);
-        assertEquals(continent.get(1).getFacts().get(3).getFactName(), "Area");
-        assertEquals(continent.get(1).getFacts().get(3).getFactValue(), "24,709,000 km2");
+        assertEquals(tree.get(1).getFacts().get(0).getId(), 3);
+        assertEquals(tree.get(1).getFacts().get(0).getContinentId(), 2);
+        assertEquals(tree.get(1).getFacts().get(0).getFactName(), "Area");
+        assertEquals(tree.get(1).getFacts().get(0).getFactValue(), "24,709,000 km2");
 
-        assertEquals(continent.get(1).getFacts().get(4).getId(), 4);
-        assertEquals(continent.get(1).getFacts().get(4).getContinentId(), 2);
-        assertEquals(continent.get(1).getFacts().get(4).getFactName(), "Largest city");
-        assertEquals(continent.get(1).getFacts().get(4).getFactValue(), "Mexico City");
+        assertEquals(tree.get(1).getFacts().get(1).getId(), 4);
+        assertEquals(tree.get(1).getFacts().get(1).getContinentId(), 2);
+        assertEquals(tree.get(1).getFacts().get(1).getFactName(), "Largest city");
+        assertEquals(tree.get(1).getFacts().get(1).getFactValue(), "Mexico City");
 
         // Countries
-        assertEquals(continent.get(0).getCountries().size(), 2);
+        assertEquals(tree.get(0).getCountries().size(), 2);
 
-        assertEquals(continent.get(0).getCountries().get(1).getId(), 1);
-        assertEquals(continent.get(0).getCountries().get(1).getContinentId(), 1);
-        assertEquals(continent.get(0).getCountries().get(1).getName(), "Germany");
+        assertEquals(tree.get(0).getCountries().get(0).getId(), 1);
+        assertEquals(tree.get(0).getCountries().get(0).getContinentId(), 1);
+        assertEquals(tree.get(0).getCountries().get(0).getName(), "Germany");
 
-        assertEquals(continent.get(0).getCountries().get(2).getId(), 2);
-        assertEquals(continent.get(0).getCountries().get(2).getContinentId(), 1);
-        assertEquals(continent.get(0).getCountries().get(2).getName(), "Netherlands");
+        assertEquals(tree.get(0).getCountries().get(1).getId(), 2);
+        assertEquals(tree.get(0).getCountries().get(1).getContinentId(), 1);
+        assertEquals(tree.get(0).getCountries().get(1).getName(), "Netherlands");
 
-        assertEquals(continent.get(1).getCountries().get(3).getId(), 3);
-        assertEquals(continent.get(1).getCountries().get(3).getContinentId(), 2);
-        assertEquals(continent.get(1).getCountries().get(3).getName(), "USA");
+        assertEquals(tree.get(1).getCountries().get(0).getId(), 3);
+        assertEquals(tree.get(1).getCountries().get(0).getContinentId(), 2);
+        assertEquals(tree.get(1).getCountries().get(0).getName(), "USA");
 
-        assertEquals(continent.get(1).getCountries().get(4).getId(), 4);
-        assertEquals(continent.get(1).getCountries().get(4).getContinentId(), 2);
-        assertEquals(continent.get(1).getCountries().get(4).getName(), "Canada");
+        assertEquals(tree.get(1).getCountries().get(1).getId(), 4);
+        assertEquals(tree.get(1).getCountries().get(1).getContinentId(), 2);
+        assertEquals(tree.get(1).getCountries().get(1).getName(), "Canada");
 
         // Cities
-        assertEquals(continent.get(0).getCountries().get(1).getCities().get(1).getId(), 1);
-        assertEquals(continent.get(0).getCountries().get(1).getCities().get(1).getCountryId(), 1);
-        assertEquals(continent.get(0).getCountries().get(1).getCities().get(1).getName(), "Esslingen");
+        assertEquals(tree.get(0).getCountries().get(0).getCities().get(0).getId(), 1);
+        assertEquals(tree.get(0).getCountries().get(0).getCities().get(0).getCountryId(), 1);
+        assertEquals(tree.get(0).getCountries().get(0).getCities().get(0).getName(), "Esslingen");
 
-        assertEquals(continent.get(0).getCountries().get(1).getCities().get(2).getId(), 2);
-        assertEquals(continent.get(0).getCountries().get(1).getCities().get(2).getCountryId(), 1);
-        assertEquals(continent.get(0).getCountries().get(1).getCities().get(2).getName(), "Bonn");
+        assertEquals(tree.get(0).getCountries().get(0).getCities().get(1).getId(), 2);
+        assertEquals(tree.get(0).getCountries().get(0).getCities().get(1).getCountryId(), 1);
+        assertEquals(tree.get(0).getCountries().get(0).getCities().get(1).getName(), "Bonn");
 
-        assertEquals(continent.get(1).getCountries().get(3).getCities().get(3).getId(), 3);
-        assertEquals(continent.get(1).getCountries().get(3).getCities().get(3).getCountryId(), 3);
-        assertEquals(continent.get(1).getCountries().get(3).getCities().get(3).getName(), "Boston");
+        assertEquals(tree.get(1).getCountries().get(0).getCities().get(0).getId(), 3);
+        assertEquals(tree.get(1).getCountries().get(0).getCities().get(0).getCountryId(), 3);
+        assertEquals(tree.get(1).getCountries().get(0).getCities().get(0).getName(), "Boston");
 
-        assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getId(), 4);
-        assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getCountryId(), 3);
-        assertEquals(continent.get(1).getCountries().get(3).getCities().get(4).getName(), "New York");
+        assertEquals(tree.get(1).getCountries().get(0).getCities().get(1).getId(), 4);
+        assertEquals(tree.get(1).getCountries().get(0).getCities().get(1).getCountryId(), 3);
+        assertEquals(tree.get(1).getCountries().get(0).getCities().get(1).getName(), "New York");
     }
 
-    private PojoQuery<QueryContinent> statementContinentsWithFactsAndCountriesAndCities() {
-        return this.treeTestData.getlSqlFile().statement("continentsWithFactsAndCountriesAndCities_1", QueryContinent.class).query();
-    }
 
 }

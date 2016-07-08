@@ -146,23 +146,13 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     @SuppressWarnings("unchecked")
-    public <A> List<A> getListOf(Class<A> clazz, String key) {
+    public <A> List<A> getAsListOf(Class<A> clazz, String key) {
         return (List<A>) get(key);
     }
 
     @SuppressWarnings("unchecked")
-    public <A> Set<A> getSetOf(Class<A> clazz, String key) {
+    public <A> Set<A> getAsSetOf(Class<A> clazz, String key) {
         return (Set<A>) get(key);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <A> TreeSet<A> getTreeSetOf(Class<A> clazz, String key) {
-        return (TreeSet<A>) get(key);
-    }
-
-    @SuppressWarnings("unchecked")
-    public LinkedHashMap<Number, Row> getTree(String key) {
-        return getAs(LinkedHashMap.class, key);
     }
 
     public boolean hasNonNullValue(String key) {
