@@ -111,12 +111,13 @@ public class QueryToTreeConverter {
 
         // Build table segments and columns meta data
         int lastMarkerIndex = 1;
-        String lastLabel = metaData.getColumnLabel(lastMarkerIndex);
+        String lastLabel = metaData.getColumnLabel(lastMarkerIndex).replaceAll(" ", "");
         assert isColumnMarker(lastLabel);
         columns.put(1, new ResultSetColumn(1, lastLabel, new MarkerColumnConverter()));
         for (int i = 2; i <= metaData.getColumnCount(); i++) {
             String label = metaData.getColumnLabel(i);
             if (isColumnMarker(label)) {
+                label = label.replaceAll(" ", "");
                 columns.put(i, new ResultSetColumn(i, label, new MarkerColumnConverter()));
                 assert !segmentHeaders.containsKey(lastLabel);
                 segmentHeaders.put(lastLabel, new SegmentHeader(lastMarkerIndex, i - 1));

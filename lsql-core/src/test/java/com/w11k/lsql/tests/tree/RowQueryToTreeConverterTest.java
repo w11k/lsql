@@ -3,6 +3,7 @@ package com.w11k.lsql.tests.tree;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.tests.AbstractLSqlTest;
+import com.w11k.lsql.utils.DebugUtils;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -59,6 +60,8 @@ public class RowQueryToTreeConverterTest extends AbstractLSqlTest {
     public void continentsWithFactsAndCountriesAndCities_2() {
         RowQuery query = this.treeTestData.getlSqlFile().statement("continentsWithFactsAndCountriesAndCities_2").query();
         List<Row> tree = query.toTree();
+        DebugUtils.prettyPrintJson(tree);
+
         assertContinents(tree);
         assertFacts(tree);
         assertCountries(tree);
