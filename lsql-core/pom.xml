@@ -19,11 +19,6 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
 
-    <!--<dependency>-->
-      <!--<groupId>com.google.inject</groupId>-->
-      <!--<artifactId>guice</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -50,15 +45,6 @@
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
     </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>com.google.code.findbugs</groupId>-->
-      <!--<artifactId>jsr305</artifactId>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.javassist</groupId>-->
-      <!--<artifactId>javassist</artifactId>-->
-    <!--</dependency>-->
 
     <dependency>
       <groupId>joda-time</groupId>
