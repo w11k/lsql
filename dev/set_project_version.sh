@@ -11,10 +11,10 @@ fi
 
 version_new=$1
 
-cd lsql-example
-sed -i "s/<lsql-version>.*<\/lsql-version>/<lsql-version>$version_new<\/lsql-version>/g" pom.xml
+#cd lsql-example
+#sed -i "s/<lsql-version>.*<\/lsql-version>/<lsql-version>$version_new<\/lsql-version>/g" pom.xml
+#cd ..
 
-cd ..
 mvn versions:set -DnewVersion=$version_new -DgenerateBackupPoms=false
 
 dev/get_current_version.sh > VERSION

@@ -9,9 +9,12 @@ import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
+import com.w11k.lsql.statement.AbstractSqlStatement;
+import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
@@ -204,6 +207,18 @@ public class LSql {
                 this,
                 getDialect().getStatementCreator().createPreparedStatement(this, sql, false),
                 pojoClass);
+    }
+
+    public AbstractSqlStatement<RowQuery> executeQuery(String sqlString) {
+        final SqlStatementToPreparedStatement stmtToPs =
+                new SqlStatementToPreparedStatement(this, "executeQuery", sqlString);
+
+        return new AbstractSqlStatement<RowQuery>(stmtToPs) {
+            @Override
+            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps) {
+                return new RowQuery(lSql, ps);
+            }
+        };
     }
 
     public String identifierSqlToJava(String sqlName) {
