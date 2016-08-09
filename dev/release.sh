@@ -20,10 +20,10 @@ cd ..
 exit_on_error
 
 # Test Sample Application
-cd lsql-example
-mvn clean test
-cd ..
-exit_on_error
+#cd lsql-example
+#mvn clean test
+#cd ..
+#exit_on_error
 
 # Set the current version
 git tag "`dev/get_current_version.sh`"
