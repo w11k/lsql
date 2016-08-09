@@ -6,8 +6,12 @@ import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
@@ -17,6 +21,10 @@ import static com.google.common.collect.Maps.newHashMap;
  *
  */
 public class Row extends ForwardingMap<String, Object> {
+
+    public static boolean LEGACY_CONVERT_VALUE_ON_GET = false;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static Row fromKeyVals(Object... keyVals) {
         Row r = new Row();
@@ -58,7 +66,22 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     public <A> A getAs(Class<A> type, String key) {
-        return getAs(type, key, false);
+        if (!LEGACY_CONVERT_VALUE_ON_GET) {
+            return getAs(type, key, false);
+        }
+
+        // legacy mode
+        try {
+            return getAs(type, key, false);
+        } catch (WrongTypeException e) {
+            String msg = "Row entry for " +
+                    "key: '" + key + "' " +
+                    "was converted implicitly to type: " +
+                    "'" + type.getCanonicalName() + "'. " +
+                    "Please use .getAs(type, key, true);";
+            logger.warn(msg);
+            return getAs(type, key, true);
+        }
     }
 
     public <A> A getAs(Class<A> type, String key, boolean convert) {
@@ -84,7 +107,7 @@ public class Row extends ForwardingMap<String, Object> {
                         e);
             }
         } else {
-            throw new IllegalArgumentException("Row entry for " +
+            throw new WrongTypeException("Row entry for " +
                     "key: '" + key + "', " +
                     "value: '" + value + "', " +
                     "type: '" + value.getClass().getCanonicalName() + "' " +

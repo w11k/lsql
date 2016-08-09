@@ -1,6 +1,7 @@
 package com.w11k.lsql.tests;
 
 import com.w11k.lsql.Row;
+import com.w11k.lsql.WrongTypeException;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 import org.testng.annotations.Test;
@@ -65,6 +66,34 @@ public class RowTest extends AbstractLSqlTest {
         assertTrue(r.get("date") instanceof Long);
         DateTime dt2 = r.getDateTime("date");
         assertEquals(dt1, dt2);
+    }
+
+    @Test(expectedExceptions = WrongTypeException.class)
+    public void failOnWrongType() {
+        Row r = Row.fromKeyVals(
+                "a", 1
+        );
+        r.getString("a");
+    }
+
+    @Test
+    public void explicitlyConvertValue() {
+        Row r = Row.fromKeyVals(
+                "a", 1
+        );
+        String a = r.getAs(String.class, "a", true);
+        assertEquals(a, "1");
+    }
+
+    @Test
+    public void implicitlyConvertValue() {
+        Row r = Row.fromKeyVals(
+                "a", 1
+        );
+        Row.LEGACY_CONVERT_VALUE_ON_GET = true;
+        String a = r.getAs(String.class, "a");
+        assertEquals(a, "1");
+        Row.LEGACY_CONVERT_VALUE_ON_GET = false;
     }
 
 }
