@@ -125,7 +125,7 @@ public class QueryToTreeConverter {
                 lastMarkerIndex = i;
             } else {
                 label = lSql.identifierSqlToJava(label);
-                Converter converter = this.query.getConverterForResultSetColumn(metaData, i, label, true);
+                Converter converter = this.query.getConverterForResultSetColumn(metaData, i, label, false);
                 columns.put(i, new ResultSetColumn(i, label, converter));
             }
         }

@@ -52,6 +52,8 @@ public class LSql {
 
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
 
+    private Config config = new Config();
+
     /**
      * Creates a new LSql instance.
      * <p/>
@@ -115,6 +117,14 @@ public class LSql {
 
     public void setInitColumnCallback(InitColumnCallback initColumnCallback) {
         this.initColumnCallback = initColumnCallback;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
     }
 
     /**

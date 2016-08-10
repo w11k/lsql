@@ -8,6 +8,8 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.ResultSetColumn;
 import com.w11k.lsql.ResultSetWithColumns;
 import com.w11k.lsql.converter.Converter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -20,6 +22,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 public abstract class AbstractQuery<T> {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final LSql lSql;
 
@@ -183,15 +187,23 @@ public abstract class AbstractQuery<T> {
         // or if the default converter was allowed
         if (getConverterBySqlType
                 || (converters.containsKey(columnLabel) && converters.get(columnLabel) == null)) {
-
-            int columnSqlType = metaData.getColumnType(position);
-            return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
+            return getConverterByColumnType(metaData, position);
         }
 
-        // Error
+        // Error/Warn
         String msg = "Unable to determine a Converter instance for column '" + columnLabel + "'. ";
         msg += "Register a converter with Query#addConverter() / Query#setConverters().";
-        throw new IllegalStateException(msg);
+        if (lSql.getConfig().isUseColumnTypeForConverterLookupInQueries()) {
+            this.logger.warn(msg);
+            return getConverterByColumnType(metaData, position);
+        } else {
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    private Converter getConverterByColumnType(ResultSetMetaData metaData, int position) throws SQLException {
+        int columnSqlType = metaData.getColumnType(position);
+        return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
     }
 
     protected abstract T createEntity();
