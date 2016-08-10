@@ -22,6 +22,7 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class Row extends ForwardingMap<String, Object> {
 
+    @Deprecated
     public static boolean LEGACY_CONVERT_VALUE_ON_GET = false;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
