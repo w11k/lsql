@@ -165,9 +165,9 @@ public abstract class AbstractQuery<T> {
     }
 
     public Optional<Converter> getConverterForResultSetColumn(ResultSetMetaData metaData,
-                                                    int position,
-                                                    String columnLabel,
-                                                    boolean getConverterBySqlType)
+                                                              int position,
+                                                              String columnLabel,
+                                                              boolean getConverterBySqlType)
             throws SQLException {
 
         // Check for user provided Converter
@@ -186,10 +186,12 @@ public abstract class AbstractQuery<T> {
                 && columnName != null
                 && columnName.length() > 0) {
             Column column = lSql.table(tableName).column(columnName);
-            if (!column.isIgnored()) {
-                return of(column.getConverter());
-            } else {
-                return absent();
+            if (column != null) {
+                if (!column.isIgnored()) {
+                    return of(column.getConverter());
+                } else {
+                    return absent();
+                }
             }
         }
 
@@ -211,16 +213,16 @@ public abstract class AbstractQuery<T> {
         }
     }
 
-    private Converter getConverterByColumnType(ResultSetMetaData metaData, int position) throws SQLException {
-        int columnSqlType = metaData.getColumnType(position);
-        return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
-    }
-
     protected abstract T createEntity();
 
     protected abstract void checkConformity(Map<String, Converter> converters);
 
     protected abstract void setValue(T entity, String name, Object value);
+
+    private Converter getConverterByColumnType(ResultSetMetaData metaData, int position) throws SQLException {
+        int columnSqlType = metaData.getColumnType(position);
+        return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
+    }
 
     private T extractEntity(ResultSetWithColumns resultSetWithColumns) {
         ResultSet resultSet = resultSetWithColumns.getResultSet();
