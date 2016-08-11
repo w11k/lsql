@@ -1,5 +1,6 @@
 package com.w11k.lsql.query;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
@@ -125,8 +126,10 @@ public class QueryToTreeConverter {
                 lastMarkerIndex = i;
             } else {
                 label = lSql.identifierSqlToJava(label);
-                Converter converter = this.query.getConverterForResultSetColumn(metaData, i, label, false);
-                columns.put(i, new ResultSetColumn(i, label, converter));
+                Optional<Converter> converter = this.query.getConverterForResultSetColumn(metaData, i, label, false);
+                if (converter.isPresent()) {
+                    columns.put(i, new ResultSetColumn(i, label, converter.get()));
+                }
             }
         }
         segmentHeaders.put(lastLabel, new SegmentHeader(lastMarkerIndex, metaData.getColumnCount()));

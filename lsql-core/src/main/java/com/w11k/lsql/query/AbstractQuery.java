@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.w11k.lsql.Column;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.ResultSetColumn;
 import com.w11k.lsql.ResultSetWithColumns;
@@ -20,6 +21,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
+
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
 
 public abstract class AbstractQuery<T> {
 
@@ -78,7 +82,7 @@ public abstract class AbstractQuery<T> {
         if (list.isEmpty()) {
             return Optional.absent();
         } else {
-            return Optional.of(list.get(0));
+            return of(list.get(0));
         }
     }
 
@@ -128,10 +132,11 @@ public abstract class AbstractQuery<T> {
                         }
                         processedColumnLabels.add(columnLabel);
 
-                        Converter converter = getConverterForResultSetColumn(metaData, i, columnLabel, false);
-
-                        resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter));
-                        converters.put(columnLabel, converter);
+                        Optional<Converter> converter = getConverterForResultSetColumn(metaData, i, columnLabel, false);
+                        if (converter.isPresent()) {
+                            resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter.get()));
+                            converters.put(columnLabel, converter.get());
+                        }
                     }
 
                     // Check for unused converters
@@ -159,7 +164,7 @@ public abstract class AbstractQuery<T> {
         });
     }
 
-    public Converter getConverterForResultSetColumn(ResultSetMetaData metaData,
+    public Optional<Converter> getConverterForResultSetColumn(ResultSetMetaData metaData,
                                                     int position,
                                                     String columnLabel,
                                                     boolean getConverterBySqlType)
@@ -169,7 +174,7 @@ public abstract class AbstractQuery<T> {
         if (converters.containsKey(columnLabel)) {
             Converter converter = converters.get(columnLabel);
             if (converter != null) {
-                return converter;
+                return of(converter);
             }
         }
 
@@ -180,14 +185,19 @@ public abstract class AbstractQuery<T> {
                 && tableName.length() > 0
                 && columnName != null
                 && columnName.length() > 0) {
-            return lSql.table(tableName).column(columnName).getConverter();
+            Column column = lSql.table(tableName).column(columnName);
+            if (!column.isIgnored()) {
+                return of(column.getConverter());
+            } else {
+                return absent();
+            }
         }
 
         // Check if the user registered null as a Converter to use a type-based Converter
         // or if the default converter was allowed
         if (getConverterBySqlType
                 || (converters.containsKey(columnLabel) && converters.get(columnLabel) == null)) {
-            return getConverterByColumnType(metaData, position);
+            return of(getConverterByColumnType(metaData, position));
         }
 
         // Error/Warn
@@ -195,7 +205,7 @@ public abstract class AbstractQuery<T> {
         msg += "Register a converter with Query#addConverter() / Query#setConverters().";
         if (lSql.getConfig().isUseColumnTypeForConverterLookupInQueries()) {
             this.logger.warn(msg);
-            return getConverterByColumnType(metaData, position);
+            return of(getConverterByColumnType(metaData, position));
         } else {
             throw new IllegalStateException(msg);
         }
