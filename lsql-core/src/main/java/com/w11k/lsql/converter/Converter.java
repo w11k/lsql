@@ -23,7 +23,6 @@ public abstract class Converter {
 
     public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         if (val != null) {
-//            val = convertValueToTargetType(lSql, val);
             failOnWrongValueType(val);
             setValue(lSql, ps, index, val);
         } else {

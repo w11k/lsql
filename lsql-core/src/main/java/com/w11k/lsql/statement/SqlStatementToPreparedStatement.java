@@ -4,7 +4,6 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,10 +85,6 @@ public class SqlStatementToPreparedStatement {
 
     private final Map<String, List<Parameter>> parameters;
 
-//    private Map<String, Converter> inConverters = Maps.newLinkedHashMap();
-
-//    private Map<String, Converter> outConverters = Maps.newLinkedHashMap();
-
     public SqlStatementToPreparedStatement(LSql lSql, String statementName, String sqlString) {
         this.lSql = lSql;
         this.statementName = statementName;
@@ -107,69 +103,6 @@ public class SqlStatementToPreparedStatement {
     public ImmutableMap<String, List<Parameter>> getParameters() {
         return ImmutableMap.copyOf(this.parameters);
     }
-
-//    public SqlStatement addInConverter(String parameterName, Converter converter) {
-//        this.inConverters.put(parameterName, converter);
-//        return this;
-//    }
-//
-//    public SqlStatement setInConverters(Map<String, Converter> inConverters) {
-//        this.inConverters = inConverters;
-//        return this;
-//    }
-//
-//    public SqlStatement addOutConverter(String columnName, Converter converter) {
-//        this.outConverters.put(columnName, converter);
-//        return this;
-//    }
-//
-//    public SqlStatement setOutConverters(Map<String, Converter> outConverters) {
-//        this.outConverters = outConverters;
-//        return this;
-//    }
-//
-//    public SqlStatement setInAndOutConverters(Map<String, Converter> inAndOutConverters) {
-//        this.inConverters = inAndOutConverters;
-//        this.outConverters = inAndOutConverters;
-//        return this;
-//    }
-
-//    public RowQuery query() {
-//        return query(Maps.<String, Object>newHashMap());
-//    }
-//
-//    public RowQuery query(Object... keyVals) {
-//        return query(Row.fromKeyVals(keyVals));
-//    }
-//
-//    public RowQuery query(Map<String, Object> queryParameters) {
-//        try {
-//            PreparedStatement ps = createPreparedStatement(queryParameters);
-//            RowQuery query = new RowQuery(lSql, ps);
-////            query.setConverters(this.outConverters);
-//            return query;
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//    }
-//
-//    public void execute() {
-//        execute(Maps.<String, Object>newHashMap());
-//    }
-//
-//    public void execute(Object... keyVals) {
-//        execute(Row.fromKeyVals(keyVals));
-//    }
-//
-//    public void execute(Map<String, Object> queryParameters) {
-//        try {
-//            PreparedStatement ps = createPreparedStatement(queryParameters);
-//            ps.execute();
-//        } catch (SQLException e) {
-//            throw new DatabaseAccessException(e);
-//        }
-//    }
 
     private Map<String, List<Parameter>> parseParameters() {
         Map<String, List<Parameter>> found = Maps.newHashMap();
@@ -212,7 +145,12 @@ public class SqlStatementToPreparedStatement {
         left = left.trim();
 
         Iterable<String> splitIter = Splitter.on(CharMatcher.anyOf("!=<> ")).omitEmptyStrings().split(left);
-        return Iterables.getLast(splitIter);
+        ArrayList<String> strings = Lists.newArrayList(splitIter);
+        String name = strings.get(strings.size() - 1);
+        if (name.toUpperCase().equals("IS")) {
+            name = strings.get(strings.size() - 2);
+        }
+        return name;
     }
 
     private void log(Map<String, Object> queryParameters) {
@@ -302,6 +240,8 @@ public class SqlStatementToPreparedStatement {
 
                 // -1 because one ? was already set
                 offset += dqp.getNumberOfQueryParameters() - 1;
+            } else if (pips.value == null) {
+                ps.setNull(i + offset + 1, Types.OTHER);
             } else {
                 Converter converter = this.lSql.getDialect().getConverterRegistry()
                         .getConverterForJavaType(pips.value.getClass());

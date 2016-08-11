@@ -222,51 +222,27 @@ public class SqlStatementTest extends AbstractLSqlTest {
         assertEquals(rows.size(), 1);
     }
 
-/*    @Test
-    public void statementInAndOutConverter() {
-        JavaBoolToSqlStringConverter converter = new JavaBoolToSqlStringConverter("positive", "negative");
+    @Test
+    public void nullValueAsQueryParameter() {
+        createTable();
+        insert(0, 50, null);
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "SELECT * FROM person WHERE fullname IS /*=*/ NULL /**/;");
 
-        lSql.executeRawSql("CREATE TABLE T (id INT PRIMARY KEY, yesno VARCHAR(100));");
-        Table t = lSql.table("T");
-        t.column("yesno").setConverter(converter);
-        t.newLinkedRow("id", 1, "yesno", true).insert();
+        List<Row> rows = statement.query("fullname", null).toList();
+        assertEquals(rows.size(), 1);
+    }
 
-        // Ensure that it was saved as a String
-        Row row = lSql.executeRawQuery("SELECT * FROM T").first().get();
-        assertEquals(row.get("yesno"), "positive");
-        assertNotEquals(row.get("yesno"), true);
+    @Test
+    public void nullValueAsNamedQueryParameter() {
+        createTable();
+        insert(0, 50, null);
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "SELECT * FROM person WHERE fullname IS /*aaa=*/ NULL /**/;");
 
-        // Ensure that table converter is working
-        LinkedRow linkedRow = t.load(1).get();
-        assertEquals(linkedRow.get("yesno"), true);
-        assertNotEquals(linkedRow.get("yesno"), "positive");
-
-        // Use IN converter
-        row = statement("SELECT * FROM T WHERE yesno = *//*=*//* 'positive' *//**//*;")
-                .addInConverter("yesno", converter)
-                .query("yesno", true).first().get();
-        assertEquals(row.get("yesno"), "positive");
-
-        // Pass-through OUT converter
-        row = statement("SELECT * FROM T WHERE yesno = *//*=*//* 'positive' *//**//*;")
-                .addInConverter("yesno", converter)
-                .addOutConverter("yesno", converter)
-                .query("yesno", true).first().get();
-        assertEquals(row.get("yesno"), true);
-
-        // Pass-through table column converters to converters API 1
-        row = statement("SELECT * FROM T WHERE yesno = *//*=*//* 'positive' *//**//*;")
-                .setInConverters(t.getColumnConverters())
-                .setOutConverters(t.getColumnConverters())
-                .query("yesno", true).first().get();
-        assertEquals(row.get("yesno"), true);
-
-        // Pass-through table column converters to converters API 2
-        row = statement("SELECT * FROM T WHERE yesno = *//*=*//* 'positive' *//**//*;")
-                .setInAndOutConverters(t.getColumnConverters())
-                .query("yesno", true).first().get();
-        assertEquals(row.get("yesno"), true);
-    }*/
+        List<Row> rows = statement.query("aaa", null).toList();
+        assertEquals(rows.size(), 1);
+    }
 
     @Test
     public void literalQueryParameter() {
@@ -391,15 +367,5 @@ public class SqlStatementTest extends AbstractLSqlTest {
         Table person = lSql.table("person");
         person.insert(Row.fromKeyVals("id", id, "age", age, "fullname", fullname));
     }
-
-//    private AbstractSqlStatement<RowQuery> statement(String sqlString) {
-//        SqlStatementToPreparedStatement stmtToPs = new SqlStatementToPreparedStatement(this.lSql, "testStatement", sqlString);
-//        return new AbstractSqlStatement<RowQuery>(stmtToPs) {
-//            @Override
-//            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps) {
-//                return new RowQuery(lSql, ps);
-//            }
-//        };
-//    }
 
 }
