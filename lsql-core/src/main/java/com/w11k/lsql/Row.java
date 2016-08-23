@@ -67,6 +67,7 @@ public class Row extends ForwardingMap<String, Object> {
     }
 
     public <A> A getAs(Class<A> type, String key) {
+        //noinspection deprecation
         if (!LEGACY_CONVERT_VALUE_ON_GET) {
             return getAs(type, key, false);
         }
@@ -77,7 +78,7 @@ public class Row extends ForwardingMap<String, Object> {
         } catch (WrongTypeException e) {
             String msg = "Row entry for " +
                     "key: '" + key + "' " +
-                    "was converted implicitly to type: " +
+                    "will be converted implicitly to type: " +
                     "'" + type.getCanonicalName() + "'. " +
                     "Please use .getAs(type, key, true);";
             logger.warn(msg);

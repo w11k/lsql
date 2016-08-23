@@ -85,6 +85,7 @@ public class RowTest extends AbstractLSqlTest {
         assertEquals(a, "1");
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void implicitlyConvertValue() {
         Row r = Row.fromKeyVals(

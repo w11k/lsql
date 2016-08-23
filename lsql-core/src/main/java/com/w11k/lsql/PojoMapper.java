@@ -35,6 +35,8 @@ public class PojoMapper<T> {
 
         // Extract property names
         PropertyDescriptor[] descs = PropertyUtils.getPropertyDescriptors(pojoClass);
+
+
         for (PropertyDescriptor desc : descs) {
             Class<?> declaringClass = desc.getReadMethod().getDeclaringClass();
             if (declaringClass.equals(Object.class)) {
