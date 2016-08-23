@@ -18,7 +18,7 @@ public class SchemaExporterTest extends AbstractLSqlTest {
     @Test
     public void createPojos() {
         createTable("CREATE TABLE table_aaa (id INTEGER PRIMARY KEY, field_a INT)");
-        createTable("CREATE TABLE table_bbb (id INTEGER PRIMARY KEY, field_bbb VARCHAR(100))");
+        createTable("CREATE TABLE table_bbb (id INTEGER PRIMARY KEY, field_bbb VARCHAR(100), yesno BOOLEAN)");
 
         lSql.table("tableAaa");
         lSql.table("tableBbb");
