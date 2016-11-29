@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.io.ByteStreams;
 
 import java.io.ByteArrayInputStream;
@@ -37,6 +38,7 @@ public class Blob {
         this.data = data;
     }
 
+    @JsonIgnore
     public InputStream getInputStream() {
         return new ByteArrayInputStream(getData());
     }
