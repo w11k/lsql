@@ -29,7 +29,7 @@ public class SqlStatementToPreparedStatement {
 
     private static final String QUERY_ARG_END = "/**/";
 
-    private final class Parameter {
+    public static final class Parameter {
         String placeholder;
 
         String name;

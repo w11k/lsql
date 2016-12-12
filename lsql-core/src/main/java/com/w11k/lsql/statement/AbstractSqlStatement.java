@@ -1,5 +1,6 @@
 package com.w11k.lsql.statement;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
@@ -7,6 +8,7 @@ import com.w11k.lsql.exceptions.DatabaseAccessException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractSqlStatement<T> {
@@ -53,5 +55,9 @@ public abstract class AbstractSqlStatement<T> {
     }
 
     abstract protected T createQueryInstance(LSql lSql, PreparedStatement ps);
+
+    public ImmutableMap<String, List<SqlStatementToPreparedStatement.Parameter>> getParameters() {
+        return this.sqlStatementToPreparedStatement.getParameters();
+    }
 
 }
