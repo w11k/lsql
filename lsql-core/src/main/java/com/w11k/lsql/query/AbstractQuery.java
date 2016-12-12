@@ -46,7 +46,7 @@ public abstract class AbstractQuery<T> {
         return lSql;
     }
 
-    public AbstractQuery ignoreDuplicateColumns() {
+    public AbstractQuery<T> ignoreDuplicateColumns() {
         ignoreDuplicateColumns = true;
         return this;
     }
@@ -59,12 +59,12 @@ public abstract class AbstractQuery<T> {
         return converters;
     }
 
-    public AbstractQuery setConverters(Map<String, Converter> converters) {
+    public AbstractQuery<T> setConverters(Map<String, Converter> converters) {
         this.converters = converters;
         return this;
     }
 
-    public AbstractQuery addConverter(String columnName, Converter converter) {
+    public AbstractQuery<T> addConverter(String columnName, Converter converter) {
         this.converters.put(columnName, converter);
         return this;
     }
