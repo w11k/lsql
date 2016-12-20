@@ -22,7 +22,12 @@ public class TreeToPojoNoCaseConversionTest extends AbstractLSqlTest {
     @Test
     public void continentsWithFactsAndCountriesAndCities() {
         List<ContinentWithFactsCountriesCities> tree = this.treeTestData.getlSqlFile()
-                .statement("continentsWithFactsAndCountriesAndCities_2", ContinentWithFactsCountriesCities.class).query().toTree();
+                .statement(
+                        "continentsWithFactsAndCountriesAndCities_2",
+                        ContinentWithFactsCountriesCities.class)
+                .query()
+                .addConverter("", null)
+                .toTree();
 
         DebugUtils.prettyPrintJson(tree);
 

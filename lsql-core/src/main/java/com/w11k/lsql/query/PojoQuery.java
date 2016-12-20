@@ -21,6 +21,7 @@ public class PojoQuery<T> extends AbstractQuery<T> {
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<T> toTree() {
         return (List<T>) new QueryToTreeConverter(this, new PojoEntityCreator<T>(this.pojoClass)).getTree();
     }

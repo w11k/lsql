@@ -15,6 +15,7 @@ public class RowQuery extends AbstractQuery<Row> {
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Row> toTree() {
         return (List<Row>) new QueryToTreeConverter(this, new RowEntityCreator()).getTree();
     }

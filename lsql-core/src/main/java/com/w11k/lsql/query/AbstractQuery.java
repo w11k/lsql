@@ -71,8 +71,9 @@ public abstract class AbstractQuery<T> {
 
     public List<T> toList() {
         return rx().toList().toBlocking().first();
-
     }
+
+    public abstract List<T> toTree();
 
     /**
      * Executes the query and returns the first row in the result set. Return absent() if the result set is empty.
