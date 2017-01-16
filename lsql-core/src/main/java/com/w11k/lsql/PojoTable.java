@@ -35,11 +35,11 @@ public class PojoTable<T> {
         return this.table;
     }
 
-    public void insert(T pojo) {
-        insert(pojo, false);
+    public Optional<Object> insert(T pojo) {
+        return insert(pojo, false);
     }
 
-    public void insert(T pojo, boolean pure) {
+    public Optional<Object> insert(T pojo, boolean pure) {
         Row row = this.pojoMapper.pojoToRow(pojo);
 
         // Remove null values so that the DB can insert the default values
@@ -52,12 +52,13 @@ public class PojoTable<T> {
         }
 
         Optional<Object> id = this.table.insert(row);
-        if (!id.isPresent() || pure) {
-            return;
+
+        if (id.isPresent() && !pure) {
+            LinkedRow linkedRow = this.table.load(id.get()).get();
+            this.pojoMapper.assignRowToPojo(linkedRow, pojo);
         }
 
-        LinkedRow linkedRow = this.table.load(id.get()).get();
-        this.pojoMapper.assignRowToPojo(linkedRow, pojo);
+        return id;
     }
 
     public Optional<T> load(Object id) {
