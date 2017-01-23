@@ -1,5 +1,6 @@
 package com.w11k.lsql.query;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -73,6 +74,10 @@ public abstract class AbstractQuery<T> {
         return rx().toList().toBlocking().first();
     }
 
+    public <R> List<R> toList(Func1<T, R> mapper) {
+        return rx().map(mapper).toList().toBlocking().first();
+    }
+
     public abstract List<T> toTree();
 
     /**
@@ -86,6 +91,16 @@ public abstract class AbstractQuery<T> {
             return of(list.get(0));
         }
     }
+
+    public <R> Optional<R> first(final Func1<T, R> mapper) {
+        return this.first().transform(new Function<T, R>() {
+            @Override
+            public R apply(T input) {
+                return mapper.call(input);
+            }
+        });
+    }
+
 
     /**
      * Turns this query into an Observable.  Each subscription will trigger the underlying database operation.
