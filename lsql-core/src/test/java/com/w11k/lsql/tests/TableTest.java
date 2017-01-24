@@ -136,7 +136,6 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(queriedRow, row);
     }
 
-/*
     @Test
     public void updateWithCustomWhere() throws SQLException {
         createTable("CREATE TABLE table1 (col1 TEXT, col2 TEXT, col3 TEXT)");
@@ -151,7 +150,6 @@ public class TableTest extends AbstractLSqlTest {
         Row loaded = lSql.executeRawQuery("select * from table1").first().get();
         assertEquals(loaded, copy);
     }
-*/
 
     @Test(expectedExceptions = UpdateException.class)
     public void updateWithWrongId() throws SQLException {

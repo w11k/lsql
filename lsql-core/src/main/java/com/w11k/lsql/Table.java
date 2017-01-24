@@ -123,7 +123,7 @@ public class Table {
             PreparedStatement ps =
                     lSql.getDialect().getStatementCreator().createInsertStatement(this, columns);
 
-            setValuesInPreparedStatement(ps, columns, row);
+            setValuesInPreparedStatement(ps, columns, row, null, null);
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
@@ -170,49 +170,23 @@ public class Table {
      * @throws UpdateException
      */
     public void update(Row row) {
-        if (getPrimaryKeyColumn().isPresent() && !row.containsKey(getPrimaryKeyColumn().get())) {
+        Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
+
+        if (!primaryKeyColumn.isPresent()) {
+            throw new UpdateException("Can not update row without a primary key column.");
+        }
+
+        if (!row.containsKey(primaryKeyColumn.get())) {
             throw new UpdateException("Can not update row because the primary key column " +
-                    "'" + getPrimaryKeyColumn().get() + "' is not present.");
+                    "'" + primaryKeyColumn.get() + "' is not present.");
         }
-        try {
-            List<String> columns = createColumnList(row);
-            columns.remove(getPrimaryKeyColumn().get());
-            if (revisionColumn.isPresent()) {
-                columns.remove(getRevisionColumn().get().getJavaColumnName());
-            }
 
-            if (columns.isEmpty()) {
-                return;
-            }
-
-            PreparedStatement ps = lSql.getDialect().getStatementCreator().createUpdateStatement(this, columns);
-            setValuesInPreparedStatement(ps, columns, row);
-
-            // Set ID
-            String pkColumn = getPrimaryKeyColumn().get();
-            Object id = row.get(pkColumn);
-            Column column = column(pkColumn);
-            column.getConverter().setValueInStatement(lSql, ps, columns.size() + 1, id);
-
-            // Set Revision
-            if (revisionColumn.isPresent()) {
-                Column col = revisionColumn.get();
-                Object revision = row.get(col.getJavaColumnName());
-                col.getConverter().setValueInStatement(lSql, ps, columns.size() + 2, revision);
-            }
-
-            executeUpdate(ps);
-
-            // Set new revision
-            applyNewRevision(row, id);
-
-            //return row.getOptional(getPrimaryKeyColumn().load());
-        } catch (Exception e) {
-            throw new UpdateException(e);
-        }
+        String pkName = primaryKeyColumn.get();
+        Row whereIdVal = Row.fromKeyVals(pkName, row.get(pkName));
+        updateWhere(row, whereIdVal);
     }
 
-    /*public void updateWhere(Row values, Row where) {
+    public void updateWhere(Row values, Row where) {
         if (where.size() == 0) {
             throw new UpdateException("Can not update row without where values.");
         }
@@ -222,38 +196,39 @@ public class Table {
 
             if (revisionColumn.isPresent()) {
                 valueColumns.remove(getRevisionColumn().get().getJavaColumnName());
+                whereColumns.remove(getRevisionColumn().get().getJavaColumnName());
             }
+
+            final int placeholderCount = valueColumns.size() + whereColumns.size();
 
             if (valueColumns.isEmpty()) {
                 return;
             }
 
-            PreparedStatement ps = lSql.getDialect().getStatementCreator().createUpdateStatement(this, valueColumns);
-            setValuesInPreparedStatement(ps, valueColumns, values);
+            PreparedStatement ps = lSql.getDialect().getStatementCreator()
+                    .createUpdateStatement(this, valueColumns, whereColumns);
 
-            // Set ID
-            String pkColumn = getPrimaryKeyColumn().get();
-            Object id = values.get(pkColumn);
-            Column column = column(pkColumn);
-            column.getConverter().setValueInStatement(lSql, ps, valueColumns.size() + 1, id);
+            setValuesInPreparedStatement(ps, valueColumns, values, whereColumns, where);
 
             // Set Revision
             if (revisionColumn.isPresent()) {
                 Column col = revisionColumn.get();
                 Object revision = values.get(col.getJavaColumnName());
-                col.getConverter().setValueInStatement(lSql, ps, valueColumns.size() + 2, revision);
+                col.getConverter().setValueInStatement(lSql, ps, placeholderCount + 1, revision);
             }
 
             executeUpdate(ps);
 
             // Set new revision
-            applyNewRevision(values, id);
-
-            //return row.getOptional(getPrimaryKeyColumn().load());
+            if (getPrimaryKeyColumn().isPresent() && values.containsKey(getPrimaryKeyColumn().get())) {
+                String pkColumn = getPrimaryKeyColumn().get();
+                Object id = values.get(pkColumn);
+                applyNewRevision(values, id);
+            }
         } catch (Exception e) {
             throw new UpdateException(e);
         }
-    }*/
+    }
 
     /**
      * Saves the {@link Row} instance.
@@ -560,11 +535,20 @@ public class Table {
     }
 
     private PreparedStatement setValuesInPreparedStatement(PreparedStatement ps,
-                                                           List<String> columns, Row row) {
+                                                           List<String> columns1,
+                                                           Row values1,
+                                                           List<String> columns2,
+                                                           Row values2) {
         try {
-            for (int i = 0; i < columns.size(); i++) {
-                Converter converter = column(columns.get(i)).getConverter();
-                converter.setValueInStatement(lSql, ps, i + 1, row.get(columns.get(i)));
+            for (int i = 0; i < columns1.size(); i++) {
+                Converter converter = column(columns1.get(i)).getConverter();
+                converter.setValueInStatement(lSql, ps, i + 1, values1.get(columns1.get(i)));
+            }
+            if (columns2 != null && values2 != null) {
+                for (int i = 0; i < columns2.size(); i++) {
+                    Converter converter = column(columns2.get(i)).getConverter();
+                    converter.setValueInStatement(lSql, ps, columns1.size() + i + 1, values2.get(columns2.get(i)));
+                }
             }
             return ps;
         } catch (SQLException e) {

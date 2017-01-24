@@ -60,17 +60,21 @@ public class StatementCreator {
         return createPreparedStatement(table.getlSql(), sql, true);
     }
 
-    public PreparedStatement createUpdateStatement(Table table, List<String> columns) {
+    public PreparedStatement createUpdateStatement(Table table, List<String> columns, List<String> whereColumns) {
         String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
         String sql = "UPDATE " + sqlTableName;
         sql += " SET ";
+
+        // set revision value?
         if (table.getRevisionColumn().isPresent()) {
-            String col = getRevisionColumnSqlIdentifier(table);
-            sql += col + "=" + col + "+1";
+            String revCol = getRevisionColumnSqlIdentifier(table);
+            sql += revCol + "=" + revCol + "+1";
             if (columns.size() > 0) {
                 sql += ",";
             }
         }
+
+        // new values
         sql += Joiner.on(",").join(Lists.transform(
           createSqlColumnNames(table, columns),
           new Function<String, Object>() {
@@ -79,14 +83,23 @@ public class StatementCreator {
                   return input + "=?";
               }
           }));
+
+        // where
         sql += " WHERE ";
-        sql += table.getPrimaryKeyColumn().get();
-        sql += "=?";
+        sql += Joiner.on(" AND ").join(Lists.transform(
+                createSqlColumnNames(table, whereColumns),
+                new Function<String, Object>() {
+                    @Override
+                    public Object apply(String input) {
+                        return input + "=?";
+                    }
+                }));
+
         if (table.getRevisionColumn().isPresent()) {
             sql += " AND ";
-            String sqlRevisionColumn = getRevisionColumnSqlIdentifier(table);
-            sql += sqlRevisionColumn + "=?";
+            sql += getRevisionColumnSqlIdentifier(table) + "=?";
         }
+
         sql += ";";
         return createPreparedStatement(table.getlSql(), sql, false);
     }
