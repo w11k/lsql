@@ -136,6 +136,23 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(queriedRow, row);
     }
 
+/*
+    @Test
+    public void updateWithCustomWhere() throws SQLException {
+        createTable("CREATE TABLE table1 (col1 TEXT, col2 TEXT, col3 TEXT)");
+        Table table1 = lSql.table("table1");
+        Row row = new Row().addKeyVals("col1", "a", "col2", "b", "col3", "c");
+        table1.insert(row);
+
+        Row copy = row.copy();
+        copy.put("col3", "ccc");
+        table1.updateWhere(copy, row);
+
+        Row loaded = lSql.executeRawQuery("select * from table1").first().get();
+        assertEquals(loaded, copy);
+    }
+*/
+
     @Test(expectedExceptions = UpdateException.class)
     public void updateWithWrongId() throws SQLException {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT)");

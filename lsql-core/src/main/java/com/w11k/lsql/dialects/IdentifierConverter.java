@@ -48,6 +48,16 @@ public abstract class IdentifierConverter {
         }
     };
 
+    public static IdentifierConverter JAVA_UPPER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE = new IdentifierConverter() {
+        public String sqlToJava(String sqlName) {
+            return sqlName.toUpperCase();
+        }
+
+        public String javaToSql(String javaName) {
+            return javaName.toUpperCase();
+        }
+    };
+
     public abstract String sqlToJava(String sqlName);
 
     public abstract String javaToSql(String javaName);

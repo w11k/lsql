@@ -59,6 +59,10 @@ public class GenericDialect {
         return this.converterRegistry;
     }
 
+    public void setConverterRegistry(ConverterRegistry converterRegistry) {
+        this.converterRegistry = converterRegistry;
+    }
+
     public StatementCreator getStatementCreator() {
         return statementCreator;
     }

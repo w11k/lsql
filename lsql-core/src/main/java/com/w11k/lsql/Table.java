@@ -212,6 +212,49 @@ public class Table {
         }
     }
 
+    /*public void updateWhere(Row values, Row where) {
+        if (where.size() == 0) {
+            throw new UpdateException("Can not update row without where values.");
+        }
+        try {
+            List<String> valueColumns = createColumnList(values);
+            List<String> whereColumns = createColumnList(where);
+
+            if (revisionColumn.isPresent()) {
+                valueColumns.remove(getRevisionColumn().get().getJavaColumnName());
+            }
+
+            if (valueColumns.isEmpty()) {
+                return;
+            }
+
+            PreparedStatement ps = lSql.getDialect().getStatementCreator().createUpdateStatement(this, valueColumns);
+            setValuesInPreparedStatement(ps, valueColumns, values);
+
+            // Set ID
+            String pkColumn = getPrimaryKeyColumn().get();
+            Object id = values.get(pkColumn);
+            Column column = column(pkColumn);
+            column.getConverter().setValueInStatement(lSql, ps, valueColumns.size() + 1, id);
+
+            // Set Revision
+            if (revisionColumn.isPresent()) {
+                Column col = revisionColumn.get();
+                Object revision = values.get(col.getJavaColumnName());
+                col.getConverter().setValueInStatement(lSql, ps, valueColumns.size() + 2, revision);
+            }
+
+            executeUpdate(ps);
+
+            // Set new revision
+            applyNewRevision(values, id);
+
+            //return row.getOptional(getPrimaryKeyColumn().load());
+        } catch (Exception e) {
+            throw new UpdateException(e);
+        }
+    }*/
+
     /**
      * Saves the {@link Row} instance.
      * <p/>
