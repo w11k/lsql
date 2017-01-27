@@ -3,6 +3,7 @@ package com.w11k.lsql.tests.pojo;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.PojoTable;
+import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.predefined.AtomicIntegerConverter;
 import com.w11k.lsql.tests.AbstractLSqlTest;
@@ -139,6 +140,36 @@ public class PojoTableTest extends AbstractLSqlTest {
     public void errorMessageOnSuperfluousType() {
         PersonTestData.init(this.lSql, false);
         this.lSql.table("person", PersonWithSuperfluousField.class);
+    }
+
+    @Test
+    public void nullInColumnForStringFieldInPojo() {
+        PersonTestData.init(this.lSql, false);
+        Table personTable = this.lSql.table("person");
+        personTable.insert(Row.fromKeyVals(
+                "id", 1,
+                "firstName", null,
+                "age", 10,
+                "title", "Title"
+        ));
+        PojoTable<Person> personPojoTable = personTable.withPojo(Person.class);
+        Person person = personPojoTable.load(1).get();
+        assertNull(person.getFirstName());
+    }
+
+    @Test
+    public void nullInColumnForIntFieldInPojo() {
+        PersonTestData.init(this.lSql, false);
+        Table personTable = this.lSql.table("person");
+        personTable.insert(Row.fromKeyVals(
+                "id", 1,
+                "firstName", "First",
+                "age", null,
+                "title", "Title"
+        ));
+        PojoTable<Person> personPojoTable = personTable.withPojo(Person.class);
+        Person person = personPojoTable.load(1).get();
+        assertNull(person.getFirstName());
     }
 
 }

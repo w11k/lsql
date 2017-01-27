@@ -9,6 +9,25 @@ import java.util.Arrays;
 
 public abstract class Converter {
 
+    public static Converter withDefaultValueForNull(final Converter delegate, final Object defaultValueForNull) {
+        return new Converter(delegate.getJavaType(), delegate.getSqlTypes(), delegate.getSqlTypeForNullValues()) {
+            @Override
+            protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+                delegate.setValue(lSql, ps, index, val);
+            }
+
+            @Override
+            protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+                return delegate.getValue(lSql, rs, index);
+            }
+
+            @Override
+            protected Object getDefaultValueForNull(LSql lSql, ResultSet rs, int index) {
+                return defaultValueForNull;
+            }
+        };
+    }
+
     private final Class<?> javaType;
 
     private final int[] sqlTypes;
@@ -20,6 +39,7 @@ public abstract class Converter {
         this.sqlTypes = sqlTypes;
         this.sqlTypeForNullValues = sqlTypeForNullValues;
     }
+
 
     public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         if (val != null) {
@@ -40,14 +60,10 @@ public abstract class Converter {
         }
     }
 
-//    public Object convertValueToTargetType(LSql lSql, Object val) {
-//        return lSql.getObjectMapper().convertValue(val, javaType);
-//    }
-
     public Object getValueFromResultSet(LSql lSql, ResultSet rs, int index) throws SQLException {
         rs.getObject(index);
         if (rs.wasNull()) {
-            return null;
+            return this.getDefaultValueForNull(lSql, rs, index);
         }
         return getValue(lSql, rs, index);
     }
@@ -57,37 +73,8 @@ public abstract class Converter {
             return isNullValid();
         }
 
-//        if (getSupportedJavaClass().isPresent()) {
         return javaType.isAssignableFrom(value.getClass());
-//        } else {
-//            return true;
-//        }
     }
-
-//    public boolean supportsSqlType(int sqlType) {
-//        for (int type : this.sqlTypes) {
-//            if (sqlType == type) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-//    public int[] getSupportedSqlTypes() {
-//        throw new RuntimeException("This converter does not specify the supported SQL types.");
-//    }
-
-//    public Optional<? extends Class<?>> getSupportedJavaClass() {
-//        return Optional.of(Object.class);
-//    }
-
-//    public int getSqlTypeForNullValues() {
-//        return getSupportedSqlTypes()[0];
-//    }
-
-//    public boolean convertWithJacksonOnWrongType() {
-//        return true;
-//    }
 
     public boolean supportsSqlType(int sqlType) {
         for (int type : this.sqlTypes) {
@@ -127,4 +114,9 @@ public abstract class Converter {
     protected boolean isNullValid() {
         return true;
     }
+
+    protected Object getDefaultValueForNull(LSql lSql, ResultSet rs, int index) {
+        return null;
+    }
+
 }
