@@ -157,19 +157,4 @@ public class PojoTableTest extends AbstractLSqlTest {
         assertNull(person.getFirstName());
     }
 
-    @Test
-    public void nullInColumnForIntFieldInPojo() {
-        PersonTestData.init(this.lSql, false);
-        Table personTable = this.lSql.table("person");
-        personTable.insert(Row.fromKeyVals(
-                "id", 1,
-                "firstName", "First",
-                "age", null,
-                "title", "Title"
-        ));
-        PojoTable<Person> personPojoTable = personTable.withPojo(Person.class);
-        Person person = personPojoTable.load(1).get();
-        assertNull(person.getFirstName());
-    }
-
 }
