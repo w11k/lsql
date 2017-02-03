@@ -512,8 +512,8 @@ public class Table {
             String schema = null;
             if (tableName.contains(".")) {
                 int dot = tableName.indexOf('.');
-                tableName = tableName.substring(0, dot);
-                schema = tableName.substring(dot + 1);
+                schema = tableName.substring(0, dot);
+                tableName = tableName.substring(dot + 1);
             }
 
             // Check table name
