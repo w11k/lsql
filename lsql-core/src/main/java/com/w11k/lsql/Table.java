@@ -506,16 +506,25 @@ public class Table {
         Connection con = ConnectionUtils.getConnection(lSql);
         try {
             DatabaseMetaData md = con.getMetaData();
+            String tableName = lSql.identifierJavaToSql(this.tableName);
+
+            // Schema name
+            String schema = null;
+            if (tableName.contains(".")) {
+                int dot = tableName.indexOf('.');
+                tableName = tableName.substring(0, dot);
+                schema = tableName.substring(dot + 1);
+            }
 
             // Check table name
-            ResultSet tables = md.getTables(null, null, lSql.identifierJavaToSql(this.tableName), null);
+            ResultSet tables = md.getTables(null, schema, tableName, null);
             if (!tables.next()) {
-                throw new IllegalArgumentException("Unknown table '" + tableName + "'");
+                throw new IllegalArgumentException("Unknown table '" + this.tableName + "'");
             }
 
             // Fetch Primary Key
             ResultSet primaryKeys =
-                    md.getPrimaryKeys(null, null, lSql.identifierJavaToSql(tableName));
+                    md.getPrimaryKeys(null, schema, lSql.identifierJavaToSql(this.tableName));
 
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
@@ -526,7 +535,7 @@ public class Table {
 
             // Fetch all columns
             ResultSet columnsMetaData =
-                    md.getColumns(null, null, lSql.identifierJavaToSql(tableName), null);
+                    md.getColumns(null, schema, lSql.identifierJavaToSql(this.tableName), null);
 
             while (columnsMetaData.next()) {
                 String sqlColumnName = columnsMetaData.getString(4);
@@ -537,6 +546,10 @@ public class Table {
                 Column column = new Column(this, javaColumnName, sqlType, converter, columnSize);
                 lSql.getInitColumnCallback().onNewColumn(column);
                 this.columns.put(javaColumnName, column);
+            }
+
+            if (tables.next()) {
+                throw new IllegalArgumentException("meta data fetch returned more than one table for '" + this.tableName + "'");
             }
         } catch (SQLException e) {
             e.printStackTrace();
