@@ -524,7 +524,7 @@ public class Table {
 
             // Fetch Primary Key
             ResultSet primaryKeys =
-                    md.getPrimaryKeys(null, schema, lSql.identifierJavaToSql(this.tableName));
+                    md.getPrimaryKeys(null, schema, tableName);
 
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
@@ -535,7 +535,7 @@ public class Table {
 
             // Fetch all columns
             ResultSet columnsMetaData =
-                    md.getColumns(null, schema, lSql.identifierJavaToSql(this.tableName), null);
+                    md.getColumns(null, schema, tableName, null);
 
             while (columnsMetaData.next()) {
                 String sqlColumnName = columnsMetaData.getString(4);
