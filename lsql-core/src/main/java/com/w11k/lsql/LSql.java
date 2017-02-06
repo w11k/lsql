@@ -161,7 +161,10 @@ public class LSql {
      */
     public synchronized Table table(String tableName) {
         if (!this.tables.containsKey(tableName)) {
-            this.tables.put(tableName, new Table(this, tableName));
+            Table table = new Table(this, tableName);
+
+            this.tables.put(tableName, table);
+            this.tables.put(table.getSchemaAndTableName(), table);
         }
         return this.tables.get(tableName);
     }

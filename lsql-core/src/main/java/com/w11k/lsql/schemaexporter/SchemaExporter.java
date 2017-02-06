@@ -68,7 +68,7 @@ public class SchemaExporter {
         assert packageFolderFile.exists();
 
         for (Table table : this.lSql.getTables()) {
-            logger.info("Generating POJO for table '" + table.getTableName() + "'");
+            logger.info("Generating POJO for table '" + table.getSchemaAndTableName() + "'");
             new TableExporter(table, this, packageFolderFile).export();
         }
     }

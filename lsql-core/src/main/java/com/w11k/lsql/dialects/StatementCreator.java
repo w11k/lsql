@@ -40,7 +40,7 @@ public class StatementCreator {
     }
 
     public PreparedStatement createRevisionQueryStatement(Table table) {
-        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getSchemaAndTableName());
         String revCol = getRevisionColumnSqlIdentifier(table);
         String sql = "SELECT " + revCol + " FROM " + sqlTableName + " WHERE ";
         sql += table.getPrimaryKeyColumn().get();
@@ -49,7 +49,7 @@ public class StatementCreator {
     }
 
     public PreparedStatement createInsertStatement(final Table table, List<String> columns) {
-        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getSchemaAndTableName());
         String sql = "";
         sql += "INSERT INTO " + sqlTableName;
         sql += "(";
@@ -61,7 +61,7 @@ public class StatementCreator {
     }
 
     public PreparedStatement createUpdateStatement(Table table, List<String> columns, List<String> whereColumns) {
-        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getSchemaAndTableName());
         String sql = "UPDATE " + sqlTableName;
         sql += " SET ";
 
@@ -105,7 +105,7 @@ public class StatementCreator {
     }
 
     public String createSelectByIdStatement(Table table, Column idColumn, Collection<Column> columns) {
-        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getSchemaAndTableName());
         String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
 
         String sql = "SELECT ";
@@ -123,7 +123,7 @@ public class StatementCreator {
 
     public PreparedStatement createDeleteByIdStatement(Table table) {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
-        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getSchemaAndTableName());
         String sqlIdName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
 
         String sql = "DELETE FROM ";
@@ -141,7 +141,7 @@ public class StatementCreator {
 
     public PreparedStatement createCountForIdStatement(Table table) throws SQLException {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
-        String sqlTableName = table.getlSql().identifierJavaToSql(table.getTableName());
+        String sqlTableName = table.getlSql().identifierJavaToSql(table.getSchemaAndTableName());
         String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
         String sql = "select count(" + sqlColumnName + ") from " + sqlTableName + " where " +
           sqlColumnName + "=?";

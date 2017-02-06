@@ -38,10 +38,15 @@ public class PostgresDialect extends GenericDialect {
     }
 
     @Override
-    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
-                                                    int columnIndex) throws SQLException {
+    public String getSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                             int columnIndex) throws SQLException {
+
         Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
-        return postgresMetaData.getBaseTableName(columnIndex);
+
+        String schema = getIdentifierConverter().sqlToJava(postgresMetaData.getBaseSchemaName(columnIndex));
+        String table = getIdentifierConverter().sqlToJava(postgresMetaData.getBaseTableName(columnIndex));
+
+        return schema.equals("") ? table : schema + "." + table;
     }
 
     @Override

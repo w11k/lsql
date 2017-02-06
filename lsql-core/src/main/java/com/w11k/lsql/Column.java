@@ -84,7 +84,7 @@ public class Column {
     public Optional<? extends AbstractValidationError> validateValue(Object value) {
         if (!this.converter.isValueValid(value)) {
             return of(new TypeError(
-              this.table.getTableName(),
+              this.table.getSchemaAndTableName(),
                     this.columnName,
                     this.converter.getJavaType().getSimpleName(), value.getClass().getSimpleName()));
         }
@@ -94,7 +94,7 @@ public class Column {
             String string = (String) value;
             if (string != null && string.length() > this.columnSize) {
                 return of(new StringTooLongError(
-                        this.table.getTableName(), this.columnName, this.columnSize, string.length()));
+                        this.table.getSchemaAndTableName(), this.columnName, this.columnSize, string.length()));
             }
         }
 

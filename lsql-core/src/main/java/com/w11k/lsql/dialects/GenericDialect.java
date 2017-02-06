@@ -75,9 +75,13 @@ public class GenericDialect {
         this.identifierConverter = identifierConverter;
     }
 
-    public String getTableNameFromResultSetMetaData(ResultSetMetaData metaData,
-                                                    int columnIndex) throws SQLException {
-        return getIdentifierConverter().sqlToJava(metaData.getTableName(columnIndex));
+    public String getSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                             int columnIndex) throws SQLException {
+
+        String schema = getIdentifierConverter().sqlToJava(metaData.getSchemaName(columnIndex));
+        String table = getIdentifierConverter().sqlToJava(metaData.getTableName(columnIndex));
+
+        return schema.equals("") ? table : schema + "." + table;
     }
 
     public String getColumnNameFromResultSetMetaData(ResultSetMetaData metaData,

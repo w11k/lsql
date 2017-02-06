@@ -195,7 +195,7 @@ public abstract class AbstractQuery<T> {
         }
 
         // Determine source table and column from ResultSet
-        String tableName = lSql.getDialect().getTableNameFromResultSetMetaData(metaData, position);
+        String tableName = lSql.getDialect().getSchemaAndTableNameFromResultSetMetaData(metaData, position);
         String columnName = lSql.getDialect().getColumnNameFromResultSetMetaData(metaData, position);
         if (tableName != null
                 && tableName.length() > 0

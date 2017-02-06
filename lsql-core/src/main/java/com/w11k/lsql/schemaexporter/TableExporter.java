@@ -26,7 +26,7 @@ public class TableExporter {
     public void export() {
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(this.schemaExporter.getPackageName()).append(";\n\n");
-        sb.append("public class ").append(nameToIdentifier(this.table.getTableName())).append(" {\n\n");
+        sb.append("public class ").append(nameToIdentifier(this.table.getSchemaAndTableName())).append(" {\n\n");
 
         // Field instances
         for (Map.Entry<String, Column> entry : this.table.getColumns().entrySet()) {
@@ -53,7 +53,7 @@ public class TableExporter {
     }
 
     private File getPojoSourceFile() {
-        return new File(this.packageFolderFile, nameToIdentifier(this.table.getTableName()) + ".java");
+        return new File(this.packageFolderFile, nameToIdentifier(this.table.getSchemaAndTableName()) + ".java");
     }
 
     private void generateGetterSetter(StringBuilder sb, Map.Entry<String, Column> entry) {
