@@ -23,6 +23,8 @@ public class Column {
 
     private boolean ignored = false;
 
+    private boolean ignoreOnUpdate = false;
+
 //    public static Column create(Table table,
 //                                    String columnName,
 //                                    int sqlType,
@@ -79,6 +81,14 @@ public class Column {
 
     public void setIgnored(boolean ignored) {
         this.ignored = ignored;
+    }
+
+    public boolean isIgnoreOnUpdate() {
+        return ignoreOnUpdate;
+    }
+
+    public void setIgnoreOnUpdate(boolean ignoreOnUpdate) {
+        this.ignoreOnUpdate = ignoreOnUpdate;
     }
 
     public Optional<? extends AbstractValidationError> validateValue(Object value) {

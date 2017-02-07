@@ -127,7 +127,7 @@ public class Table {
      */
     public Optional<Object> insert(Row row) {
         try {
-            List<String> columns = createColumnList(row);
+            List<String> columns = createColumnList(row, false);
 
             PreparedStatement ps =
                     lSql.getDialect().getStatementCreator().createInsertStatement(this, columns);
@@ -200,8 +200,8 @@ public class Table {
             throw new UpdateException("Can not update row without where values.");
         }
         try {
-            List<String> valueColumns = createColumnList(values);
-            List<String> whereColumns = createColumnList(where);
+            List<String> valueColumns = createColumnList(values, true);
+            List<String> whereColumns = createColumnList(where, true);
 
             if (revisionColumn.isPresent()) {
                 valueColumns.remove(getRevisionColumn().get().getJavaColumnName());
@@ -459,7 +459,7 @@ public class Table {
         return lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, psString, false);
     }
 
-    private List<String> createColumnList(final Row row) {
+    private List<String> createColumnList(final Row row, final boolean filterIgnoreOnUpdateColumns) {
         List<String> columns = Lists.newLinkedList(row.keySet());
         columns = newLinkedList(filter(columns, new Predicate<String>() {
             public boolean apply(String input) {
@@ -471,7 +471,13 @@ public class Table {
                     message += "]";
                     throw new RuntimeException(message);
                 }
-                return !column.isIgnored();
+
+                if (filterIgnoreOnUpdateColumns && column.isIgnoreOnUpdate()) {
+                    return false;
+                } else {
+                    return !column.isIgnored();
+                }
+
             }
         }));
         return columns;
