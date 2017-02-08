@@ -6,6 +6,7 @@ import com.w11k.lsql.Table;
 import com.w11k.lsql.tests.testdata.PersonTestData;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 public class TableColumnIgnoreTest extends AbstractLSqlTest {
@@ -43,6 +44,31 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
 
         Row row = lSql.executeRawQuery("select * from person").toList().get(0);
         assertNull(row.get("firstName"));
+    }
+
+    @Test
+    public void ignoreColumnOnUpdateFlag() {
+        PersonTestData.init(this.lSql, true);
+        Table person = this.lSql.table("person");
+
+        person.column("id").setIgnoreOnUpdate(true);
+        person.column("age").setIgnoreOnUpdate(true);
+        person.column("title").setIgnoreOnUpdate(true);
+
+        Row row = lSql.executeRawQuery("select * from person").toList().get(0);
+        assertEquals(row.get("firstName"), "Adam");
+        assertEquals(row.get("age"), 30);
+        assertEquals(row.get("title"), "n/a");
+
+        row.put("firstName", "Adam2");
+        row.put("age", 32);
+        row.put("title", "n/a2");
+        person.update(row);
+
+        row = lSql.executeRawQuery("select * from person").toList().get(0);
+        assertEquals(row.get("firstName"), "Adam2");
+        assertEquals(row.get("age"), 30);
+        assertEquals(row.get("title"), "n/a");
     }
 
 }

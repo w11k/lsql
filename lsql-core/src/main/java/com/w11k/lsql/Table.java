@@ -201,7 +201,7 @@ public class Table {
         }
         try {
             List<String> valueColumns = createColumnList(values, true);
-            List<String> whereColumns = createColumnList(where, true);
+            List<String> whereColumns = createColumnList(where, false);
 
             if (revisionColumn.isPresent()) {
                 valueColumns.remove(getRevisionColumn().get().getJavaColumnName());
