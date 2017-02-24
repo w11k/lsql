@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -146,6 +147,9 @@ public class Row extends ForwardingMap<String, Object> {
 
     public Boolean getBoolean(String key) {
         return getAs(Boolean.class, key);
+    }
+    public BigDecimal getBigDecimal(String key) {
+        return getAs(BigDecimal.class, key);
     }
 
     public DateTime getDateTime(String key) {

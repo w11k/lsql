@@ -6,7 +6,7 @@
 
   <groupId>com.w11k.lsql</groupId>
   <artifactId>lsql-parent</artifactId>
-  <version>0.22.8</version>
+  <version>0.23.0</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -24,9 +24,9 @@
     <dependencies>
       <!-- compile -->
       <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>1.0.13</version>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.7</version>
       </dependency>
 
       <dependency>
