@@ -7,14 +7,8 @@ import java.sql.*;
 
 public class BlobConverter extends Converter {
 
-    public static final BlobConverter INSTANCE = new BlobConverter();
-
     public BlobConverter() {
-        super(
-          com.w11k.lsql.Blob.class,
-          new int[]{Types.BLOB},
-          Types.BLOB
-        );
+        super(com.w11k.lsql.Blob.class, Types.BLOB);
     }
 
     @Override

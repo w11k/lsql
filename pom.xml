@@ -79,19 +79,6 @@
         <version>2.3.1</version>
       </dependency>
 
-      <!--<dependency>-->
-        <!--<groupId>com.google.code.findbugs</groupId>-->
-        <!--<artifactId>jsr305</artifactId>-->
-        <!--<version>2.0.1</version>-->
-        <!--<scope>provided</scope>-->
-      <!--</dependency>-->
-
-      <!--<dependency>-->
-        <!--<groupId>org.javassist</groupId>-->
-        <!--<artifactId>javassist</artifactId>-->
-        <!--<version>3.18.0-GA</version>-->
-      <!--</dependency>-->
-
       <!-- for dialect -->
       <dependency>
         <groupId>org.postgresql</groupId>

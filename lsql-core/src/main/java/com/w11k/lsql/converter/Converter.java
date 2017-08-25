@@ -1,16 +1,16 @@
 package com.w11k.lsql.converter;
 
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.utils.SqlTypesNames;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 public abstract class Converter {
 
     public static Converter withDefaultValueForNull(final Converter delegate, final Object defaultValueForNull) {
-        return new Converter(delegate.getJavaType(), delegate.getSqlTypes(), delegate.getSqlTypeForNullValues()) {
+        return new Converter(delegate.getJavaType(), delegate.getSqlType()) {
             @Override
             protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                 delegate.setValue(lSql, ps, index, val);
@@ -30,14 +30,11 @@ public abstract class Converter {
 
     private final Class<?> javaType;
 
-    private final int[] sqlTypes;
+    private final int sqlType;
 
-    private final int sqlTypeForNullValues;
-
-    public Converter(Class<?> javaType, int[] sqlTypes, int sqlTypeForNullValues) {
+    public Converter(Class<?> javaType, int sqlType) {
         this.javaType = javaType;
-        this.sqlTypes = sqlTypes;
-        this.sqlTypeForNullValues = sqlTypeForNullValues;
+        this.sqlType = sqlType;
     }
 
 
@@ -46,7 +43,7 @@ public abstract class Converter {
             failOnWrongValueType(val);
             setValue(lSql, ps, index, val);
         } else {
-            ps.setNull(index, sqlTypeForNullValues);
+            ps.setNull(index, sqlType);
         }
     }
 
@@ -76,33 +73,19 @@ public abstract class Converter {
         return javaType.isAssignableFrom(value.getClass());
     }
 
-    public boolean supportsSqlType(int sqlType) {
-        for (int type : this.sqlTypes) {
-            if (type == sqlType) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Class<?> getJavaType() {
         return javaType;
     }
 
-    public int[] getSqlTypes() {
-        return sqlTypes;
-    }
-
-    public int getSqlTypeForNullValues() {
-        return sqlTypeForNullValues;
+    public int getSqlType() {
+        return sqlType;
     }
 
     @Override
     public String toString() {
         return "Converter{" +
                 "javaType=" + javaType +
-                ", sqlTypes=" + Arrays.toString(sqlTypes) +
-                ", sqlTypeForNullValues=" + sqlTypeForNullValues +
+                ", sqlType=" + SqlTypesNames.getName(sqlType) +
                 '}';
     }
 

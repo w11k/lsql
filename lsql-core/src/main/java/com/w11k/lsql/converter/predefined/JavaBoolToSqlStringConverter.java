@@ -18,11 +18,8 @@ public class JavaBoolToSqlStringConverter extends Converter {
 
     public JavaBoolToSqlStringConverter(String sqlStringValueForTrue,
                                         String sqlStringValueForFalse) {
-        super(
-          Boolean.class,
-          new int[]{Types.VARCHAR},
-          Types.VARCHAR
-        );
+
+        super(Boolean.class, Types.VARCHAR);
 
         checkArgument(!sqlStringValueForTrue.equals(sqlStringValueForFalse));
         this.sqlStringValueForTrue = sqlStringValueForTrue;

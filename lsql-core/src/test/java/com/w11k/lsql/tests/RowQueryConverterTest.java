@@ -7,6 +7,8 @@ import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.converter.sqltypes.IntConverter;
 import org.testng.annotations.Test;
 
+import java.sql.Types;
+
 import static org.testng.Assert.assertEquals;
 
 public class RowQueryConverterTest extends AbstractLSqlTest {
@@ -88,7 +90,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         RowQuery query = lSql.executeRawQuery("SELECT count(*) AS c FROM table1");
-        query.addConverter("c", IntConverter.INSTANCE);
+        query.addConverter("c", new IntConverter(Types.INTEGER));
         Row row = query.first().get();
         assertEquals(row.getInt("c"), (Integer) 2);
     }
@@ -98,7 +100,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (id, name, age) VALUES (1, 'cus1', 20)");
         RowQuery query = lSql.executeRawQuery("SELECT id, name, age, count(*) AS c FROM table1 GROUP BY id;");
-        query.addConverter("c", IntConverter.INSTANCE);
+        query.addConverter("c", new IntConverter(Types.INTEGER));
         Row row = query.first().get();
         assertEquals(row.getString("name"), "cus1");
         assertEquals(row.getInt("age"), (Integer) 20);

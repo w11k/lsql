@@ -10,14 +10,12 @@ import java.sql.Types;
 
 public class BooleanConverter extends Converter {
 
-    public static final BooleanConverter INSTANCE = new BooleanConverter();
+    public static int[] SQL_TYPES = new int[]{
+            Types.BIT, Types.BOOLEAN
+    };
 
-    public BooleanConverter() {
-        super(
-          Boolean.class,
-          new int[]{Types.BIT, Types.BOOLEAN},
-          Types.BIT
-        );
+    public BooleanConverter(int sqlType) {
+        super(Boolean.class, sqlType);
     }
 
     @Override

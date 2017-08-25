@@ -10,14 +10,12 @@ import java.sql.Types;
 
 public class IntConverter extends Converter {
 
-    public static final IntConverter INSTANCE = new IntConverter();
+    public static int[] SQL_TYPES = new int[]{
+            Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT
+    };
 
-    public IntConverter() {
-        super(
-          Integer.class,
-          new int[]{Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT},
-          Types.INTEGER
-        );
+    public IntConverter(int sqlType) {
+        super(Integer.class, sqlType);
     }
 
     @Override

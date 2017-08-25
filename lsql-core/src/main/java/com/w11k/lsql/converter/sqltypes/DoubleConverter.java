@@ -10,14 +10,12 @@ import java.sql.Types;
 
 public class DoubleConverter extends Converter {
 
-    public static final DoubleConverter INSTANCE = new DoubleConverter();
+    public static int[] SQL_TYPES = new int[]{
+            Types.DOUBLE, Types.REAL, Types.DECIMAL, Types.NUMERIC
+    };
 
-    public DoubleConverter() {
-        super(
-          Double.class,
-          new int[]{Types.DOUBLE, Types.REAL, Types.DECIMAL, Types.NUMERIC},
-          Types.DOUBLE
-        );
+    public DoubleConverter(int sqlType) {
+        super(Double.class, sqlType);
     }
 
     @Override

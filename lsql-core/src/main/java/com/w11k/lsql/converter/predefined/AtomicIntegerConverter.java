@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AtomicIntegerConverter extends Converter {
 
     public AtomicIntegerConverter() {
-        super(AtomicInteger.class, new int[]{Types.INTEGER}, Types.INTEGER);
+        super(AtomicInteger.class, Types.INTEGER);
     }
 
     @Override

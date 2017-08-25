@@ -9,9 +9,8 @@ import java.sql.Types;
 
 public class MarkerColumnConverter extends com.w11k.lsql.converter.Converter {
 
-
     public MarkerColumnConverter() {
-        super(Object.class, new int[]{Types.OTHER}, Types.OTHER);
+        super(Object.class, Types.OTHER);
     }
 
     @Override

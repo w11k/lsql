@@ -10,14 +10,8 @@ import java.sql.Types;
 
 public class ByteConverter extends Converter {
 
-    public static final ByteConverter INSTANCE = new ByteConverter();
-
     public ByteConverter() {
-        super(
-          com.w11k.lsql.Blob.class,
-          new int[]{},
-          Types.BINARY
-        );
+        super(com.w11k.lsql.Blob.class, Types.BINARY);
     }
 
     @Override

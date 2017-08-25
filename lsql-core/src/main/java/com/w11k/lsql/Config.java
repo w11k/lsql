@@ -2,7 +2,7 @@ package com.w11k.lsql;
 
 public class Config {
 
-    boolean useColumnTypeForConverterLookupInQueries = false;
+    private boolean useColumnTypeForConverterLookupInQueries = false;
 
     public boolean isUseColumnTypeForConverterLookupInQueries() {
         return useColumnTypeForConverterLookupInQueries;

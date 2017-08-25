@@ -26,25 +26,37 @@ public class GenericDialect {
     public GenericDialect() {
         // http://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html
 
-        this.converterRegistry.addConverter(IntConverter.INSTANCE);
-        this.converterRegistry.addConverter(DoubleConverter.INSTANCE);
-        this.converterRegistry.addConverter(FloatConverter.INSTANCE);
-        this.converterRegistry.addConverter(BooleanConverter.INSTANCE);
-        this.converterRegistry.addConverter(StringConverter.INSTANCE);
-        this.converterRegistry.addConverter(BinaryConverter.INSTANCE);
-        this.converterRegistry.addConverter(ByteConverter.INSTANCE);
-        this.converterRegistry.addConverter(BlobConverter.INSTANCE);
-        this.converterRegistry.addConverter(ClobConverter.INSTANCE);
-        this.converterRegistry.addConverter(JodaDateConverter.INSTANCE);
+        for (int sqlType : IntConverter.SQL_TYPES) {
+            this.converterRegistry.addConverter(new IntConverter(sqlType));
+        }
 
+        for (int sqlType : DoubleConverter.SQL_TYPES) {
+            this.converterRegistry.addConverter(new DoubleConverter(sqlType));
+        }
 
-        // TODO Missing primitives
+        this.converterRegistry.addConverter(new FloatConverter());
 
-        // TODO add more types
-        // static int 	LONGVARBINARY;
-        // static int 	STRUCT;
-        // static int 	TIME;
-        // static int 	DATE;
+        for (int sqlType : BooleanConverter.SQL_TYPES) {
+            this.converterRegistry.addConverter(new BooleanConverter(sqlType));
+        }
+
+        for (int sqlType : StringConverter.SQL_TYPES) {
+            this.converterRegistry.addConverter(new StringConverter(sqlType));
+        }
+
+        for (int sqlType : BinaryConverter.SQL_TYPES) {
+            this.converterRegistry.addConverter(new BinaryConverter(sqlType));
+        }
+
+        this.converterRegistry.addConverter(new ByteConverter());
+
+        this.converterRegistry.addConverter(new BlobConverter());
+
+        this.converterRegistry.addConverter(new ClobConverter());
+
+        this.converterRegistry.addConverter(new JodaDateTimeConverter());
+
+        this.converterRegistry.addConverter(new JodaLocalDateConverter());
     }
 
     public LSql getlSql() {

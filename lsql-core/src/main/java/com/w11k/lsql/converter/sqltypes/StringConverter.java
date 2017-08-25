@@ -10,14 +10,13 @@ import java.sql.Types;
 
 public class StringConverter extends Converter {
 
-    public static final StringConverter INSTANCE = new StringConverter();
+    public static int[] SQL_TYPES = new int[]{
+            Types.CHAR, Types.VARCHAR, Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR
+    };
 
-    public StringConverter() {
-        super(
-          String.class,
-          new int[]{Types.CHAR, Types.VARCHAR, Types.LONGNVARCHAR, Types.LONGVARCHAR, Types.NCHAR, Types.NVARCHAR},
-          Types.CHAR
-        );
+
+    public StringConverter(int sqlType) {
+        super(String.class, sqlType);
     }
 
     @Override

@@ -16,11 +16,7 @@ public class ObjectToJsonStringConverter extends Converter {
     private TypeReference typeReference;
 
     public <A> ObjectToJsonStringConverter(Class<A> clazz, TypeReference typeReference) {
-        super(
-          clazz,
-          new int[]{Types.VARCHAR},
-          Types.VARCHAR
-        );
+        super(clazz, Types.VARCHAR);
 
         this.clazz = clazz;
         this.typeReference = typeReference;

@@ -7,14 +7,13 @@ import java.sql.*;
 
 public class BinaryConverter extends Converter {
 
-    public static final BinaryConverter INSTANCE = new BinaryConverter();
+    public static int[] SQL_TYPES = new int[]{
+            Types.VARBINARY, Types.BINARY
+    };
 
-    public BinaryConverter() {
-        super(
-          com.w11k.lsql.Blob.class,
-          new int[]{Types.VARBINARY, Types.BINARY},
-          Types.VARBINARY
-        );
+
+    public BinaryConverter(int sqlType) {
+        super(com.w11k.lsql.Blob.class, sqlType);
     }
 
     @Override

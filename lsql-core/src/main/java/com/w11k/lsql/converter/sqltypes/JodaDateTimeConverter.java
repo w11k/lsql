@@ -6,16 +6,10 @@ import org.joda.time.DateTime;
 
 import java.sql.*;
 
-public class JodaDateConverter extends Converter {
+public class JodaDateTimeConverter extends Converter {
 
-    public static final JodaDateConverter INSTANCE = new JodaDateConverter();
-
-    public JodaDateConverter() {
-        super(
-          DateTime.class,
-          new int[]{Types.TIMESTAMP},
-          Types.TIMESTAMP
-        );
+    public JodaDateTimeConverter() {
+        super(DateTime.class, Types.TIMESTAMP);
     }
 
     @Override

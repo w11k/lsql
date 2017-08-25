@@ -10,10 +10,8 @@ public class PostgresDialect extends GenericDialect {
 
     private static class BooleanConverter extends Converter {
 
-        public BooleanConverter() {
-            super(Boolean.class,
-                    new int[]{Types.BIT, Types.BOOLEAN},
-                    Types.BIT);
+        public BooleanConverter(int sqlType) {
+            super(Boolean.class, sqlType);
         }
 
         @Override
@@ -34,7 +32,9 @@ public class PostgresDialect extends GenericDialect {
     }
 
     public PostgresDialect() {
-        getConverterRegistry().addConverter(new BooleanConverter());
+        for (int sqlType : com.w11k.lsql.converter.sqltypes.BooleanConverter.SQL_TYPES) {
+            getConverterRegistry().addConverter(new BooleanConverter(sqlType));
+        }
     }
 
     @Override
