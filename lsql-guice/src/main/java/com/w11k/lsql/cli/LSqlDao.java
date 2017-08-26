@@ -1,4 +1,4 @@
-package com.w11k.lsql.guice;
+package com.w11k.lsql.cli;
 
 import com.google.inject.Inject;
 import com.w11k.lsql.LSql;

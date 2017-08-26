@@ -12,6 +12,7 @@
   <modules>
     <module>lsql-core</module>
     <module>lsql-guice</module>
+    <module>lsql-cli</module>
     <module>lsql-doc</module>
   </modules>
 

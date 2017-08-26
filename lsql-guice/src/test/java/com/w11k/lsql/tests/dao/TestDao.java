@@ -2,7 +2,7 @@ package com.w11k.lsql.tests.dao;
 
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
-import com.w11k.lsql.guice.LSqlDao;
+import com.w11k.lsql.cli.LSqlDao;
 
 public class TestDao extends LSqlDao {
 

@@ -6,6 +6,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.dialects.GenericDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
+import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
@@ -13,10 +14,7 @@ import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -32,26 +30,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LSql {
 
-    static private ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JodaModule());
-        return mapper;
-    }
-
     static public final ObjectMapper OBJECT_MAPPER = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
-
     private final Map<String, Table> tables = Maps.newHashMap();
-
     private final Map<Class<?>, PojoTable<?>> pojoTables = Maps.newHashMap();
-
     private final GenericDialect dialect;
-
     private final Callable<Connection> connectionProvider;
-
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
-
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
-
     private Config config = new Config();
 
     /**
@@ -80,6 +65,12 @@ public class LSql {
      */
     public LSql(GenericDialect dialect, DataSource dataSource) {
         this(dialect, ConnectionProviders.fromDataSource(dataSource));
+    }
+
+    static private ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+        return mapper;
     }
 
     public void clearTables() {
@@ -187,6 +178,18 @@ public class LSql {
         PojoTable<T> pojoTable = (PojoTable<T>) this.pojoTables.get(pojoClass);
         assert pojoTable.getPojoClass().equals(pojoClass);
         return pojoTable;
+    }
+
+    public void fetchMetaDataForAllTables() throws SQLException {
+        Connection con = ConnectionUtils.getConnection(this);
+        DatabaseMetaData md = con.getMetaData();
+
+        ResultSet tables = md.getTables(null, null, null, new String[]{"TABLE", "VIEW"});
+        while (tables.next()) {
+            String sqlTableName = tables.getString(3);
+            String javaTableName = identifierSqlToJava(sqlTableName);
+            table(javaTableName);
+        }
     }
 
     /**
