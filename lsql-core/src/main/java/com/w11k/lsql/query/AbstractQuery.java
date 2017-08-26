@@ -195,13 +195,17 @@ public abstract class AbstractQuery<T> {
         }
 
         // Determine source table and column from ResultSet
-        String tableName = lSql.getDialect().getSchemaAndTableNameFromResultSetMetaData(metaData, position);
-        String columnName = lSql.getDialect().getColumnNameFromResultSetMetaData(metaData, position);
-        if (tableName != null
-                && tableName.length() > 0
-                && columnName != null
-                && columnName.length() > 0) {
-            Column column = lSql.table(tableName).column(columnName);
+        String javaTableName = lSql.getDialect().getIdentifierConverter().sqlToJava(
+                lSql.getDialect().getSqlSchemaAndTableNameFromResultSetMetaData(metaData, position));
+
+        String javaColumnName = lSql.getDialect().getIdentifierConverter().sqlToJava(
+                lSql.getDialect().getSqlColumnNameFromResultSetMetaData(metaData, position));
+
+        if (javaTableName != null
+                && javaTableName.length() > 0
+                && javaColumnName != null
+                && javaColumnName.length() > 0) {
+            Column column = lSql.table(javaTableName).column(javaColumnName);
             if (column != null) {
                 if (!column.isIgnored()) {
                     return of(column.getConverter());

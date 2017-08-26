@@ -9,6 +9,7 @@ import com.w11k.lsql.converter.sqltypes.*;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
@@ -26,37 +27,49 @@ public class GenericDialect {
     public GenericDialect() {
         // http://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html
 
+        // int
         for (int sqlType : IntConverter.SQL_TYPES) {
-            this.converterRegistry.addConverter(new IntConverter(sqlType));
+            this.converterRegistry.addSqlToJavaConverter(new IntConverter(sqlType), false);
         }
+        this.converterRegistry.addJavaToSqlConverter(
+                this.converterRegistry.getConverterForSqlType(Types.INTEGER), false);
 
+        // double
         for (int sqlType : DoubleConverter.SQL_TYPES) {
-            this.converterRegistry.addConverter(new DoubleConverter(sqlType));
+            this.converterRegistry.addSqlToJavaConverter(new DoubleConverter(sqlType), false);
         }
+        this.converterRegistry.addJavaToSqlConverter(
+                this.converterRegistry.getConverterForSqlType(Types.DOUBLE), false);
 
-        this.converterRegistry.addConverter(new FloatConverter());
+        this.converterRegistry.addSqlToJavaConverter(new FloatConverter(), false);
 
+        // boolean
         for (int sqlType : BooleanConverter.SQL_TYPES) {
-            this.converterRegistry.addConverter(new BooleanConverter(sqlType));
+            this.converterRegistry.addSqlToJavaConverter(new BooleanConverter(sqlType), false);
         }
+        this.converterRegistry.addJavaToSqlConverter(
+                this.converterRegistry.getConverterForSqlType(Types.BOOLEAN), false);
 
+        // string
         for (int sqlType : StringConverter.SQL_TYPES) {
-            this.converterRegistry.addConverter(new StringConverter(sqlType));
+            this.converterRegistry.addSqlToJavaConverter(new StringConverter(sqlType), false);
         }
+        this.converterRegistry.addJavaToSqlConverter(
+                this.converterRegistry.getConverterForSqlType(Types.VARCHAR), false);
 
+        // binary
         for (int sqlType : BinaryConverter.SQL_TYPES) {
-            this.converterRegistry.addConverter(new BinaryConverter(sqlType));
+            this.converterRegistry.addSqlToJavaConverter(new BinaryConverter(sqlType), false);
         }
+        this.converterRegistry.addJavaToSqlConverter(
+                this.converterRegistry.getConverterForSqlType(Types.BINARY), false);
 
-        this.converterRegistry.addConverter(new ByteConverter());
+//        this.converterRegistry.addConverter(new ByteConverter());
+//        this.converterRegistry.addConverter(new BlobConverter(), false);
+        this.converterRegistry.addSqlToJavaConverter(new ClobConverter(), false);
+        this.converterRegistry.addConverter(new JodaDateTimeConverter(), false);
+        this.converterRegistry.addConverter(new JodaLocalDateConverter(), false);
 
-        this.converterRegistry.addConverter(new BlobConverter());
-
-        this.converterRegistry.addConverter(new ClobConverter());
-
-        this.converterRegistry.addConverter(new JodaDateTimeConverter());
-
-        this.converterRegistry.addConverter(new JodaLocalDateConverter());
     }
 
     public LSql getlSql() {
@@ -87,18 +100,18 @@ public class GenericDialect {
         this.identifierConverter = identifierConverter;
     }
 
-    public String getSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,
-                                                             int columnIndex) throws SQLException {
+    public String getSqlSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                                int columnIndex) throws SQLException {
 
-        String schema = getIdentifierConverter().sqlToJava(metaData.getSchemaName(columnIndex));
-        String table = getIdentifierConverter().sqlToJava(metaData.getTableName(columnIndex));
+        String schema = metaData.getSchemaName(columnIndex);
+        String table =  metaData.getTableName(columnIndex);
 
         return schema.equals("") ? table : schema + "." + table;
     }
 
-    public String getColumnNameFromResultSetMetaData(ResultSetMetaData metaData,
-                                                     int columnIndex) throws SQLException {
-        return getIdentifierConverter().sqlToJava(metaData.getColumnName(columnIndex));
+    public String getSqlColumnNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                        int columnIndex) throws SQLException {
+        return metaData.getColumnName(columnIndex);
     }
 
     public Optional<Object> extractGeneratedPk(Table table,

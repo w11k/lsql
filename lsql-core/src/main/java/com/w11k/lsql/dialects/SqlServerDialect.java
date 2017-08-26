@@ -26,12 +26,10 @@ public class SqlServerDialect extends GenericDialect {
         // Weird behaviour in SQL Server. Generated INT PRIMARY KEYS are returned
         // as NUMERIC. Hence we convert double to int because we assume that nobody would
         // use decimal numbers as primary keys.
-        if (id.isPresent()) {
-            Object o = id.get();
-            if (o instanceof Double) {
-                Double d = (Double) o;
-                return Optional.of((Object) d.intValue());
-            }
+        Object o = id.get();
+        if (o instanceof Double) {
+            Double d = (Double) o;
+            return Optional.of((Object) d.intValue());
         }
         return id;
     }

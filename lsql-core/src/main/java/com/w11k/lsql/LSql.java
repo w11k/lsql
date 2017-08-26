@@ -42,7 +42,7 @@ public class LSql {
 
     private final Map<String, Table> tables = Maps.newHashMap();
 
-    private final Map<String, PojoTable<?>> pojoTables = Maps.newHashMap();
+    private final Map<Class<?>, PojoTable<?>> pojoTables = Maps.newHashMap();
 
     private final GenericDialect dialect;
 
@@ -156,26 +156,35 @@ public class LSql {
     /**
      * Returns a Table instance.
      *
-     * @param tableName the table name (Java identifier format)
+     * @param schemaAndTableName the table name (Java identifier format)
      * @return the Table instance
      */
-    public synchronized Table table(String tableName) {
-        if (!this.tables.containsKey(tableName)) {
-            Table table = new Table(this, tableName);
+    public synchronized Table table(String schemaAndTableName) {
+        // check existing table names
+        if (!schemaAndTableName.contains(".")) {
+            for (Table table : tables.values()) {
+                if (table.getTableName().equals(schemaAndTableName)) {
+                    return table;
+                }
+            }
+        }
 
-            this.tables.put(tableName, table);
+        if (!this.tables.containsKey(schemaAndTableName)) {
+            Table table = new Table(this, schemaAndTableName);
+
+            this.tables.put(schemaAndTableName, table);
             this.tables.put(table.getSchemaAndTableName(), table);
         }
-        return this.tables.get(tableName);
+        return this.tables.get(schemaAndTableName);
     }
 
     @SuppressWarnings("unchecked")
     public synchronized <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
-        if (!this.pojoTables.containsKey(tableName)) {
-            this.pojoTables.put(tableName, new PojoTable<T>(table(tableName), pojoClass));
+        if (!this.pojoTables.containsKey(pojoClass)) {
+            this.pojoTables.put(pojoClass, new PojoTable<T>(table(tableName), pojoClass));
         }
 
-        PojoTable<T> pojoTable = (PojoTable<T>) this.pojoTables.get(tableName);
+        PojoTable<T> pojoTable = (PojoTable<T>) this.pojoTables.get(pojoClass);
         assert pojoTable.getPojoClass().equals(pojoClass);
         return pojoTable;
     }

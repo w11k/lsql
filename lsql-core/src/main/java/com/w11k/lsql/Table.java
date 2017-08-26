@@ -15,6 +15,8 @@ import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.KeyError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -28,9 +30,15 @@ import static com.google.common.collect.Lists.newLinkedList;
 
 public class Table {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final LSql lSql;
 
     private String schemaAndTableName;
+
+    private String schemaName;
+
+    private String tableName;
 
     private final Map<String, Column> columns = Maps.newHashMap();
 
@@ -42,6 +50,16 @@ public class Table {
         this.lSql = lSql;
         this.schemaAndTableName = schemaAndTableName;
         fetchMeta();
+
+        if (logger.isDebugEnabled()) {
+            StringBuilder msg = new StringBuilder("Read schema for table '" + this.schemaAndTableName + "':\n");
+            for (Column column : columns.values()) {
+                msg.append("    ").append(column).append("\n");
+            }
+
+            logger.debug(msg.toString());
+        }
+
     }
 
     public Map<String, Converter> getColumnConverters() {
@@ -59,6 +77,14 @@ public class Table {
 
     public String getSchemaAndTableName() {
         return this.schemaAndTableName;
+    }
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public String getTableName() {
+        return tableName;
     }
 
     public Optional<String> getPrimaryKeyColumn() {
@@ -513,37 +539,43 @@ public class Table {
         try {
             DatabaseMetaData md = con.getMetaData();
 
-            String schemaAndTableName = lSql.identifierJavaToSql(this.schemaAndTableName);
+            String sqlSchemaAndTableName = lSql.identifierJavaToSql(this.schemaAndTableName);
 
             // Schema name
-            String schema;
-            String tableName;
-            if (schemaAndTableName.contains(".")) {
-                int dot = schemaAndTableName.indexOf('.');
-                schema = schemaAndTableName.substring(0, dot);
-                tableName = schemaAndTableName.substring(dot + 1);
+            String sqlSchema;
+            String sqlTableName;
+            if (sqlSchemaAndTableName.contains(".")) {
+                int dot = sqlSchemaAndTableName.indexOf('.');
+                sqlSchema = sqlSchemaAndTableName.substring(0, dot);
+                sqlTableName = sqlSchemaAndTableName.substring(dot + 1);
             } else {
-                schema = null;
-                tableName = schemaAndTableName;
+                sqlSchema = null;
+                sqlTableName = sqlSchemaAndTableName;
             }
 
             // Check table name
-            ResultSet tables = md.getTables(null, schema, tableName, null);
+            ResultSet tables = md.getTables(null, sqlSchema, sqlTableName, null);
             if (!tables.next()) {
                 throw new IllegalArgumentException("Unknown table '" + this.schemaAndTableName + "'");
             }
 
             // Missing schema name?
-            if (schema == null) {
-                schema = tables.getString(2);
-                if (!schema.equals("")) {
-                    this.schemaAndTableName = lSql.identifierSqlToJava(schema + "." + tableName);
-                }
+            if (sqlSchema == null) {
+                sqlSchema = tables.getString(2);
             }
+
+            if (sqlSchema != null && !sqlSchema.equals("")) {
+                this.schemaAndTableName = lSql.identifierSqlToJava(sqlSchema + "." + sqlTableName);
+            } else {
+                this.schemaAndTableName = lSql.identifierSqlToJava(sqlTableName);
+            }
+
+            this.schemaName = lSql.identifierSqlToJava(sqlSchema);
+            this.tableName = lSql.identifierSqlToJava(sqlTableName);
 
             // Fetch Primary Key
             ResultSet primaryKeys =
-                    md.getPrimaryKeys(null, schema, tableName);
+                    md.getPrimaryKeys(null, sqlSchema, sqlTableName);
 
             if (!primaryKeys.next()) {
                 primaryKeyColumn = Optional.absent();
@@ -554,7 +586,7 @@ public class Table {
 
             // Fetch all columns
             ResultSet columnsMetaData =
-                    md.getColumns(null, schema, tableName, null);
+                    md.getColumns(null, sqlSchema, sqlTableName, null);
 
             while (columnsMetaData.next()) {
                 String sqlColumnName = columnsMetaData.getString(4);

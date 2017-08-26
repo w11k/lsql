@@ -32,9 +32,39 @@ public class ConverterRegistry {
         throw new IllegalArgumentException(msg);
     }
 
-    public void addConverter(Converter converter) {
+    public void removeSqlToJavaConverter(int sqlType) {
+        this.defaultSqlToJavaConverters.remove(sqlType);
+    }
+
+    public void removeJavaToSqlConverter(Class<?> clazz) {
+        this.defaultJavaToSqlConverters.remove(clazz);
+    }
+
+    public void addSqlToJavaConverter(Converter converter, boolean replaceExisting) {
+        if (!replaceExisting && this.defaultSqlToJavaConverters.containsKey(converter.getSqlType())) {
+            throw new IllegalStateException(
+                    "A converter for the SQL type "
+                            + SqlTypesNames.getName(converter.getSqlType())
+                            + " was already registered. You must explicitly remove it first with " +
+                            "removeSqlToJavaConverter(...).");
+        }
         this.defaultSqlToJavaConverters.put(converter.getSqlType(), converter);
+    }
+
+    public void addJavaToSqlConverter(Converter converter, boolean replaceExisting) {
+        if (!replaceExisting && this.defaultJavaToSqlConverters.containsKey(converter.getJavaType())) {
+            throw new IllegalStateException(
+                    "A converter for the Java type "
+                            + converter.getJavaType().getCanonicalName()
+                            + " was already registered. You must explicitly remove it first with " +
+                            "removeJavaToSqlConverter(...).");
+        }
         this.defaultJavaToSqlConverters.put(converter.getJavaType(), converter);
+    }
+
+    public void addConverter(Converter converter, boolean replaceExisting) {
+        this.addSqlToJavaConverter(converter, replaceExisting);
+        this.addJavaToSqlConverter(converter, replaceExisting);
     }
 
 }

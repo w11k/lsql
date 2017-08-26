@@ -33,25 +33,28 @@ public class PostgresDialect extends GenericDialect {
 
     public PostgresDialect() {
         for (int sqlType : com.w11k.lsql.converter.sqltypes.BooleanConverter.SQL_TYPES) {
-            getConverterRegistry().addConverter(new BooleanConverter(sqlType));
+            getConverterRegistry().addSqlToJavaConverter(new BooleanConverter(sqlType), true);
         }
+        getConverterRegistry().addJavaToSqlConverter(
+                getConverterRegistry().getConverterForSqlType(Types.BOOLEAN), true);
+
     }
 
     @Override
-    public String getSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,
-                                                             int columnIndex) throws SQLException {
+    public String getSqlSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                                int columnIndex) throws SQLException {
 
         Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
 
-        String schema = getIdentifierConverter().sqlToJava(postgresMetaData.getBaseSchemaName(columnIndex));
-        String table = getIdentifierConverter().sqlToJava(postgresMetaData.getBaseTableName(columnIndex));
+        String schema = postgresMetaData.getBaseSchemaName(columnIndex);
+        String table =  postgresMetaData.getBaseTableName(columnIndex);
 
         return schema.equals("") ? table : schema + "." + table;
     }
 
     @Override
-    public String getColumnNameFromResultSetMetaData(ResultSetMetaData metaData,
-                                                    int columnIndex) throws SQLException {
+    public String getSqlColumnNameFromResultSetMetaData(ResultSetMetaData metaData,
+                                                        int columnIndex) throws SQLException {
         Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
         return postgresMetaData.getBaseColumnName(columnIndex);
     }

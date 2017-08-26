@@ -2,6 +2,7 @@ package com.w11k.lsql;
 
 import com.google.common.base.Optional;
 import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.utils.SqlTypesNames;
 import com.w11k.lsql.validation.AbstractValidationError;
 import com.w11k.lsql.validation.StringTooLongError;
 import com.w11k.lsql.validation.TypeError;
@@ -133,4 +134,12 @@ public class Column {
     }
 
 
+    @Override
+    public String toString() {
+        return "Column{" +
+                "table=" + table.getSchemaAndTableName() +
+                ", name=" + columnName +
+                ", sqlType=" + SqlTypesNames.getName(sqlType) +
+                '}';
+    }
 }
