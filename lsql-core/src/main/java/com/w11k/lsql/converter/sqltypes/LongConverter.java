@@ -8,24 +8,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class IntConverter extends Converter {
+public class LongConverter extends Converter {
 
-    public static int[] SQL_TYPES = new int[]{
-            Types.TINYINT, Types.SMALLINT, Types.INTEGER
-    };
-
-    public IntConverter(int sqlType) {
-        super(Integer.class, sqlType);
+    public LongConverter() {
+        super(Long.class, Types.BIGINT);
     }
 
     @Override
     protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
-        ps.setInt(index, (Integer) val);
+        ps.setLong(index, (Integer) val);
     }
 
     @Override
     protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
-        return rs.getInt(index);
+        return rs.getLong(index);
 
     }
 }

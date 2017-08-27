@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class SqlStatementTest extends AbstractLSqlTest {
 
@@ -344,6 +345,19 @@ public class SqlStatementTest extends AbstractLSqlTest {
                 "param", 1
         ).toList();
         assertEquals(rows.size(), 0);
+    }
+
+    @Test()
+    public void resultSetTypeAnnotations() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("select count(id) as count_id /*:string*/, max(age) as max_age /*:long*/ from person;");
+        RowQuery query = statement.query();
+        List<Row> rows = query.toList();
+        assertEquals(rows.size(), 1);
+        Row row = rows.get(0);
+        assertTrue(row.get("countId") instanceof String);
+        assertTrue(row.get("maxAge") instanceof Long);
     }
 
     private void setup() {

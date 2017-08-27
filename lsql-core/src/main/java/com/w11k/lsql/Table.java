@@ -366,7 +366,7 @@ public class Table {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        RowQuery query = new RowQuery(lSql, ps);
+        RowQuery query = new RowQuery(lSql, ps, null);
         for (Map.Entry<String, Column> columnInTable : this.columns.entrySet()) {
             Column value = columnInTable.getValue();
             if (value.isIgnored()) {

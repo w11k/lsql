@@ -38,9 +38,13 @@ public abstract class AbstractQuery<T> {
 
     private boolean ignoreDuplicateColumns = false;
 
-    AbstractQuery(LSql lSql, PreparedStatement preparedStatement) {
+    AbstractQuery(LSql lSql, PreparedStatement preparedStatement, Map<String, Converter> outConverters) {
         this.lSql = lSql;
         this.preparedStatement = preparedStatement;
+
+        if (outConverters != null) {
+            this.setConverters(outConverters);
+        }
     }
 
     public LSql getlSql() {

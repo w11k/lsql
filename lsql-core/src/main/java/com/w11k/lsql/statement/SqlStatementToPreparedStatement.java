@@ -1,6 +1,5 @@
 package com.w11k.lsql.statement;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -21,6 +20,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.CharMatcher.anyOf;
+import static com.google.common.collect.Lists.newLinkedList;
+
 public class SqlStatementToPreparedStatement {
 
     // ..... /*name=*/ 123 /**/
@@ -29,51 +31,10 @@ public class SqlStatementToPreparedStatement {
 
     private static final String QUERY_ARG_END = "/**/";
 
-    public static final class Parameter {
-        String placeholder;
-
-        String name;
-
-        int startIndex;
-
-        int endIndex;
-
-        public String getName() {
-            return name;
-        }
-
-        public int getStartIndex() {
-            return startIndex;
-        }
-
-        public int getEndIndex() {
-            return endIndex;
-        }
-
-        @Override
-        public String toString() {
-            return "Parameter{" +
-                    "placeholder='" + placeholder + '\'' +
-                    ", name='" + name + '\'' +
-                    ", startIndex=" + startIndex +
-                    ", endIndex=" + endIndex +
-                    '}';
-        }
-    }
-
-    private final class ParameterInPreparedStatement {
-        Parameter parameter;
-
-        Object value;
-
-        @Override
-        public String toString() {
-            return "ParameterInPreparedStatement{" +
-                    "parameter=" + parameter +
-                    ", value=" + value +
-                    '}';
-        }
-    }
+    private static final Pattern OUT_TYPE_ANNOTATION = Pattern.compile(
+            "(/\\*\\s*:\\s*(\\w*)\\s*\\*/)",
+            Pattern.MULTILINE
+    );
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -85,11 +46,14 @@ public class SqlStatementToPreparedStatement {
 
     private final Map<String, List<Parameter>> parameters;
 
+    private final Map<String, Converter> outConverters;
+
     public SqlStatementToPreparedStatement(LSql lSql, String statementName, String sqlString) {
         this.lSql = lSql;
         this.statementName = statementName;
         this.sqlString = sqlString;
         this.parameters = parseParameters();
+        this.outConverters = parseOutConverters();
     }
 
     public com.w11k.lsql.LSql getlSql() {
@@ -102,6 +66,10 @@ public class SqlStatementToPreparedStatement {
 
     public ImmutableMap<String, List<Parameter>> getParameters() {
         return ImmutableMap.copyOf(this.parameters);
+    }
+
+    public Map<String, Converter> getOutConverters() {
+        return outConverters;
     }
 
     private Map<String, List<Parameter>> parseParameters() {
@@ -144,13 +112,32 @@ public class SqlStatementToPreparedStatement {
         String left = sqlString.substring(0, start);
         left = left.trim();
 
-        Iterable<String> splitIter = Splitter.on(CharMatcher.anyOf("!=<> ")).omitEmptyStrings().split(left);
+        Iterable<String> splitIter = Splitter.on(anyOf("!=<> ")).omitEmptyStrings().split(left);
         ArrayList<String> strings = Lists.newArrayList(splitIter);
         String name = strings.get(strings.size() - 1);
         if (name.toUpperCase().equals("IS")) {
             name = strings.get(strings.size() - 2);
         }
         return name;
+    }
+
+    private Map<String, Converter> parseOutConverters() {
+        Matcher matcher = OUT_TYPE_ANNOTATION.matcher(this.sqlString);
+
+        Map<String, Converter> converters = Maps.newHashMap();
+        while (matcher.find()) {
+            String alias = matcher.group(2);
+            String beforeAlias = this.sqlString.substring(0, matcher.start(1)).trim();
+
+            LinkedList<String> strings = newLinkedList(Splitter.on(anyOf(" ,\t")).split(beforeAlias));
+            String last = strings.getLast();
+
+            String javaColumnName = this.getlSql().identifierSqlToJava(last);
+            Converter converter = this.getlSql().getConverterForAlias(alias);
+            converters.put(javaColumnName, converter);
+        }
+
+        return converters;
     }
 
     private void log(Map<String, Object> queryParameters) {
@@ -190,10 +177,10 @@ public class SqlStatementToPreparedStatement {
         return sqlCopy;
     }
 
-    PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
+    public PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
         log(queryParameters);
 
-        List<ParameterInPreparedStatement> parameterInPreparedStatements = Lists.newLinkedList();
+        List<ParameterInPreparedStatement> parameterInPreparedStatements = newLinkedList();
         String sqlStringCopy = this.sqlString;
         for (String queryParameter : queryParameters.keySet()) {
             List<Parameter> parametersByName = this.parameters.get(queryParameter);
@@ -254,6 +241,52 @@ public class SqlStatementToPreparedStatement {
         }
 
         return ps;
+    }
+
+    public static final class Parameter {
+        String placeholder;
+
+        String name;
+
+        int startIndex;
+
+        int endIndex;
+
+        public String getName() {
+            return name;
+        }
+
+        public int getStartIndex() {
+            return startIndex;
+        }
+
+        public int getEndIndex() {
+            return endIndex;
+        }
+
+        @Override
+        public String toString() {
+            return "Parameter{" +
+                    "placeholder='" + placeholder + '\'' +
+                    ", name='" + name + '\'' +
+                    ", startIndex=" + startIndex +
+                    ", endIndex=" + endIndex +
+                    '}';
+        }
+    }
+
+    private final class ParameterInPreparedStatement {
+        Parameter parameter;
+
+        Object value;
+
+        @Override
+        public String toString() {
+            return "ParameterInPreparedStatement{" +
+                    "parameter=" + parameter +
+                    ", value=" + value +
+                    '}';
+        }
     }
 
 }

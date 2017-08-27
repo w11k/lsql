@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 
 import java.sql.PreparedStatement;
@@ -30,7 +31,10 @@ public abstract class AbstractSqlStatement<T> {
     public T query(Map<String, Object> queryParameters) {
         try {
             PreparedStatement ps = this.sqlStatementToPreparedStatement.createPreparedStatement(queryParameters);
-            return createQueryInstance(this.sqlStatementToPreparedStatement.getlSql(), ps);
+            return createQueryInstance(
+                    this.sqlStatementToPreparedStatement.getlSql(),
+                    ps,
+                    this.sqlStatementToPreparedStatement.getOutConverters());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -54,7 +58,7 @@ public abstract class AbstractSqlStatement<T> {
         }
     }
 
-    abstract protected T createQueryInstance(LSql lSql, PreparedStatement ps);
+    abstract protected T createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters);
 
     public ImmutableMap<String, List<SqlStatementToPreparedStatement.Parameter>> getParameters() {
         return this.sqlStatementToPreparedStatement.getParameters();

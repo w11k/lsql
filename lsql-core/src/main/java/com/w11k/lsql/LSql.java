@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.GenericDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.jdbc.ConnectionUtils;
@@ -15,6 +16,7 @@ import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -214,9 +216,16 @@ public class LSql {
      * @return the Query instance
      */
     public RowQuery executeRawQuery(String sql) {
-        return new RowQuery(
-                this,
-                getDialect().getStatementCreator().createPreparedStatement(this, sql, false));
+        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "<raw>", sql);
+
+        try {
+            return new RowQuery(
+                    this,
+                    st.createPreparedStatement(Collections.<String, Object>emptyMap()),
+                    st.getOutConverters());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -228,10 +237,17 @@ public class LSql {
      * @return the Query instance
      */
     public <T> PojoQuery<T> executeRawQuery(String sql, Class<T> pojoClass) {
-        return new PojoQuery<T>(
-                this,
-                getDialect().getStatementCreator().createPreparedStatement(this, sql, false),
-                pojoClass);
+        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "<raw>", sql);
+
+        try {
+            return new PojoQuery<T>(
+                    this,
+                    st.createPreparedStatement(Collections.<String, Object>emptyMap()),
+                    pojoClass,
+                    st.getOutConverters());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public AbstractSqlStatement<RowQuery> executeQuery(String sqlString) {
@@ -240,8 +256,8 @@ public class LSql {
 
         return new AbstractSqlStatement<RowQuery>(stmtToPs) {
             @Override
-            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps) {
-                return new RowQuery(lSql, ps);
+            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new RowQuery(lSql, ps, outConverters);
             }
         };
     }
@@ -252,6 +268,18 @@ public class LSql {
 
     public String identifierJavaToSql(String javaName) {
         return getDialect().getIdentifierConverter().javaToSql(javaName);
+    }
+
+    public Converter getConverterForSqlType(int sqlType) {
+        return getDialect().getConverterRegistry().getConverterForSqlType(sqlType);
+    }
+
+    public Converter getConverterForJavaType(Class<?> clazz) {
+        return getDialect().getConverterRegistry().getConverterForJavaType(clazz);
+    }
+
+    public Converter getConverterForAlias(String alias) {
+        return getDialect().getConverterRegistry().getConverterForAlias(alias);
     }
 
     @Override

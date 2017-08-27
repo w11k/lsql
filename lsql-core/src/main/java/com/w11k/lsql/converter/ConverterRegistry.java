@@ -9,12 +9,14 @@ import static com.w11k.lsql.utils.JavaClassUtils.convertPrimitiveClassToWrapperC
 
 public class ConverterRegistry {
 
-    private final Map<Class<?>, Converter> defaultJavaToSqlConverters = Maps.newHashMap();
+    private final Map<Class<?>, Converter> javaToSqlConverters = Maps.newHashMap();
 
-    private final Map<Integer, Converter> defaultSqlToJavaConverters = Maps.newHashMap();
+    private final Map<String, Class<?>> typeAliases = Maps.newHashMap();
+
+    private final Map<Integer, Converter> sqlToJavaConverters = Maps.newHashMap();
 
     public Converter getConverterForSqlType(int sqlType) {
-        Converter converter = this.defaultSqlToJavaConverters.get(sqlType);
+        Converter converter = this.sqlToJavaConverters.get(sqlType);
         if (converter != null) {
             return converter;
         }
@@ -24,7 +26,7 @@ public class ConverterRegistry {
 
     public Converter getConverterForJavaType(Class<?> clazz) {
         clazz = convertPrimitiveClassToWrapperClass(clazz);
-        Converter converter = this.defaultJavaToSqlConverters.get(clazz);
+        Converter converter = this.javaToSqlConverters.get(clazz);
         if (converter != null) {
             return converter;
         }
@@ -32,39 +34,52 @@ public class ConverterRegistry {
         throw new IllegalArgumentException(msg);
     }
 
+    public Converter getConverterForAlias(String aliasName) {
+        aliasName = aliasName.toLowerCase();
+        if (this.typeAliases.containsKey(aliasName)) {
+            return this.getConverterForJavaType(this.typeAliases.get(aliasName));
+        }
+
+        throw new IllegalStateException("No converter for alias '" + aliasName + "' registered!");
+    }
+
     public void removeSqlToJavaConverter(int sqlType) {
-        this.defaultSqlToJavaConverters.remove(sqlType);
+        this.sqlToJavaConverters.remove(sqlType);
     }
 
     public void removeJavaToSqlConverter(Class<?> clazz) {
-        this.defaultJavaToSqlConverters.remove(clazz);
+        this.javaToSqlConverters.remove(clazz);
     }
 
     public void addSqlToJavaConverter(Converter converter, boolean replaceExisting) {
-        if (!replaceExisting && this.defaultSqlToJavaConverters.containsKey(converter.getSqlType())) {
+        if (!replaceExisting && this.sqlToJavaConverters.containsKey(converter.getSqlType())) {
             throw new IllegalStateException(
                     "A converter for the SQL type "
                             + SqlTypesNames.getName(converter.getSqlType())
                             + " was already registered. You must explicitly remove it first with " +
                             "removeSqlToJavaConverter(...).");
         }
-        this.defaultSqlToJavaConverters.put(converter.getSqlType(), converter);
+        this.sqlToJavaConverters.put(converter.getSqlType(), converter);
     }
 
     public void addJavaToSqlConverter(Converter converter, boolean replaceExisting) {
-        if (!replaceExisting && this.defaultJavaToSqlConverters.containsKey(converter.getJavaType())) {
+        if (!replaceExisting && this.javaToSqlConverters.containsKey(converter.getJavaType())) {
             throw new IllegalStateException(
                     "A converter for the Java type "
                             + converter.getJavaType().getCanonicalName()
                             + " was already registered. You must explicitly remove it first with " +
                             "removeJavaToSqlConverter(...).");
         }
-        this.defaultJavaToSqlConverters.put(converter.getJavaType(), converter);
+        this.javaToSqlConverters.put(converter.getJavaType(), converter);
     }
 
     public void addConverter(Converter converter, boolean replaceExisting) {
         this.addSqlToJavaConverter(converter, replaceExisting);
         this.addJavaToSqlConverter(converter, replaceExisting);
+    }
+
+    public void addTypeAlias(String alias, Class<?> forClass) {
+        this.typeAliases.put(alias.toLowerCase(), forClass);
     }
 
 }

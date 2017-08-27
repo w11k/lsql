@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
@@ -59,8 +60,8 @@ public class LSqlFile {
         final SqlStatementToPreparedStatement stmtToPs = getStatement(name);
         return new AbstractSqlStatement<RowQuery>(stmtToPs) {
             @Override
-            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps) {
-                return new RowQuery(LSqlFile.this.lSql, ps);
+            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new RowQuery(LSqlFile.this.lSql, ps, outConverters);
             }
         };
     }
@@ -69,8 +70,8 @@ public class LSqlFile {
         final SqlStatementToPreparedStatement stmtToPs = getStatement(name);
         return new AbstractSqlStatement<PojoQuery<T>>(stmtToPs) {
             @Override
-            protected PojoQuery<T> createQueryInstance(LSql lSql, PreparedStatement ps) {
-                return new PojoQuery<T>(LSqlFile.this.lSql, ps, pojoClass);
+            protected PojoQuery<T> createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new PojoQuery<T>(LSqlFile.this.lSql, ps, pojoClass, outConverters);
             }
         };
     }

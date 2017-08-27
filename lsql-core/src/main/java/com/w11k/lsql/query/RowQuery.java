@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class RowQuery extends AbstractQuery<Row> {
 
-    public RowQuery(LSql lSql, PreparedStatement preparedStatement) {
-        super(lSql, preparedStatement);
+    public RowQuery(LSql lSql, PreparedStatement preparedStatement, Map<String, Converter> outConverters) {
+        super(lSql, preparedStatement, outConverters);
     }
 
     @SuppressWarnings("unchecked")

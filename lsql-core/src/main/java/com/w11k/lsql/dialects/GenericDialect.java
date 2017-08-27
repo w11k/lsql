@@ -5,6 +5,7 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.ConverterRegistry;
 import com.w11k.lsql.converter.sqltypes.*;
+import org.joda.time.DateTime;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -33,6 +34,9 @@ public class GenericDialect {
         }
         this.converterRegistry.addJavaToSqlConverter(
                 this.converterRegistry.getConverterForSqlType(Types.INTEGER), false);
+
+        // long
+        this.converterRegistry.addConverter(new LongConverter(), false);
 
         // double
         for (int sqlType : DoubleConverter.SQL_TYPES) {
@@ -70,6 +74,12 @@ public class GenericDialect {
         this.converterRegistry.addConverter(new JodaDateTimeConverter(), false);
         this.converterRegistry.addConverter(new JodaLocalDateConverter(), false);
 
+        // Aliases
+        this.converterRegistry.addTypeAlias("int", Integer.class);
+        this.converterRegistry.addTypeAlias("integer", Integer.class);
+        this.converterRegistry.addTypeAlias("long", Long.class);
+        this.converterRegistry.addTypeAlias("string", String.class);
+        this.converterRegistry.addTypeAlias("date", DateTime.class);
     }
 
     public LSql getlSql() {
