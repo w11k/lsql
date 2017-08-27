@@ -1,4 +1,4 @@
-package com.w11k.lsql.schemaexporter;
+package com.w11k.lsql.cli;
 
 import com.google.common.io.Files;
 import com.w11k.lsql.Column;

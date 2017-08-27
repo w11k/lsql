@@ -20,7 +20,8 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void pojo() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, person TEXT)");
         Table t1 = this.lSql.table("table1");
-        t1.column("person").setConverter(new ObjectToJsonStringConverter(Person.class, new TypeReference<Person>(){}));
+        this.setConverter("table1", "person", new ObjectToJsonStringConverter(Person.class, new TypeReference<Person>() {
+        }));
 
         Person p = new Person(1, "Adam", 30);
         t1.insert(Row.fromKeyVals("id", 1, "person", p));
@@ -32,7 +33,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfString() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class, new TypeReference<List<String>>() {
+        this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class, new TypeReference<List<String>>() {
         }));
 
         List<String> list = Lists.newLinkedList();
@@ -48,7 +49,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfMapStringString() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
+        this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
         }));
 
         List<Map<String, String>> list = Lists.newLinkedList();
@@ -67,7 +68,7 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     public void listOfMapStringStringInALinkedRow() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, data TEXT)");
         Table t1 = lSql.table("table1");
-        t1.column("data").setConverter(new ObjectToJsonStringConverter(List.class,
+        this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class,
                 new TypeReference<List<Map<String, String>>>() {
                 }));
 

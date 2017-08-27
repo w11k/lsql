@@ -105,11 +105,6 @@ public class Table {
         return columns.get(columnName);
     }
 
-    public Table setColumnConverter(String columnName, Converter converter) {
-        column(columnName).setConverter(converter);
-        return this;
-    }
-
     public <T> PojoTable<T> withPojo(Class<T> pojoClass) {
         return new PojoTable<T>(this, pojoClass);
     }

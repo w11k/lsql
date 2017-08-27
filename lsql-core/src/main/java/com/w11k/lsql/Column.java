@@ -18,9 +18,9 @@ public class Column {
 
     private final int sqlType;
 
-    private Table table;
+    private final Table table;
 
-    private Converter converter;
+    private final Converter converter;
 
     private boolean ignored = false;
 
@@ -70,10 +70,6 @@ public class Column {
 
     public Converter getConverter() {
         return this.converter;
-    }
-
-    public void setConverter(Converter converter) {
-        this.converter = converter;
     }
 
     public boolean isIgnored() {

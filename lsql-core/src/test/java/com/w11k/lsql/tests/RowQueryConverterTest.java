@@ -1,10 +1,9 @@
 package com.w11k.lsql.tests;
 
-import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.Row;
-import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.converter.sqltypes.IntConverter;
+import com.w11k.lsql.query.RowQuery;
 import org.testng.annotations.Test;
 
 import java.sql.Types;
@@ -13,12 +12,18 @@ import static org.testng.Assert.assertEquals;
 
 public class RowQueryConverterTest extends AbstractLSqlTest {
 
+//    public static class Conf extends TestConfig {
+//        public Conf() {
+//            this.setConverter("table1", "field1", );
+//        }
+//    }
+
+
     @Test
     public void normalColumn() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field VARCHAR(10))");
 
-        Table table1 = lSql.table("table1");
-        table1.column("field").setConverter(new JavaBoolToSqlStringConverter("ja", "nein"));
+        this.setConverter("table1", "field", new JavaBoolToSqlStringConverter("ja", "nein"));
 
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 'ja')");
         Row row = lSql.executeRawQuery("SELECT * FROM table1").first().get();
@@ -31,8 +36,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
 
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field VARCHAR(10))");
 
-        Table table1 = lSql.table("table1");
-        table1.column("field").setConverter(converter);
+        this.setConverter("table1", "field", new JavaBoolToSqlStringConverter("ja", "nein"));
 
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 'ja')");
         RowQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");

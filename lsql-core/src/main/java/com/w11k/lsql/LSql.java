@@ -45,13 +45,15 @@ public class LSql {
      * Creates a new LSql instance.
      * <p/>
      * LSql will use the {@link Callable} for obtaining connections.
-     *
-     * @param dialect            the database dialect
-     * @param connectionProvider provider to load a Connection instance
      */
-    public LSql(GenericDialect dialect, Callable<Connection> connectionProvider) {
+    public LSql(Class<? extends Config> configClass, Callable<Connection> connectionProvider) {
         checkNotNull(connectionProvider);
-        this.dialect = dialect;
+        try {
+            this.config = configClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        this.dialect = config.getDialect();
         this.connectionProvider = connectionProvider;
 
         dialect.setlSql(this);
@@ -61,12 +63,9 @@ public class LSql {
      * Creates a new LSql instance.
      * <p/>
      * LSql will use the {@link DataSource} for obtaining connections.
-     *
-     * @param dialect    the database dialect
-     * @param dataSource data source to load a Connection instance
      */
-    public LSql(GenericDialect dialect, DataSource dataSource) {
-        this(dialect, ConnectionProviders.fromDataSource(dataSource));
+    public LSql(Class<? extends Config> configClass, DataSource dataSource) {
+        this(configClass, ConnectionProviders.fromDataSource(dataSource));
     }
 
     static private ObjectMapper CREATE_DEFAULT_JSON_MAPPER_INSTANCE() {
@@ -114,10 +113,6 @@ public class LSql {
 
     public Config getConfig() {
         return config;
-    }
-
-    public void setConfig(Config config) {
-        this.config = config;
     }
 
     /**

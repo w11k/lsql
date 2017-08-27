@@ -4,7 +4,6 @@ import com.beust.jcommander.internal.Sets;
 import com.w11k.lsql.Column;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.dialects.H2Dialect;
 import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import org.testng.annotations.Test;
@@ -26,7 +25,7 @@ public class LSqlTest extends AbstractLSqlTest {
 
     @Test(expectedExceptions = DatabaseAccessException.class)
     public void getConnectionThrowsDatabaseAccessException() throws SQLException {
-        LSql l = new LSql(new H2Dialect(), new Callable<Connection>() {
+        LSql l = new LSql(TestConfig.class, new Callable<Connection>() {
             @Override
             public Connection call() throws Exception {
                 throw new RuntimeException();
