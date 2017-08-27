@@ -140,6 +140,7 @@ public class Column {
                 "table=" + table.getSchemaAndTableName() +
                 ", name=" + columnName +
                 ", sqlType=" + SqlTypesNames.getName(sqlType) +
+                ", javaType=" + converter.getJavaType().getCanonicalName() +
                 '}';
     }
 }

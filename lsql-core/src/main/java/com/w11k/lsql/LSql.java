@@ -184,7 +184,7 @@ public class LSql {
         Connection con = ConnectionUtils.getConnection(this);
         DatabaseMetaData md = con.getMetaData();
 
-        ResultSet tables = md.getTables(null, null, null, new String[]{"TABLE", "VIEW"});
+        ResultSet tables = md.getTables(null, null, null, new String[]{"TABLE"});
         while (tables.next()) {
             String sqlTableName = tables.getString(3);
             String javaTableName = identifierSqlToJava(sqlTableName);

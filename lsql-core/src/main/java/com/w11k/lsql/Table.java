@@ -59,17 +59,16 @@ public class Table {
 
             logger.debug(msg.toString());
         }
-
     }
 
-    public Map<String, Converter> getColumnConverters() {
-        Map<String, Converter> converters = Maps.newLinkedHashMap();
-        for (String name : this.columns.keySet()) {
-            Column column = this.columns.get(name);
-            converters.put(name, column.getConverter());
-        }
-        return converters;
-    }
+//    public Map<String, Converter> getColumnConverters() {
+//        Map<String, Converter> converters = Maps.newLinkedHashMap();
+//        for (String name : this.columns.keySet()) {
+//            Column column = this.columns.get(name);
+//            converters.put(name, column.getConverter());
+//        }
+//        return converters;
+//    }
 
     public LSql getlSql() {
         return lSql;
