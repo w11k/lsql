@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.GenericDialect;
 
-import java.sql.Connection;
 import java.util.Map;
 
 public class Config {
@@ -40,10 +39,6 @@ public class Config {
 
     protected void setConverters(Map<String, Map<String, Converter>> converters) {
         this.converters = converters;
-    }
-
-    public Connection getCliConnection() {
-        return null;
     }
 
     protected void setConverter(String tableName, String columnName, Class<?> classForConverterLookup) {
