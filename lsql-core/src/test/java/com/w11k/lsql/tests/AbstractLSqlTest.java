@@ -19,9 +19,18 @@ import java.util.Map;
 
 public abstract class AbstractLSqlTest {
 
-    private static Map<String, Map<String, Converter>> CONVERTERS = Maps.newHashMap();
+    private Connection connection;
 
     public static class TestConfig extends Config {
+
+        public static Map<String, Map<String, Converter>> CONVERTERS = Maps.newHashMap();
+
+        public static boolean USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP = false;
+
+        public static void reset() {
+            CONVERTERS = Maps.newHashMap();
+            USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP = false;
+        }
 
         static String driverClassName = null;
 
@@ -33,6 +42,7 @@ public abstract class AbstractLSqlTest {
             }
 
             this.setConverters(CONVERTERS);
+            this.setUseColumnTypeForConverterLookupInQueries(USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP);
         }
 
     }
@@ -47,12 +57,14 @@ public abstract class AbstractLSqlTest {
     }
 
     public void setConverter(String tableName, String columnName, Converter converter) {
-        if (!CONVERTERS.containsKey(tableName)) {
-            CONVERTERS.put(tableName, Maps.<String, Converter>newHashMap());
+        if (!TestConfig.CONVERTERS.containsKey(tableName)) {
+            TestConfig.CONVERTERS.put(tableName, Maps.<String, Converter>newHashMap());
         }
 
-        Map<String, Converter> columnClassMap = CONVERTERS.get(tableName);
+        Map<String, Converter> columnClassMap = TestConfig.CONVERTERS.get(tableName);
         columnClassMap.put(columnName, converter);
+
+        this.createLSqlInstance();
     }
 
     @Parameters({
@@ -67,7 +79,7 @@ public abstract class AbstractLSqlTest {
                                    @Optional String username,
                                    @Optional String password) {
 
-        CONVERTERS = Maps.newHashMap();
+        TestConfig.reset();
 
         driverClassName = driverClassName != null ? driverClassName : "org.h2.Driver";
         url = url != null ? url : "jdbc:h2:mem:testdb;mode=postgresql";
@@ -82,15 +94,14 @@ public abstract class AbstractLSqlTest {
 
         ds.setDefaultAutoCommit(false);
         TestUtils.clear(ds);
-        Connection connection;
         try {
-            connection = ds.getConnection();
+            this.connection = ds.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         TestConfig.driverClassName = driverClassName;
-        this.lSql = new LSql(TestConfig.class, ConnectionProviders.fromInstance(connection));
+        this.createLSqlInstance();
         this.beforeMethodHook();
     }
 
@@ -100,11 +111,14 @@ public abstract class AbstractLSqlTest {
     }
 
     protected void beforeMethodHook() {
-
     }
 
     protected void createTable(String sql) {
         lSql.executeRawSql(sql);
+    }
+
+    protected void createLSqlInstance() {
+        this.lSql = new LSql(TestConfig.class, ConnectionProviders.fromInstance(this.connection));
     }
 
 }

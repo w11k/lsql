@@ -19,9 +19,10 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     @Test
     public void pojo() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, person TEXT)");
-        Table t1 = this.lSql.table("table1");
         this.setConverter("table1", "person", new ObjectToJsonStringConverter(Person.class, new TypeReference<Person>() {
         }));
+
+        Table t1 = this.lSql.table("table1");
 
         Person p = new Person(1, "Adam", 30);
         t1.insert(Row.fromKeyVals("id", 1, "person", p));
@@ -32,9 +33,10 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     @Test
     public void listOfString() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
-        Table t1 = lSql.table("table1");
         this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class, new TypeReference<List<String>>() {
         }));
+
+        Table t1 = lSql.table("table1");
 
         List<String> list = Lists.newLinkedList();
         list.add("first");
@@ -48,9 +50,10 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     @Test
     public void listOfMapStringString() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
-        Table t1 = lSql.table("table1");
         this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
         }));
+
+        Table t1 = lSql.table("table1");
 
         List<Map<String, String>> list = Lists.newLinkedList();
         Map<String, String> e = Maps.newHashMap();
@@ -67,10 +70,11 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     @Test
     public void listOfMapStringStringInALinkedRow() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, data TEXT)");
-        Table t1 = lSql.table("table1");
         this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class,
                 new TypeReference<List<Map<String, String>>>() {
                 }));
+
+        Table t1 = lSql.table("table1");
 
         List<Map<String, String>> list = Lists.newLinkedList();
         Map<String, String> e = Maps.newHashMap();

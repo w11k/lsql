@@ -33,13 +33,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class LSql {
 
     static public final ObjectMapper OBJECT_MAPPER = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
+
     private final Map<String, Table> tables = Maps.newHashMap();
+
     private final Map<Class<?>, PojoTable<?>> pojoTables = Maps.newHashMap();
+
     private final GenericDialect dialect;
+
     private final Callable<Connection> connectionProvider;
+
+    private final Config config;
+
     private InitColumnCallback initColumnCallback = new InitColumnCallback();
+
     private ObjectMapper objectMapper = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
-    private Config config = new Config();
 
     /**
      * Creates a new LSql instance.
@@ -53,6 +60,7 @@ public class LSql {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         this.dialect = config.getDialect();
         this.connectionProvider = connectionProvider;
 
@@ -109,10 +117,6 @@ public class LSql {
 
     public void setInitColumnCallback(InitColumnCallback initColumnCallback) {
         this.initColumnCallback = initColumnCallback;
-    }
-
-    public Config getConfig() {
-        return config;
     }
 
     /**
@@ -284,4 +288,7 @@ public class LSql {
                 '}';
     }
 
+    Config getConfig() {
+        return config;
+    }
 }

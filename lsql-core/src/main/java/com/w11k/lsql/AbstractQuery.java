@@ -1,14 +1,10 @@
-package com.w11k.lsql.query;
+package com.w11k.lsql;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.w11k.lsql.Column;
-import com.w11k.lsql.LSql;
-import com.w11k.lsql.ResultSetColumn;
-import com.w11k.lsql.ResultSetWithColumns;
 import com.w11k.lsql.converter.Converter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +34,7 @@ public abstract class AbstractQuery<T> {
 
     private boolean ignoreDuplicateColumns = false;
 
-    AbstractQuery(LSql lSql, PreparedStatement preparedStatement, Map<String, Converter> outConverters) {
+    public AbstractQuery(LSql lSql, PreparedStatement preparedStatement, Map<String, Converter> outConverters) {
         this.lSql = lSql;
         this.preparedStatement = preparedStatement;
 
@@ -228,7 +224,9 @@ public abstract class AbstractQuery<T> {
 
         // Error/Warn
         String msg = "Unable to determine a Converter instance for column '" + columnLabel + "'. ";
-        msg += "Register a converter with Query#addConverter() / Query#setConverters().";
+        msg += "Annotate the query with /*:type*/ or " +
+                "register a converter with Query#addConverter() / Query#setConverters().";
+
         if (lSql.getConfig().isUseColumnTypeForConverterLookupInQueries()) {
             this.logger.warn(msg);
             return of(getConverterByColumnType(metaData, position));

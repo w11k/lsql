@@ -3,6 +3,7 @@ package com.w11k.lsql.query;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.w11k.lsql.AbstractQuery;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.ResultSetColumn;
 import com.w11k.lsql.converter.Converter;

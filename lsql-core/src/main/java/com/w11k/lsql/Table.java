@@ -465,6 +465,19 @@ public class Table {
     }
 
     protected Converter getConverter(String javaColumnName, int sqlType) {
+        Map<String, Map<String, Converter>> configuredConverters = this.lSql.getConfig().getConverters();
+
+        Map<String, Converter> conv1 = configuredConverters.get(this.schemaAndTableName);
+        Map<String, Converter> conv2 = configuredConverters.get(this.tableName);
+        Map<String, Converter> conv = conv1 != null ? conv1 : conv2;
+
+        if (conv != null) {
+            Converter converterForColumn = conv.get(javaColumnName);
+            if (converterForColumn != null) {
+                return converterForColumn;
+            }
+        }
+
         return this.lSql.getDialect().getConverterRegistry().getConverterForSqlType(sqlType);
     }
 

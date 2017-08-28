@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import java.sql.Types;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class RowQueryConverterTest extends AbstractLSqlTest {
 
@@ -73,19 +74,21 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
     @Test
     public void configSettingsToUseColumnTypeForConverter() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field INT)");
-
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 2)");
-        RowQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
 
-        Row row;
+        // default error
+        boolean error = false;
         try {
-            lSql.getConfig().setUseColumnTypeForConverterLookupInQueries(true);
-            row = query.first().get();
-        } finally {
-            lSql.getConfig().setUseColumnTypeForConverterLookupInQueries(false);
+            lSql.executeRawQuery("SELECT id, field as aaa FROM table1").toList();
+        } catch (Exception e) {
+            error = true;
         }
+        assertTrue(error);
 
-        assertEquals(row.getInt("aaa"), new Integer(2));
+        // change
+        TestConfig.USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP = true;
+        this.createLSqlInstance();
+        lSql.executeRawQuery("SELECT id, field as aaa FROM table1").toList();
     }
 
     @Test
