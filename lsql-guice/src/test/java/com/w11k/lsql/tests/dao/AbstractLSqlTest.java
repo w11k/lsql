@@ -2,7 +2,7 @@ package com.w11k.lsql.tests.dao;
 
 import com.googlecode.flyway.core.Flyway;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.dialects.H2Dialect;
+import com.w11k.lsql.dialects.H2Config;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.h2.jdbcx.JdbcDataSource;
 import org.testng.annotations.AfterMethod;
@@ -25,7 +25,7 @@ public abstract class AbstractLSqlTest {
         flyway.setDataSource(ds);
         flyway.clean();
 
-        this.lSql = new LSql(new H2Dialect(), ConnectionProviders.fromInstance(connection));
+        this.lSql = new LSql(H2Config.class, ConnectionProviders.fromInstance(connection));
     }
 
     @AfterMethod

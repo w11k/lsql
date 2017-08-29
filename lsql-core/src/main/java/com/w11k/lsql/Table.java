@@ -150,7 +150,7 @@ public class Table {
             List<String> columns = createColumnList(row, false);
 
             PreparedStatement ps =
-                    lSql.getDialect().getStatementCreator().createInsertStatement(this, columns);
+                    lSql.getStatementCreator().createInsertStatement(this, columns);
 
             setValuesInPreparedStatement(ps, columns, row, null, null);
 
@@ -164,7 +164,7 @@ public class Table {
                     // check for generated keys
                     ResultSet resultSet = ps.getGeneratedKeys();
                     if (resultSet.next()) {
-                        Optional<Object> generated = lSql.getDialect().extractGeneratedPk(this, resultSet);
+                        Optional<Object> generated = lSql.extractGeneratedPk(this, resultSet);
                         if (generated.isPresent()) {
                             id = generated.get();
                             row.put(primaryKeyColumn.get(), id);
@@ -234,7 +234,7 @@ public class Table {
                 return;
             }
 
-            PreparedStatement ps = lSql.getDialect().getStatementCreator()
+            PreparedStatement ps = lSql.getStatementCreator()
                     .createUpdateStatement(this, valueColumns, whereColumns);
 
             setValuesInPreparedStatement(ps, valueColumns, values, whereColumns, where);
@@ -280,7 +280,7 @@ public class Table {
             // Check if insert or update
             Object id = row.get(primaryKeyColumn.get());
             try {
-                PreparedStatement ps = lSql.getDialect().getStatementCreator()
+                PreparedStatement ps = lSql.getStatementCreator()
                         .createCountForIdStatement(this);
                 Column column = column(getPrimaryKeyColumn().get());
                 column.getConverter().setValueInStatement(lSql, ps, 1, id);
@@ -322,7 +322,7 @@ public class Table {
      * @throws com.w11k.lsql.exceptions.DeleteException
      */
     public void delete(Row row) {
-        PreparedStatement ps = lSql.getDialect().getStatementCreator().createDeleteByIdStatement(this);
+        PreparedStatement ps = lSql.getStatementCreator().createDeleteByIdStatement(this);
         try {
             Column column = column(getPrimaryKeyColumn().get());
             Object id = row.get(getPrimaryKeyColumn().get());
@@ -464,23 +464,6 @@ public class Table {
         return "Table{schemaAndTableName='" + schemaAndTableName + "'}";
     }
 
-    protected Converter getConverter(String javaColumnName, int sqlType) {
-        Map<String, Map<String, Converter>> configuredConverters = this.lSql.getConfig().getConverters();
-
-        Map<String, Converter> conv1 = configuredConverters.get(this.schemaAndTableName);
-        Map<String, Converter> conv2 = configuredConverters.get(this.tableName);
-        Map<String, Converter> conv = conv1 != null ? conv1 : conv2;
-
-        if (conv != null) {
-            Converter converterForColumn = conv.get(javaColumnName);
-            if (converterForColumn != null) {
-                return converterForColumn;
-            }
-        }
-
-        return this.lSql.getDialect().getConverterRegistry().getConverterForSqlType(sqlType);
-    }
-
     private PreparedStatement createLoadPreparedStatement() {
         Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
         if (!primaryKeyColumn.isPresent()) {
@@ -488,8 +471,8 @@ public class Table {
         }
         String pkColumn = primaryKeyColumn.get();
         Column column = column(pkColumn);
-        String psString = lSql.getDialect().getStatementCreator().createSelectByIdStatement(this, column, this.columns.values());
-        return lSql.getDialect().getStatementCreator().createPreparedStatement(lSql, psString, false);
+        String psString = lSql.getStatementCreator().createSelectByIdStatement(this, column, this.columns.values());
+        return lSql.getStatementCreator().createPreparedStatement(lSql, psString, false);
     }
 
     private List<String> createColumnList(final Row row, final boolean filterIgnoreOnUpdateColumns) {
@@ -520,7 +503,8 @@ public class Table {
         int rowsAffected = ps.executeUpdate();
         if (rowsAffected != 1) {
             throw new UpdateException(rowsAffected +
-                    " toList were affected by update operation (expected 1). Either the ID or the revision (if enabled) is wrong.");
+                    " toList were affected by update operation (expected 1). " +
+                    "Either the ID or the revision (if enabled) is wrong.");
         }
     }
 
@@ -533,8 +517,7 @@ public class Table {
 
     private Object queryRevision(Object id) throws SQLException {
         Column revCol = revisionColumn.get();
-        PreparedStatement revQuery =
-                lSql.getDialect().getStatementCreator().createRevisionQueryStatement(this);
+        PreparedStatement revQuery = lSql.getStatementCreator().createRevisionQueryStatement(this);
         revCol.getConverter().setValueInStatement(lSql, revQuery, 1, id);
         ResultSet resultSet = revQuery.executeQuery();
         resultSet.next();
@@ -600,14 +583,16 @@ public class Table {
                 int columnSize = columnsMetaData.getInt(7);
                 String javaColumnName = lSql.identifierSqlToJava(sqlColumnName);
                 int sqlType = columnsMetaData.getInt(5);
-                Converter converter = getConverter(javaColumnName, sqlType);
+                Converter converter = this.lSql.getConverterForTableColumn(
+                        this.schemaAndTableName, javaColumnName, sqlType);
                 Column column = new Column(this, javaColumnName, sqlType, converter, columnSize);
                 lSql.getInitColumnCallback().onNewColumn(column);
                 this.columns.put(javaColumnName, column);
             }
 
             if (tables.next()) {
-                throw new IllegalArgumentException("meta data fetch returned more than one table for '" + this.schemaAndTableName + "'");
+                throw new IllegalArgumentException("meta data fetch returned more than one table for '"
+                        + this.schemaAndTableName + "'");
             }
         } catch (SQLException e) {
             e.printStackTrace();

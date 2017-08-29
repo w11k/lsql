@@ -2,10 +2,13 @@ package com.w11k.lsql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.GenericDialect;
+import com.w11k.lsql.dialects.StatementCreator;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.query.PojoQuery;
@@ -21,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterators.getLast;
 
 /**
  * Main LSql class. Normally, an application only needs to create
@@ -87,10 +91,6 @@ public class LSql {
         pojoTables.clear();
     }
 
-    public GenericDialect getDialect() {
-        return dialect;
-    }
-
     public Callable<Connection> getConnectionProvider() {
         return connectionProvider;
     }
@@ -117,6 +117,10 @@ public class LSql {
 
     public void setInitColumnCallback(InitColumnCallback initColumnCallback) {
         this.initColumnCallback = initColumnCallback;
+    }
+
+    public Class<? extends GenericDialect> getDialectClass() {
+        return dialect.getClass();
     }
 
     /**
@@ -199,7 +203,7 @@ public class LSql {
      * @param sql the SQL string
      */
     public void executeRawSql(String sql) {
-        Statement st = getDialect().getStatementCreator().createStatement(this);
+        Statement st = this.dialect.getStatementCreator().createStatement(this);
         try {
             st.execute(sql);
         } catch (SQLException e) {
@@ -262,23 +266,69 @@ public class LSql {
     }
 
     public String identifierSqlToJava(String sqlName) {
-        return getDialect().getIdentifierConverter().sqlToJava(sqlName);
+        return this.dialect.getIdentifierConverter().sqlToJava(sqlName);
     }
 
     public String identifierJavaToSql(String javaName) {
-        return getDialect().getIdentifierConverter().javaToSql(javaName);
+        return this.dialect.getIdentifierConverter().javaToSql(javaName);
     }
 
     public Converter getConverterForSqlType(int sqlType) {
-        return getDialect().getConverterRegistry().getConverterForSqlType(sqlType);
+        return this.dialect.getConverterRegistry().getConverterForSqlType(sqlType);
     }
 
     public Converter getConverterForJavaType(Class<?> clazz) {
-        return getDialect().getConverterRegistry().getConverterForJavaType(clazz);
+        return this.dialect.getConverterRegistry().getConverterForJavaType(clazz);
     }
 
     public Converter getConverterForAlias(String alias) {
-        return getDialect().getConverterRegistry().getConverterForAlias(alias);
+        return this.dialect.getConverterRegistry().getConverterForAlias(alias);
+    }
+
+    public String getSqlSchemaAndTableNameFromResultSetMetaData(
+            ResultSetMetaData metaData, int columnIndex) throws SQLException {
+
+        return dialect.getSqlSchemaAndTableNameFromResultSetMetaData(metaData, columnIndex);
+    }
+
+    public Optional<Object> extractGeneratedPk(Table table, ResultSet resultSet) throws SQLException {
+        return dialect.extractGeneratedPk(table, resultSet);
+    }
+
+    public StatementCreator getStatementCreator() {
+        return dialect.getStatementCreator();
+    }
+
+    public String getSqlColumnNameFromResultSetMetaData(
+            ResultSetMetaData metaData, int columnIndex) throws SQLException {
+
+        return dialect.getSqlColumnNameFromResultSetMetaData(metaData, columnIndex);
+    }
+
+    public Converter getConverterForTableColumn(String schemaAndTableName, String javaColumnName, int sqlType) {
+        Map<String, Map<String, Converter>> configuredConverters = this.config.getConverters();
+
+        Map<String, Converter> convertersForTable = configuredConverters.get(schemaAndTableName);
+
+        // if no converters were found for this schemaAndTable,
+        // check if only the tableName was used
+        if (convertersForTable == null && schemaAndTableName.contains(".")) {
+            String tableName = getLast(Splitter.on(".").split(schemaAndTableName).iterator());
+            convertersForTable = configuredConverters.get(tableName);
+        }
+
+        if (convertersForTable != null) {
+            Converter converterForColumn = convertersForTable.get(javaColumnName);
+            if (converterForColumn != null) {
+                return converterForColumn;
+            }
+        }
+
+        return this.getConverterForSqlType(sqlType);
+    }
+
+    public boolean isUseColumnTypeForConverterLookupInQueries() {
+        return config.isUseColumnTypeForConverterLookupInQueries();
     }
 
     @Override
@@ -288,7 +338,11 @@ public class LSql {
                 '}';
     }
 
-    Config getConfig() {
-        return config;
-    }
+//    GenericDialect getDialect() {
+//        return dialect;
+//    }
+
+//    Config getConfig() {
+//        return config;
+//    }
 }

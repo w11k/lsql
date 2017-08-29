@@ -327,7 +327,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
 
     @Test()
     public void listLiteralQueryParameterEmptyArray() {
-        boolean skipTest = lSql.getDialect() instanceof PostgresDialect;
+        boolean skipTest = lSql.getDialectClass().equals(PostgresDialect.class);
         if (skipTest) {
             throw new SkipException("empty list literal not support");
         }

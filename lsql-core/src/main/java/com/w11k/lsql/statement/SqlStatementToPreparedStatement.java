@@ -210,7 +210,8 @@ public class SqlStatementToPreparedStatement {
         // RAW conversions
         sqlStringCopy = processRawConversions(sqlStringCopy, parameterInPreparedStatements);
 
-        PreparedStatement ps = this.lSql.getDialect().getStatementCreator().createPreparedStatement(this.lSql, sqlStringCopy, false);
+        PreparedStatement ps = this.lSql.getStatementCreator()
+                .createPreparedStatement(this.lSql, sqlStringCopy, false);
 
         int offset = 0;
         for (int i = 0; i < parameterInPreparedStatements.size(); i++) {
@@ -230,8 +231,7 @@ public class SqlStatementToPreparedStatement {
             } else if (pips.value == null) {
                 ps.setNull(i + offset + 1, Types.OTHER);
             } else {
-                Converter converter = this.lSql.getDialect().getConverterRegistry()
-                        .getConverterForJavaType(pips.value.getClass());
+                Converter converter = this.lSql.getConverterForJavaType(pips.value.getClass());
 
                 if (converter == null) {
                     throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);

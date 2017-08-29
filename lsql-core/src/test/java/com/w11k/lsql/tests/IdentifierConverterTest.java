@@ -17,7 +17,7 @@ public class IdentifierConverterTest extends AbstractLSqlTest {
 
     @Test
     public void testTableNameUnderscore() {
-        lSql.getDialect().setIdentifierConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
+        this.setIdentifierConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
         createTable("CREATE TABLE AAA_BBB (CCC_DDD INT NULL)");
         lSql.table("aaa_bbb");
     }
@@ -32,7 +32,7 @@ public class IdentifierConverterTest extends AbstractLSqlTest {
 
     @Test
     public void testColumnNameUnderscore() {
-        lSql.getDialect().setIdentifierConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
+        this.setIdentifierConverter(JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, CCC_DDD INT NULL)");
         Table table1 = lSql.table("table1");
         table1.insert(fromKeyVals("id", 1, "ccc_ddd", 2));

@@ -4,7 +4,7 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.dialects.H2Dialect;
+import com.w11k.lsql.dialects.H2Config;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.joda.time.DateTime;
 import org.testng.annotations.AfterMethod;
@@ -24,7 +24,7 @@ public class CrudExamples {
     @BeforeMethod
     public void beforeMethod() throws Exception {
         Connection conn = DriverManager.getConnection("jdbc:h2:mem:lsqlexamples;mode=postgresql");
-        lSql = new LSql(new H2Dialect(), ConnectionProviders.fromInstance(conn));
+        lSql = new LSql(H2Config.class, ConnectionProviders.fromInstance(conn));
 
         lSql.executeRawSql("CREATE TABLE person (" +
                 "id SERIAL PRIMARY KEY, " +

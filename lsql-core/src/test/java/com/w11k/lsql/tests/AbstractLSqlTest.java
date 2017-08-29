@@ -5,6 +5,7 @@ import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.H2Dialect;
+import com.w11k.lsql.dialects.IdentifierConverter;
 import com.w11k.lsql.dialects.PostgresDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -27,9 +28,12 @@ public abstract class AbstractLSqlTest {
 
         public static boolean USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP = false;
 
+        public static IdentifierConverter IDENTIFIER_CONVERTER = null;
+
         public static void reset() {
             CONVERTERS = Maps.newHashMap();
             USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP = false;
+            IDENTIFIER_CONVERTER = null;
         }
 
         static String driverClassName = null;
@@ -42,6 +46,9 @@ public abstract class AbstractLSqlTest {
             }
 
             this.setConverters(CONVERTERS);
+            if (IDENTIFIER_CONVERTER != null) {
+                this.getDialect().setIdentifierConverter(IDENTIFIER_CONVERTER);
+            }
             this.setUseColumnTypeForConverterLookupInQueries(USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP);
         }
 
@@ -53,7 +60,7 @@ public abstract class AbstractLSqlTest {
         this.setConverter(
                 tableName,
                 columnName,
-                this.lSql.getDialect().getConverterRegistry().getConverterForJavaType(classForConverterLookup));
+                this.lSql.getConverterForJavaType(classForConverterLookup));
     }
 
     public void setConverter(String tableName, String columnName, Converter converter) {
@@ -64,6 +71,11 @@ public abstract class AbstractLSqlTest {
         Map<String, Converter> columnClassMap = TestConfig.CONVERTERS.get(tableName);
         columnClassMap.put(columnName, converter);
 
+        this.createLSqlInstance();
+    }
+
+    public void setIdentifierConverter(IdentifierConverter identifierConverter) {
+        TestConfig.IDENTIFIER_CONVERTER = identifierConverter;
         this.createLSqlInstance();
     }
 

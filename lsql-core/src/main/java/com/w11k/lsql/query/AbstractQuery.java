@@ -1,10 +1,14 @@
-package com.w11k.lsql;
+package com.w11k.lsql.query;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.w11k.lsql.Column;
+import com.w11k.lsql.LSql;
+import com.w11k.lsql.ResultSetColumn;
+import com.w11k.lsql.ResultSetWithColumns;
 import com.w11k.lsql.converter.Converter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -195,11 +199,11 @@ public abstract class AbstractQuery<T> {
         }
 
         // Determine source table and column from ResultSet
-        String javaTableName = lSql.getDialect().getIdentifierConverter().sqlToJava(
-                lSql.getDialect().getSqlSchemaAndTableNameFromResultSetMetaData(metaData, position));
+        String javaTableName = lSql.identifierSqlToJava(
+                lSql.getSqlSchemaAndTableNameFromResultSetMetaData(metaData, position));
 
-        String javaColumnName = lSql.getDialect().getIdentifierConverter().sqlToJava(
-                lSql.getDialect().getSqlColumnNameFromResultSetMetaData(metaData, position));
+        String javaColumnName = lSql.identifierSqlToJava(
+                lSql.getSqlColumnNameFromResultSetMetaData(metaData, position));
 
         if (javaTableName != null
                 && javaTableName.length() > 0
@@ -227,7 +231,7 @@ public abstract class AbstractQuery<T> {
         msg += "Annotate the query with /*:type*/ or " +
                 "register a converter with Query#addConverter() / Query#setConverters().";
 
-        if (lSql.getConfig().isUseColumnTypeForConverterLookupInQueries()) {
+        if (lSql.isUseColumnTypeForConverterLookupInQueries()) {
             this.logger.warn(msg);
             return of(getConverterByColumnType(metaData, position));
         } else {
@@ -243,7 +247,7 @@ public abstract class AbstractQuery<T> {
 
     private Converter getConverterByColumnType(ResultSetMetaData metaData, int position) throws SQLException {
         int columnSqlType = metaData.getColumnType(position);
-        return lSql.getDialect().getConverterRegistry().getConverterForSqlType(columnSqlType);
+        return lSql.getConverterForSqlType(columnSqlType);
     }
 
     private T extractEntity(ResultSetWithColumns resultSetWithColumns) {

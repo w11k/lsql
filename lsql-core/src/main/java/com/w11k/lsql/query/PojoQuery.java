@@ -1,6 +1,5 @@
 package com.w11k.lsql.query;
 
-import com.w11k.lsql.AbstractQuery;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.PojoMapper;
 import com.w11k.lsql.converter.Converter;
