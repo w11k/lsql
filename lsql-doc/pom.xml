@@ -62,67 +62,38 @@
           </includes>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>create doc</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target>
-                <exec dir="." executable="bash" failonerror="true">
-                  <arg value="-c"/>
-                  <arg value="bin/extract_snippets.sh"/>
-                </exec>
-                <exec dir="." executable="${pandoc.path}" failonerror="true">
-                  <arg value="${project.build.outputDirectory}/main/index.md"/>
-                  <arg value="--smart"/>
-                  <arg value="--standalone"/>
-                  <arg value="--template=${project.build.outputDirectory}/main/template.html"/>
-                  <arg value="--toc"/>
-                  <arg value="-o"/>
-                  <arg value="${project.build.outputDirectory}/main/index.html"/>
-                </exec>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <version>2.7</version>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.github.github</groupId>
-        <artifactId>site-maven-plugin</artifactId>
-        <version>0.8</version>
-        <configuration>
-          <message>GitHub pages for ${project.version}</message>
-          <outputDirectory>${project.basedir}/target/classes</outputDirectory>
-          <branch>refs/heads/gh-pages</branch>
-          <noJekyll>true</noJekyll>
-          <merge>false</merge>
-          <includes>
-            <include>**/*</include>
-          </includes>
-          <repositoryOwner>w11k</repositoryOwner>
-          <repositoryName>lsql</repositoryName>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>site</goal>
-            </goals>
-            <phase>deploy</phase>
-          </execution>
-        </executions>
-      </plugin>
+      <!--<plugin>-->
+        <!--<artifactId>maven-deploy-plugin</artifactId>-->
+        <!--<version>2.7</version>-->
+        <!--<configuration>-->
+          <!--<skip>true</skip>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
+      <!--<plugin>-->
+        <!--<groupId>com.github.github</groupId>-->
+        <!--<artifactId>site-maven-plugin</artifactId>-->
+        <!--<version>0.8</version>-->
+        <!--<configuration>-->
+          <!--<message>GitHub pages for ${project.version}</message>-->
+          <!--<outputDirectory>${project.basedir}/target/classes</outputDirectory>-->
+          <!--<branch>refs/heads/gh-pages</branch>-->
+          <!--<noJekyll>true</noJekyll>-->
+          <!--<merge>false</merge>-->
+          <!--<includes>-->
+            <!--<include>**/*</include>-->
+          <!--</includes>-->
+          <!--<repositoryOwner>w11k</repositoryOwner>-->
+          <!--<repositoryName>lsql</repositoryName>-->
+        <!--</configuration>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<goals>-->
+              <!--<goal>site</goal>-->
+            <!--</goals>-->
+            <!--<phase>deploy</phase>-->
+          <!--</execution>-->
+        <!--</executions>-->
+      <!--</plugin>-->
     </plugins>
   </build>
 

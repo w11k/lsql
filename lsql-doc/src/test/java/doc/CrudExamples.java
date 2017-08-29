@@ -1,4 +1,4 @@
-package com.w11k.lsql.example;
+package doc;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.LinkedRow;

@@ -19,11 +19,11 @@ mvn clean install
 cd ..
 exit_on_error
 
-# Test Sample Application
-#cd lsql-example
-#mvn clean test
-#cd ..
-#exit_on_error
+# generate doc
+cd lsql-doc
+./bin/generate_doc.sh
+cd ..
+exit_on_error
 
 # Set the current version
 git tag "`dev/get_current_version.sh`"

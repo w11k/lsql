@@ -2,8 +2,8 @@
 
 cd `dirname $0`/..
 
-SNIPPETS_DIR=target/snippets
-FILE=$SNIPPETS_DIR/$1
+SNIPPETS_DIR=target/doc
+FILE=$SNIPPETS_DIR/${1%.*}.md
 
 mkdir -p `dirname $FILE`
 echo "" > $FILE
