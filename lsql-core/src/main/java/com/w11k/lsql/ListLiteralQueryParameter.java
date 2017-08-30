@@ -11,11 +11,12 @@ import java.util.List;
 public class ListLiteralQueryParameter<T> implements LiteralQueryParameter {
 
     public static <A> ListLiteralQueryParameter<A> of(Iterable<A> values) {
-        return new ListLiteralQueryParameter<A>(values);
+        return new ListLiteralQueryParameter<>(values);
     }
 
+    @SafeVarargs
     public static <A> ListLiteralQueryParameter<A> of(A... values) {
-        return new ListLiteralQueryParameter<A>(Lists.newArrayList(values));
+        return new ListLiteralQueryParameter<>(Lists.newArrayList(values));
     }
 
     protected List<T> values;

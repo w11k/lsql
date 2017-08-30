@@ -1,6 +1,6 @@
 package com.w11k.lsql;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Iterables;
@@ -218,7 +218,7 @@ public class Row extends ForwardingMap<String, Object> {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).addValue(delegate()).toString();
+        return MoreObjects.toStringHelper(this).addValue(delegate()).toString();
     }
 
     @Override

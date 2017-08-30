@@ -1,86 +1,124 @@
 package com.w11k.lsql.cli;
 
-import com.google.common.io.Files;
+import com.google.common.base.Joiner;
 import com.w11k.lsql.Column;
 import com.w11k.lsql.Table;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Map;
 
-public class TableExporter {
+import static java.util.stream.Collectors.toList;
 
-    private final Table table;
+public class TableExporter extends AbstractTableExporter {
 
-    private final SchemaExporter schemaExporter;
-
-    private final File packageFolderFile;
-
-    public TableExporter(Table table, SchemaExporter schemaExporter, File packageFolderFile) {
-        this.table = table;
-        this.schemaExporter = schemaExporter;
-        this.packageFolderFile = packageFolderFile;
+    public TableExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
+        super(table, schemaExporter, rootPackage);
     }
 
-    public void export() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("package ").append(this.schemaExporter.getPackageName()).append(";\n\n");
-        sb.append("public class ").append(nameToIdentifier(this.table.getSchemaAndTableName())).append(" {\n\n");
+    public void createContent() {
+        content.append("package ").append(getFullPackageName()).append(";\n\n");
+        content.append("import ").append(this.schemaExporter.getPackageName()).append(".*;\n\n");
+        content.append("public class ").append(getClassName());
+        contentImplements();
+        content.append(" {\n\n");
 
-        // Field instances
-        for (Map.Entry<String, Column> entry : this.table.getColumns().entrySet()) {
-            Class<?> javaType = entry.getValue().getConverter().getJavaType();
-            sb.append("    ");
-            sb.append(javaType.getCanonicalName()).append(" ").append(entry.getKey()).append(";\n");
+        // constructors
+        contentConstructors();
+
+        // Field instances and getter/setter
+        for (Column column : this.columns) {
+            contentSeperator();
+            Class<?> javaType = column.getConverter().getJavaType();
+            contentField(column, javaType);
+            content.append("\n");
+            contentGetterSetterForField(column);
         }
 
-        sb.append("\n");
+        contentSeperator();
 
-        // Getter/setter
-        for (Map.Entry<String, Column> entry : this.table.getColumns().entrySet()) {
-            generateGetterSetter(sb, entry);
-        }
+        // assignInto
+        contentAssignInto();
 
-        sb.append("}\n");
-
-        File pojoSourceFile = getPojoSourceFile();
-        try {
-            Files.write(sb, pojoSourceFile, Charset.forName("UTF-8"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        content.append("}\n");
     }
 
-    private File getPojoSourceFile() {
-        return new File(this.packageFolderFile, nameToIdentifier(this.table.getSchemaAndTableName()) + ".java");
+    private void contentAssignInto() {
+        content.append("    public <T extends ");
+        content.append(Joiner.on(" & ").join(getStructuralTypingFields().stream()
+                .map(StructuralTypingField::getInterfaceName).collect(toList())));
+        content.append("> T assignNew(T target) {\n");
+
+
+        content.append("}\n\n");
+
+
     }
 
-    private void generateGetterSetter(StringBuilder sb, Map.Entry<String, Column> entry) {
+    private void contentImplements() {
+        content.append(" implements ");
+        content.append(
+                Joiner.on(",")
+                        .join(getStructuralTypingFields().stream()
+                                .map(StructuralTypingField::getInterfaceName).collect(toList())));
+
+    }
+
+    private void contentConstructors() {
+        // empty constructor
+        content.append("    public ").append(getClassName()).append("() {}\n\n");
+
+        // constructor with field initializer
+        content.append("    private ").append(getClassName()).append("(\n");
+
+        String arguments = Joiner.on(",\n").join(columns.stream().map(column ->
+                "            "
+                        + column.getConverter().getJavaType().getCanonicalName()
+                        + " "
+                        + column.getJavaColumnName())
+                .collect(toList()));
+        content.append(arguments);
+        content.append(") {\n");
+
+        // assign member
+        for (Column column : columns) {
+            content.append("        ")
+                    .append("this.").append(column.getJavaColumnName())
+                    .append(" = ")
+                    .append(column.getJavaColumnName())
+                    .append(";\n");
+        }
+        content.append("    }\n");
+    }
+
+    private void contentField(Column column, Class<?> javaType) {
+        content.append("    private ");
+        content.append(javaType.getCanonicalName()).append(" ").append(column.getJavaColumnName()).append(";\n");
+    }
+
+    private void contentGetterSetterForField(Column column) {
         // Getter
-        sb.append("    public ");
-        sb.append(entry.getValue().getConverter().getJavaType().getCanonicalName());
-        sb.append(" ");
+        content.append("    public ");
+        content.append(column.getConverter().getJavaType().getCanonicalName());
+        content.append(" ");
 
-        boolean isBool = Boolean.class.isAssignableFrom(entry.getValue().getConverter().getJavaType());
+        boolean isBool = Boolean.class.isAssignableFrom(column.getConverter().getJavaType());
         String prefix = isBool ? "is" : "get";
-        sb.append(prefix).append(nameToIdentifier(entry.getKey())).append("() {\n");
-        sb.append("        return this.").append(entry.getKey()).append(";\n");
-        sb.append("    }\n\n");
+        content.append(prefix).append(lowerCamelToUpperCamel(column.getJavaColumnName())).append("() {\n");
+        content.append("        return this.").append(column.getJavaColumnName()).append(";\n");
+        content.append("    }\n\n");
 
         // Setter
-        sb.append("    public void ");
-        sb.append("set").append(nameToIdentifier(entry.getKey())).append("(");
-        sb.append(entry.getValue().getConverter().getJavaType().getCanonicalName());
-        sb.append(" ").append(entry.getKey());
-        sb.append(") {\n");
+        content.append("    public ").append(this.getClassName()).append(" ");
+        content.append("with").append(lowerCamelToUpperCamel(column.getJavaColumnName())).append("(");
+        content.append(column.getConverter().getJavaType().getCanonicalName());
+        content.append(" ").append(column.getJavaColumnName());
+        content.append(") {\n");
 
-        sb.append("        this.").append(entry.getKey()).append(" = ");
-        sb.append(entry.getKey()).append(";\n");
-        sb.append("    }\n\n");
+        // setter body
+        content.append("        return new ").append(this.getClassName()).append("(");
+        content.append(constructorCallArgs);
+        content.append(");\n");
+        content.append("    }\n");
+
     }
 
-    protected String nameToIdentifier(String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
-    }
 }

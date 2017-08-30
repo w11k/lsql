@@ -1,12 +1,8 @@
-*.dblocal
-*.db
-
 # Maven
-target
+*/target
 
 # IntelliJ
 *.iml
 .idea
 
-# Sublime
-*.sublime-workspace
+lsql-cli-tests/src/generated

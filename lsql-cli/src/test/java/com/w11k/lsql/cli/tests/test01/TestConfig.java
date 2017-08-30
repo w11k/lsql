@@ -7,6 +7,7 @@ public final class TestConfig extends Config {
 
     public TestConfig() {
         setDialect(new H2Dialect());
+        setGeneratedPackageName(this.getClass().getPackage().getName());
     }
 
 }

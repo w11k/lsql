@@ -12,6 +12,8 @@ public class Config {
 
     private GenericDialect dialect = new GenericDialect();
 
+    private String generatedPackageName = null;
+
     public Config() {
     }
 
@@ -23,6 +25,14 @@ public class Config {
 
     public void setUseColumnTypeForConverterLookupInQueries(boolean useColumnTypeForConverterLookupInQueries) {
         this.useColumnTypeForConverterLookupInQueries = useColumnTypeForConverterLookupInQueries;
+    }
+
+    public String getGeneratedPackageName() {
+        return generatedPackageName;
+    }
+
+    public void setGeneratedPackageName(String generatedPackageName) {
+        this.generatedPackageName = generatedPackageName;
     }
 
     public GenericDialect getDialect() {

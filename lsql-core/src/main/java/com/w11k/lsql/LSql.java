@@ -331,6 +331,10 @@ public class LSql {
         return config.isUseColumnTypeForConverterLookupInQueries();
     }
 
+    public String getGeneratedPackageName() {
+        return config.getGeneratedPackageName();
+    }
+
     @Override
     public String toString() {
         return "LSql{" +

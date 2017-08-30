@@ -1,5 +1,7 @@
 package com.w11k.lsql.cli;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
 import org.slf4j.Logger;
@@ -8,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
+import java.util.Set;
 
 public class SchemaExporter {
 
@@ -67,10 +71,25 @@ public class SchemaExporter {
         assert packageFolderFile.isDirectory();
         assert packageFolderFile.exists();
 
+        List<TableExporter> tableExporters = Lists.newLinkedList();
         for (Table table : this.lSql.getTables()) {
             logger.info("Generating POJO for table '" + table.getSchemaAndTableName() + "'");
-            new TableExporter(table, this, packageFolderFile).export();
+            tableExporters.add(new TableExporter(table, this, packageFolderFile));
         }
+
+        Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
+        for (TableExporter tableExporter : tableExporters) {
+            structuralTypingFields.addAll(tableExporter.getStructuralTypingFields());
+        }
+        for (StructuralTypingField structuralTypingField : structuralTypingFields) {
+            new StructuralTypingFieldExporter(structuralTypingField, this, packageFolderFile).export();
+        }
+
+
+        for (TableExporter tableExporter : tableExporters) {
+            tableExporter.export();
+        }
+
     }
 
 
