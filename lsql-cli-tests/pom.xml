@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.w11k.lsql</groupId>
     <artifactId>lsql-parent</artifactId>
-    <version>0.24.1</version>
+    <version>0.25.0</version>
   </parent>
 
   <artifactId>lsql-cli-tests</artifactId>
@@ -17,10 +17,6 @@
       <groupId>${project.parent.groupId}</groupId>
       <version>${project.parent.version}</version>
       <artifactId>lsql-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>org.testng</groupId>
