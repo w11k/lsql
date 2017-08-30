@@ -12,7 +12,6 @@
   <modules>
     <module>lsql-core</module>
     <module>lsql-guice</module>
-    <module>lsql-cli</module>
     <module>lsql-cli-tests</module>
     <module>lsql-doc</module>
   </modules>
@@ -54,11 +53,6 @@
         <version>2.2</version>
       </dependency>
 
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.5</version>
-      </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>

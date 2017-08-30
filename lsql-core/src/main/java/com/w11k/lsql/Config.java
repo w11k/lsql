@@ -1,6 +1,7 @@
 package com.w11k.lsql;
 
 import com.google.common.collect.Maps;
+import com.w11k.lsql.cli.CliConfig;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.GenericDialect;
 
@@ -12,7 +13,7 @@ public class Config {
 
     private GenericDialect dialect = new GenericDialect();
 
-    private String generatedPackageName = null;
+    private CliConfig cliConfig = new CliConfig();
 
     public Config() {
     }
@@ -27,20 +28,16 @@ public class Config {
         this.useColumnTypeForConverterLookupInQueries = useColumnTypeForConverterLookupInQueries;
     }
 
-    public String getGeneratedPackageName() {
-        return generatedPackageName;
-    }
-
-    public void setGeneratedPackageName(String generatedPackageName) {
-        this.generatedPackageName = generatedPackageName;
-    }
-
     public GenericDialect getDialect() {
         return dialect;
     }
 
     public void setDialect(GenericDialect dialect) {
         this.dialect = dialect;
+    }
+
+    public CliConfig getCliConfig() {
+        return cliConfig;
     }
 
     public Map<String, Map<String, Converter>> getConverters() {

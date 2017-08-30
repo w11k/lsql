@@ -64,6 +64,8 @@ public class SchemaExporter {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void export() {
+        this.outputDir.mkdirs();
+
         String packageFolder = this.packageName.replaceAll("\\.", File.separator);
         File packageFolderFile = new File(this.outputDir, packageFolder);
 

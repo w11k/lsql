@@ -28,12 +28,12 @@ public class StructuralTypingFieldExporter {
 
         content.append("    ")
                 .append(stf.getFieldClass().getCanonicalName())
-                .append(" ").append("get").append(stf.getName())
+                .append(" ").append("get").append(stf.getUppercaseName())
                 .append("();\n\n");
 
         content.append("    ")
                 .append(stf.getInterfaceName())
-                .append(" ").append("with").append(stf.getName()).append("(")
+                .append(" ").append("with").append(stf.getUppercaseName()).append("(")
                 .append(stf.getFieldClass().getCanonicalName()).append(" val")
                 .append(");\n\n");
 

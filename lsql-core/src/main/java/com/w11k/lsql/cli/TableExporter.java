@@ -36,21 +36,46 @@ public class TableExporter extends AbstractTableExporter {
         contentSeperator();
 
         // assignInto
-        contentAssignInto();
+        contentAssignIntoNew();
+        contentUpdatedWith();
 
         content.append("}\n");
     }
 
-    private void contentAssignInto() {
-        content.append("    public <T extends ");
-        content.append(Joiner.on(" & ").join(getStructuralTypingFields().stream()
+    private void contentAssignIntoNew() {
+        content.append("    @SuppressWarnings(\"unchecked\")\n");
+        content.append("    public <T extends \n            ");
+        content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
                 .map(StructuralTypingField::getInterfaceName).collect(toList())));
-        content.append("> T assignNew(T target) {\n");
+        content.append("> T assignIntoNew(T targetStart) {\n");
 
+        content.append("        Object target = targetStart;\n");
+        for (StructuralTypingField stf : getStructuralTypingFields()) {
+            content.append("        target = ")
+                    .append("((").append(stf.getInterfaceName()).append(") target).with").append(stf.getUppercaseName())
+                    .append("(this.get").append(stf.getUppercaseName()).append("());\n");
+        }
+        content.append("        return (T) target;\n");
 
-        content.append("}\n\n");
+        content.append("    }\n\n");
+    }
 
+    private void contentUpdatedWith() {
+        content.append("    @SuppressWarnings(\"unchecked\")\n");
+        content.append("    public <T extends \n            ");
+        content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
+                .map(StructuralTypingField::getInterfaceName).collect(toList())));
+        content.append("> ").append(getClassName()).append(" updatedWith(T source) {\n");
 
+        content.append("        Object target = this;\n");
+        for (StructuralTypingField stf : getStructuralTypingFields()) {
+            content.append("        target = ")
+                    .append("((").append(stf.getInterfaceName()).append(") target).with").append(stf.getUppercaseName())
+                    .append("(source.get").append(stf.getUppercaseName()).append("());\n");
+        }
+        content.append("        return (").append(getClassName()).append(") target;\n");
+
+        content.append("    }\n\n");
     }
 
     private void contentImplements() {

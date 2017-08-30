@@ -4,22 +4,27 @@ import com.google.common.base.CaseFormat;
 
 public final class StructuralTypingField {
 
-    private final String name;
+    private final String uppercaseName;
 
     private final Class<?> fieldClass;
 
     private final String typeName;
 
     public StructuralTypingField(String name, Class<?> fieldClass) {
-        this.name = name.substring(0, 1).toUpperCase() +  name.substring(1);
+        this.uppercaseName = name.substring(0, 1).toUpperCase() +  name.substring(1);
         this.fieldClass = fieldClass;
 
         String canonicalNameWithUnderscores = fieldClass.getCanonicalName().replace('.', '_').toLowerCase();
-        this.typeName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, canonicalNameWithUnderscores);
+        String typeName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, canonicalNameWithUnderscores);
+
+        if (typeName.startsWith("JavaLang")) {
+            typeName = typeName.substring("JavaLang".length());
+        }
+        this.typeName = typeName;
     }
 
-    public String getName() {
-        return name;
+    public String getUppercaseName() {
+        return uppercaseName;
     }
 
     public Class<?> getFieldClass() {
@@ -27,7 +32,7 @@ public final class StructuralTypingField {
     }
 
     public String getInterfaceName() {
-        return this.name + this.typeName;
+        return this.uppercaseName + this.typeName;
     }
 
     @Override
@@ -35,12 +40,12 @@ public final class StructuralTypingField {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StructuralTypingField that = (StructuralTypingField) o;
-        return name.equals(that.name) && typeName.equals(that.typeName);
+        return uppercaseName.equals(that.uppercaseName) && typeName.equals(that.typeName);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
+        int result = uppercaseName.hashCode();
         result = 31 * result + typeName.hashCode();
         return result;
     }
@@ -48,7 +53,7 @@ public final class StructuralTypingField {
     @Override
     public String toString() {
         return "StructuralTypingField{" +
-                "name='" + name + '\'' +
+                "name='" + uppercaseName + '\'' +
                 ", typeName='" + typeName + '\'' +
                 '}';
     }
