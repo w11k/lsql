@@ -34,11 +34,13 @@ public final class TestCliProjectGenerationTest {
         LSql lSql = new LSql(TestCliConfig.class, ConnectionProviders.fromInstance(connection));
         lSql.executeRawSql("create table person1 (id integer, first_name text)");
         lSql.executeRawSql("create table person2 (id integer, first_name text, age integer)");
+        lSql.executeRawSql("create table checks (yesno BOOLEAN);");
         connection.close();
 
         String[] args = {
                 TestCliConfig.class.getCanonicalName(),
                 url,
+                ":",
                 genJavaDir.getAbsolutePath()};
         Main.main(args);
     }

@@ -28,7 +28,7 @@ public class StructuralTypingFieldExporter {
 
         content.append("    ")
                 .append(stf.getFieldClass().getCanonicalName())
-                .append(" ").append("get").append(stf.getUppercaseName())
+                .append(" ").append(stf.getGetterMethodName())
                 .append("();\n\n");
 
         content.append("    ")

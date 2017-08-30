@@ -35,6 +35,14 @@ public final class StructuralTypingField {
         return this.uppercaseName + this.typeName;
     }
 
+    public String getGetterMethodName() {
+        if (getFieldClass().isAssignableFrom(Boolean.class)) {
+            return "is" + getUppercaseName();
+        } else {
+            return "get" + getUppercaseName();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

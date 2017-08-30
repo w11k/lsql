@@ -73,23 +73,26 @@ public class SchemaExporter {
         assert packageFolderFile.isDirectory();
         assert packageFolderFile.exists();
 
-        List<TableExporter> tableExporters = Lists.newLinkedList();
+        List<TableRowClassExporter> tableRowClassExporters = Lists.newLinkedList();
         for (Table table : this.lSql.getTables()) {
             logger.info("Generating POJO for table '" + table.getSchemaAndTableName() + "'");
-            tableExporters.add(new TableExporter(table, this, packageFolderFile));
+            TableRowClassExporter rowClassExporter = new TableRowClassExporter(table, this, packageFolderFile);
+            tableRowClassExporters.add(rowClassExporter);
+
+            new RowTableExporter(rowClassExporter, this, packageFolderFile).export();
         }
 
         Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
-        for (TableExporter tableExporter : tableExporters) {
-            structuralTypingFields.addAll(tableExporter.getStructuralTypingFields());
+        for (TableRowClassExporter tableRowClassExporter : tableRowClassExporters) {
+            structuralTypingFields.addAll(tableRowClassExporter.getStructuralTypingFields());
         }
         for (StructuralTypingField structuralTypingField : structuralTypingFields) {
             new StructuralTypingFieldExporter(structuralTypingField, this, packageFolderFile).export();
         }
 
 
-        for (TableExporter tableExporter : tableExporters) {
-            tableExporter.export();
+        for (TableRowClassExporter tableRowClassExporter : tableRowClassExporters) {
+            tableRowClassExporter.export();
         }
 
     }

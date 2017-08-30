@@ -15,7 +15,13 @@ public class Main {
 
         String configClassName = args[0];
         String url = args[1];
-        String outDirPath = args[2];
+
+        String userPass = args[2];
+        int idxDivider = userPass.indexOf(':');
+        String username = userPass.substring(0, idxDivider);
+        String password = userPass.substring(idxDivider + 1);
+
+        String outDirPath = args[3];
         File outDir = new File(outDirPath);
 
         // Config
@@ -23,13 +29,7 @@ public class Main {
         Class<? extends Config> configClass =
                 (Class<? extends Config>) Main.class.getClassLoader().loadClass(configClassName);
 
-        // connection
-//        BasicDataSource ds = new BasicDataSource();
-//        ds.setDriverClassName(driver);
-//        ds.setUrl(url);
-//        ds.setDefaultAutoCommit(false);
-
-        Connection connection = DriverManager.getConnection(url);
+        Connection connection = DriverManager.getConnection(url, username, password);
         connection.setAutoCommit(false);
 
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));

@@ -27,14 +27,6 @@ public class PojoTable<T> {
         this.pojoMapper.checkConformity(converters);
     }
 
-    public Class<T> getPojoClass() {
-        return this.pojoClass;
-    }
-
-    public Table getTable() {
-        return this.table;
-    }
-
     public Optional<Object> insert(T pojo) {
         return insert(pojo, false);
     }

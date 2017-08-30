@@ -1,7 +1,7 @@
 package com.w11k.lsql.cli_tests.tests.test01;
 
-import com.w11k.lsql.tests.cli.schema_public.Person1;
-import com.w11k.lsql.tests.cli.schema_public.Person2;
+import com.w11k.lsql.tests.cli.schema_public.Person1Row;
+import com.w11k.lsql.tests.cli.schema_public.Person2Row;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -10,7 +10,7 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void with() {
-        Person1 p1 = new Person1();
+        Person1Row p1 = new Person1Row();
         p1 = p1
                 .withId(1)
                 .withFirstName("a");
@@ -18,7 +18,7 @@ public final class TestCliProjectAssertsTest {
         assertEquals(p1.getId(), new Integer(1));
         assertEquals(p1.getFirstName(), "a");
 
-        Person2 p2 = new Person2()
+        Person2Row p2 = new Person2Row()
                 .withId(2)
                 .withFirstName("b")
                 .withAge(50);
@@ -30,8 +30,8 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void assignIntoNew() {
-        Person1 p1 = new Person1().withId(1).withFirstName("a");
-        Person2 p2 = new Person2().withId(2).withFirstName("b").withAge(50);
+        Person1Row p1 = new Person1Row().withId(1).withFirstName("a");
+        Person2Row p2 = new Person2Row().withId(2).withFirstName("b").withAge(50);
 
         p2 = p1.assignIntoNew(p2);
         assertEquals(p2.getId(), new Integer(1));
@@ -41,8 +41,8 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void updatedWith() {
-        Person1 p1 = new Person1().withId(1).withFirstName("a");
-        Person2 p2 = new Person2().withId(2).withFirstName("b").withAge(50);
+        Person1Row p1 = new Person1Row().withId(1).withFirstName("a");
+        Person2Row p2 = new Person2Row().withId(2).withFirstName("b").withAge(50);
 
         p1 = p1.updatedWith(p2);
         assertEquals(p1.getId(), new Integer(2));

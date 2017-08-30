@@ -181,9 +181,7 @@ public class LSql {
             this.pojoTables.put(pojoClass, new PojoTable<T>(table(tableName), pojoClass));
         }
 
-        PojoTable<T> pojoTable = (PojoTable<T>) this.pojoTables.get(pojoClass);
-        assert pojoTable.getPojoClass().equals(pojoClass);
-        return pojoTable;
+        return (PojoTable<T>) this.pojoTables.get(pojoClass);
     }
 
     public void fetchMetaDataForAllTables() throws SQLException {

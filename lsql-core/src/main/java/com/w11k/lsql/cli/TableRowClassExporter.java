@@ -3,14 +3,16 @@ package com.w11k.lsql.cli;
 import com.google.common.base.Joiner;
 import com.w11k.lsql.Column;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.TableRow;
 
 import java.io.File;
 
+import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
 import static java.util.stream.Collectors.toList;
 
-public class TableExporter extends AbstractTableExporter {
+public class TableRowClassExporter extends AbstractTableExporter {
 
-    public TableExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
+    public TableRowClassExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
         super(table, schemaExporter, rootPackage);
     }
 
@@ -18,6 +20,7 @@ public class TableExporter extends AbstractTableExporter {
         content.append("package ").append(getFullPackageName()).append(";\n\n");
         content.append("import ").append(this.schemaExporter.getPackageName()).append(".*;\n\n");
         content.append("public class ").append(getClassName());
+        content.append(" implements ").append(TableRow.class.getCanonicalName());
         contentImplements();
         content.append(" {\n\n");
 
@@ -35,11 +38,27 @@ public class TableExporter extends AbstractTableExporter {
 
         contentSeperator();
 
-        // assignInto
+        // StructuralTyping methods
         contentAssignIntoNew();
         contentUpdatedWith();
 
+        // toMap
+        contentToMap();
+
         content.append("}\n");
+    }
+
+    private void contentToMap() {
+        content.append("    public java.util.Map<String, Object> toMap() {\n");
+        content.append("        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();\n");
+
+        for (Column column : columns) {
+            content.append("        ")
+                    .append("map.put(\"").append(column.getJavaColumnName()).append("\", this.").append(column.getJavaColumnName()).append(");\n");
+        }
+
+        content.append("        return map;\n");
+        content.append("    }\n\n");
     }
 
     private void contentAssignIntoNew() {
@@ -53,7 +72,7 @@ public class TableExporter extends AbstractTableExporter {
         for (StructuralTypingField stf : getStructuralTypingFields()) {
             content.append("        target = ")
                     .append("((").append(stf.getInterfaceName()).append(") target).with").append(stf.getUppercaseName())
-                    .append("(this.get").append(stf.getUppercaseName()).append("());\n");
+                    .append("(this.").append(stf.getGetterMethodName()).append("());\n");
         }
         content.append("        return (T) target;\n");
 
@@ -71,7 +90,7 @@ public class TableExporter extends AbstractTableExporter {
         for (StructuralTypingField stf : getStructuralTypingFields()) {
             content.append("        target = ")
                     .append("((").append(stf.getInterfaceName()).append(") target).with").append(stf.getUppercaseName())
-                    .append("(source.get").append(stf.getUppercaseName()).append("());\n");
+                    .append("(source.").append(stf.getGetterMethodName()).append("());\n");
         }
         content.append("        return (").append(getClassName()).append(") target;\n");
 
@@ -79,7 +98,9 @@ public class TableExporter extends AbstractTableExporter {
     }
 
     private void contentImplements() {
-        content.append(" implements ");
+        if (getStructuralTypingFields().size() > 0) {
+            content.append(",");
+        }
         content.append(
                 Joiner.on(",")
                         .join(getStructuralTypingFields().stream()
@@ -110,6 +131,21 @@ public class TableExporter extends AbstractTableExporter {
                     .append(" = ")
                     .append(column.getJavaColumnName())
                     .append(";\n");
+        }
+
+        content.append("    }\n\n");
+
+        // constructor from map
+        content.append("    public ").append(getClassName()).append("(java.util.Map<String, Object> from) {\n");
+        // assign member
+        for (Column column : columns) {
+            content.append("        ")
+                    .append("this.").append(column.getJavaColumnName())
+                    .append(" = ")
+                    .append("(").append(column.getConverter().getJavaType().getCanonicalName()).append(") ")
+                    .append("from.get(\"")
+                    .append(column.getJavaColumnName())
+                    .append("\");\n");
         }
         content.append("    }\n");
     }

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
 import static java.util.stream.Collectors.toList;
 
 abstract public class AbstractTableExporter {
@@ -39,8 +40,10 @@ abstract public class AbstractTableExporter {
 
         this.structuralTypingFields = createStructuralTypingFieldList();
         this.constructorCallArgs = Joiner.on(",").join(columns.stream().map(Column::getJavaColumnName).collect(toList()));
+    }
 
-
+    public Table getTable() {
+        return table;
     }
 
     private List<StructuralTypingField> createStructuralTypingFieldList() {
@@ -72,11 +75,7 @@ abstract public class AbstractTableExporter {
         return new File(packageWithSchema, getClassName() + ".java");
     }
 
-    protected String lowerCamelToUpperCamel(String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
-    }
-
-    protected String getLastPackageSegmentForSchema() {
+    public String getLastPackageSegmentForSchema() {
         String schemaName = this.table.getSchemaName();
 
         // no schema
@@ -96,7 +95,7 @@ abstract public class AbstractTableExporter {
     }
 
     protected String getClassName() {
-        return lowerCamelToUpperCamel(this.table.getTableName());
+        return lowerCamelToUpperCamel(this.table.getTableName()) + "Row";
     }
 
     protected void contentSeperator() {
