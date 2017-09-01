@@ -5,12 +5,12 @@ import com.google.common.base.Optional;
 import java.lang.reflect.Constructor;
 import java.util.Map;
 
-public class RowTable<T extends TableRow> {
+public class TypedTable<T extends TableRow> {
 
     private final Table table;
     private final Constructor<T> tableRowConstructor;
 
-    public RowTable(LSql lSql, String tableName, Class<T> tableRowClass) {
+    public TypedTable(LSql lSql, String tableName, Class<T> tableRowClass) {
         this.table = lSql.table(tableName);
 
         try {
@@ -27,6 +27,15 @@ public class RowTable<T extends TableRow> {
         map.entrySet().removeIf(entry -> entry.getValue() == null);
 
         return this.table.insert(new Row(map));
+    }
+
+    public T insertAndLoad(T row) {
+        Optional<Object> pk = this.insert(row);
+        if (pk.isPresent()) {
+            return this.load(pk.get()).get();
+        } else {
+            throw new IllegalStateException("insert did not return a primary key");
+        }
     }
 
     public Optional<T> load(Object id) {
@@ -47,6 +56,16 @@ public class RowTable<T extends TableRow> {
     public void delete(T row) {
         Map<String, Object> map = row.toMap();
         this.table.delete(new Row(map));
+    }
+
+    public void update(T row) {
+        Map<String, Object> map = row.toMap();
+        this.table.update(new Row(map));
+    }
+
+    public void updateWhere(T row, Map<String, Object> where) {
+        Map<String, Object> map = row.toMap();
+        this.table.updateWhere(new Row(map), new Row(where));
     }
 
 }

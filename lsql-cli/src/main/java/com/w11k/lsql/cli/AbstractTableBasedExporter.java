@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+import com.google.common.io.MoreFiles;
 import com.w11k.lsql.Column;
 import com.w11k.lsql.Table;
 
@@ -12,10 +13,10 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
+import static com.w11k.lsql.cli.CodeGenUtils.log;
 import static java.util.stream.Collectors.toList;
 
-abstract public class AbstractTableExporter {
+abstract public class AbstractTableBasedExporter {
 
     private final List<StructuralTypingField> structuralTypingFields;
 
@@ -31,7 +32,7 @@ abstract public class AbstractTableExporter {
 
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractTableExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
+    public AbstractTableBasedExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
         this.table = table;
         this.schemaExporter = schemaExporter;
         this.rootPackage = rootPackage;
@@ -55,10 +56,14 @@ abstract public class AbstractTableExporter {
     }
 
     final public void export() {
+        log("Generating", getOutputFile().getAbsolutePath());
+
         this.createContent();
 
         File pojoSourceFile = getOutputFile();
         try {
+            MoreFiles.createParentDirectories(pojoSourceFile.toPath());
+
             // TODO only write if content changed
             Files.write(content.toString().getBytes(Charsets.UTF_8), pojoSourceFile);
         } catch (IOException e) {
@@ -70,10 +75,10 @@ abstract public class AbstractTableExporter {
 
     protected File getOutputFile() {
         File packageWithSchema = new File(this.rootPackage, this.getLastPackageSegmentForSchema());
-        //noinspection ResultOfMethodCallIgnored
-        packageWithSchema.mkdirs();
-        return new File(packageWithSchema, getClassName() + ".java");
+        return new File(packageWithSchema, getOutputFileName());
     }
+
+    abstract public String getOutputFileName();
 
     public String getLastPackageSegmentForSchema() {
         String schemaName = this.table.getSchemaName();
@@ -92,10 +97,6 @@ abstract public class AbstractTableExporter {
         return packageSchemaSegment.equals("")
                 ? this.schemaExporter.getPackageName()
                 : this.schemaExporter.getPackageName() + "." + packageSchemaSegment;
-    }
-
-    protected String getClassName() {
-        return lowerCamelToUpperCamel(this.table.getTableName()) + "Row";
     }
 
     protected void contentSeperator() {

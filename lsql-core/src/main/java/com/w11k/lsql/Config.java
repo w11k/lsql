@@ -1,7 +1,6 @@
 package com.w11k.lsql;
 
 import com.google.common.collect.Maps;
-import com.w11k.lsql.cli.CliConfig;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.GenericDialect;
 
@@ -12,8 +11,6 @@ public class Config {
     private Map<String, Map<String, Converter>> converters = Maps.newHashMap();
 
     private GenericDialect dialect = new GenericDialect();
-
-    private CliConfig cliConfig = new CliConfig();
 
     private Integer defaultQueryTimeoutInSeconds = null;
 
@@ -36,10 +33,6 @@ public class Config {
 
     protected void setDialect(GenericDialect dialect) {
         this.dialect = dialect;
-    }
-
-    public CliConfig getCliConfig() {
-        return cliConfig;
     }
 
     public Map<String, Map<String, Converter>> getConverters() {

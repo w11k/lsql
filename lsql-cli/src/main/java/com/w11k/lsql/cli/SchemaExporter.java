@@ -13,6 +13,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import static com.w11k.lsql.cli.CodeGenUtils.log;
+
 public class SchemaExporter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -73,17 +75,18 @@ public class SchemaExporter {
         assert packageFolderFile.isDirectory();
         assert packageFolderFile.exists();
 
-        List<TableRowClassExporter> tableRowClassExporters = Lists.newLinkedList();
-        for (Table table : this.lSql.getTables()) {
-            logger.info("Generating POJO for table '" + table.getSchemaAndTableName() + "'");
-            TableRowClassExporter rowClassExporter = new TableRowClassExporter(table, this, packageFolderFile);
+        List<RowExporter> tableRowClassExporters = Lists.newLinkedList();
+        Iterable<Table> tables = this.lSql.getTables();
+
+        for (Table table : tables) {
+            RowExporter rowClassExporter = new RowExporter(table, this, packageFolderFile);
             tableRowClassExporters.add(rowClassExporter);
 
-            new RowTableExporter(rowClassExporter, this, packageFolderFile).export();
+            new TableExporter(table, this, packageFolderFile).export();
         }
 
         Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
-        for (TableRowClassExporter tableRowClassExporter : tableRowClassExporters) {
+        for (RowExporter tableRowClassExporter : tableRowClassExporters) {
             structuralTypingFields.addAll(tableRowClassExporter.getStructuralTypingFields());
         }
         for (StructuralTypingField structuralTypingField : structuralTypingFields) {
@@ -91,10 +94,11 @@ public class SchemaExporter {
         }
 
 
-        for (TableRowClassExporter tableRowClassExporter : tableRowClassExporters) {
+        for (RowExporter tableRowClassExporter : tableRowClassExporters) {
             tableRowClassExporter.export();
         }
 
+        log("");
     }
 
 

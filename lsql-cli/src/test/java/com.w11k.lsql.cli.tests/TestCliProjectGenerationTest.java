@@ -1,4 +1,4 @@
-package com.w11k.lsql.tests.cli;
+package com.w11k.lsql.cli.tests;
 
 import com.google.common.io.MoreFiles;
 import com.w11k.lsql.LSql;
@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.UUID;
+
+import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
+
 
 public final class TestCliProjectGenerationTest {
 
@@ -32,16 +35,17 @@ public final class TestCliProjectGenerationTest {
         ds.setDefaultAutoCommit(false);
         Connection connection = ds.getConnection();
         LSql lSql = new LSql(TestCliConfig.class, ConnectionProviders.fromInstance(connection));
-        lSql.executeRawSql("create table person1 (id integer, first_name text)");
-        lSql.executeRawSql("create table person2 (id integer, first_name text, age integer)");
-        lSql.executeRawSql("create table checks (yesno BOOLEAN);");
+        createTables(lSql);
         connection.close();
 
         String[] args = {
-                TestCliConfig.class.getCanonicalName(),
-                url,
-                ":",
-                genJavaDir.getAbsolutePath()};
+                "config:" + TestCliConfig.class.getCanonicalName(),
+                "url:" + url,
+                "user:",
+                "password:",
+                "package:" + TestCliConfig.class.getPackage().getName(),
+                "output:" + genJavaDir.getAbsolutePath()
+        };
         Main.main(args);
     }
 
