@@ -15,6 +15,8 @@ public class Config {
 
     private CliConfig cliConfig = new CliConfig();
 
+    private Integer defaultQueryTimeoutInSeconds = null;
+
     public Config() {
     }
 
@@ -24,7 +26,7 @@ public class Config {
         return useColumnTypeForConverterLookupInQueries;
     }
 
-    public void setUseColumnTypeForConverterLookupInQueries(boolean useColumnTypeForConverterLookupInQueries) {
+    protected void setUseColumnTypeForConverterLookupInQueries(boolean useColumnTypeForConverterLookupInQueries) {
         this.useColumnTypeForConverterLookupInQueries = useColumnTypeForConverterLookupInQueries;
     }
 
@@ -32,7 +34,7 @@ public class Config {
         return dialect;
     }
 
-    public void setDialect(GenericDialect dialect) {
+    protected void setDialect(GenericDialect dialect) {
         this.dialect = dialect;
     }
 
@@ -64,4 +66,11 @@ public class Config {
         columnClassMap.put(columnName, converter);
     }
 
+    public Integer getDefaultQueryTimeoutInSeconds() {
+        return defaultQueryTimeoutInSeconds;
+    }
+
+    protected void setDefaultQueryTimeoutInSeconds(Integer defaultQueryTimeoutInSeconds) {
+        this.defaultQueryTimeoutInSeconds = defaultQueryTimeoutInSeconds;
+    }
 }

@@ -330,6 +330,10 @@ public class LSql {
         return config.isUseColumnTypeForConverterLookupInQueries();
     }
 
+    public Config getConfig() {
+        return config;
+    }
+
     public CliConfig getCliConfig() {
         return config.getCliConfig();
     }

@@ -45,6 +45,15 @@ public abstract class AbstractQuery<T> {
         if (outConverters != null) {
             this.setConverters(outConverters);
         }
+
+        Integer defaultQueryTimeoutInSeconds = lSql.getConfig().getDefaultQueryTimeoutInSeconds();
+        if (defaultQueryTimeoutInSeconds != null) {
+            try {
+                preparedStatement.setQueryTimeout(defaultQueryTimeoutInSeconds);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public LSql getlSql() {
@@ -72,6 +81,15 @@ public abstract class AbstractQuery<T> {
     public AbstractQuery<T> addConverter(String columnName, Converter converter) {
         this.converters.put(columnName, converter);
         return this;
+    }
+
+    public AbstractQuery<T> setQueryTimeout(int seconds) {
+        try {
+            this.preparedStatement.setQueryTimeout(seconds);
+            return this;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<T> toList() {
