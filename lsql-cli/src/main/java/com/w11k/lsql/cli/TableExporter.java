@@ -37,6 +37,9 @@ public class TableExporter extends AbstractTableBasedExporter {
     }
 
     private void contentConstructor() {
+        if (this.schemaExporter.isGuice()) {
+            content.append("    @com.google.inject.Inject\n");
+        }
         content.append("    public ").append(getClassName())
                 .append("(").append(LSql.class.getCanonicalName()).append(" lSql) {\n");
 

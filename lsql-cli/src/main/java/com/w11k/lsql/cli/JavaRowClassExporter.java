@@ -10,9 +10,9 @@ import java.io.File;
 import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
 import static java.util.stream.Collectors.toList;
 
-public class RowExporter extends AbstractTableBasedExporter {
+public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
-    public RowExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
+    public JavaRowClassExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
         super(table, schemaExporter, rootPackage);
     }
 

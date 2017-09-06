@@ -17,7 +17,9 @@ public class Main {
     private String url;
     private String user;
     private String password;
+
     private String packageName;
+    private boolean guice = false;
     private String output;
 
     public Main(String[] args) throws ClassNotFoundException, SQLException {
@@ -47,6 +49,7 @@ public class Main {
         SchemaExporter schemaExporter = new SchemaExporter(lSql);
         schemaExporter.setPackageName(this.packageName);
         schemaExporter.setOutputPath(outDir);
+        schemaExporter.setGuice(this.guice);
         schemaExporter.export();
     }
 
@@ -69,11 +72,15 @@ public class Main {
                 this.packageName = value;
             } else if (arg.startsWith("output:")) {
                 this.output = value;
+            }else if (arg.startsWith("di:")) {
+                if (value.equalsIgnoreCase("guice")) {
+                    this.guice = true;
+                }
             }
         }
     }
 
     private String getParamValue(String param) {
-        return param.substring(param.indexOf(":") + 1);
+        return param.substring(param.indexOf(":") + 1).trim();
     }
 }
