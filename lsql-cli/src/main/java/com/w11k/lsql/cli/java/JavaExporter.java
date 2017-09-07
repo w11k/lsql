@@ -2,8 +2,8 @@ package com.w11k.lsql.cli.java;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.w11k.lsql.ColumnsContainer;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.Table;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -61,16 +61,16 @@ public class JavaExporter {
         assert packageFolderFile.exists();
 
         List<JavaRowClassExporter> tableRowClassExporters = Lists.newLinkedList();
-        Iterable<Table> tables = this.lSql.getTables();
+        Iterable<? extends ColumnsContainer> tables = this.lSql.getTables();
 
         // Tables
-        for (Table table : tables) {
+        for (ColumnsContainer cc : tables) {
             // collect all row classes
-            JavaRowClassExporter rowClassExporter = new JavaRowClassExporter(table, this, packageFolderFile);
+            JavaRowClassExporter rowClassExporter = new JavaRowClassExporter(cc, this, packageFolderFile);
             tableRowClassExporters.add(rowClassExporter);
 
             // generate table classes
-            new TableExporter(table, this, packageFolderFile).export();
+            new TableExporter(cc, this, packageFolderFile).export();
         }
 
         // find unique StructuralTypingFields

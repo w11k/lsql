@@ -1,20 +1,9 @@
 package com.w11k.lsql.cli.typescript;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.Table;
-import com.w11k.lsql.cli.java.JavaRowClassExporter;
-import com.w11k.lsql.cli.java.StructuralTypingField;
-import com.w11k.lsql.cli.java.StructuralTypingFieldExporter;
-import com.w11k.lsql.cli.java.TableExporter;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
-
-import static com.w11k.lsql.cli.CodeGenUtils.log;
 
 public class TypeScriptExporter {
 
@@ -36,8 +25,7 @@ public class TypeScriptExporter {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void export() {
-        this.outDirTypeScript.mkdirs();
-
+/*
         String packageFolder = this.packageName.replaceAll("\\.", File.separator);
         File packageFolderFile = new File(this.outDirTypeScript, packageFolder);
 
@@ -75,7 +63,7 @@ public class TypeScriptExporter {
         }
 
         log("");
+        */
     }
-
 
 }

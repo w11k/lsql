@@ -1,12 +1,14 @@
 package com.w11k.lsql.cli;
 
+import com.google.common.io.MoreFiles;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.java.JavaExporter;
-import com.w11k.lsql.cli.typescript.TypeScriptExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
+import com.w11k.lsql.sqlfile.LSqlFile;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -21,8 +23,10 @@ public class Main {
     private String password;
 
     private String packageName;
+    private String sqlStatements;
     private boolean guice = false;
     private String outDirJava;
+    private String outDirTypeScript;
 
     public Main(String[] args) throws ClassNotFoundException, SQLException {
         log("=================");
@@ -46,6 +50,7 @@ public class Main {
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
+        // Java table and row classes
         JavaExporter javaExporter = new JavaExporter(lSql);
         javaExporter.setPackageName(this.packageName);
         File outDirJava = new File(this.outDirJava);
@@ -55,8 +60,26 @@ public class Main {
         javaExporter.setGuice(this.guice);
         javaExporter.export();
 
-        TypeScriptExporter tse = new TypeScriptExporter(lSql);
-        tse.export();
+        // Java statements
+        if (this.sqlStatements != null) {
+
+            Iterable<Path> children = MoreFiles.directoryTreeTraverser().preOrderTraversal(new File(this.sqlStatements).toPath());
+            for (Path child : children) {
+                File file = child.toFile();
+                if (file.isFile() && file.getName().endsWith(".sql")) {
+                    System.out.println("child = " + child);
+
+                    LSqlFile lSqlFile = new LSqlFile(lSql, file.getAbsolutePath(), file.getAbsolutePath());
+
+                }
+            }
+
+        }
+
+//        TypeScriptExporter tse = new TypeScriptExporter(lSql);
+//        File outDirTs = new File(this.outDirTypeScript);
+//        tse.setOutputPath(outDirTs);
+//        tse.export();
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
@@ -76,9 +99,11 @@ public class Main {
                 this.password = value;
             } else if (arg.startsWith("package:")) {
                 this.packageName = value;
+            } else if (arg.startsWith("sqlStatements:")) {
+                this.sqlStatements = value;
             } else if (arg.startsWith("outDirJava:")) {
                 this.outDirJava = value;
-            }else if (arg.startsWith("di:")) {
+            } else if (arg.startsWith("di:")) {
                 if (value.equalsIgnoreCase("guice")) {
                     this.guice = true;
                 }

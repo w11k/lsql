@@ -2,7 +2,7 @@ package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Joiner;
 import com.w11k.lsql.Column;
-import com.w11k.lsql.Table;
+import com.w11k.lsql.ColumnsContainer;
 import com.w11k.lsql.TableRow;
 
 import java.io.File;
@@ -12,8 +12,8 @@ import static java.util.stream.Collectors.toList;
 
 public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
-    public JavaRowClassExporter(Table table, JavaExporter javaExporter, File rootPackage) {
-        super(table, javaExporter, rootPackage);
+    public JavaRowClassExporter(ColumnsContainer columnsContainer, JavaExporter javaExporter, File rootPackage) {
+        super(columnsContainer, javaExporter, rootPackage);
     }
 
     public void createContent() {
@@ -54,7 +54,7 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
     }
 
     protected String getClassName() {
-        return lowerCamelToUpperCamel(this.table.getTableName()) + "Row";
+        return lowerCamelToUpperCamel(this.getColumnsContainer().getTableName()) + "Row";
     }
 
     private void contentToMap() {

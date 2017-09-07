@@ -1,7 +1,7 @@
 package com.w11k.lsql.cli.java;
 
+import com.w11k.lsql.ColumnsContainer;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.Table;
 import com.w11k.lsql.TypedTable;
 
 import java.io.File;
@@ -10,13 +10,8 @@ import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
 
 public class TableExporter extends AbstractTableBasedExporter {
 
-//    private final RowExporter rowClassExporter;
-//    private final SchemaExporter schemaExporter;
-//    private final File rootPackage;
-//    private StringBuilder content = new StringBuilder();
-
-    public TableExporter(Table table, JavaExporter javaExporter, File rootPackage) {
-        super(table, javaExporter, rootPackage);
+    public TableExporter(ColumnsContainer columnsContainer, JavaExporter javaExporter, File rootPackage) {
+        super(columnsContainer, javaExporter, rootPackage);
     }
 
     @Override
@@ -44,18 +39,18 @@ public class TableExporter extends AbstractTableBasedExporter {
                 .append("(").append(LSql.class.getCanonicalName()).append(" lSql) {\n");
 
         content.append("        super(lSql, \"")
-                .append(getTable().getSchemaAndTableName()).append("\", ")
+                .append(getColumnsContainer().getSchemaAndTableName()).append("\", ")
                 .append(getFullPackageName()).append(".").append(getRowClassName()).append(".class);\n");
 
         content.append("    }\n\n");
     }
 
     private String getRowClassName() {
-        return lowerCamelToUpperCamel(this.getTable().getTableName() + "Row");
+        return lowerCamelToUpperCamel(this.getColumnsContainer().getTableName() + "Row");
     }
 
     protected String getClassName() {
-        return lowerCamelToUpperCamel(this.getTable().getTableName()) + "Table";
+        return lowerCamelToUpperCamel(this.getColumnsContainer().getTableName()) + "Table";
     }
 
 }

@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 import com.w11k.lsql.Column;
-import com.w11k.lsql.Table;
+import com.w11k.lsql.ColumnsContainer;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,11 +20,11 @@ abstract public class AbstractTableBasedExporter {
 
     private final List<StructuralTypingField> structuralTypingFields;
 
-    protected final Table table;
-
     protected final List<Column> columns;
 
     protected final String constructorCallArgs;
+
+    private final ColumnsContainer columnsContainer;
 
     protected final JavaExporter javaExporter;
 
@@ -32,19 +32,19 @@ abstract public class AbstractTableBasedExporter {
 
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractTableBasedExporter(Table table, JavaExporter javaExporter, File rootPackage) {
-        this.table = table;
+    public AbstractTableBasedExporter(ColumnsContainer cc, JavaExporter javaExporter, File rootPackage) {
+        columnsContainer = cc;
         this.javaExporter = javaExporter;
         this.rootPackage = rootPackage;
-        this.columns = Lists.newLinkedList(table.getColumns().values());
+        this.columns = Lists.newLinkedList(cc.getColumns().values());
         this.columns.sort(Comparator.comparing(Column::getJavaColumnName));
 
         this.structuralTypingFields = createStructuralTypingFieldList();
         this.constructorCallArgs = Joiner.on(",").join(columns.stream().map(Column::getJavaColumnName).collect(toList()));
     }
 
-    public Table getTable() {
-        return table;
+    public ColumnsContainer getColumnsContainer() {
+        return columnsContainer;
     }
 
     private List<StructuralTypingField> createStructuralTypingFieldList() {
@@ -81,7 +81,7 @@ abstract public class AbstractTableBasedExporter {
     abstract public String getOutputFileName();
 
     public String getLastPackageSegmentForSchema() {
-        String schemaName = this.table.getSchemaName();
+        String schemaName = this.columnsContainer.getSchemaName();
 
         // no schema
         if (schemaName.length() == 0) {
