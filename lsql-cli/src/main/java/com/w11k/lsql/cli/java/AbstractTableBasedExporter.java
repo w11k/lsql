@@ -1,4 +1,4 @@
-package com.w11k.lsql.cli;
+package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -26,15 +26,15 @@ abstract public class AbstractTableBasedExporter {
 
     protected final String constructorCallArgs;
 
-    protected final SchemaExporter schemaExporter;
+    protected final JavaExporter javaExporter;
 
     protected final File rootPackage;
 
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractTableBasedExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
+    public AbstractTableBasedExporter(Table table, JavaExporter javaExporter, File rootPackage) {
         this.table = table;
-        this.schemaExporter = schemaExporter;
+        this.javaExporter = javaExporter;
         this.rootPackage = rootPackage;
         this.columns = Lists.newLinkedList(table.getColumns().values());
         this.columns.sort(Comparator.comparing(Column::getJavaColumnName));
@@ -95,8 +95,8 @@ abstract public class AbstractTableBasedExporter {
     protected String getFullPackageName() {
         String packageSchemaSegment = this.getLastPackageSegmentForSchema();
         return packageSchemaSegment.equals("")
-                ? this.schemaExporter.getPackageName()
-                : this.schemaExporter.getPackageName() + "." + packageSchemaSegment;
+                ? this.javaExporter.getPackageName()
+                : this.javaExporter.getPackageName() + "." + packageSchemaSegment;
     }
 
     protected void contentSeperator() {

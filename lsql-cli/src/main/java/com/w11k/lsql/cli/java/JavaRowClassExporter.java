@@ -1,4 +1,4 @@
-package com.w11k.lsql.cli;
+package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Joiner;
 import com.w11k.lsql.Column;
@@ -12,13 +12,13 @@ import static java.util.stream.Collectors.toList;
 
 public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
-    public JavaRowClassExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
-        super(table, schemaExporter, rootPackage);
+    public JavaRowClassExporter(Table table, JavaExporter javaExporter, File rootPackage) {
+        super(table, javaExporter, rootPackage);
     }
 
     public void createContent() {
         content.append("package ").append(getFullPackageName()).append(";\n\n");
-        content.append("import ").append(this.schemaExporter.getPackageName()).append(".*;\n\n");
+        content.append("import ").append(this.javaExporter.getPackageName()).append(".*;\n\n");
         content.append("public class ").append(getClassName());
         content.append(" implements ").append(TableRow.class.getCanonicalName());
         contentImplements();

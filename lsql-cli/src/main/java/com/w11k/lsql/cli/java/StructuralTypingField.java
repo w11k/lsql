@@ -1,4 +1,4 @@
-package com.w11k.lsql.cli;
+package com.w11k.lsql.cli.java;
 
 import com.google.common.base.CaseFormat;
 

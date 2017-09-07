@@ -1,4 +1,4 @@
-package com.w11k.lsql.cli;
+package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -10,20 +10,20 @@ public class StructuralTypingFieldExporter {
 
     private final StructuralTypingField stf;
 
-    private final SchemaExporter schemaExporter;
+    private final JavaExporter javaExporter;
 
     private final File rootPackage;
 
     private StringBuilder content = new StringBuilder();
 
-    public StructuralTypingFieldExporter(StructuralTypingField stf, SchemaExporter schemaExporter, File rootPackage) {
+    public StructuralTypingFieldExporter(StructuralTypingField stf, JavaExporter javaExporter, File rootPackage) {
         this.stf = stf;
-        this.schemaExporter = schemaExporter;
+        this.javaExporter = javaExporter;
         this.rootPackage = rootPackage;
     }
 
     public void export() {
-        content.append("package ").append(schemaExporter.getPackageName()).append(";\n\n");
+        content.append("package ").append(javaExporter.getPackageName()).append(";\n\n");
         content.append("public interface ").append(stf.getInterfaceName()).append(" {\n\n");
 
         content.append("    ")

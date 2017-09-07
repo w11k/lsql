@@ -3,7 +3,7 @@ package com.w11k.lsql.cli.tests;
 import com.google.common.io.MoreFiles;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.Main;
-import com.w11k.lsql.cli.SchemaExporter;
+import com.w11k.lsql.cli.java.JavaExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.annotations.Test;
@@ -21,9 +21,9 @@ import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
 
 public final class TestCliProjectGenerationTest {
 
-    public static File pathRelativeToProjectRoot(String fileInProjectRoot, String folderRelativeToProjectRoot) {
+    private static File pathRelativeToProjectRoot(String fileInProjectRoot, String folderRelativeToProjectRoot) {
         try {
-            URL resource = SchemaExporter.class.getResource("/");
+            URL resource = JavaExporter.class.getResource("/");
             File folder = new File(resource.toURI());
 
             while (folder != null) {
@@ -65,7 +65,7 @@ public final class TestCliProjectGenerationTest {
                 "password:",
                 "package:" + TestCliConfig.class.getPackage().getName(),
                 "di:guice",
-                "output:" + genJavaDir.getAbsolutePath()
+                "outDirJava:" + genJavaDir.getAbsolutePath()
         };
         Main.main(args);
     }

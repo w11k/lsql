@@ -167,10 +167,10 @@ public class LSql {
 
         if (!this.tables.containsKey(schemaAndTableName)) {
             Table table = new Table(this, schemaAndTableName);
-
-            this.tables.put(schemaAndTableName, table);
             this.tables.put(table.getSchemaAndTableName(), table);
+            schemaAndTableName = table.getSchemaAndTableName();
         }
+
         return this.tables.get(schemaAndTableName);
     }
 

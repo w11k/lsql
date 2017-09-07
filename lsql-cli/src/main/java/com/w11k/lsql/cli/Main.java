@@ -2,6 +2,8 @@ package com.w11k.lsql.cli;
 
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.cli.java.JavaExporter;
+import com.w11k.lsql.cli.typescript.TypeScriptExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 
 import java.io.File;
@@ -20,7 +22,7 @@ public class Main {
 
     private String packageName;
     private boolean guice = false;
-    private String output;
+    private String outDirJava;
 
     public Main(String[] args) throws ClassNotFoundException, SQLException {
         log("=================");
@@ -28,8 +30,6 @@ public class Main {
         log("=================\n");
 
         this.parseArgs(args);
-
-        File outDir = new File(this.output);
 
         // Config
         @SuppressWarnings("unchecked")
@@ -46,11 +46,17 @@ public class Main {
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
-        SchemaExporter schemaExporter = new SchemaExporter(lSql);
-        schemaExporter.setPackageName(this.packageName);
-        schemaExporter.setOutputPath(outDir);
-        schemaExporter.setGuice(this.guice);
-        schemaExporter.export();
+        JavaExporter javaExporter = new JavaExporter(lSql);
+        javaExporter.setPackageName(this.packageName);
+        File outDirJava = new File(this.outDirJava);
+        //noinspection ResultOfMethodCallIgnored
+        outDirJava.mkdirs();
+        javaExporter.setOutputPath(outDirJava);
+        javaExporter.setGuice(this.guice);
+        javaExporter.export();
+
+        TypeScriptExporter tse = new TypeScriptExporter(lSql);
+        tse.export();
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
@@ -70,8 +76,8 @@ public class Main {
                 this.password = value;
             } else if (arg.startsWith("package:")) {
                 this.packageName = value;
-            } else if (arg.startsWith("output:")) {
-                this.output = value;
+            } else if (arg.startsWith("outDirJava:")) {
+                this.outDirJava = value;
             }else if (arg.startsWith("di:")) {
                 if (value.equalsIgnoreCase("guice")) {
                     this.guice = true;

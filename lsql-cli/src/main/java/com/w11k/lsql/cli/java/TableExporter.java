@@ -1,4 +1,4 @@
-package com.w11k.lsql.cli;
+package com.w11k.lsql.cli.java;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
@@ -15,8 +15,8 @@ public class TableExporter extends AbstractTableBasedExporter {
 //    private final File rootPackage;
 //    private StringBuilder content = new StringBuilder();
 
-    public TableExporter(Table table, SchemaExporter schemaExporter, File rootPackage) {
-        super(table, schemaExporter, rootPackage);
+    public TableExporter(Table table, JavaExporter javaExporter, File rootPackage) {
+        super(table, javaExporter, rootPackage);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class TableExporter extends AbstractTableBasedExporter {
     }
 
     private void contentConstructor() {
-        if (this.schemaExporter.isGuice()) {
+        if (this.javaExporter.isGuice()) {
             content.append("    @com.google.inject.Inject\n");
         }
         content.append("    public ").append(getClassName())
