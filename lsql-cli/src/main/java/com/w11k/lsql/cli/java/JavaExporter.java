@@ -3,7 +3,6 @@ package com.w11k.lsql.cli.java;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.ColumnsContainer;
-import com.w11k.lsql.LSql;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -14,7 +13,9 @@ import static com.w11k.lsql.cli.CodeGenUtils.log;
 
 public class JavaExporter {
 
-    private final LSql lSql;
+    private final List<? extends ColumnsContainer> tables;
+
+    private final List<StatementColumnContainer> stmtColumnContainer;
 
     private File outDirJava = null;
 
@@ -22,10 +23,11 @@ public class JavaExporter {
 
     private boolean guice = false;
 
-    public JavaExporter(LSql lSql) throws SQLException {
-        this.lSql = lSql;
+    public JavaExporter(List<? extends ColumnsContainer> tables,
+                        List<StatementColumnContainer> stmtColumnContainer) throws SQLException {
+        this.tables = tables;
+        this.stmtColumnContainer = stmtColumnContainer;
     }
-
 
     public String getPackageName() {
         return packageName;
@@ -61,7 +63,9 @@ public class JavaExporter {
         assert packageFolderFile.exists();
 
         List<JavaRowClassExporter> tableRowClassExporters = Lists.newLinkedList();
-        Iterable<? extends ColumnsContainer> tables = this.lSql.getTables();
+        Iterable<? extends ColumnsContainer> tables = this.tables;
+
+        Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
 
         // Tables
         for (ColumnsContainer cc : tables) {
@@ -73,8 +77,14 @@ public class JavaExporter {
             new TableExporter(cc, this, packageFolderFile).export();
         }
 
+        // StatementExporter
+        for (StatementColumnContainer stmtInColumn : this.stmtColumnContainer) {
+            StatementExporter stmtInRowClass = new StatementExporter(stmtInColumn, this, packageFolderFile);
+            structuralTypingFields.addAll(stmtInRowClass.getStructuralTypingFields());
+            stmtInRowClass.export();
+        }
+
         // find unique StructuralTypingFields
-        Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
         for (JavaRowClassExporter tableRowClassExporter : tableRowClassExporters) {
             structuralTypingFields.addAll(tableRowClassExporter.getStructuralTypingFields());
         }

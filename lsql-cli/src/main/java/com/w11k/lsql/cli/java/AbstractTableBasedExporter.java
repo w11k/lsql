@@ -33,7 +33,7 @@ abstract public class AbstractTableBasedExporter {
     protected StringBuilder content = new StringBuilder();
 
     public AbstractTableBasedExporter(ColumnsContainer cc, JavaExporter javaExporter, File rootPackage) {
-        columnsContainer = cc;
+        this.columnsContainer = cc;
         this.javaExporter = javaExporter;
         this.rootPackage = rootPackage;
         this.columns = Lists.newLinkedList(cc.getColumns().values());

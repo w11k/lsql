@@ -25,9 +25,9 @@ import static com.google.common.collect.Lists.newLinkedList;
 
 public class SqlStatementToPreparedStatement {
 
-    // ..... /*name=*/ 123 /**/
+    // ..... /*name: type =*/ 123 /**/
     private static final Pattern QUERY_ARG_START = Pattern.compile(
-            "/\\*\\s*(\\S*)\\s*=\\s*\\*/");
+            "/\\*\\s*(\\S*)\\s*:?\\s*(\\S*)\\s*=\\s*\\*/");
 
     private static final String QUERY_ARG_END = "/**/";
 
@@ -80,10 +80,24 @@ public class SqlStatementToPreparedStatement {
         while (matcher.find()) {
             Parameter p = new Parameter();
 
-            // Name
-            String paramName = matcher.group(1);
-            paramName = paramName.equals("") ? extractParameterName(sqlString, matcher.start()) : paramName;
-            p.name = paramName;
+            // name and type
+            String name = matcher.group(1).trim();
+            String type = matcher.group(2).trim();
+
+            if (name.equals(":")) {
+                name = "";
+            } else if (name.startsWith(":")) {
+                type = name.substring(1);
+                name = "";
+            } else if (name.contains(":")) {
+                String[] split = name.split(":");
+                name = split[0];
+                type = split[1];
+            }
+
+            name = name.equals("") ? extractParameterName(sqlString, matcher.start()) : name;
+            p.name = name;
+            p.javaTypeAlias = type;
 
             // Start
             p.startIndex = matcher.start();
@@ -196,6 +210,17 @@ public class SqlStatementToPreparedStatement {
                 ParameterInPreparedStatement pips = new ParameterInPreparedStatement();
                 pips.parameter = p;
                 pips.value = queryParameters.get(queryParameter);
+
+                String parameterTypeAlias = p.getJavaTypeAlias();
+                if (!Strings.isNullOrEmpty(parameterTypeAlias)) {
+                    Converter converterForAlias = this.lSql.getConverterForAlias(parameterTypeAlias);
+                    if (!converterForAlias.isValueValid(pips.value)) {
+                        throw new IllegalArgumentException("Value for parameter '" + p.name + "' has the wrong type. "
+                                + "Expected: " + converterForAlias.getJavaType().getCanonicalName()
+                                + ", actual: " + pips.value.getClass().getCanonicalName());
+                    }
+                }
+
                 parameterInPreparedStatements.add(pips);
             }
         }
@@ -248,6 +273,8 @@ public class SqlStatementToPreparedStatement {
 
         String name;
 
+        String javaTypeAlias;
+
         int startIndex;
 
         int endIndex;
@@ -264,11 +291,16 @@ public class SqlStatementToPreparedStatement {
             return endIndex;
         }
 
+        public String getJavaTypeAlias() {
+            return javaTypeAlias;
+        }
+
         @Override
         public String toString() {
             return "Parameter{" +
                     "placeholder='" + placeholder + '\'' +
                     ", name='" + name + '\'' +
+                    ", javaTypeAlias='" + javaTypeAlias + '\'' +
                     ", startIndex=" + startIndex +
                     ", endIndex=" + endIndex +
                     '}';

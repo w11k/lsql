@@ -1,4 +1,4 @@
 
---loadPerson1
+--loadAllPersons
 select * from person1;
 

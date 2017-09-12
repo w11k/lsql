@@ -6,6 +6,8 @@ import com.w11k.lsql.dialects.PostgresDialect;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
+import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
+import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
@@ -351,13 +353,68 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void resultSetTypeAnnotations() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("select count(id) as count_id /*:string*/, max(age) as max_age /*:long*/ from person;");
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "select count(id) as count_id /*:string*/, max(age) as max_age /*:long*/ from person;");
         RowQuery query = statement.query();
         List<Row> rows = query.toList();
         assertEquals(rows.size(), 1);
         Row row = rows.get(0);
         assertTrue(row.get("countId") instanceof String);
         assertTrue(row.get("maxAge") instanceof Long);
+    }
+
+    @Test()
+    public void queryParameterTypeAnnotations1() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "select * from person where age > /*:int=*/ 18 /**/;");
+
+        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("age").get(0);
+        Assert.assertEquals(param.getJavaTypeAlias(), "int");
+    }
+
+    @Test()
+    public void queryParameterTypeAnnotations2() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "select * from person where age > /* :  int  =*/ 18 /**/;");
+
+        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("age").get(0);
+        Assert.assertEquals(param.getJavaTypeAlias(), "int");
+    }
+
+    @Test()
+    public void queryParameterTypeAnnotations3() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "select * from person where age > /*p1:int=*/ 18 /**/;");
+
+        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
+        Assert.assertEquals(param.getJavaTypeAlias(), "int");
+    }
+
+    @Test()
+    public void queryParameterTypeAnnotations4() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "select * from person where age > /* p1 : int =*/ 18 /**/;");
+
+        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
+        Assert.assertEquals(param.getJavaTypeAlias(), "int");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*age.*Integer.*String")
+    public void queryParameterTypeAnnotationsAreCheckedAtQueryTime() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "select * from person where age > /*:int =*/ 18 /**/;");
+
+        statement.query("age", "3").toList();
     }
 
     private void setup() {

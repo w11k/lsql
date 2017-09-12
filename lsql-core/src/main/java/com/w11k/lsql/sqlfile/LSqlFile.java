@@ -12,10 +12,7 @@ import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.sql.PreparedStatement;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -89,7 +86,18 @@ public class LSqlFile {
     private void parseSqlStatements() {
         logger.info("Reading SQL file '" + nameForDescription + "'");
         statements.clear();
+
+        // a) try to load path via classloader
         InputStream is = getClass().getResourceAsStream(path);
+        if (is == null) {
+            try {
+                // b) try to load path via file system
+                is = new FileInputStream(path);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException("Unable to read file '" + path + "'");
+            }
+        }
+
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String content = CharStreams.toString(reader);

@@ -44,7 +44,7 @@ public class Column {
      * @param converter  Converter instance used to convert between SQL and Java values.
      * @param columnSize The maximum column size. -1 if not applicable.
      */
-    Column(Table table, String columnName, int sqlType, Converter converter, int columnSize) {
+    public Column(Table table, String columnName, int sqlType, Converter converter, int columnSize) {
         this.table = table;
         this.columnName = columnName;
         this.sqlType = sqlType;
