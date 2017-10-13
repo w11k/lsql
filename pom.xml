@@ -183,8 +183,9 @@
 
   <distributionManagement>
     <repository>
-      <id>w11k-repository</id>
-      <url>scpexe://w11k.com/srv/www/vhosts/mvn.weiglewilczek.com/www/releases</url>
+      <id>bintray-w11k-lsql</id>
+      <name>w11k-lsql</name>
+      <url>https://api.bintray.com/maven/w11k/lsql/[PACKAGE_NAME]/;publish=1</url>
     </repository>
   </distributionManagement>
 
