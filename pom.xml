@@ -6,7 +6,7 @@
 
   <groupId>com.w11k.lsql</groupId>
   <artifactId>lsql-parent</artifactId>
-  <version>0.26.4</version>
+  <version>0.26.6</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -172,20 +172,13 @@
         </executions>
       </plugin>
     </plugins>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0-beta-6</version>
-      </extension>
-    </extensions>
   </build>
 
   <distributionManagement>
     <repository>
       <id>bintray-w11k-lsql</id>
       <name>w11k-lsql</name>
-      <url>https://api.bintray.com/maven/w11k/lsql/[PACKAGE_NAME]/;publish=1</url>
+      <url>https://api.bintray.com/maven/w11k/lsql/releases/;publish=1</url>
     </repository>
   </distributionManagement>
 
