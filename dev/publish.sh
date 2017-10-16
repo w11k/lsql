@@ -26,7 +26,7 @@ cd ..
 exit_on_error
 
 # Set the current version
-git tag "`dev/get_current_version.sh`"
+git tag "v`dev/get_current_version.sh`"
 exit_on_error
 dev/get_current_version.sh > LATEST_RELEASED_VERSION
 
@@ -43,7 +43,7 @@ VERSION=`dev/get_current_version.sh`
 # Increment version and push
 dev/increment_project_version.sh
 git add --all
-git commit -m "started new version `dev/get_current_version.sh`"
+git commit -m "set development version to `dev/get_current_version.sh`"
 git push origin master
 
 echo --------------------------------------------------------------------
