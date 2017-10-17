@@ -2,6 +2,7 @@ package com.w11k.lsql.tests;
 
 import com.google.common.collect.Lists;
 import com.w11k.lsql.*;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.PostgresDialect;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.query.RowQuery;
@@ -12,7 +13,9 @@ import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -361,6 +364,28 @@ public class SqlStatementTest extends AbstractLSqlTest {
         Row row = rows.get(0);
         assertTrue(row.get("countId") instanceof String);
         assertTrue(row.get("maxAge") instanceof Long);
+    }
+
+    @Test()
+    public void explicitParameterConverter() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "select * from person where id = /*=*/ 1 /**/;")
+                .setParameterConverter("id", new Converter(String.class, Types.INTEGER) {
+                    @Override
+                    protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+                        ps.setInt(1, Integer.parseInt(val.toString()));
+                    }
+
+                    @Override
+                    protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+                        return null;
+                    }
+                });
+
+        Row row = statement.query("id", "1").toList().get(0);
+        Assert.assertEquals(row.getInt("id"), new Integer(1));
     }
 
     @Test()

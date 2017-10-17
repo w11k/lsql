@@ -191,7 +191,8 @@ public class SqlStatementToPreparedStatement {
         return sqlCopy;
     }
 
-    public PreparedStatement createPreparedStatement(Map<String, Object> queryParameters) throws SQLException {
+    public PreparedStatement createPreparedStatement(Map<String, Object> queryParameters,
+                                                     Map<String, Converter> parameterConverters) throws SQLException {
         log(queryParameters);
 
         List<ParameterInPreparedStatement> parameterInPreparedStatements = newLinkedList();
@@ -211,14 +212,24 @@ public class SqlStatementToPreparedStatement {
                 pips.parameter = p;
                 pips.value = queryParameters.get(queryParameter);
 
-                String parameterTypeAlias = p.getJavaTypeAlias();
-                if (!Strings.isNullOrEmpty(parameterTypeAlias)) {
-                    Converter converterForAlias = this.lSql.getConverterForAlias(parameterTypeAlias);
-                    if (!converterForAlias.isValueValid(pips.value)) {
-                        throw new IllegalArgumentException("Value for parameter '" + p.name + "' has the wrong type. "
-                                + "Expected: " + converterForAlias.getJavaType().getCanonicalName()
-                                + ", actual: " + pips.value.getClass().getCanonicalName());
+                // converter specified by API
+                if (parameterConverters != null) {
+                    pips.converter = parameterConverters.get(pips.parameter.name);
+                }
+
+                // converter specified by statement's 'param: type' annotation
+                if (pips.converter == null) {
+                    String parameterTypeAlias = p.getJavaTypeAlias();
+                    if (!Strings.isNullOrEmpty(parameterTypeAlias)) {
+                        pips.converter = this.lSql.getConverterForAlias(parameterTypeAlias);
                     }
+                }
+
+                // check if the param type is correct
+                if (pips.converter != null && !pips.converter.isValueValid(pips.value)) {
+                    throw new IllegalArgumentException("Value for parameter '" + p.name + "' has the wrong type. "
+                            + "Expected: " + pips.converter.getJavaType().getCanonicalName()
+                            + ", actual: " + pips.value.getClass().getCanonicalName());
                 }
 
                 parameterInPreparedStatements.add(pips);
@@ -256,12 +267,15 @@ public class SqlStatementToPreparedStatement {
             } else if (pips.value == null) {
                 ps.setNull(i + offset + 1, Types.OTHER);
             } else {
-                Converter converter = this.lSql.getConverterForJavaType(pips.value.getClass());
+                // converter by param type
+                if (pips.converter == null) {
+                    pips.converter = this.lSql.getConverterForJavaType(pips.value.getClass());
+                }
 
-                if (converter == null) {
+                if (pips.converter == null) {
                     throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);
                 }
-                converter.setValueInStatement(this.lSql, ps, i + offset + 1, pips.value);
+                pips.converter.setValueInStatement(this.lSql, ps, i + offset + 1, pips.value);
             }
         }
 
@@ -308,14 +322,18 @@ public class SqlStatementToPreparedStatement {
     }
 
     private final class ParameterInPreparedStatement {
+
         Parameter parameter;
 
         Object value;
+
+        Converter converter;
 
         @Override
         public String toString() {
             return "ParameterInPreparedStatement{" +
                     "parameter=" + parameter +
+                    "converter=" + converter +
                     ", value=" + value +
                     '}';
         }

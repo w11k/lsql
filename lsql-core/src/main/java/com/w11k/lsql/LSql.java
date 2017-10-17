@@ -222,7 +222,7 @@ public class LSql {
         try {
             return new RowQuery(
                     this,
-                    st.createPreparedStatement(Collections.<String, Object>emptyMap()),
+                    st.createPreparedStatement(Collections.<String, Object>emptyMap(), null),
                     st.getOutConverters());
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -243,7 +243,7 @@ public class LSql {
         try {
             return new PojoQuery<T>(
                     this,
-                    st.createPreparedStatement(Collections.<String, Object>emptyMap()),
+                    st.createPreparedStatement(Collections.<String, Object>emptyMap(), null),
                     pojoClass,
                     st.getOutConverters());
         } catch (SQLException e) {

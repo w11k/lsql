@@ -16,8 +16,15 @@ public abstract class AbstractSqlStatement<T> {
 
     private final SqlStatementToPreparedStatement sqlStatementToPreparedStatement;
 
+    private final Map<String, Converter> parameterConverters = Maps.newHashMap();
+
     public AbstractSqlStatement(SqlStatementToPreparedStatement sqlStatementToPreparedStatement) {
         this.sqlStatementToPreparedStatement = sqlStatementToPreparedStatement;
+    }
+
+    public AbstractSqlStatement<T> setParameterConverter(String parameterName, Converter converter) {
+        this.parameterConverters.put(parameterName, converter);
+        return this;
     }
 
     public T query() {
@@ -30,7 +37,7 @@ public abstract class AbstractSqlStatement<T> {
 
     public T query(Map<String, Object> queryParameters) {
         try {
-            PreparedStatement ps = this.sqlStatementToPreparedStatement.createPreparedStatement(queryParameters);
+            PreparedStatement ps = this.sqlStatementToPreparedStatement.createPreparedStatement(queryParameters, this.parameterConverters);
             return createQueryInstance(
                     this.sqlStatementToPreparedStatement.getlSql(),
                     ps,
@@ -51,7 +58,7 @@ public abstract class AbstractSqlStatement<T> {
 
     public void execute(Map<String, Object> queryParameters) {
         try {
-            PreparedStatement ps = this.sqlStatementToPreparedStatement.createPreparedStatement(queryParameters);
+            PreparedStatement ps = this.sqlStatementToPreparedStatement.createPreparedStatement(queryParameters, this.parameterConverters);
             ps.execute();
         } catch (SQLException e) {
             throw new DatabaseAccessException(e);
