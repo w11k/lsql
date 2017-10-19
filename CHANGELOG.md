@@ -1,4 +1,9 @@
 
+**0.27.3**
+
+fixed statement parameter recognition
+
+
 **0.27.2**
 
 Removed logger warning "Unable to determine a Converter instance for column..."

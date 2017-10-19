@@ -27,7 +27,7 @@ public class SqlStatementToPreparedStatement {
 
     // ..... /*name: type =*/ 123 /**/
     private static final Pattern QUERY_ARG_START = Pattern.compile(
-            "/\\*\\s*(\\S*)\\s*:?\\s*(\\S*)\\s*=\\s*\\*/");
+            "/\\*\\s*(?!\\*/)(\\S*)\\s*:?\\s*(\\S*)\\s*=\\s*\\*/");
 
     private static final String QUERY_ARG_END = "/**/";
 
