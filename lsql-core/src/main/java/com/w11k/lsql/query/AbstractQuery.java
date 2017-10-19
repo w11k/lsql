@@ -245,14 +245,13 @@ public abstract class AbstractQuery<T> {
         }
 
         // Error/Warn
-        String msg = "Unable to determine a Converter instance for column '" + columnLabel + "'. ";
-        msg += "Annotate the query with /*:type*/ or " +
-                "register a converter with Query#addConverter() / Query#setConverters().";
-
         if (lSql.isUseColumnTypeForConverterLookupInQueries()) {
-            this.logger.warn(msg);
             return of(getConverterByColumnType(metaData, position));
         } else {
+            String msg = "Unable to determine a Converter instance for column '" + columnLabel + "'. ";
+            msg += "Annotate the query with /*:type*/ or " +
+                    "register a converter with Query#addConverter() / Query#setConverters().";
+
             throw new IllegalStateException(msg);
         }
     }
