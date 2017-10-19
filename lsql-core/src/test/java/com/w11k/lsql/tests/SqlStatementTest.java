@@ -215,6 +215,27 @@ public class SqlStatementTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void statementInsert() {
+        setup();
+        lSql.executeRawSql("delete from person;");
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "insert into person (id, age, fullname) \n" +
+                        "values ( \n" +
+                        "/*id  =   */ 100 /**/,\n" +
+                        "/* age = */ 100 /**/,\n" +
+                        "/* name=*/ '' /**/\n" +
+                        ");"
+        );
+
+        statement.execute("id", 100, "age", 100, "name", "test1");
+        statement.execute("id", 101, "age", 101, "name", "test2");
+
+        List<Row> rows = lSql.executeQuery("select * from person").query().toList();
+        assertEquals(rows.size(), 2);
+    }
+
+    @Test
     public void statementQueryParameter() {
         setup();
         AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("SELECT * FROM person WHERE id = /*=*/ 99999 /**/;");
