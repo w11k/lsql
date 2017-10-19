@@ -5,15 +5,13 @@ import com.w11k.lsql.Column;
 import com.w11k.lsql.ColumnsContainer;
 import com.w11k.lsql.TableRow;
 
-import java.io.File;
-
 import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
 import static java.util.stream.Collectors.toList;
 
 public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
-    public JavaRowClassExporter(ColumnsContainer columnsContainer, JavaExporter javaExporter, File rootPackage) {
-        super(columnsContainer, javaExporter, rootPackage);
+    public JavaRowClassExporter(ColumnsContainer columnsContainer, JavaExporter javaExporter) {
+        super(columnsContainer, javaExporter);
     }
 
     public void createContent() {

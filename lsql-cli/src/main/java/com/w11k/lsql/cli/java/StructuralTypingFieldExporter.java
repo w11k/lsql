@@ -12,14 +12,11 @@ public class StructuralTypingFieldExporter {
 
     private final JavaExporter javaExporter;
 
-    private final File rootPackage;
-
     private StringBuilder content = new StringBuilder();
 
-    public StructuralTypingFieldExporter(StructuralTypingField stf, JavaExporter javaExporter, File rootPackage) {
+    public StructuralTypingFieldExporter(StructuralTypingField stf, JavaExporter javaExporter) {
         this.stf = stf;
         this.javaExporter = javaExporter;
-        this.rootPackage = rootPackage;
     }
 
     public void export() {
@@ -50,7 +47,7 @@ public class StructuralTypingFieldExporter {
     }
 
     protected File getOutputFile() {
-        return new File(rootPackage, this.stf.getInterfaceName() + ".java");
+        return new File(this.javaExporter.getOutputRootPackageDir(), this.stf.getInterfaceName() + ".java");
     }
 
 }

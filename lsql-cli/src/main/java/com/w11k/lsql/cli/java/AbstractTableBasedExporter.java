@@ -1,19 +1,16 @@
 package com.w11k.lsql.cli.java;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
-import com.google.common.io.MoreFiles;
 import com.w11k.lsql.Column;
 import com.w11k.lsql.ColumnsContainer;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
 import static com.w11k.lsql.cli.CodeGenUtils.log;
+import static com.w11k.lsql.cli.CodeGenUtils.writeContentIfChanged;
 import static java.util.stream.Collectors.toList;
 
 abstract public class AbstractTableBasedExporter {
@@ -28,14 +25,11 @@ abstract public class AbstractTableBasedExporter {
 
     protected final JavaExporter javaExporter;
 
-    protected final File rootPackage;
-
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractTableBasedExporter(ColumnsContainer cc, JavaExporter javaExporter, File rootPackage) {
+    public AbstractTableBasedExporter(ColumnsContainer cc, JavaExporter javaExporter) {
         this.columnsContainer = cc;
         this.javaExporter = javaExporter;
-        this.rootPackage = rootPackage;
         this.columns = Lists.newLinkedList(cc.getColumns().values());
         this.columns.sort(Comparator.comparing(Column::getJavaColumnName));
 
@@ -57,24 +51,17 @@ abstract public class AbstractTableBasedExporter {
 
     final public void export() {
         log("Generating", getOutputFile().getAbsolutePath());
-
         this.createContent();
-
         File pojoSourceFile = getOutputFile();
-        try {
-            MoreFiles.createParentDirectories(pojoSourceFile.toPath());
-
-            // TODO only write if content changed
-            Files.write(content.toString().getBytes(Charsets.UTF_8), pojoSourceFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        writeContentIfChanged(this.content.toString(), pojoSourceFile);
     }
 
     protected abstract void createContent();
 
     protected File getOutputFile() {
-        File packageWithSchema = new File(this.rootPackage, this.getLastPackageSegmentForSchema());
+        File packageWithSchema = new File(
+                this.javaExporter.getOutputRootPackageDir(), this.getLastPackageSegmentForSchema());
+
         return new File(packageWithSchema, getOutputFileName());
     }
 

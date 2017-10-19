@@ -4,14 +4,12 @@ import com.w11k.lsql.ColumnsContainer;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.TypedTable;
 
-import java.io.File;
-
 import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
 
 public class TableExporter extends AbstractTableBasedExporter {
 
-    public TableExporter(ColumnsContainer columnsContainer, JavaExporter javaExporter, File rootPackage) {
-        super(columnsContainer, javaExporter, rootPackage);
+    public TableExporter(ColumnsContainer columnsContainer, JavaExporter javaExporter) {
+        super(columnsContainer, javaExporter);
     }
 
     @Override

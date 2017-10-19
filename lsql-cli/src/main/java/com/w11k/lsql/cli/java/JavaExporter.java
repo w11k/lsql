@@ -15,18 +15,16 @@ public class JavaExporter {
 
     private final List<? extends ColumnsContainer> tables;
 
-    private final List<StatementColumnContainer> stmtColumnContainer;
+    private List<StatementFileExporter> statementFileExporters;
 
-    private File outDirJava = null;
+    private File outputRootPackageDir = null;
 
     private String packageName;
 
     private boolean guice = false;
 
-    public JavaExporter(List<? extends ColumnsContainer> tables,
-                        List<StatementColumnContainer> stmtColumnContainer) throws SQLException {
+    public JavaExporter(List<? extends ColumnsContainer> tables) throws SQLException {
         this.tables = tables;
-        this.stmtColumnContainer = stmtColumnContainer;
     }
 
     public String getPackageName() {
@@ -37,12 +35,12 @@ public class JavaExporter {
         this.packageName = packageName;
     }
 
-    public File getOutDirJava() {
-        return outDirJava;
+    public void setOutputRootPackageDir(File outputDir) {
+        this.outputRootPackageDir = outputDir;
     }
 
-    public void setOutputPath(File outputDir) {
-        this.outDirJava = outputDir;
+    public File getOutputRootPackageDir() {
+        return outputRootPackageDir;
     }
 
     public boolean isGuice() {
@@ -53,15 +51,16 @@ public class JavaExporter {
         this.guice = guice;
     }
 
+    public List<StatementFileExporter> getStatementFileExporters() {
+        return statementFileExporters;
+    }
+
+    public void setStatementFileExporters(List<StatementFileExporter> statementFileExporters) {
+        this.statementFileExporters = statementFileExporters;
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void export() {
-        String packageFolder = this.packageName.replaceAll("\\.", File.separator);
-        File packageFolderFile = new File(this.outDirJava, packageFolder);
-
-        packageFolderFile.mkdirs();
-        assert packageFolderFile.isDirectory();
-        assert packageFolderFile.exists();
-
         List<JavaRowClassExporter> tableRowClassExporters = Lists.newLinkedList();
         Iterable<? extends ColumnsContainer> tables = this.tables;
 
@@ -70,18 +69,17 @@ public class JavaExporter {
         // Tables
         for (ColumnsContainer cc : tables) {
             // collect all row classes
-            JavaRowClassExporter rowClassExporter = new JavaRowClassExporter(cc, this, packageFolderFile);
+            JavaRowClassExporter rowClassExporter = new JavaRowClassExporter(cc, this);
             tableRowClassExporters.add(rowClassExporter);
 
             // generate table classes
-            new TableExporter(cc, this, packageFolderFile).export();
+            new TableExporter(cc, this).export();
         }
 
-        // StatementExporter
-        for (StatementColumnContainer stmtInColumn : this.stmtColumnContainer) {
-            StatementExporter stmtInRowClass = new StatementExporter(stmtInColumn, this, packageFolderFile);
-            structuralTypingFields.addAll(stmtInRowClass.getStructuralTypingFields());
-            stmtInRowClass.export();
+        // StatementFileExporter
+        for (StatementFileExporter statementFileExporter : this.statementFileExporters) {
+            Set<StructuralTypingField> stfs = statementFileExporter.exportAndGetStructuralTypingFields();
+            structuralTypingFields.addAll(stfs);
         }
 
         // find unique StructuralTypingFields
@@ -91,7 +89,7 @@ public class JavaExporter {
 
         // generate StructuralTypingField
         for (StructuralTypingField structuralTypingField : structuralTypingFields) {
-            new StructuralTypingFieldExporter(structuralTypingField, this, packageFolderFile).export();
+            new StructuralTypingFieldExporter(structuralTypingField, this).export();
         }
 
         // generate row classes

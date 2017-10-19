@@ -1,18 +1,13 @@
 package com.w11k.lsql.cli;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.io.MoreFiles;
 import com.w11k.lsql.ColumnsContainer;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.java.JavaExporter;
-import com.w11k.lsql.cli.java.StatementColumnContainer;
+import com.w11k.lsql.cli.java.StatementFileExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
-import com.w11k.lsql.query.RowQuery;
-import com.w11k.lsql.sqlfile.LSqlFile;
-import com.w11k.lsql.statement.AbstractSqlStatement;
-import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -35,12 +30,13 @@ public class Main {
     private String sqlStatements;
     private boolean guice = false;
     private String outDirJava;
-    private String outDirTypeScript;
+    private List<StatementFileExporter> statementFileExporters = Lists.newLinkedList();
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public Main(String[] args) throws ClassNotFoundException, SQLException {
-        log("=================");
+        log("========================================================");
         log("LSql CLI Exporter");
-        log("=================\n");
+        log("========================================================\n");
 
         this.parseArgs(args);
 
@@ -59,56 +55,48 @@ public class Main {
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
-        // Java statements
-        List<StatementColumnContainer> stmtInColumns = processStatements(lSql);
+        // Java output dir
+        String packageFolder = this.packageName.replaceAll("\\.", File.separator);
+        File outputRootPackageDir = new File(this.outDirJava, packageFolder);
+        outputRootPackageDir.mkdirs();
+        assert outputRootPackageDir.isDirectory();
 
         // Java table and row classes
         LinkedList<? extends ColumnsContainer> tables = Lists.newLinkedList(lSql.getTables());
-        JavaExporter javaExporter = new JavaExporter(tables, stmtInColumns);
+        JavaExporter javaExporter = new JavaExporter(tables);
         javaExporter.setPackageName(this.packageName);
-        File outDirJava = new File(this.outDirJava);
-        //noinspection ResultOfMethodCallIgnored
-        outDirJava.mkdirs();
-        javaExporter.setOutputPath(outDirJava);
+        javaExporter.setOutputRootPackageDir(outputRootPackageDir);
         javaExporter.setGuice(this.guice);
+
+        // Java statements
+        processStatements(lSql, javaExporter);
+        javaExporter.setStatementFileExporters(this.statementFileExporters);
+
         javaExporter.export();
 
-//        TypeScriptExporter tse = new TypeScriptExporter(lSql);
+
+        //        TypeScriptExporter tse = new TypeScriptExporter(lSql);
 //        File outDirTs = new File(this.outDirTypeScript);
-//        tse.setOutputPath(outDirTs);
+//        tse.setOutputRootPackageDir(outDirTs);
 //        tse.export();
     }
 
-    private List<StatementColumnContainer> processStatements(LSql lSql) {
-        List<StatementColumnContainer> stmtInCon = Lists.newLinkedList();
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        new Main(args);
+    }
 
+    private void processStatements(LSql lSql, JavaExporter javaExporter) {
         if (this.sqlStatements != null) {
             Iterable<Path> children = MoreFiles.directoryTreeTraverser().preOrderTraversal(new File(this.sqlStatements).toPath());
             for (Path child : children) {
                 File file = child.toFile();
                 if (file.isFile() && file.getName().endsWith(".sql")) {
-                    LSqlFile lSqlFile = new LSqlFile(lSql, file.getAbsolutePath(), file.getAbsolutePath());
-                    ImmutableMap<String, SqlStatementToPreparedStatement> statements = lSqlFile.getStatements();
-
-                    for (String stmtName : statements.keySet()) {
-                        log("Executing statement '" + file.getAbsolutePath() + "#" + stmtName + "'");
-                        AbstractSqlStatement<RowQuery> query = lSqlFile.statement(stmtName);
-
-                        // IN
-                        stmtInCon.add(new StatementColumnContainer(lSql, query));
-
-                        // OUT
-                        query.execute();
-                    }
+                    StatementFileExporter statementFileExporter =
+                            new StatementFileExporter(lSql, file, javaExporter, this.sqlStatements);
+                    this.statementFileExporters.add(statementFileExporter);
                 }
             }
         }
-
-        return stmtInCon;
-    }
-
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        new Main(args);
     }
 
     private void parseArgs(String[] args) {

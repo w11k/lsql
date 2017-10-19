@@ -1,4 +1,9 @@
 
+**0.27.4**
+
+- added check for pk column in Table#delete
+
+
 **0.27.3**
 
 fixed statement parameter recognition

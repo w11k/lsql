@@ -42,6 +42,8 @@ public class SqlStatementToPreparedStatement {
 
     private final String statementName;
 
+    private final String originalSqlString;
+
     private final String sqlString;
 
     private final Map<String, List<Parameter>> parameters;
@@ -51,13 +53,22 @@ public class SqlStatementToPreparedStatement {
     public SqlStatementToPreparedStatement(LSql lSql, String statementName, String sqlString) {
         this.lSql = lSql;
         this.statementName = statementName;
-        this.sqlString = sqlString;
+        this.originalSqlString = sqlString;
+        this.sqlString = sqlString.replaceAll("\n", " ");
         this.parameters = parseParameters();
         this.outConverters = parseOutConverters();
     }
 
     public com.w11k.lsql.LSql getlSql() {
         return this.lSql;
+    }
+
+    public String getStatementName() {
+        return statementName;
+    }
+
+    public String getOriginalSqlString() {
+        return originalSqlString;
     }
 
     public String getSqlString() {

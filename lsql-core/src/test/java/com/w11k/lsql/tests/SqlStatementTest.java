@@ -234,7 +234,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementQueryParameter() {
         setup();
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("SELECT * FROM person WHERE id = /*=*/ 99999 /**/;");
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("SELECT * FROM \n" +
+                "person \n" +
+                "WHERE \n" +
+                "id = /*=*/ 99999 /**/;");
 
         List<Row> rows = statement.query("id", new QueryParameter() {
             @Override

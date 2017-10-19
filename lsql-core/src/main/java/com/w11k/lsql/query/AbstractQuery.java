@@ -151,55 +151,61 @@ public abstract class AbstractQuery<T> {
             @Override
             public void call(Subscriber<? super ResultSetWithColumns> subscriber) {
                 try {
-                    ResultSet resultSet = AbstractQuery.this.preparedStatement.executeQuery();
-                    ResultSetMetaData metaData = resultSet.getMetaData();
+                    ResultSetWithColumns resultSetWithColumns = createResultSetWithColumns();
+                    checkConformity(resultSetWithColumns.getConverters());
 
-                    // used to find duplicates
-                    // or unused converter
-                    Set<String> processedColumnLabels = Sets.newLinkedHashSet();
-
-                    List<ResultSetColumn> resultSetColumns = Lists.newLinkedList();
-                    LinkedHashMap<String, Converter> converters = Maps.newLinkedHashMap();
-
-                    for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                        String columnLabel = AbstractQuery.this.lSql.identifierSqlToJava(metaData.getColumnLabel(i));
-
-                        // check duplicates
-                        if (!AbstractQuery.this.ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel)) {
-                            throw new IllegalStateException("Duplicate column '" + columnLabel + "' in query.");
-                        }
-                        processedColumnLabels.add(columnLabel);
-
-                        Optional<Converter> converter = getConverterForResultSetColumn(metaData, i, columnLabel, false);
-                        if (converter.isPresent()) {
-                            resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter.get()));
-                            converters.put(columnLabel, converter.get());
-                        }
-                    }
-
-                    // Check for unused converters
-                    for (String converterFor : AbstractQuery.this.converters.keySet()) {
-                        if (!processedColumnLabels.contains(converterFor)) {
-                            throw new IllegalArgumentException(
-                                    "unused converter for column '" + converterFor + "'");
-                        }
-                    }
-
-                    ResultSetWithColumns resultSetWithColumns =
-                            new ResultSetWithColumns(resultSet, metaData, resultSetColumns);
-
-                    checkConformity(converters);
-
-                    while (resultSet.next() && !subscriber.isUnsubscribed()) {
+                    while (resultSetWithColumns.getResultSet().next() && !subscriber.isUnsubscribed()) {
                         subscriber.onNext(resultSetWithColumns);
                     }
-                    resultSet.close();
+                    resultSetWithColumns.getResultSet().close();
                     subscriber.onCompleted();
                 } catch (SQLException e) {
                     subscriber.onError(e);
                 }
             }
         });
+    }
+
+    public ResultSetWithColumns createResultSetWithColumns() {
+        try {
+            ResultSet resultSet = AbstractQuery.this.preparedStatement.executeQuery();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+
+            // used to find duplicates
+            // or unused converter
+            Set<String> processedColumnLabels = Sets.newLinkedHashSet();
+
+            List<ResultSetColumn> resultSetColumns = Lists.newLinkedList();
+            LinkedHashMap<String, Converter> converters = Maps.newLinkedHashMap();
+
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                String columnLabel = AbstractQuery.this.lSql.identifierSqlToJava(metaData.getColumnLabel(i));
+
+                // check duplicates
+                if (!AbstractQuery.this.ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel)) {
+                    throw new IllegalStateException("Duplicate column '" + columnLabel + "' in query.");
+                }
+                processedColumnLabels.add(columnLabel);
+
+                Optional<Converter> converter = getConverterForResultSetColumn(metaData, i, columnLabel, false);
+                if (converter.isPresent()) {
+                    resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter.get()));
+                    converters.put(columnLabel, converter.get());
+                }
+            }
+
+            // Check for unused converters
+            for (String converterFor : AbstractQuery.this.converters.keySet()) {
+                if (!processedColumnLabels.contains(converterFor)) {
+                    throw new IllegalArgumentException(
+                            "unused converter for column '" + converterFor + "'");
+                }
+            }
+
+            return new ResultSetWithColumns(resultSet, metaData, resultSetColumns, converters);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Optional<Converter> getConverterForResultSetColumn(ResultSetMetaData metaData,

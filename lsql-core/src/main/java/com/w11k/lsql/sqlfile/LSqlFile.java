@@ -73,6 +73,10 @@ public class LSqlFile {
         };
     }
 
+    public SqlStatementToPreparedStatement getSqlStatementToPreparedStatement(String name) {
+        return this.getStatement(name);
+    }
+
     private SqlStatementToPreparedStatement getStatement(String name) {
         if (!this.statements.containsKey(name)) {
             throw new IllegalArgumentException("No statement with name '" + name +
@@ -113,7 +117,7 @@ public class LSqlFile {
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
                 logger.debug("Found SQL statement '{}'", name);
-                statements.put(name, new SqlStatementToPreparedStatement(lSql, nameForDescription + "." + name, sub));
+                statements.put(name, new SqlStatementToPreparedStatement(lSql, name, sub));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

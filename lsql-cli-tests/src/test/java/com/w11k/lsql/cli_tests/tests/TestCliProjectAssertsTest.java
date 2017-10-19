@@ -3,9 +3,12 @@ package com.w11k.lsql.cli_tests.tests;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.tests.TestCliConfig;
+import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.Stmts2Row;
+import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.Stmts2Statement;
 import com.w11k.lsql.cli.tests.schema_public.Person1Row;
 import com.w11k.lsql.cli.tests.schema_public.Person1Table;
 import com.w11k.lsql.cli.tests.schema_public.Person2Row;
+import com.w11k.lsql.cli.tests.schema_public.Person2Table;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.Assert;
@@ -14,6 +17,7 @@ import org.testng.annotations.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
@@ -130,7 +134,27 @@ public final class TestCliProjectAssertsTest {
         person1Table.update(p1.withFirstName("b"));
         p1 = person1Table.load(1).get();
 
-        Assert.assertEquals(p1.getFirstName(), "b");
+        assertEquals(p1.getFirstName(), "b");
+    }
+
+    @Test
+    public void statement() throws SQLException {
+        createTables(lSql);
+
+        Person2Table person2Table = new Person2Table(lSql);
+        person2Table.insert(new Person2Row().withId(1).withFirstName("a").withAge(50));
+
+        Stmts2Statement statement = new Stmts2Statement(lSql);
+        List<Stmts2Row> list = statement.newQuery()
+                .age(49)
+                .toList();
+
+        assertEquals(list.size(), 1);
+
+        Stmts2Row row = list.get(0);
+        assertEquals(row.getId(), new Integer(1));
+        assertEquals(row.getFirstName(), "a");
+        assertEquals(row.getAge(), new Integer(50));
     }
 
 }

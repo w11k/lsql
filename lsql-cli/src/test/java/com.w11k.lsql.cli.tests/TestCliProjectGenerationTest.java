@@ -62,7 +62,7 @@ public final class TestCliProjectGenerationTest {
                 "url:" + url,
                 "user:",
                 "password:",
-                "sqlStatements:" + pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/test/java"),
+                "sqlStatements:" + pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/test/java/com/w11k/lsql"),
                 "package:" + TestCliConfig.class.getPackage().getName(),
                 "di:guice",
                 "outDirJava:" + genJavaDir.getAbsolutePath()
