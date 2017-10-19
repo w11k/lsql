@@ -16,7 +16,7 @@ public class LongConverter extends Converter {
 
     @Override
     protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
-        ps.setLong(index, (Integer) val);
+        ps.setLong(index, (Long) val);
     }
 
     @Override
