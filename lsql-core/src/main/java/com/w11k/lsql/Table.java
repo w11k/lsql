@@ -322,10 +322,15 @@ public class Table implements ColumnsContainer {
      * @throws com.w11k.lsql.exceptions.DeleteException
      */
     public void delete(Row row) {
+        Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
+        if (!primaryKeyColumn.isPresent()) {
+            throw new IllegalArgumentException("Can not delete row, table has no primary column");
+        }
+
         PreparedStatement ps = lSql.getStatementCreator().createDeleteByIdStatement(this);
         try {
-            Column column = column(getPrimaryKeyColumn().get());
-            Object id = row.get(getPrimaryKeyColumn().get());
+            Column column = column(primaryKeyColumn.get());
+            Object id = row.get(primaryKeyColumn.get());
             column.getConverter().setValueInStatement(lSql, ps, 1, id);
             if (revisionColumn.isPresent()) {
                 Column revCol = revisionColumn.get();
@@ -568,10 +573,10 @@ public class Table implements ColumnsContainer {
                     md.getPrimaryKeys(null, sqlSchema, sqlTableName);
 
             if (!primaryKeys.next()) {
-                primaryKeyColumn = Optional.absent();
+                this.primaryKeyColumn = Optional.absent();
             } else {
                 String idColumn = primaryKeys.getString(4);
-                primaryKeyColumn = of(lSql.identifierSqlToJava(idColumn));
+                this.primaryKeyColumn = of(lSql.identifierSqlToJava(idColumn));
             }
 
             // Fetch all columns
