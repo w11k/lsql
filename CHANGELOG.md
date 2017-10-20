@@ -1,4 +1,9 @@
 
+**0.27.5**
+
+- added support for statement return type void
+
+
 **0.27.4**
 
 - added check for pk column in Table#delete
