@@ -3,8 +3,8 @@ package com.w11k.lsql.cli_tests.tests;
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.tests.TestCliConfig;
-import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.Stmts2Row;
-import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.Stmts2Statement;
+import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.LoadPersonsByAgeAndFirstNameRow;
+import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.Stmts2;
 import com.w11k.lsql.cli.tests.schema_public.Person1Row;
 import com.w11k.lsql.cli.tests.schema_public.Person1Table;
 import com.w11k.lsql.cli.tests.schema_public.Person2Row;
@@ -142,16 +142,20 @@ public final class TestCliProjectAssertsTest {
         createTables(lSql);
 
         Person2Table person2Table = new Person2Table(lSql);
-        person2Table.insert(new Person2Row().withId(1).withFirstName("a").withAge(50));
+        person2Table.insert(new Person2Row()
+                .withId(1)
+                .withFirstName("a")
+                .withAge(50));
 
-        Stmts2Statement statement = new Stmts2Statement(lSql);
-        List<Stmts2Row> list = statement.newQuery()
-                .age(49)
+        Stmts2 statement = new Stmts2(lSql);
+        List<LoadPersonsByAgeAndFirstNameRow> list = statement.loadPersonsByAgeAndFirstName()
+                .firstName("a")
+                .age(50)
                 .toList();
 
         assertEquals(list.size(), 1);
 
-        Stmts2Row row = list.get(0);
+        LoadPersonsByAgeAndFirstNameRow row = list.get(0);
         assertEquals(row.getId(), new Integer(1));
         assertEquals(row.getFirstName(), "a");
         assertEquals(row.getAge(), new Integer(50));

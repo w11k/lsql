@@ -15,6 +15,8 @@ import java.util.Map;
 
 public final class TypedStatementMeta {
 
+    private final LSql lSql;
+
     private final SqlStatementToPreparedStatement statement;
 
     private Map<String, Class<?>> parameters = Maps.newHashMap();
@@ -25,6 +27,7 @@ public final class TypedStatementMeta {
                               String sqlStatementsDir,
                               File statementSourceFile) {
 
+        this.lSql = lSql;
         this.statement = statement;
 
         ImmutableMap<String, List<SqlStatementToPreparedStatement.Parameter>> queryParameters =
@@ -45,6 +48,10 @@ public final class TypedStatementMeta {
             this.parameters.put(key, paramType);
         }
 
+    }
+
+    public LSql getlSql() {
+        return lSql;
     }
 
     public SqlStatementToPreparedStatement getStatement() {

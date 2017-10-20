@@ -54,7 +54,7 @@ public final class StatementRowColumnContainer implements ColumnsContainer {
 
     @Override
     public String getTableName() {
-        return this.statementFileExporter.getClassName();
+        return this.typedStatementMeta.getStatement().getStatementName();
     }
 
 
