@@ -138,7 +138,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void statement() throws SQLException {
+    public void statementSelect() throws SQLException {
         createTables(lSql);
 
         Person2Table person2Table = new Person2Table(lSql);
@@ -159,6 +159,20 @@ public final class TestCliProjectAssertsTest {
         assertEquals(row.getId(), new Integer(1));
         assertEquals(row.getFirstName(), "a");
         assertEquals(row.getAge(), new Integer(50));
+    }
+
+    @Test
+    public void statementDelete() throws SQLException {
+        createTables(lSql);
+
+        Person2Table person2Table = new Person2Table(lSql);
+        person2Table.insert(new Person2Row()
+                .withId(1)
+                .withFirstName("a")
+                .withAge(50));
+
+        Stmts2 statement = new Stmts2(lSql);
+        statement.deletePersonByFirstName().firstName("age").execute();
     }
 
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 public final class StatementRowColumnContainer implements ColumnsContainer {
 
     private final StatementFileExporter statementFileExporter;
+
     private final TypedStatementMeta typedStatementMeta;
 
     private Map<String, Column> columns = Maps.newHashMap();

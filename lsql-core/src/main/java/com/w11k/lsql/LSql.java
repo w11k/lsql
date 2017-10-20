@@ -217,7 +217,7 @@ public class LSql {
      * @return the Query instance
      */
     public RowQuery executeRawQuery(String sql) {
-        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "<raw>", sql);
+        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "<raw>", "", sql);
 
         try {
             return new RowQuery(
@@ -238,7 +238,7 @@ public class LSql {
      * @return the Query instance
      */
     public <T> PojoQuery<T> executeRawQuery(String sql, Class<T> pojoClass) {
-        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "<raw>", sql);
+        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "<raw>", "", sql);
 
         try {
             return new PojoQuery<T>(
@@ -253,7 +253,7 @@ public class LSql {
 
     public AbstractSqlStatement<RowQuery> executeQuery(String sqlString) {
         final SqlStatementToPreparedStatement stmtToPs =
-                new SqlStatementToPreparedStatement(this, "executeQuery", sqlString);
+                new SqlStatementToPreparedStatement(this, "executeQuery", "", sqlString);
 
         return new AbstractSqlStatement<RowQuery>(stmtToPs) {
             @Override

@@ -42,6 +42,8 @@ public class SqlStatementToPreparedStatement {
 
     private final String statementName;
 
+    private final String typeAnnotation;
+
     private final String originalSqlString;
 
     private final String sqlString;
@@ -50,9 +52,10 @@ public class SqlStatementToPreparedStatement {
 
     private final Map<String, Converter> outConverters;
 
-    public SqlStatementToPreparedStatement(LSql lSql, String statementName, String sqlString) {
+    public SqlStatementToPreparedStatement(LSql lSql, String statementName, String typeAnnotation, String sqlString) {
         this.lSql = lSql;
-        this.statementName = statementName;
+        this.statementName = statementName.trim();
+        this.typeAnnotation = typeAnnotation.trim();
         this.originalSqlString = sqlString;
         this.sqlString = sqlString.replaceAll("\n", " ");
         this.parameters = parseParameters();
@@ -65,6 +68,10 @@ public class SqlStatementToPreparedStatement {
 
     public String getStatementName() {
         return statementName;
+    }
+
+    public String getTypeAnnotation() {
+        return typeAnnotation;
     }
 
     public String getOriginalSqlString() {

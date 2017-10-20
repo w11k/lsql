@@ -23,7 +23,7 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 public class LSqlFile {
 
     private static final Pattern STMT_BLOCK_BEGIN = Pattern.compile(
-            "^--\\s*(\\w*)\\s*$",
+            "^--\\s*(.*)$",
             Pattern.MULTILINE);
 
     private static final Pattern STMT_BLOCK_END = Pattern.compile(
@@ -108,6 +108,13 @@ public class LSqlFile {
             Matcher startMatcher = STMT_BLOCK_BEGIN.matcher(content);
             while (startMatcher.find()) {
                 String name = startMatcher.group(1);
+                String typeAnnotation = "";
+                if (name.contains(":")) {
+                    int idxColon = name.indexOf(":");
+                    typeAnnotation = name.substring(idxColon + 1);
+                    name = name.substring(0, idxColon);
+                }
+
                 String sub = content.substring(startMatcher.end());
                 Matcher endMatcher = STMT_BLOCK_END.matcher(sub);
                 if (!endMatcher.find()) {
@@ -117,7 +124,9 @@ public class LSqlFile {
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
                 logger.debug("Found SQL statement '{}'", name);
-                statements.put(name, new SqlStatementToPreparedStatement(lSql, name, sub));
+                SqlStatementToPreparedStatement stmt = new SqlStatementToPreparedStatement(lSql, name, typeAnnotation, sub);
+
+                statements.put(name, stmt);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

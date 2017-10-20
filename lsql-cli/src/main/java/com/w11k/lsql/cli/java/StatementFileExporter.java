@@ -21,12 +21,19 @@ import static com.w11k.lsql.cli.CodeGenUtils.*;
 public final class StatementFileExporter {
 
     private final LSql lSql;
+
     private final File sourceFile;
+
     private final JavaExporter javaExporter;
+
     private final String sqlStatementsRootDir;
+
     private final List<TypedStatementMeta> typedStatementMetas = Lists.newLinkedList();
+
     private final List<StatementRowColumnContainer> statementRows = Lists.newLinkedList();
+
     private final String packageName;
+
     private final String className;
 
     public StatementFileExporter(LSql lSql,
@@ -66,13 +73,15 @@ public final class StatementFileExporter {
             this.typedStatementMetas.add(typedStatementMeta);
 
             // out
-            this.statementRows.add(new StatementRowColumnContainer(
-                    this,
-                    typedStatementMeta,
-                    lSql,
-                    query,
-                    sqlStatementsRootDir,
-                    sourceFile));
+            if (!stmt.getTypeAnnotation().toLowerCase().equals("void")) {
+                this.statementRows.add(new StatementRowColumnContainer(
+                        this,
+                        typedStatementMeta,
+                        lSql,
+                        query,
+                        sqlStatementsRootDir,
+                        sourceFile));
+            }
 
             rollback(lSql);
         }

@@ -1,4 +1,3 @@
--- noinspection SqlResolveForFile
 
 --continents
 SELECT

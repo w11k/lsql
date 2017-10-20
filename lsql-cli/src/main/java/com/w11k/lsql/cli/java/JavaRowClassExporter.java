@@ -70,9 +70,14 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
     private void contentAssignIntoNew() {
         content.append("    @SuppressWarnings(\"unchecked\")\n");
-        content.append("    public <T extends \n            ");
-        content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
-                .map(StructuralTypingField::getInterfaceName).collect(toList())));
+        content.append("    public <T");
+
+        if (this.columns.size() > 0) {
+            content.append(" extends \n            ");
+            content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
+                    .map(StructuralTypingField::getInterfaceName).collect(toList())));
+        }
+
         content.append("> T assignIntoNew(T targetStart) {\n");
 
         content.append("        Object target = targetStart;\n");
@@ -88,10 +93,15 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
     private void contentUpdatedWith() {
         content.append("    @SuppressWarnings(\"unchecked\")\n");
-        content.append("    public <T extends \n            ");
-        content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
-                .map(StructuralTypingField::getInterfaceName).collect(toList())));
-        content.append("> ").append(getClassName()).append(" updatedWith(T source) {\n");
+        content.append("    public <T");
+
+        if (this.columns.size() > 0) {
+            content.append(" extends \n            ");
+            content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
+                    .map(StructuralTypingField::getInterfaceName).collect(toList())));
+        }
+        content.append("> ");
+        content.append(getClassName()).append(" updatedWith(T source) {\n");
 
         content.append("        Object target = this;\n");
         for (StructuralTypingField stf : getStructuralTypingFields()) {
@@ -120,27 +130,29 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
         content.append("    public ").append(getClassName()).append("() {}\n\n");
 
         // constructor with field initializer
-        content.append("    private ").append(getClassName()).append("(\n");
+        if (this.columns.size() > 0) {
+            content.append("    private ").append(getClassName()).append("(\n");
 
-        String arguments = Joiner.on(",\n").join(columns.stream().map(column ->
-                "            "
-                        + column.getConverter().getJavaType().getCanonicalName()
-                        + " "
-                        + column.getJavaColumnName())
-                .collect(toList()));
-        content.append(arguments);
-        content.append(") {\n");
+            String arguments = Joiner.on(",\n").join(columns.stream().map(column ->
+                    "            "
+                            + column.getConverter().getJavaType().getCanonicalName()
+                            + " "
+                            + column.getJavaColumnName())
+                    .collect(toList()));
+            content.append(arguments);
+            content.append(") {\n");
 
-        // assign member
-        for (Column column : columns) {
-            content.append("        ")
-                    .append("this.").append(column.getJavaColumnName())
-                    .append(" = ")
-                    .append(column.getJavaColumnName())
-                    .append(";\n");
+            // assign member
+            for (Column column : columns) {
+                content.append("        ")
+                        .append("this.").append(column.getJavaColumnName())
+                        .append(" = ")
+                        .append(column.getJavaColumnName())
+                        .append(";\n");
+            }
+
+            content.append("    }\n\n");
         }
-
-        content.append("    }\n\n");
 
         // constructor from map
         content.append("    public ").append(getClassName()).append("(java.util.Map<String, Object> from) {\n");

@@ -2,6 +2,7 @@ package com.w11k.lsql.cli.java;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
+import com.w11k.lsql.TypedStatementCommand;
 import com.w11k.lsql.TypedStatementQuery;
 
 import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
@@ -9,6 +10,7 @@ import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
 public final class TypedStatementExporter {
 
     private final TypedStatementMeta typedStatementMeta;
+
     private final StatementFileExporter statementFileExporter;
 
     public TypedStatementExporter(TypedStatementMeta typedStatementMeta, StatementFileExporter statementFileExporter) {
@@ -30,17 +32,25 @@ public final class TypedStatementExporter {
 //        content.append(" */\n");
 
         String queryClassName = this.typedStatementMeta.getStatement().getStatementName();
-        String rowClassName = lowerCamelToUpperCamel(queryClassName + "Row");
+
+        boolean isVoid = this.typedStatementMeta.getStatement().getTypeAnnotation().toLowerCase().equals("void");
+        String rowClassName = !isVoid ? lowerCamelToUpperCamel(queryClassName + "Row") : Void.class.getCanonicalName();
 
         // query class
         content.append("    public class ")
                 .append(queryClassName)
-                .append(" extends ")
-                .append(TypedStatementQuery.class.getCanonicalName())
-                .append("<")
-                .append(rowClassName)
-                .append("> ")
-                .append("{\n\n");
+                .append(" extends ");
+
+        if (!isVoid) {
+            content.append(TypedStatementQuery.class.getCanonicalName())
+                    .append("<")
+                    .append(rowClassName)
+                    .append(">");
+        } else {
+            content.append(TypedStatementCommand.class.getCanonicalName());
+        }
+
+        content.append(" {\n\n");
 
         for (String parameterName : this.typedStatementMeta.getParameters().keySet()) {
             Class<?> paramType = this.typedStatementMeta.getParameters().get(parameterName);
@@ -64,19 +74,21 @@ public final class TypedStatementExporter {
                 .append("        }\n\n");
 
         // createTypedRow
-        content.append("        protected ").append(rowClassName);
-        content.append(" createTypedRow(")
-                .append(Row.class.getCanonicalName())
-                .append(" row) {\n")
-                .append("            return new ").append(rowClassName)
-                .append("(row);\n");
-        content.append("        }\n\n");
+        if (!isVoid) {
+            content.append("        protected ").append(rowClassName);
+            content.append(" createTypedRow(")
+                    .append(Row.class.getCanonicalName())
+                    .append(" row) {\n")
+                    .append("            return new ").append(rowClassName)
+                    .append("(row);\n");
+            content.append("        }\n\n");
+        }
 
         content.append("    }\n\n");
 
         // new query
         content.append("    public ").append(queryClassName).append(" ").append(queryClassName).append("() {\n")
-                .append("        return new ").append(queryClassName).append("(this.lSql);\n")
+                .append("        return ").append("new ").append(queryClassName).append("(this.lSql);\n")
                 .append("    }\n\n");
 
 
