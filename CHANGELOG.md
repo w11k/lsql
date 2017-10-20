@@ -2,6 +2,7 @@
 **0.27.4**
 
 - added check for pk column in Table#delete
+- implemented CLI statement generation
 
 
 **0.27.3**
