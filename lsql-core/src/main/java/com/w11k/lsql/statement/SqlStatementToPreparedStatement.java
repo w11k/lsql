@@ -10,6 +10,7 @@ import com.w11k.lsql.LiteralQueryParameter;
 import com.w11k.lsql.QueryParameter;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,8 +126,20 @@ public class SqlStatementToPreparedStatement {
             if (paramEnd == -1) {
                 throw new IllegalArgumentException("Unable to find end marker for parameter '" + p.name + "'");
             }
+
+            if (Strings.isNullOrEmpty(p.javaTypeAlias)) {
+                String placeHolderValue = sqlString.substring(matcher.end(0), paramEnd).trim();
+                if (placeHolderValue.startsWith("'") && placeHolderValue.endsWith("'")) {
+                    p.javaTypeAlias = "string";
+                } else if (NumberUtils.isNumber(placeHolderValue)) {
+                    p.javaTypeAlias = "int";
+                }
+
+            }
+
             paramEnd += QUERY_ARG_END.length();
             p.endIndex = paramEnd;
+
 
             // Placeholder for PreparedStatement
             p.placeholder = "?" + Strings.repeat(" ", p.endIndex - p.startIndex - 1);
@@ -244,10 +257,12 @@ public class SqlStatementToPreparedStatement {
                 }
 
                 // check if the param type is correct
-                if (pips.converter != null && !pips.converter.isValueValid(pips.value)) {
+                if (pips.converter != null
+                        && !(pips.value instanceof QueryParameter)
+                        && !pips.converter.isValueValid(pips.value)) {
                     throw new IllegalArgumentException("Value for parameter '" + p.name + "' has the wrong type. "
                             + "Expected: " + pips.converter.getJavaType().getCanonicalName()
-                            + ", actual: " + pips.value.getClass().getCanonicalName());
+                            + ", actual: " + pips.value.getClass().getName());
                 }
 
                 parameterInPreparedStatements.add(pips);

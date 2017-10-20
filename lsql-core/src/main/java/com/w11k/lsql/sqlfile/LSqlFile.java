@@ -1,5 +1,6 @@
 package com.w11k.lsql.sqlfile;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
@@ -106,7 +107,13 @@ public class LSqlFile {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String content = CharStreams.toString(reader);
             Matcher startMatcher = STMT_BLOCK_BEGIN.matcher(content);
+
+            int endOfLastMatch = -1;
             while (startMatcher.find()) {
+                if (startMatcher.start() <= endOfLastMatch) {
+                    continue;
+                }
+
                 String name = startMatcher.group(1);
                 String typeAnnotation = "";
                 if (name.contains(":")) {
@@ -123,14 +130,27 @@ public class LSqlFile {
                                     name + "'. Did you add ';' at the end?");
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
-                logger.debug("Found SQL statement '{}'", name);
-                SqlStatementToPreparedStatement stmt = new SqlStatementToPreparedStatement(lSql, name, typeAnnotation, sub);
+                endOfLastMatch = startMatcher.start() + (startMatcher.end() - startMatcher.start()) + endMatcher.end();
 
-                statements.put(name, stmt);
+                if (!this.areAllLinesCommented(sub)) {
+                    logger.debug("Found SQL statement '{}'", name);
+                    SqlStatementToPreparedStatement stmt = new SqlStatementToPreparedStatement(lSql, name, typeAnnotation, sub);
+                    statements.put(name, stmt);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean areAllLinesCommented(String sqlString) {
+        Iterable<String> lines = Splitter.on("\n").split(sqlString);
+        for (String line : lines) {
+            if (!line.trim().startsWith("--")) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
