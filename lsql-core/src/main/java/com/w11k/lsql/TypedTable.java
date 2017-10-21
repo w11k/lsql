@@ -68,4 +68,9 @@ public class TypedTable<T extends TableRow> {
         this.table.updateWhere(new Row(map), new Row(where));
     }
 
+    public void save(T row) {
+        Map<String, Object> map = row.toMap();
+        this.table.save(new Row(map));
+    }
+
 }

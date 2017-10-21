@@ -22,6 +22,9 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
         contentImplements();
         content.append(" {\n\n");
 
+        // static from
+        contentFrom();
+
         // constructors
         contentConstructors();
 
@@ -44,6 +47,39 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
         contentToMap();
 
         content.append("}\n");
+    }
+
+    private void contentFrom() {
+//        content.append("    public <T");
+//
+//        if (this.columns.size() > 0) {
+//            content.append(" extends \n            ");
+//            content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
+//                    .map(StructuralTypingField::getInterfaceName).collect(toList())));
+//        }
+//        content.append("> ");
+//        content.append(getClassName()).append(" updatedWith(T source) {\n");
+//
+//        content.append("        Object target = this;\n");
+//        for (StructuralTypingField stf : getStructuralTypingFields()) {
+//            content.append("        target = ")
+//                    .append("((").append(stf.getInterfaceName()).append(") target).with").append(stf.getUppercaseName())
+//                    .append("(source.").append(stf.getGetterMethodName()).append("());\n");
+//        }
+//        content.append("        return (").append(getClassName()).append(") target;\n");
+//
+//        content.append("    }\n\n");
+
+        content.append("    public static <T");
+        if (this.columns.size() > 0) {
+            content.append(" extends \n            ");
+            content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
+                    .map(StructuralTypingField::getInterfaceName).collect(toList())));
+        }
+        content.append("> ");
+        content.append(getClassName()).append(" from(T source) {\n")
+                .append("        return new ").append(getClassName()).append("().updatedWith(source);\n")
+                .append("    }\n\n");
     }
 
     @Override
