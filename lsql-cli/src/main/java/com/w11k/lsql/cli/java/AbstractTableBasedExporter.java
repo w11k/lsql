@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.w11k.lsql.cli.CodeGenUtils.log;
 import static com.w11k.lsql.cli.CodeGenUtils.writeContentIfChanged;
 import static java.util.stream.Collectors.toList;
 
@@ -50,7 +49,6 @@ abstract public class AbstractTableBasedExporter {
     }
 
     final public void export() {
-        log("Generating", getOutputFile().getAbsolutePath());
         this.createContent();
         File pojoSourceFile = getOutputFile();
         writeContentIfChanged(this.content.toString(), pojoSourceFile);

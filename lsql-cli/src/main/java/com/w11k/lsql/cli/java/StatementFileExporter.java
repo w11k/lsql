@@ -46,10 +46,7 @@ public final class StatementFileExporter {
         this.javaExporter = javaExporter;
         this.sqlStatementsRootDir = sqlStatementsRootDir;
 
-        this.packageName = this.getPackageNameFromStmtPath(
-                this.sqlStatementsRootDir,
-                this.sourceFile.getAbsolutePath(),
-                this.sourceFile.getName());
+        this.packageName = this.getPackageNameFromStmtPath(this.sqlStatementsRootDir, this.sourceFile);
 
         this.className = MoreFiles.getNameWithoutExtension(this.sourceFile.toPath());
 
@@ -58,7 +55,6 @@ public final class StatementFileExporter {
         ImmutableMap<String, SqlStatementToPreparedStatement> statements = lSqlFile.getStatements();
 
         for (String stmtName : statements.keySet()) {
-            log("Statement '" + sourceFile.getAbsolutePath() + "#" + stmtName + "'");
             AbstractSqlStatement<RowQuery> query = lSqlFile.statement(stmtName);
             SqlStatementToPreparedStatement stmt = lSqlFile.getSqlStatementToPreparedStatement(stmtName);
 
@@ -96,8 +92,6 @@ public final class StatementFileExporter {
 
     private void exportTypedStatementClass() {
         File outputFile = this.getOutputFile(packageName, className);
-        log("Generating", outputFile.getAbsolutePath());
-
         StringBuilder content = new StringBuilder();
 
         content.append("package ").append(this.getFullPackageName(packageName)).append(";\n\n");
@@ -156,11 +150,14 @@ public final class StatementFileExporter {
         return new File(packageFolder, className + ".java");
     }
 
-    private String getPackageNameFromStmtPath(String sqlStatements, String absolutePath, String fileName) {
-        String withoutLocationDir = absolutePath.substring(sqlStatements.length());
-        String withoutFilename = withoutLocationDir.substring(0, withoutLocationDir.length() - fileName.length());
-        Iterable<String> pathSlit = Splitter.on(File.separatorChar).omitEmptyStrings().split(withoutFilename);
-        return Joiner.on("_").join(pathSlit);
+    private String getPackageNameFromStmtPath(String sqlStatementsRootDir, File sourceFile) {
+        String filePath = sourceFile.getAbsolutePath();
+        int start = filePath.lastIndexOf(sqlStatementsRootDir) + sqlStatementsRootDir.length();
+        String relativePath = filePath.substring(start);
+        Iterable<String> pathSlitIt = Splitter.on(File.separatorChar).omitEmptyStrings().split(relativePath);
+        List<String> pathSplit = Lists.newLinkedList(pathSlitIt);
+        pathSplit.remove(pathSplit.size() - 1);
+        return Joiner.on("_").join(pathSplit);
     }
 
 }

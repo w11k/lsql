@@ -19,18 +19,6 @@ public final class TypedStatementExporter {
     }
 
     public void export(StringBuilder content) {
-
-//        String originalSqlString = this.typedStatementMeta.getStatement().getOriginalSqlString();
-//        originalSqlString = originalSqlString
-//                .replaceAll("/\\*", "/°")
-//                .replaceAll("\\*/", "°/");
-//        content.append("/**\n");
-//        String[] lines = originalSqlString.split("\n");
-//        for (String line : lines) {
-//            content.append(" * ").append(line).append("\n");
-//        }
-//        content.append(" */\n");
-
         String queryClassName = this.typedStatementMeta.getStatement().getStatementName();
 
         boolean isVoid = this.typedStatementMeta.getStatement().getTypeAnnotation().toLowerCase().equals("void");
@@ -55,7 +43,9 @@ public final class TypedStatementExporter {
         for (String parameterName : this.typedStatementMeta.getParameters().keySet()) {
             Class<?> paramType = this.typedStatementMeta.getParameters().get(parameterName);
 
-            String setterName = this.typedStatementMeta.getlSql().identifierSqlToJava(parameterName);
+            String setterName = parameterName.replaceAll("\\.", "_"); 
+            setterName = this.typedStatementMeta.getlSql().identifierSqlToJava(setterName);
+
             content.append("        public ").append(queryClassName).append(" ").append(setterName)
                     .append("(").append(paramType.getCanonicalName()).append(" value) {\n");
 

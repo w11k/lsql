@@ -40,6 +40,10 @@ public class Main {
 
         this.parseArgs(args);
 
+        log("output dir: " + this.outDirJava);
+        log("sql statements dir: " + this.sqlStatements);
+
+
         // Config
         @SuppressWarnings("unchecked")
         Class<? extends Config> configClass =

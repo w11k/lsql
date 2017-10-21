@@ -15,17 +15,23 @@ public final class CodeGenUtils {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    public static void log(String ...strings) {
+    public static void log(String... strings) {
         String joined = Joiner.on(" ").join(strings);
         System.out.println(joined);
     }
 
-    public static void writeContentIfChanged(String c, File pojoSourceFile) {
+    public static void writeContentIfChanged(String content, File target) {
         try {
-            MoreFiles.createParentDirectories(pojoSourceFile.toPath());
+            if (target.isFile()) {
+                String existing = MoreFiles.asCharSource(target.toPath(), Charsets.UTF_8).read();
+                if (existing.equals(content)) {
+                    return;
+                }
+            }
 
-            // TODO only write if content changed
-            Files.write(c.getBytes(Charsets.UTF_8), pojoSourceFile);
+            log("Writing", target.getAbsolutePath());
+            MoreFiles.createParentDirectories(target.toPath());
+            Files.write(content.getBytes(Charsets.UTF_8), target);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

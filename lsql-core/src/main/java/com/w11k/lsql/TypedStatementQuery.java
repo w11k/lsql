@@ -1,10 +1,13 @@
 package com.w11k.lsql;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import rx.Observable;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Optional.of;
 
 public abstract class TypedStatementQuery<T> {
 
@@ -28,6 +31,15 @@ public abstract class TypedStatementQuery<T> {
 
     public List<T> toList() {
         return this.toStream().toList().toBlocking().first();
+    }
+
+    public Optional<T> first() {
+        List<T> first = this.toStream().take(1).toList().toBlocking().first();
+        if (first.isEmpty()) {
+            return Optional.absent();
+        } else {
+            return of(first.get(0));
+        }
     }
 
     protected abstract T createTypedRow(Row row);
