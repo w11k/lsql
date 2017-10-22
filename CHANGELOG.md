@@ -2,6 +2,7 @@
 **0.27.5**
 
 - added support for statement return type void
+- improved code generation
 
 
 **0.27.4**

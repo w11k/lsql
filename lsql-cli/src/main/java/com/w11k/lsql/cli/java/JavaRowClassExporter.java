@@ -40,46 +40,13 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
         contentSeperator();
 
         // StructuralTyping methods
-        contentAssignIntoNew();
-        contentUpdatedWith();
+        contentAsInstance();
+        contentAsClass();
 
         // toMap
         contentToMap();
 
         content.append("}\n");
-    }
-
-    private void contentFrom() {
-//        content.append("    public <T");
-//
-//        if (this.columns.size() > 0) {
-//            content.append(" extends \n            ");
-//            content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
-//                    .map(StructuralTypingField::getInterfaceName).collect(toList())));
-//        }
-//        content.append("> ");
-//        content.append(getClassName()).append(" updatedWith(T source) {\n");
-//
-//        content.append("        Object target = this;\n");
-//        for (StructuralTypingField stf : getStructuralTypingFields()) {
-//            content.append("        target = ")
-//                    .append("((").append(stf.getInterfaceName()).append(") target).with").append(stf.getUppercaseName())
-//                    .append("(source.").append(stf.getGetterMethodName()).append("());\n");
-//        }
-//        content.append("        return (").append(getClassName()).append(") target;\n");
-//
-//        content.append("    }\n\n");
-
-        content.append("    public static <T");
-        if (this.columns.size() > 0) {
-            content.append(" extends \n            ");
-            content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
-                    .map(StructuralTypingField::getInterfaceName).collect(toList())));
-        }
-        content.append("> ");
-        content.append(getClassName()).append(" from(T source) {\n")
-                .append("        return new ").append(getClassName()).append("().updatedWith(source);\n")
-                .append("    }\n\n");
     }
 
     @Override
@@ -104,7 +71,7 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
         content.append("    }\n\n");
     }
 
-    private void contentAssignIntoNew() {
+    private void contentAsInstance() {
         content.append("    @SuppressWarnings(\"unchecked\")\n");
         content.append("    public <T");
 
@@ -114,7 +81,7 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
                     .map(StructuralTypingField::getInterfaceName).collect(toList())));
         }
 
-        content.append("> T assignIntoNew(T targetStart) {\n");
+        content.append("> T as(T targetStart) {\n");
 
         content.append("        Object target = targetStart;\n");
         for (StructuralTypingField stf : getStructuralTypingFields()) {
@@ -127,7 +94,7 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
         content.append("    }\n\n");
     }
 
-    private void contentUpdatedWith() {
+    private void contentAsClass() {
         content.append("    @SuppressWarnings(\"unchecked\")\n");
         content.append("    public <T");
 
@@ -136,10 +103,30 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
             content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
                     .map(StructuralTypingField::getInterfaceName).collect(toList())));
         }
-        content.append("> ");
-        content.append(getClassName()).append(" updatedWith(T source) {\n");
 
-        content.append("        Object target = this;\n");
+        content.append("> T as(Class<? extends T> targetClass) {\n");
+
+        content.append("        try {\n");
+        content.append("            Object target = targetClass.newInstance();\n");
+        content.append("            return this.as((T) target);\n");
+        content.append("        } catch (Exception e) {throw new RuntimeException(e);}\n");
+
+        content.append("    }\n\n");
+    }
+
+    private void contentFrom() {
+        content.append("    @SuppressWarnings(\"unchecked\")\n");
+        content.append("    public static <T");
+
+        if (this.columns.size() > 0) {
+            content.append(" extends \n            ");
+            content.append(Joiner.on("\n            & ").join(getStructuralTypingFields().stream()
+                    .map(StructuralTypingField::getInterfaceName).collect(toList())));
+        }
+        content.append("> ");
+        content.append(getClassName()).append(" from(T source) {\n");
+
+        content.append("        Object target = new ").append(getClassName()).append("();\n");
         for (StructuralTypingField stf : getStructuralTypingFields()) {
             content.append("        target = ")
                     .append("((").append(stf.getInterfaceName()).append(") target).with").append(stf.getUppercaseName())

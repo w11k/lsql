@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 public final class TestCliProjectAssertsTest {
 
@@ -58,22 +59,31 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void assignIntoNew() {
+    public void asWithInstance() {
         Person1Row p1 = new Person1Row().withId(1).withFirstName("a");
         Person2Row p2 = new Person2Row().withId(2).withFirstName("b").withAge(50);
 
-        p2 = p1.assignIntoNew(p2);
+        p2 = p1.as(p2);
         assertEquals(p2.getId(), new Integer(1));
         assertEquals(p2.getFirstName(), "a");
         assertEquals(p2.getAge(), new Integer(50));
     }
 
     @Test
-    public void updatedWith() {
+    public void asWithClass() {
         Person1Row p1 = new Person1Row().withId(1).withFirstName("a");
+
+        Person2Row p2 = p1.as(Person2Row.class);
+        assertEquals(p2.getId(), new Integer(1));
+        assertEquals(p2.getFirstName(), "a");
+        assertNull(p2.getAge());
+    }
+
+    @Test
+    public void updatedWith() {
         Person2Row p2 = new Person2Row().withId(2).withFirstName("b").withAge(50);
 
-        p1 = p1.updatedWith(p2);
+        Person1Row p1 = Person1Row.from(p2);
         assertEquals(p1.getId(), new Integer(2));
         assertEquals(p1.getFirstName(), "b");
     }
