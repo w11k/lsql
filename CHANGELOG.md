@@ -1,4 +1,9 @@
 
+**0.27.6**
+
+fixed bug with ListLiteralQueryParameter and statement type parameter checks
+
+
 **0.27.5**
 
 - added support for statement return type void

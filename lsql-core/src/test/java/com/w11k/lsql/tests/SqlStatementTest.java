@@ -350,6 +350,17 @@ public class SqlStatementTest extends AbstractLSqlTest {
         assertEquals(rows.size(), 2);
     }
 
+    @Test
+    public void listLiteralQueryParameterWithPlaceholderStrings() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("select * from person where" +
+                " fullname in (/*fullnames=*/ 'a', 'b', 'c' /**/) ;");
+
+        List<Row> rows = statement.query("fullnames", ListLiteralQueryParameter.of("a", "x")).toList();
+        assertEquals(rows.size(), 1);
+    }
+
     @Test()
     public void listLiteralQueryParameterEmptyArray() {
         boolean skipTest = lSql.getDialectClass().equals(PostgresDialect.class);

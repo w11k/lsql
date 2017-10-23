@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.ListLiteralQueryParameter;
 import com.w11k.lsql.LiteralQueryParameter;
 import com.w11k.lsql.QueryParameter;
 import com.w11k.lsql.converter.Converter;
@@ -259,7 +260,9 @@ public class SqlStatementToPreparedStatement {
                 // check if the param type is correct
                 if (pips.converter != null
                         && !(pips.value instanceof QueryParameter)
+                        && !(pips.value instanceof ListLiteralQueryParameter)
                         && !pips.converter.isValueValid(pips.value)) {
+
                     throw new IllegalArgumentException("Value for parameter '" + p.name + "' has the wrong type. "
                             + "Expected: " + pips.converter.getJavaType().getCanonicalName()
                             + ", actual: " + pips.value.getClass().getName());
