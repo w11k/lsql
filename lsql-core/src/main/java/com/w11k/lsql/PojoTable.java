@@ -68,6 +68,15 @@ public class PojoTable<T> {
         this.table.delete(row);
     }
 
+    public void deleteById(Object id) {
+        Optional<String> pkColOpt = this.table.getPrimaryKeyColumn();
+        if (!pkColOpt.isPresent()) {
+            throw new RuntimeException("table does not have a primary key column");
+        }
+
+        this.table.delete(id);
+    }
+
     public void update(T pojo) {
         Row row = this.pojoMapper.pojoToRow(pojo);
         this.table.update(row);

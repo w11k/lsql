@@ -1,4 +1,9 @@
 
+**0.28.0**
+
+add deleteById method to PojoTable
+
+
 **0.27.7**
 
 add deleteById method to generated TypedTable classes #25

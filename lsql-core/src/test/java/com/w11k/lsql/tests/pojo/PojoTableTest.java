@@ -59,6 +59,20 @@ public class PojoTableTest extends AbstractLSqlTest {
     }
 
     @Test
+    public void deleteById() {
+        PersonTestData.init(this.lSql, false);
+        PojoTable<Person> personTable = this.lSql.table("person", Person.class);
+        Person p1 = new Person(1, "Max", 30);
+        personTable.insert(p1);
+
+        personTable.deleteById(1);
+
+        Table personRowTable = this.lSql.table("person");
+        Optional<LinkedRow> load = personRowTable.load(1);
+        assertFalse(load.isPresent());
+    }
+
+    @Test
     public void insertAssignsDefaultValue() {
         PersonTestData.init(this.lSql, false);
         PojoTable<Person> personTable = this.lSql.table("person", Person.class);
