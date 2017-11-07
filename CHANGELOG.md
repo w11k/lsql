@@ -1,4 +1,9 @@
 
+**0.27.7**
+
+add deleteById method to generated TypedTable classes #25
+
+
 **0.27.6**
 
 fixed bug with ListLiteralQueryParameter and statement type parameter checks

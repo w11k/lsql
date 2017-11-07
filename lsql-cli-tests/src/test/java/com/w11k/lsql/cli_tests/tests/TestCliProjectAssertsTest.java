@@ -134,6 +134,18 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
+    public void deleteById() throws SQLException {
+        createTables(lSql);
+
+        Person1Table person1Table = new Person1Table(lSql);
+        person1Table.insert(new Person1Row().withId(1).withFirstName("a"));
+        person1Table.deleteById(1);
+
+        Optional<Person1Row> person1RowOptional = person1Table.load(1);
+        Assert.assertFalse(person1RowOptional.isPresent());
+    }
+
+    @Test
     public void update() throws SQLException {
         createTables(lSql);
 

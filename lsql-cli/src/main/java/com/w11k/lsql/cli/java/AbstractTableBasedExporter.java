@@ -3,7 +3,7 @@ package com.w11k.lsql.cli.java;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.w11k.lsql.Column;
-import com.w11k.lsql.ColumnsContainer;
+import com.w11k.lsql.TableLike;
 
 import java.io.File;
 import java.util.Comparator;
@@ -20,14 +20,14 @@ abstract public class AbstractTableBasedExporter {
 
     protected final String constructorCallArgs;
 
-    private final ColumnsContainer columnsContainer;
+    private final TableLike tableLike;
 
     protected final JavaExporter javaExporter;
 
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractTableBasedExporter(ColumnsContainer cc, JavaExporter javaExporter) {
-        this.columnsContainer = cc;
+    public AbstractTableBasedExporter(TableLike cc, JavaExporter javaExporter) {
+        this.tableLike = cc;
         this.javaExporter = javaExporter;
         this.columns = Lists.newLinkedList(cc.getColumns().values());
         this.columns.sort(Comparator.comparing(Column::getJavaColumnName));
@@ -36,8 +36,8 @@ abstract public class AbstractTableBasedExporter {
         this.constructorCallArgs = Joiner.on(",").join(columns.stream().map(Column::getJavaColumnName).collect(toList()));
     }
 
-    public ColumnsContainer getColumnsContainer() {
-        return columnsContainer;
+    public TableLike getTableLike() {
+        return tableLike;
     }
 
     private List<StructuralTypingField> createStructuralTypingFieldList() {
@@ -66,7 +66,7 @@ abstract public class AbstractTableBasedExporter {
     abstract public String getOutputFileName();
 
     public String getLastPackageSegmentForSchema() {
-        String schemaName = this.columnsContainer.getSchemaName();
+        String schemaName = this.tableLike.getSchemaName();
 
         // no schema
         if (schemaName.length() == 0) {

@@ -2,7 +2,7 @@ package com.w11k.lsql.cli.java;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.w11k.lsql.ColumnsContainer;
+import com.w11k.lsql.TableLike;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -13,7 +13,7 @@ import static com.w11k.lsql.cli.CodeGenUtils.log;
 
 public class JavaExporter {
 
-    private final List<? extends ColumnsContainer> tables;
+    private final List<? extends TableLike> tables;
 
     private List<StatementFileExporter> statementFileExporters;
 
@@ -23,7 +23,7 @@ public class JavaExporter {
 
     private boolean guice = false;
 
-    public JavaExporter(List<? extends ColumnsContainer> tables) throws SQLException {
+    public JavaExporter(List<? extends TableLike> tables) throws SQLException {
         this.tables = tables;
     }
 
@@ -62,12 +62,12 @@ public class JavaExporter {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void export() {
         List<JavaRowClassExporter> tableRowClassExporters = Lists.newLinkedList();
-        Iterable<? extends ColumnsContainer> tables = this.tables;
+        Iterable<? extends TableLike> tables = this.tables;
 
         Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
 
         // Tables
-        for (ColumnsContainer cc : tables) {
+        for (TableLike cc : tables) {
             // collect all row classes
             JavaRowClassExporter rowClassExporter = new JavaRowClassExporter(cc, this);
             tableRowClassExporters.add(rowClassExporter);

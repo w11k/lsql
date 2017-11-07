@@ -1,16 +1,16 @@
 package com.w11k.lsql.cli.java;
 
-import com.w11k.lsql.ColumnsContainer;
+import com.w11k.lsql.TableLike;
 
 public final class StatementRowExporter extends JavaRowClassExporter {
 
-    public StatementRowExporter(ColumnsContainer columnsContainer, JavaExporter javaExporter) {
-        super(columnsContainer, javaExporter);
+    public StatementRowExporter(TableLike tableLike, JavaExporter javaExporter) {
+        super(tableLike, javaExporter);
     }
 
     @Override
     public String getLastPackageSegmentForSchema() {
-        return this.getColumnsContainer().getSchemaName();
+        return this.getTableLike().getSchemaName();
     }
 
 

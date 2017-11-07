@@ -28,7 +28,7 @@ import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class Table implements ColumnsContainer {
+public class Table implements TableLike {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -88,6 +88,17 @@ public class Table implements ColumnsContainer {
 
     public Optional<String> getPrimaryKeyColumn() {
         return primaryKeyColumn;
+    }
+
+    @Override
+    public Optional<Class<?>> getPrimaryKeyType() {
+        Optional<String> pkNameOpt = this.getPrimaryKeyColumn();
+        if (!pkNameOpt.isPresent()) {
+            return absent();
+        }
+
+        Column column = this.column(pkNameOpt.get());
+        return of(column.getConverter().getJavaType());
     }
 
     public Map<String, Column> getColumns() {

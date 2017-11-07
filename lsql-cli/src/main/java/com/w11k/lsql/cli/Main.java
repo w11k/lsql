@@ -2,7 +2,7 @@ package com.w11k.lsql.cli;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.MoreFiles;
-import com.w11k.lsql.ColumnsContainer;
+import com.w11k.lsql.TableLike;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.java.JavaExporter;
@@ -66,7 +66,7 @@ public class Main {
         assert outputRootPackageDir.isDirectory();
 
         // Java table and row classes
-        LinkedList<? extends ColumnsContainer> tables = Lists.newLinkedList(lSql.getTables());
+        LinkedList<? extends TableLike> tables = Lists.newLinkedList(lSql.getTables());
         JavaExporter javaExporter = new JavaExporter(tables);
         javaExporter.setPackageName(this.packageName);
         javaExporter.setOutputRootPackageDir(outputRootPackageDir);

@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import java.lang.reflect.Constructor;
 import java.util.Map;
 
-public class TypedTable<T extends TableRow> {
+public class TypedTable<T extends TableRow, I> {
 
     private final Table table;
     private final Constructor<T> tableRowConstructor;
@@ -56,6 +56,10 @@ public class TypedTable<T extends TableRow> {
     public void delete(T row) {
         Map<String, Object> map = row.toMap();
         this.table.delete(new Row(map));
+    }
+
+    public void deleteById(I id) {
+        this.table.delete(id);
     }
 
     public void update(T row) {

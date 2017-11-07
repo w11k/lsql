@@ -1,5 +1,6 @@
 package com.w11k.lsql.cli.java;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.*;
 import com.w11k.lsql.query.RowQuery;
@@ -8,7 +9,7 @@ import com.w11k.lsql.statement.AbstractSqlStatement;
 import java.io.File;
 import java.util.Map;
 
-public final class StatementRowColumnContainer implements ColumnsContainer {
+public final class StatementRowColumnContainer implements TableLike {
 
     private final StatementFileExporter statementFileExporter;
 
@@ -58,5 +59,8 @@ public final class StatementRowColumnContainer implements ColumnsContainer {
         return this.typedStatementMeta.getStatement().getStatementName();
     }
 
-
+    @Override
+    public Optional<Class<?>> getPrimaryKeyType() {
+        return Optional.absent();
+    }
 }
