@@ -1,69 +1,87 @@
 package com.w11k.lsql.cli.typescript;
 
-import com.w11k.lsql.LSql;
+import com.w11k.lsql.Column;
+import com.w11k.lsql.TableLike;
+import com.w11k.lsql.cli.CodeGenUtils;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.LinkedList;
+
+import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 
 public class TypeScriptExporter {
 
-    private final LSql lSql;
+    private final LinkedList<? extends TableLike> tables;
 
-    private File outDirTypeScript = null;
+    private File outputDir = null;
 
-    public TypeScriptExporter(LSql lSql) throws SQLException {
-        this.lSql = lSql;
+    public TypeScriptExporter(LinkedList<? extends TableLike> tables) throws SQLException {
+        this.tables = tables;
     }
 
-    public File getOutDirTypeScript() {
-        return outDirTypeScript;
+    public File getOutputDir() {
+        return outputDir;
     }
 
-    public void setOutputPath(File outputDir) {
-        this.outDirTypeScript = outputDir;
+    public void setOutputDir(File outputDir) {
+        this.outputDir = outputDir;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void export() {
-/*
-        String packageFolder = this.packageName.replaceAll("\\.", File.separator);
-        File packageFolderFile = new File(this.outDirTypeScript, packageFolder);
+        StringBuilder content = new StringBuilder();
+        this.exportTables(content);
 
-        packageFolderFile.mkdirs();
-        assert packageFolderFile.isDirectory();
-        assert packageFolderFile.exists();
+        //noinspection ResultOfMethodCallIgnored
+        this.outputDir.mkdirs();
+        File output = new File(this.outputDir, "domain.ts");
+        CodeGenUtils.writeContentIfChanged(content.toString(), output);
+    }
 
-        List<JavaRowClassExporter> tableRowClassExporters = Lists.newLinkedList();
-        Iterable<Table> tables = this.lSql.getTables();
+    private void exportTables(StringBuilder content) {
+        for (TableLike table : this.tables) {
+            this.exportTable(content, table);
+        }
+    }
 
-        // Tables
-        for (Table table : tables) {
-            // collect all row classes
-            JavaRowClassExporter rowClassExporter = new JavaRowClassExporter(table, this, packageFolderFile);
-            tableRowClassExporters.add(rowClassExporter);
+    private void exportTable(StringBuilder content, TableLike table) {
+        content.append("export namespace schema_").append(table.getSchemaName()).append(" {\n");
+        content.append("    export class ").append(firstCharUpperCase(table.getTableName())).append(" {\n");
+        this.exportColumns(content, table);
+        content.append("    }\n");
+        content.append("}\n\n");
+    }
 
-            // generate table classes
-            new TableExporter(table, this, packageFolderFile).export();
+    private void exportColumns(StringBuilder content, TableLike table) {
+        for (Column column : table.getColumns().values()) {
+            this.exportColumn(content, column);
+        }
+    }
+
+    private void exportColumn(StringBuilder content, Column column) {
+        Class<?> javaType = column.getConverter().getJavaType();
+        String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);
+        content.append("        ")
+                .append(column.getJavaColumnName()).append(": ").append(tsTypeName).append(";\n");
+    }
+
+    private String getTypeScriptTypeNameForJavaType(Class<?> javaType) {
+        if (String.class.isAssignableFrom(javaType)) {
+            return "string";
+        } else if (Integer.class.isAssignableFrom(javaType)) {
+            return "number";
+        }  else if (Long.class.isAssignableFrom(javaType)) {
+            return "number";
+        }  else if (Float.class.isAssignableFrom(javaType)) {
+            return "number";
+        }  else if (Double.class.isAssignableFrom(javaType)) {
+            return "number";
+        } else if (Boolean.class.isAssignableFrom(javaType)) {
+            return "boolean";
         }
 
-        // find unique StructuralTypingFields
-        Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
-        for (JavaRowClassExporter tableRowClassExporter : tableRowClassExporters) {
-            structuralTypingFields.addAll(tableRowClassExporter.getStructuralTypingFields());
-        }
 
-        // generate StructuralTypingField
-        for (StructuralTypingField structuralTypingField : structuralTypingFields) {
-            new StructuralTypingFieldExporter(structuralTypingField, this, packageFolderFile).export();
-        }
-
-        // generate row classes
-        for (JavaRowClassExporter tableRowClassExporter : tableRowClassExporters) {
-            tableRowClassExporter.export();
-        }
-
-        log("");
-        */
+        return "any";
     }
 
 }

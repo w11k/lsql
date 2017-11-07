@@ -4,7 +4,7 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.TableLike;
 import com.w11k.lsql.TypedTable;
 
-import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
+import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 
 public class TableExporter extends AbstractTableBasedExporter {
 
@@ -47,11 +47,11 @@ public class TableExporter extends AbstractTableBasedExporter {
     }
 
     private String getRowClassName() {
-        return lowerCamelToUpperCamel(this.getTableLike().getTableName() + "Row");
+        return firstCharUpperCase(this.getTableLike().getTableName() + "Row");
     }
 
     protected String getClassName() {
-        return lowerCamelToUpperCamel(this.getTableLike().getTableName()) + "Table";
+        return firstCharUpperCase(this.getTableLike().getTableName()) + "Table";
     }
 
 }

@@ -5,7 +5,7 @@ import com.w11k.lsql.Row;
 import com.w11k.lsql.TypedStatementCommand;
 import com.w11k.lsql.TypedStatementQuery;
 
-import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
+import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 
 public final class TypedStatementExporter {
 
@@ -22,7 +22,7 @@ public final class TypedStatementExporter {
         String queryClassName = this.typedStatementMeta.getStatement().getStatementName();
 
         boolean isVoid = this.typedStatementMeta.getStatement().getTypeAnnotation().toLowerCase().equals("void");
-        String rowClassName = !isVoid ? lowerCamelToUpperCamel(queryClassName + "Row") : Void.class.getCanonicalName();
+        String rowClassName = !isVoid ? firstCharUpperCase(queryClassName + "Row") : Void.class.getCanonicalName();
 
         // query class
         content.append("    public class ")

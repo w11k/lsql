@@ -47,6 +47,11 @@ public final class TestCliProjectGenerationTest {
             MoreFiles.deleteRecursively(genJavaDir.toPath());
         }
 
+        File genTSDir = pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/generated/ts");
+        if (genTSDir.exists()) {
+            MoreFiles.deleteRecursively(genTSDir.toPath());
+        }
+
         String url = "jdbc:h2:mem:" + UUID.randomUUID() + ";mode=postgresql";
 
         BasicDataSource ds = new BasicDataSource();
@@ -65,7 +70,8 @@ public final class TestCliProjectGenerationTest {
                 "sqlStatements:" + pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/test/java/com/w11k/lsql"),
                 "package:" + TestCliConfig.class.getPackage().getName(),
                 "di:guice",
-                "outDirJava:" + genJavaDir.getAbsolutePath()
+                "outDirJava:" + genJavaDir.getAbsolutePath(),
+                "outDirTypeScript:" + genTSDir.getAbsolutePath()
         };
         Main.main(args);
     }

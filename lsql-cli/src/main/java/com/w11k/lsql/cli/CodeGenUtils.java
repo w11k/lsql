@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public final class CodeGenUtils {
 
-    public static String lowerCamelToUpperCamel(String name) {
+    public static String firstCharUpperCase(String name) {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 

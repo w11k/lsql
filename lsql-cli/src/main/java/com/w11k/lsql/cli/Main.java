@@ -2,11 +2,12 @@ package com.w11k.lsql.cli;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.MoreFiles;
-import com.w11k.lsql.TableLike;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.TableLike;
 import com.w11k.lsql.cli.java.JavaExporter;
 import com.w11k.lsql.cli.java.StatementFileExporter;
+import com.w11k.lsql.cli.typescript.TypeScriptExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 
 import java.io.File;
@@ -22,14 +23,23 @@ import static com.w11k.lsql.cli.CodeGenUtils.log;
 public class Main {
 
     private String configClassName;
+
     private String url;
+
     private String user;
+
     private String password;
 
     private String packageName;
+
     private String sqlStatements;
+
     private boolean guice = false;
+
     private String outDirJava;
+
+    private String outDirTypeScript;
+
     private List<StatementFileExporter> statementFileExporters = Lists.newLinkedList();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -59,30 +69,34 @@ public class Main {
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
-        // Java output dir
-        String packageFolder = this.packageName.replaceAll("\\.", File.separator);
-        File outputRootPackageDir = new File(this.outDirJava, packageFolder);
-        outputRootPackageDir.mkdirs();
-        assert outputRootPackageDir.isDirectory();
-
-        // Java table and row classes
         LinkedList<? extends TableLike> tables = Lists.newLinkedList(lSql.getTables());
-        JavaExporter javaExporter = new JavaExporter(tables);
-        javaExporter.setPackageName(this.packageName);
-        javaExporter.setOutputRootPackageDir(outputRootPackageDir);
-        javaExporter.setGuice(this.guice);
 
-        // Java statements
-        processStatements(lSql, javaExporter);
-        javaExporter.setStatementFileExporters(this.statementFileExporters);
+        if (this.outDirJava != null) {
+            String packageFolder = this.packageName.replaceAll("\\.", File.separator);
+            File outputRootPackageDir = new File(this.outDirJava, packageFolder);
+            outputRootPackageDir.mkdirs();
+            assert outputRootPackageDir.isDirectory();
 
-        javaExporter.export();
+            JavaExporter javaExporter = new JavaExporter(tables);
+            javaExporter.setPackageName(this.packageName);
+            javaExporter.setOutputRootPackageDir(outputRootPackageDir);
+            javaExporter.setGuice(this.guice);
 
+            // Java statements
+            processStatements(lSql, javaExporter);
+            javaExporter.setStatementFileExporters(this.statementFileExporters);
 
-        //        TypeScriptExporter tse = new TypeScriptExporter(lSql);
-//        File outDirTs = new File(this.outDirTypeScript);
-//        tse.setOutputRootPackageDir(outDirTs);
-//        tse.export();
+            javaExporter.export();
+        }
+
+        if (this.outDirTypeScript != null) {
+            TypeScriptExporter tse = new TypeScriptExporter(tables);
+            File outDirTs = new File(this.outDirTypeScript);
+//            tse.setPackageName(this.packageName);
+            tse.setOutputDir(outDirTs);
+            tse.export();
+        }
+
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
@@ -120,6 +134,8 @@ public class Main {
                 this.sqlStatements = value;
             } else if (arg.startsWith("outDirJava:")) {
                 this.outDirJava = value;
+            } else if (arg.startsWith("outDirTypeScript:")) {
+                this.outDirTypeScript = value;
             } else if (arg.startsWith("di:")) {
                 if (value.equalsIgnoreCase("guice")) {
                     this.guice = true;

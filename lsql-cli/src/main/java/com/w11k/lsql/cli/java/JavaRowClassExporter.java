@@ -5,7 +5,7 @@ import com.w11k.lsql.Column;
 import com.w11k.lsql.TableLike;
 import com.w11k.lsql.TableRow;
 
-import static com.w11k.lsql.cli.CodeGenUtils.lowerCamelToUpperCamel;
+import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 import static java.util.stream.Collectors.toList;
 
 public class JavaRowClassExporter extends AbstractTableBasedExporter {
@@ -55,7 +55,7 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
     }
 
     protected String getClassName() {
-        return lowerCamelToUpperCamel(this.getTableLike().getTableName()) + "Row";
+        return firstCharUpperCase(this.getTableLike().getTableName()) + "Row";
     }
 
     private void contentToMap() {
@@ -205,13 +205,13 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
         boolean isBool = Boolean.class.isAssignableFrom(column.getConverter().getJavaType());
         String prefix = isBool ? "is" : "get";
-        content.append(prefix).append(lowerCamelToUpperCamel(column.getJavaColumnName())).append("() {\n");
+        content.append(prefix).append(firstCharUpperCase(column.getJavaColumnName())).append("() {\n");
         content.append("        return this.").append(column.getJavaColumnName()).append(";\n");
         content.append("    }\n\n");
 
         // Setter
         content.append("    public ").append(this.getClassName()).append(" ");
-        content.append("with").append(lowerCamelToUpperCamel(column.getJavaColumnName())).append("(");
+        content.append("with").append(firstCharUpperCase(column.getJavaColumnName())).append("(");
         content.append(column.getConverter().getJavaType().getCanonicalName());
         content.append(" ").append(column.getJavaColumnName());
         content.append(") {\n");

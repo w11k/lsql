@@ -1,4 +1,8 @@
 
+**0.28.1**
+
+added TypeScript generation
+
 **0.28.0**
 
 add deleteById method to PojoTable
