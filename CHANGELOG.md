@@ -1,4 +1,9 @@
 
+**0.28.2**
+
+TypeScript generation uses interfaces
+
+
 **0.28.1**
 
 added TypeScript generation

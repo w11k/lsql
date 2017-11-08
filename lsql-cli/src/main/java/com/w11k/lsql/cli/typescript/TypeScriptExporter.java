@@ -46,7 +46,7 @@ public class TypeScriptExporter {
 
     private void exportTable(StringBuilder content, TableLike table) {
         content.append("export namespace schema_").append(table.getSchemaName()).append(" {\n");
-        content.append("    export class ").append(firstCharUpperCase(table.getTableName())).append(" {\n");
+        content.append("    export interface ").append(firstCharUpperCase(table.getTableName())).append(" {\n");
         this.exportColumns(content, table);
         content.append("    }\n");
         content.append("}\n\n");
