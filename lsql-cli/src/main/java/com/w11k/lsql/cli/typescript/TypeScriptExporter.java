@@ -7,10 +7,18 @@ import com.w11k.lsql.cli.CodeGenUtils;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 
 public class TypeScriptExporter {
+
+    private static final List<String> RESERVED_TS_NAMES = newArrayList(
+            "public",
+            "private",
+            "protected"
+    );
 
     private final LinkedList<? extends TableLike> tables;
 
@@ -45,11 +53,16 @@ public class TypeScriptExporter {
     }
 
     private void exportTable(StringBuilder content, TableLike table) {
-        content.append("export namespace schema_").append(table.getSchemaName()).append(" {\n");
+        content.append("export namespace ").append(mayPrefixSchemaName(table)).append(" {\n");
         content.append("    export interface ").append(firstCharUpperCase(table.getTableName())).append(" {\n");
         this.exportColumns(content, table);
         content.append("    }\n");
         content.append("}\n\n");
+    }
+
+    private String mayPrefixSchemaName(TableLike table) {
+        String schema = table.getSchemaName();
+        return RESERVED_TS_NAMES.contains(schema) ? schema + "_" : schema;
     }
 
     private void exportColumns(StringBuilder content, TableLike table) {
@@ -70,16 +83,15 @@ public class TypeScriptExporter {
             return "string";
         } else if (Integer.class.isAssignableFrom(javaType)) {
             return "number";
-        }  else if (Long.class.isAssignableFrom(javaType)) {
+        } else if (Long.class.isAssignableFrom(javaType)) {
             return "number";
-        }  else if (Float.class.isAssignableFrom(javaType)) {
+        } else if (Float.class.isAssignableFrom(javaType)) {
             return "number";
-        }  else if (Double.class.isAssignableFrom(javaType)) {
+        } else if (Double.class.isAssignableFrom(javaType)) {
             return "number";
         } else if (Boolean.class.isAssignableFrom(javaType)) {
             return "boolean";
         }
-
 
         return "any";
     }

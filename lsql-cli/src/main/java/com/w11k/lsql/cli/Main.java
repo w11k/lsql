@@ -7,6 +7,7 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.TableLike;
 import com.w11k.lsql.cli.java.JavaExporter;
 import com.w11k.lsql.cli.java.StatementFileExporter;
+import com.w11k.lsql.cli.java.StatementRowColumnContainer;
 import com.w11k.lsql.cli.typescript.TypeScriptExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 
@@ -69,7 +70,7 @@ public class Main {
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
-        LinkedList<? extends TableLike> tables = Lists.newLinkedList(lSql.getTables());
+        LinkedList<TableLike> tables = Lists.newLinkedList(lSql.getTables());
 
         if (this.outDirJava != null) {
             String packageFolder = this.packageName.replaceAll("\\.", File.separator);
@@ -90,9 +91,14 @@ public class Main {
         }
 
         if (this.outDirTypeScript != null) {
+            // add statement rows
+            for (StatementFileExporter statementFileExporter : this.statementFileExporters) {
+                List<StatementRowColumnContainer> statementRows = statementFileExporter.getStatementRows();
+                tables.addAll(statementRows);
+            }
+
             TypeScriptExporter tse = new TypeScriptExporter(tables);
             File outDirTs = new File(this.outDirTypeScript);
-//            tse.setPackageName(this.packageName);
             tse.setOutputDir(outDirTs);
             tse.export();
         }

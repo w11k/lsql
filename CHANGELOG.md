@@ -4,6 +4,10 @@
 TypeScript generation uses interfaces
 
 
+**0.28.2**
+
+include statement rows in TypeScript export
+
 **0.28.1**
 
 added TypeScript generation

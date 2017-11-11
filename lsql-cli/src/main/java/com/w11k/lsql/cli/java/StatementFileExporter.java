@@ -150,6 +150,10 @@ public final class StatementFileExporter {
         return new File(packageFolder, className + ".java");
     }
 
+    public List<StatementRowColumnContainer> getStatementRows() {
+        return statementRows;
+    }
+
     private String getPackageNameFromStmtPath(String sqlStatementsRootDir, File sourceFile) {
         String filePath = sourceFile.getAbsolutePath();
         int start = filePath.lastIndexOf(sqlStatementsRootDir) + sqlStatementsRootDir.length();
