@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import rx.Observable;
+import rx.functions.Func1;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,14 @@ public abstract class TypedStatementQuery<T> {
 
     public List<T> toList() {
         return this.toStream().toList().toBlocking().first();
+    }
+
+    public <R> List<R> map(Func1<T, R> fn) {
+        return this.toStream()
+                .map(fn)
+                .toList()
+                .toBlocking()
+                .first();
     }
 
     public Optional<T> first() {

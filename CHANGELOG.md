@@ -1,4 +1,9 @@
 
+**0.28.4**
+
+Added convenience map method to TypedStatementQuery
+
+
 **0.28.2**
 
 TypeScript generation uses interfaces
