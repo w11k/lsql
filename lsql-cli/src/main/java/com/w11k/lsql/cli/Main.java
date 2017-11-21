@@ -78,7 +78,7 @@ public class Main {
             outputRootPackageDir.mkdirs();
             assert outputRootPackageDir.isDirectory();
 
-            JavaExporter javaExporter = new JavaExporter(tables);
+            JavaExporter javaExporter = new JavaExporter(lSql, tables);
             javaExporter.setPackageName(this.packageName);
             javaExporter.setOutputRootPackageDir(outputRootPackageDir);
             javaExporter.setGuice(this.guice);

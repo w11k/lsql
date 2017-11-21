@@ -8,8 +8,8 @@ import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 
 public class TableExporter extends AbstractTableBasedExporter {
 
-    public TableExporter(TableLike tableLike, JavaExporter javaExporter) {
-        super(tableLike, javaExporter);
+    public TableExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
+        super(lSql, tableLike, javaExporter);
     }
 
     @Override
@@ -23,8 +23,16 @@ public class TableExporter extends AbstractTableBasedExporter {
         content.append(" {\n\n");
 
         contentConstructor();
+        contentStaticFieldName();
 
         content.append("}");
+    }
+
+    private void contentStaticFieldName() {
+        content.append("    public static final String NAME = ")
+                .append("\"")
+                .append(this.getTableLike().getSchemaAndTableName())
+                .append("\";\n\n");
     }
 
     @Override

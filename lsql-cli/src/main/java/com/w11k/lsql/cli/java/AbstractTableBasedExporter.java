@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.java;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.w11k.lsql.Column;
+import com.w11k.lsql.LSql;
 import com.w11k.lsql.TableLike;
 
 import java.io.File;
@@ -20,13 +21,16 @@ abstract public class AbstractTableBasedExporter {
 
     protected final String constructorCallArgs;
 
+    private final LSql lSql;
+
     private final TableLike tableLike;
 
     protected final JavaExporter javaExporter;
 
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractTableBasedExporter(TableLike cc, JavaExporter javaExporter) {
+    public AbstractTableBasedExporter(LSql lSql, TableLike cc, JavaExporter javaExporter) {
+        this.lSql = lSql;
         this.tableLike = cc;
         this.javaExporter = javaExporter;
         this.columns = Lists.newLinkedList(cc.getColumns().values());
@@ -34,6 +38,10 @@ abstract public class AbstractTableBasedExporter {
 
         this.structuralTypingFields = createStructuralTypingFieldList();
         this.constructorCallArgs = Joiner.on(",").join(columns.stream().map(Column::getJavaColumnName).collect(toList()));
+    }
+
+    public LSql getlSql() {
+        return lSql;
     }
 
     public TableLike getTableLike() {

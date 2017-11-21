@@ -2,16 +2,18 @@ package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Joiner;
 import com.w11k.lsql.Column;
+import com.w11k.lsql.LSql;
 import com.w11k.lsql.TableLike;
 import com.w11k.lsql.TableRow;
 
+import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 import static java.util.stream.Collectors.toList;
 
 public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
-    public JavaRowClassExporter(TableLike tableLike, JavaExporter javaExporter) {
-        super(tableLike, javaExporter);
+    public JavaRowClassExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
+        super(lSql, tableLike, javaExporter);
     }
 
     public void createContent() {
@@ -32,6 +34,7 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
         for (Column column : this.columns) {
             contentSeperator();
             Class<?> javaType = column.getConverter().getJavaType();
+            contentStaticFieldName(column);
             contentField(column, javaType);
             content.append("\n");
             contentGetterSetterForField(column);
@@ -190,6 +193,15 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
                     .append("\");\n");
         }
         content.append("    }\n");
+    }
+
+    private void contentStaticFieldName(Column column) {
+        String staticName = this.getlSql().getJavaCaseFormat().to(UPPER_UNDERSCORE, column.getJavaColumnName());
+
+        content.append("    public static final String ").append(staticName).append(" = ")
+                .append("\"")
+                .append(column.getJavaColumnName())
+                .append("\";\n\n");
     }
 
     private void contentField(Column column, Class<?> javaType) {

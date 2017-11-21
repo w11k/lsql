@@ -132,7 +132,7 @@ public final class StatementFileExporter {
     private void exportStatementRowClasses(Set<StructuralTypingField> structuralTypingFields) {
         for (StatementRowColumnContainer statementRow : this.statementRows) {
             StatementRowExporter stmtInRowClass = new StatementRowExporter(
-                    statementRow, this.javaExporter);
+                    this.lSql, statementRow, this.javaExporter);
 
             structuralTypingFields.addAll(stmtInRowClass.getStructuralTypingFields());
             stmtInRowClass.export();

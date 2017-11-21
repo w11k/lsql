@@ -2,6 +2,7 @@ package com.w11k.lsql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -269,6 +270,10 @@ public class LSql {
 
     public String identifierJavaToSql(String javaName) {
         return this.dialect.getIdentifierConverter().javaToSql(javaName);
+    }
+
+    public CaseFormat getJavaCaseFormat() {
+        return this.dialect.getIdentifierConverter().getToCaseFormat();
     }
 
     public Converter getConverterForSqlType(int sqlType) {

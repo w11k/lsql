@@ -20,17 +20,18 @@ public class TypedTable<T extends TableRow, I> {
         }
     }
 
-    public Optional<Object> insert(T row) {
+    @SuppressWarnings("unchecked")
+    public Optional<I> insert(T row) {
         Map<String, Object> map = row.toMap();
 
         // Remove null values so that the DB can insert the default values
         map.entrySet().removeIf(entry -> entry.getValue() == null);
 
-        return this.table.insert(new Row(map));
+        return (Optional<I>) this.table.insert(new Row(map));
     }
 
     public T insertAndLoad(T row) {
-        Optional<Object> pk = this.insert(row);
+        Optional<I> pk = this.insert(row);
         if (pk.isPresent()) {
             return this.load(pk.get()).get();
         } else {
@@ -38,7 +39,7 @@ public class TypedTable<T extends TableRow, I> {
         }
     }
 
-    public Optional<T> load(Object id) {
+    public Optional<T> load(I id) {
         Optional<LinkedRow> row = this.table.load(id);
         if (!row.isPresent()) {
             return Optional.absent();

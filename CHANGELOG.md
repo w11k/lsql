@@ -1,4 +1,9 @@
 
+**0.28.6**
+
+Generated classes `TableRow` and `TypedTable` now contain the table and column names as static fields
+
+
 **0.28.4**
 
 Added convenience map method to TypedStatementQuery
@@ -8,14 +13,13 @@ Added convenience map method to TypedStatementQuery
 
 TypeScript generation uses interfaces
 
-
-**0.28.2**
-
 include statement rows in TypeScript export
+
 
 **0.28.1**
 
 added TypeScript generation
+
 
 **0.28.0**
 

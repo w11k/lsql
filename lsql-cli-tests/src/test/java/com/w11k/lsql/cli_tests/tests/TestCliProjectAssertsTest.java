@@ -2,6 +2,8 @@ package com.w11k.lsql.cli_tests.tests;
 
 import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.Row;
+import com.w11k.lsql.Table;
 import com.w11k.lsql.cli.tests.TestCliConfig;
 import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.LoadPersonsByAgeAndFirstNameRow;
 import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.Stmts2;
@@ -36,6 +38,25 @@ public final class TestCliProjectAssertsTest {
         ds.setDefaultAutoCommit(false);
         Connection connection = ds.getConnection();
         this.lSql = new LSql(TestCliConfig.class, ConnectionProviders.fromInstance(connection));
+    }
+
+    @Test
+    public void useStaticUtilFields() {
+        createTables(lSql);
+
+        // insert with static util fields
+        Table table = this.lSql.table(Person1Table.NAME);
+        Row person1Row = Row.fromKeyVals(
+                Person1Row.ID, 1,
+                Person1Row.FIRST_NAME, "a"
+        );
+        table.insert(person1Row);
+
+        // valid
+        Person1Table person1Table = new Person1Table(this.lSql);
+        Person1Row loaded = person1Table.load(1).get();
+        assertEquals(loaded.getId(), new Integer(1));
+        assertEquals(loaded.getFirstName(), "a");
     }
 
     @Test
@@ -93,8 +114,8 @@ public final class TestCliProjectAssertsTest {
         createTables(lSql);
 
         Person1Table person1Table = new Person1Table(lSql);
-        Optional<Object> pk = person1Table.insert(new Person1Row().withId(1).withFirstName("a"));
-        assertEquals(pk.get(), 1);
+        Optional<Integer> pk = person1Table.insert(new Person1Row().withId(1).withFirstName("a"));
+        assertEquals(pk.get(), new Integer(1));
     }
 
     @Test
