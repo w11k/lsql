@@ -14,10 +14,22 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.w11k.lsql.jdbc.ConnectionUtils.getConnection;
+import static java.util.stream.Collectors.toList;
 
 public class StatementCreator {
+
+    private String escapeColumnSymbol = "\"";
+
+    public StatementCreator() {
+    }
+
+    public StatementCreator(String escapeColumnSymbol) {
+        this.escapeColumnSymbol = escapeColumnSymbol;
+    }
 
     public Statement createStatement(LSql lSql) {
         try {
@@ -76,13 +88,13 @@ public class StatementCreator {
 
         // new values
         sql += Joiner.on(",").join(Lists.transform(
-          createSqlColumnNames(table, columns),
-          new Function<String, Object>() {
-              @Override
-              public Object apply(String input) {
-                  return input + "=?";
-              }
-          }));
+                createSqlColumnNames(table, columns),
+                new Function<String, Object>() {
+                    @Override
+                    public Object apply(String input) {
+                        return input + "=?";
+                    }
+                }));
 
         // where
         sql += " WHERE ";
@@ -143,22 +155,32 @@ public class StatementCreator {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getlSql().identifierJavaToSql(table.getSchemaAndTableName());
         String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
-        String sql = "select count(" + sqlColumnName + ") from " + sqlTableName + " where " +
-          sqlColumnName + "=?";
+
+        String sql = "select count("
+                + escapeColumnSymbol(sqlColumnName)
+                + ") from "
+                + sqlTableName
+                + " where "
+                + sqlColumnName + "=?";
         return createPreparedStatement(table.getlSql(), sql, false);
     }
 
     private String getRevisionColumnSqlIdentifier(Table table) {
-        return table.getlSql().identifierJavaToSql(table.getRevisionColumn().get().getJavaColumnName());
+        return escapeColumnName(
+                table.getlSql().identifierJavaToSql(table.getRevisionColumn().get().getJavaColumnName()));
     }
 
     private List<String> createSqlColumnNames(final Table table, List<String> columns) {
-        return Lists.transform(columns, new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                return table.getlSql().identifierJavaToSql(input);
-            }
-        });
+        return columns.stream()
+                .map(input -> escapeColumnName(table.getlSql().identifierJavaToSql(input)))
+                .collect(toList());
+    }
+
+    protected String escapeColumnName(String column) {
+        String[] split = column.split("\\.");
+        return Stream.of(split)
+                .map(e -> this.escapeColumnSymbol + e + this.escapeColumnSymbol)
+                .collect(Collectors.joining());
     }
 
 }
