@@ -9,6 +9,10 @@ import java.sql.SQLException;
 
 public class SqlServerDialect extends GenericDialect {
 
+    public SqlServerDialect() {
+        setStatementCreator(new StatementCreator("[", "]"));
+    }
+
     public Optional<Object> extractGeneratedPk(Table table,
                                                ResultSet resultSet) throws SQLException {
         ResultSetMetaData metaData = resultSet.getMetaData();

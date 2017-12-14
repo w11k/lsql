@@ -22,13 +22,15 @@ import static java.util.stream.Collectors.toList;
 
 public class StatementCreator {
 
-    private String escapeColumnSymbol = "\"";
+    private String escapeColumnSymbolLeft = "\"";
+    private String escapeColumnSymbolRight = "\"";
 
     public StatementCreator() {
     }
 
-    public StatementCreator(String escapeColumnSymbol) {
-        this.escapeColumnSymbol = escapeColumnSymbol;
+    public StatementCreator(String escapeColumnSymbolLeft, String escapeColumnSymbolRight) {
+        this.escapeColumnSymbolLeft = escapeColumnSymbolLeft;
+        this.escapeColumnSymbolRight = escapeColumnSymbolRight;
     }
 
     public Statement createStatement(LSql lSql) {
@@ -55,7 +57,7 @@ public class StatementCreator {
         String sqlTableName = table.getlSql().identifierJavaToSql(table.getSchemaAndTableName());
         String revCol = getRevisionColumnSqlIdentifier(table);
         String sql = "SELECT " + revCol + " FROM " + sqlTableName + " WHERE ";
-        sql += table.getPrimaryKeyColumn().get();
+        sql += getEscapedColumn(table.getPrimaryKeyColumn().get());
         sql += "=?";
         return createPreparedStatement(table.getlSql(), sql, false);
     }
@@ -80,7 +82,7 @@ public class StatementCreator {
         // set revision value?
         if (table.getRevisionColumn().isPresent()) {
             String revCol = getRevisionColumnSqlIdentifier(table);
-            sql += revCol + "=" + revCol + "+1";
+            sql += getEscapedColumn(revCol) + "=" + revCol + "+1";
             if (columns.size() > 0) {
                 sql += ",";
             }
@@ -109,7 +111,7 @@ public class StatementCreator {
 
         if (table.getRevisionColumn().isPresent()) {
             sql += " AND ";
-            sql += getRevisionColumnSqlIdentifier(table) + "=?";
+            sql += getEscapedColumn(getRevisionColumnSqlIdentifier(table)) + "=?";
         }
 
         sql += ";";
@@ -125,11 +127,11 @@ public class StatementCreator {
             if (column.isIgnored()) {
                 continue;
             }
-            sql += column.getSqlColumnName();
+            sql += getEscapedColumn(column.getSqlColumnName());
             sql += ",";
         }
         sql = sql.substring(0, sql.length() - 1);
-        sql += " FROM " + sqlTableName + " WHERE " + sqlColumnName + "=?;";
+        sql += " FROM " + sqlTableName + " WHERE " + getEscapedColumn(sqlColumnName) + "=?;";
         return sql;
     }
 
@@ -141,7 +143,7 @@ public class StatementCreator {
         String sql = "DELETE FROM ";
         sql += sqlTableName;
         sql += " WHERE ";
-        sql += sqlIdName + "=?";
+        sql += getEscapedColumn(sqlIdName) + "=?";
         if (table.getRevisionColumn().isPresent()) {
             String sqlRevisionName = getRevisionColumnSqlIdentifier(table);
             sql += " AND " + sqlRevisionName + "=?";
@@ -157,29 +159,34 @@ public class StatementCreator {
         String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
 
         String sql = "select count("
-                + escapeColumnSymbol(sqlColumnName)
+                + getEscapedColumn(sqlColumnName)
                 + ") from "
                 + sqlTableName
                 + " where "
-                + sqlColumnName + "=?";
+                + getEscapedColumn(sqlColumnName) + "=?";
         return createPreparedStatement(table.getlSql(), sql, false);
     }
 
     private String getRevisionColumnSqlIdentifier(Table table) {
-        return escapeColumnName(
+        return getEscapedColumn(
                 table.getlSql().identifierJavaToSql(table.getRevisionColumn().get().getJavaColumnName()));
     }
 
     private List<String> createSqlColumnNames(final Table table, List<String> columns) {
         return columns.stream()
-                .map(input -> escapeColumnName(table.getlSql().identifierJavaToSql(input)))
+                .map(input -> getEscapedColumn(table.getlSql().identifierJavaToSql(input)))
                 .collect(toList());
     }
 
-    protected String escapeColumnName(String column) {
+    protected String getEscapedColumn(String column) {
+        // avoid double escape
+        if (column.startsWith(this.escapeColumnSymbolLeft)) {
+            return column;
+        }
+
         String[] split = column.split("\\.");
         return Stream.of(split)
-                .map(e -> this.escapeColumnSymbol + e + this.escapeColumnSymbol)
+                .map(e -> this.escapeColumnSymbolLeft + e + this.escapeColumnSymbolRight)
                 .collect(Collectors.joining());
     }
 

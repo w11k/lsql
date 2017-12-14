@@ -1,4 +1,9 @@
 
+**0.28.7**
+
+Column names are now escaped in SQL statements to avoid conflicts with reserved keyword
+
+
 **0.28.6**
 
 Generated classes `TableRow` and `TypedTable` now contain the table and column names as static fields

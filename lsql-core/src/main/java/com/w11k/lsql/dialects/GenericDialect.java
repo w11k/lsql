@@ -98,6 +98,10 @@ public class GenericDialect {
         this.converterRegistry = converterRegistry;
     }
 
+    public void setStatementCreator(StatementCreator statementCreator) {
+        this.statementCreator = statementCreator;
+    }
+
     public StatementCreator getStatementCreator() {
         return statementCreator;
     }
