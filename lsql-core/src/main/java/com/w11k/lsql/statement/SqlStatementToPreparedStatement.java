@@ -46,8 +46,6 @@ public class SqlStatementToPreparedStatement {
 
     private final String typeAnnotation;
 
-    private final String originalSqlString;
-
     private final String sqlString;
 
     private final Map<String, List<Parameter>> parameters;
@@ -58,8 +56,7 @@ public class SqlStatementToPreparedStatement {
         this.lSql = lSql;
         this.statementName = statementName.trim();
         this.typeAnnotation = typeAnnotation.trim();
-        this.originalSqlString = sqlString;
-        this.sqlString = sqlString.replaceAll("\n", " ");
+        this.sqlString = sqlString;
         this.parameters = parseParameters();
         this.outConverters = parseOutConverters();
     }
@@ -74,10 +71,6 @@ public class SqlStatementToPreparedStatement {
 
     public String getTypeAnnotation() {
         return typeAnnotation;
-    }
-
-    public String getOriginalSqlString() {
-        return originalSqlString;
     }
 
     public String getSqlString() {

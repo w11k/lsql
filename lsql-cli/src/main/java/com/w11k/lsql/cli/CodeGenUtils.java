@@ -11,6 +11,10 @@ import java.io.IOException;
 
 public final class CodeGenUtils {
 
+    public static String escapeLineBreaks(String line) {
+        return line.replaceAll("\n", " \\\\n ");
+    }
+
     public static String firstCharUpperCase(String name) {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
