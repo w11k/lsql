@@ -151,13 +151,13 @@ public class SqlStatementToPreparedStatement {
         String left = sqlString.substring(0, start);
         left = left.trim();
 
-        Iterable<String> splitIter = Splitter.on(anyOf("!=<> ")).omitEmptyStrings().split(left);
+        Iterable<String> splitIter = Splitter.on(anyOf("!=<> \n")).omitEmptyStrings().split(left);
         ArrayList<String> strings = Lists.newArrayList(splitIter);
         String name = strings.get(strings.size() - 1);
         if (name.toUpperCase().equals("IS")) {
             name = strings.get(strings.size() - 2);
         }
-        return name;
+        return name.trim();
     }
 
     private Map<String, Converter> parseOutConverters() {

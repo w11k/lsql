@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.*;
 
 public final class TestCliProjectAssertsTest {
 
@@ -208,14 +207,32 @@ public final class TestCliProjectAssertsTest {
     public void statementDelete() throws SQLException {
         createTables(lSql);
 
+        // insert
         Person2Table person2Table = new Person2Table(lSql);
         person2Table.insert(new Person2Row()
                 .withId(1)
                 .withFirstName("a")
                 .withAge(50));
 
+        // validate insert
         Stmts2 statement = new Stmts2(lSql);
-        statement.deletePersonByFirstName().firstName("age").execute();
+        Optional<LoadPersonsByAgeAndFirstNameRow> row = statement.loadPersonsByAgeAndFirstName()
+                .firstName("a")
+                .age(50)
+                .first();
+        assertTrue(row.isPresent());
+        assertEquals(row.get().getFirstName(), "a");
+        assertEquals(row.get().getAge(), new  Integer(50));
+
+        // delete
+        statement.deletePersonByFirstName().firstName("a").execute();
+
+        // validate delete
+        row = statement.loadPersonsByAgeAndFirstName()
+                .firstName("a")
+                .age(50)
+                .first();
+        assertFalse(row.isPresent());
     }
 
 }

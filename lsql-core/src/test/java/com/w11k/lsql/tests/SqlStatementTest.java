@@ -1,5 +1,6 @@
 package com.w11k.lsql.tests;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.w11k.lsql.*;
 import com.w11k.lsql.converter.Converter;
@@ -237,7 +238,12 @@ public class SqlStatementTest extends AbstractLSqlTest {
         AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("SELECT * FROM \n" +
                 "person \n" +
                 "WHERE \n" +
-                "id = /*=*/ 99999 /**/;");
+                "id = /*=*/ 99999 /**/\n" +
+                "and age = /*: age =*/ 11 /**/\n;");
+
+        ImmutableMap<String, List<SqlStatementToPreparedStatement.Parameter>> params = statement.getParameters();
+        assertEquals(params.get("id").get(0).getName(), "id");
+        assertEquals(params.get("age").get(0).getName(), "age");
 
         List<Row> rows = statement.query("id", new QueryParameter() {
             @Override

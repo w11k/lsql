@@ -18,7 +18,7 @@ public abstract class TypedStatementCommand {
     }
 
     public void execute() {
-        this.lSql.executeQuery(this.sqlStatement).execute();
+        this.lSql.executeQuery(this.sqlStatement).execute(this.parameterValues);
     }
 
 }

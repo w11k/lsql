@@ -5,6 +5,7 @@ select
 from person2
 where
 age = /*=*/ 100 /**/
+-- test comment embedded
 and first_name = /*: string =*/ 'name' /**/
 ;
 
