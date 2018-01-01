@@ -1,4 +1,10 @@
 
+**0.29.0**
+
+- made code generation more robust
+- fixed missing parameter passing in TypedStatementCommands
+
+
 **0.28.7**
 
 Column names are now escaped in SQL statements to avoid conflicts with reserved keyword
