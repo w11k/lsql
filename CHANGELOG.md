@@ -1,4 +1,9 @@
 
+**0.29.3**
+
+- added `statement: nogen` option
+
+
 **0.29.0**
 
 - made code generation more robust

@@ -58,6 +58,10 @@ public final class StatementFileExporter {
             AbstractSqlStatement<RowQuery> query = lSqlFile.statement(stmtName);
             SqlStatementToPreparedStatement stmt = lSqlFile.getSqlStatementToPreparedStatement(stmtName);
 
+            if (stmt.getTypeAnnotation().toLowerCase().equals("nogen")) {
+                continue;
+            }
+
             // in
             TypedStatementMeta typedStatementMeta = new TypedStatementMeta(
                     lSql,
