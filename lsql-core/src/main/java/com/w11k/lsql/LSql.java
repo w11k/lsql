@@ -17,6 +17,8 @@ import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -38,6 +40,8 @@ import static com.google.common.collect.Iterators.getLast;
 public class LSql {
 
     static public final ObjectMapper OBJECT_MAPPER = CREATE_DEFAULT_JSON_MAPPER_INSTANCE();
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<String, Table> tables = Maps.newHashMap();
 
@@ -189,12 +193,18 @@ public class LSql {
         DatabaseMetaData md = con.getMetaData();
 
         ResultSet tables = md.getTables(null, null, null, new String[]{"TABLE"});
-        while (tables.next()) {
-            String sqlTableName = tables.getString(3);
-            String javaTableName = identifierSqlToJava(sqlTableName);
-            table(javaTableName);
+        try {
+            while (tables.next()) {
+                String sqlTableName = tables.getString(3);
+                String javaTableName = identifierSqlToJava(sqlTableName);
+                Table table = table(javaTableName);
+                this.logger.debug("Reading table " + table.getSchemaAndTableName());
+            }
+        } catch (Exception e) {
+            this.logger.warn(e.getMessage());
         }
     }
+
 
     /**
      * Executes the SQL string.
