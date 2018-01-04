@@ -6,7 +6,7 @@ import com.w11k.lsql.TypedStatementCommand;
 import com.w11k.lsql.TypedStatementQuery;
 
 import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
-import static com.w11k.lsql.cli.CodeGenUtils.escapeLineBreaks;
+import static com.w11k.lsql.cli.CodeGenUtils.escapeSqlStringForJavaSourceFile;
 
 public final class TypedStatementExporter {
 
@@ -60,7 +60,7 @@ public final class TypedStatementExporter {
         content.append("        private ").append(queryClassName).append("(")
                 .append(LSql.class.getCanonicalName()).append(" lSql) {\n")
                 .append("            super(lSql,")
-                .append("\"").append(escapeLineBreaks(this.typedStatementMeta.getStatement().getSqlString())).append("\")")
+                .append("\"").append(escapeSqlStringForJavaSourceFile(this.typedStatementMeta.getStatement().getSqlString())).append("\")")
                 .append(";\n")
                 .append("        }\n\n");
 

@@ -1,4 +1,9 @@
 
+**0.29.6**
+
+escape quotes in SQL statements during TypedStatement export
+
+
 **0.29.5**
 
 Row class fields are now `public final` instead of `private`

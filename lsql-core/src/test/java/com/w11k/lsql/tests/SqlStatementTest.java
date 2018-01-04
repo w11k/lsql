@@ -404,6 +404,20 @@ public class SqlStatementTest extends AbstractLSqlTest {
     }
 
     @Test()
+    public void resultSetTypeAnnotationsWithQuotedIdentifier() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+                "select count(id) as \"count_id\" /*:string*/, max(age) as \"max_age\" /*:long*/ from person;");
+        RowQuery query = statement.query();
+        List<Row> rows = query.toList();
+        assertEquals(rows.size(), 1);
+        Row row = rows.get(0);
+        assertTrue(row.get("countId") instanceof String);
+        assertTrue(row.get("maxAge") instanceof Long);
+    }
+
+    @Test()
     public void explicitParameterConverter() {
         setup();
 

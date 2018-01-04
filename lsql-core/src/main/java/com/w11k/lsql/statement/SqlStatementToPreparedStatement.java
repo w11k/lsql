@@ -1,6 +1,5 @@
 package com.w11k.lsql.statement;
 
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -23,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.CharMatcher.anyOf;
+import static com.google.common.base.Splitter.on;
 import static com.google.common.collect.Lists.newLinkedList;
 
 public class SqlStatementToPreparedStatement {
@@ -151,7 +151,7 @@ public class SqlStatementToPreparedStatement {
         String left = sqlString.substring(0, start);
         left = left.trim();
 
-        Iterable<String> splitIter = Splitter.on(anyOf("!=<> \n")).omitEmptyStrings().split(left);
+        Iterable<String> splitIter = on(anyOf("!=<> \n")).omitEmptyStrings().split(left);
         ArrayList<String> strings = Lists.newArrayList(splitIter);
         String name = strings.get(strings.size() - 1);
         if (name.toUpperCase().equals("IS")) {
@@ -165,13 +165,18 @@ public class SqlStatementToPreparedStatement {
 
         Map<String, Converter> converters = Maps.newHashMap();
         while (matcher.find()) {
+            // find word left from OUT_TYPE_ANNOTATION
             String alias = matcher.group(2);
-            String beforeAlias = this.sqlString.substring(0, matcher.start(1)).trim();
+            String textBeforeAlias = this.sqlString.substring(0, matcher.start(1)).trim();
+            LinkedList<String> wordsBeforeAlias = newLinkedList(on(anyOf(" ,\t")).split(textBeforeAlias));
+            String wordLeft = wordsBeforeAlias.getLast();
 
-            LinkedList<String> strings = newLinkedList(Splitter.on(anyOf(" ,\t")).split(beforeAlias));
-            String last = strings.getLast();
+            // unquote ResultSet column alias
+            if (wordLeft.startsWith("\"") && wordLeft.endsWith("\"")) {
+                wordLeft = wordLeft.substring(1, wordLeft.length() - 1);
+            }
 
-            String javaColumnName = this.getlSql().identifierSqlToJava(last);
+            String javaColumnName = this.getlSql().identifierSqlToJava(wordLeft);
             Converter converter = this.getlSql().getConverterForAlias(alias);
             converters.put(javaColumnName, converter);
         }
