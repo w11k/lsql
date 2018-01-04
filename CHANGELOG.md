@@ -1,4 +1,8 @@
 
+**0.29.5**
+
+Row class fields are now `public final` instead of `private`
+
 **0.29.3**
 
 - added `statement: nogen` option
