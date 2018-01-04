@@ -153,7 +153,13 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
     private void contentConstructors() {
         // empty constructor
-        content.append("    public ").append(getClassName()).append("() {}\n\n");
+        content.append("    public ").append(getClassName()).append("() {\n");
+        for (Column column : columns) {
+            content.append("        ")
+                    .append("this.").append(column.getJavaColumnName())
+                    .append(" = null;\n");
+        }
+        content.append("    }\n\n");
 
         // constructor with field initializer
         if (this.columns.size() > 0) {
@@ -198,15 +204,16 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
     private void contentStaticFieldName(Column column) {
         String staticName = this.getlSql().getJavaCaseFormat().to(UPPER_UNDERSCORE, column.getJavaColumnName());
 
-        content.append("    public static final String ").append(staticName).append(" = ")
+        content.append("    public static final String COL_").append(staticName).append(" = ")
                 .append("\"")
                 .append(column.getJavaColumnName())
                 .append("\";\n\n");
     }
 
     private void contentField(Column column, Class<?> javaType) {
-        content.append("    private ");
-        content.append(javaType.getCanonicalName()).append(" ").append(column.getJavaColumnName()).append(";\n");
+        content.append("    public final ");
+        content.append(javaType.getCanonicalName()).append(" ").append(column.getJavaColumnName());
+        content.append(";\n");
     }
 
     private void contentGetterSetterForField(Column column) {
@@ -214,7 +221,6 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
         content.append("    public ");
         content.append(column.getConverter().getJavaType().getCanonicalName());
         content.append(" ");
-
         boolean isBool = Boolean.class.isAssignableFrom(column.getConverter().getJavaType());
         String prefix = isBool ? "is" : "get";
         content.append(prefix).append(firstCharUpperCase(column.getJavaColumnName())).append("() {\n");

@@ -46,8 +46,8 @@ public final class TestCliProjectAssertsTest {
         // insert with static util fields
         Table table = this.lSql.table(Person1Table.NAME);
         Row person1Row = Row.fromKeyVals(
-                Person1Row.ID, 1,
-                Person1Row.FIRST_NAME, "a"
+                Person1Row.COL_ID, 1,
+                Person1Row.COL_FIRST_NAME, "a"
         );
         table.insert(person1Row);
 

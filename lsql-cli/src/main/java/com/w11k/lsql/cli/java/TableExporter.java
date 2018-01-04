@@ -25,7 +25,7 @@ public class TableExporter extends AbstractTableBasedExporter {
         contentConstructor();
         contentStaticFieldName();
 
-        content.append("}");
+        content.append("}\n");
     }
 
     private void contentStaticFieldName() {
