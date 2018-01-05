@@ -4,5 +4,3 @@
 # IntelliJ
 *.iml
 .idea
-
-lsql-cli-tests/src/generated
