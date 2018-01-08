@@ -24,7 +24,7 @@ public abstract class TypedStatementQuery<T> {
     }
 
     public Observable<T> toStream() {
-        return this.lSql.executeQuery(this.sqlStatement)
+        return this.lSql.createSqlStatement(this.sqlStatement)
                 .query(this.parameterValues)
                 .rx()
                 .map(this::createTypedRow);

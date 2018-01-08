@@ -42,6 +42,8 @@ public class SqlStatementToPreparedStatement {
 
     private final LSql lSql;
 
+    private final String statementSourceName;
+
     private final String statementName;
 
     private final String typeAnnotation;
@@ -52,8 +54,9 @@ public class SqlStatementToPreparedStatement {
 
     private final Map<String, Converter> outConverters;
 
-    public SqlStatementToPreparedStatement(LSql lSql, String statementName, String typeAnnotation, String sqlString) {
+    public SqlStatementToPreparedStatement(LSql lSql, String statementSourceName, String statementName, String typeAnnotation, String sqlString) {
         this.lSql = lSql;
+        this.statementSourceName = statementSourceName;
         this.statementName = statementName.trim();
         this.typeAnnotation = typeAnnotation.trim();
         this.sqlString = sqlString;
@@ -193,13 +196,13 @@ public class SqlStatementToPreparedStatement {
                     return o1.compareToIgnoreCase(o2);
                 }
             });
-            String msg = "Executing statement '" + this.statementName + "' with parameters:\n";
+            String msg = "Executing statement '" + getDescriptiveStatementName() + "' with parameters:\n";
             for (String key : keys) {
                 msg += String.format("%15s = %s\n", key, queryParameters.get(key));
             }
             this.logger.trace(msg);
         } else if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Executing statement '{}' with parameters {}", this.statementName, queryParameters.keySet());
+            this.logger.debug("Executing statement '{}' with parameters {}", getDescriptiveStatementName(), queryParameters.keySet());
         }
     }
 
@@ -314,6 +317,10 @@ public class SqlStatementToPreparedStatement {
         }
 
         return ps;
+    }
+
+    private String getDescriptiveStatementName() {
+        return this.statementSourceName + "#" + this.statementName;
     }
 
     public static final class Parameter {

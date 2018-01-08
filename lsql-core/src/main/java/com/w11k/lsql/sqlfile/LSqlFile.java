@@ -35,15 +35,15 @@ public class LSqlFile {
 
     private final LSql lSql;
 
-    private final String nameForDescription; // without .sql extension
+    private final String fileNameForDescription; // without .sql extension
 
     private final String path;
 
     private final Map<String, SqlStatementToPreparedStatement> statements = Maps.newHashMap();
 
-    public LSqlFile(LSql lSql, String nameForDescription, String path) {
+    public LSqlFile(LSql lSql, String fileNameForDescription, String path) {
         this.lSql = lSql;
-        this.nameForDescription = nameForDescription;
+        this.fileNameForDescription = fileNameForDescription;
         this.path = path;
         parseSqlStatements();
     }
@@ -70,7 +70,7 @@ public class LSqlFile {
         return new AbstractSqlStatement<PojoQuery<T>>(stmtToPs) {
             @Override
             protected PojoQuery<T> createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
-                return new PojoQuery<T>(LSqlFile.this.lSql, ps, pojoClass, outConverters);
+                return new PojoQuery<>(LSqlFile.this.lSql, ps, pojoClass, outConverters);
             }
         };
     }
@@ -90,7 +90,7 @@ public class LSqlFile {
     // ----- private -----
 
     private void parseSqlStatements() {
-        logger.info("Reading SQL file '" + nameForDescription + "'");
+        logger.info("Reading SQL file '" + fileNameForDescription + "'");
         statements.clear();
 
         // a) try to load path via classloader
@@ -115,12 +115,12 @@ public class LSqlFile {
                     continue;
                 }
 
-                String name = startMatcher.group(1);
+                String stmtName = startMatcher.group(1);
                 String typeAnnotation = "";
-                if (name.contains(":")) {
-                    int idxColon = name.indexOf(":");
-                    typeAnnotation = name.substring(idxColon + 1);
-                    name = name.substring(0, idxColon);
+                if (stmtName.contains(":")) {
+                    int idxColon = stmtName.indexOf(":");
+                    typeAnnotation = stmtName.substring(idxColon + 1);
+                    stmtName = stmtName.substring(0, idxColon);
                 }
 
                 String sub = content.substring(startMatcher.end());
@@ -128,15 +128,16 @@ public class LSqlFile {
                 if (!endMatcher.find()) {
                     throw new IllegalStateException(
                             "Could not find the end of the SQL expression '" +
-                                    name + "'. Did you add ';' at the end?");
+                                    stmtName + "'. Did you add ';' at the end?");
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
                 endOfLastMatch = startMatcher.start() + (startMatcher.end() - startMatcher.start()) + endMatcher.end();
 
                 if (!this.areAllLinesCommented(sub)) {
-                    logger.debug("Found SQL statement '{}'", name);
-                    SqlStatementToPreparedStatement stmt = new SqlStatementToPreparedStatement(lSql, name, typeAnnotation, sub);
-                    statements.put(name, stmt);
+                    logger.debug("Found SQL statement '{}'", stmtName);
+                    SqlStatementToPreparedStatement stmt = new SqlStatementToPreparedStatement(
+                            lSql, fileNameForDescription, stmtName, typeAnnotation, sub);
+                    statements.put(stmtName, stmt);
                 }
             }
         } catch (IOException e) {

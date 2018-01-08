@@ -182,7 +182,7 @@ public class LSql {
     @SuppressWarnings("unchecked")
     public synchronized <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
         if (!this.pojoTables.containsKey(pojoClass)) {
-            this.pojoTables.put(pojoClass, new PojoTable<T>(table(tableName), pojoClass));
+            this.pojoTables.put(pojoClass, new PojoTable<>(table(tableName), pojoClass));
         }
 
         return (PojoTable<T>) this.pojoTables.get(pojoClass);
@@ -224,16 +224,19 @@ public class LSql {
      * Executes the SQL SELECT string. Useful for simple queries.
      * {@link LSqlFile}s should be used for complex queries.
      *
+     * Deprecated: Use LSql#createSqlStatement() instead.
+     *
      * @param sql the SQL SELECT string
      * @return the Query instance
      */
+    @Deprecated
     public RowQuery executeRawQuery(String sql) {
-        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "<raw>", "", sql);
+        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "LSql", "executeRawQuery", "", sql);
 
         try {
             return new RowQuery(
                     this,
-                    st.createPreparedStatement(Collections.<String, Object>emptyMap(), null),
+                    st.createPreparedStatement(Collections.emptyMap(), null),
                     st.getOutConverters());
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -244,17 +247,20 @@ public class LSql {
      * Executes the SQL SELECT string. Useful for simple queries.
      * {@link LSqlFile}s should be used for complex queries.
      *
-     * @param sql       the SQL SELECT string
+     * Deprecated: Use LSql#createSqlStatement() instead.
+     *
+     * * @param sql       the SQL SELECT string
      * @param pojoClass the POJO class
      * @return the Query instance
      */
+    @Deprecated
     public <T> PojoQuery<T> executeRawQuery(String sql, Class<T> pojoClass) {
-        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "<raw>", "", sql);
+        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "LSql", "executeRawQuery", "", sql);
 
         try {
-            return new PojoQuery<T>(
+            return new PojoQuery<>(
                     this,
-                    st.createPreparedStatement(Collections.<String, Object>emptyMap(), null),
+                    st.createPreparedStatement(Collections.emptyMap(), null),
                     pojoClass,
                     st.getOutConverters());
         } catch (SQLException e) {
@@ -262,9 +268,14 @@ public class LSql {
         }
     }
 
-    public AbstractSqlStatement<RowQuery> executeQuery(String sqlString) {
+    /**
+     * Executes the SQL statement.
+     *
+     * @param sqlString the SQL SELECT string
+     */
+    public AbstractSqlStatement<RowQuery> createSqlStatement(String sqlString) {
         final SqlStatementToPreparedStatement stmtToPs =
-                new SqlStatementToPreparedStatement(this, "executeQuery", "", sqlString);
+                new SqlStatementToPreparedStatement(this, "LSql", "createSqlStatement", "", sqlString);
 
         return new AbstractSqlStatement<RowQuery>(stmtToPs) {
             @Override

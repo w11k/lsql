@@ -42,7 +42,6 @@ public class PojoMapper<T> {
             if (declaringClass.equals(Object.class)) {
                 continue;
             }
-            setPropertyAccessible(desc);
             this.propertyDescriptors.put(desc.getName(), desc);
         }
     }
@@ -58,18 +57,20 @@ public class PojoMapper<T> {
     public Object getValue(T instance, String fieldName) {
         PropertyDescriptor descriptor = this.propertyDescriptors.get(fieldName);
         try {
+            setPropertyAccessible(descriptor);
             return descriptor.getReadMethod().invoke(instance);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("field name: " + fieldName, e);
         }
     }
 
     public void setValue(T instance, String fieldName, Object value) {
         PropertyDescriptor descriptor = this.propertyDescriptors.get(fieldName);
         try {
+            setPropertyAccessible(descriptor);
             descriptor.getWriteMethod().invoke(instance, value);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("field name: " + fieldName, e);
         }
     }
 
@@ -80,9 +81,10 @@ public class PojoMapper<T> {
     public Row pojoToRow(T pojo) {
         try {
             Row row = new Row();
-            for (PropertyDescriptor desc : this.propertyDescriptors.values()) {
-                Object value = desc.getReadMethod().invoke(pojo);
-                row.put(desc.getName(), value);
+            for (PropertyDescriptor descriptor : this.propertyDescriptors.values()) {
+                setPropertyAccessible(descriptor);
+                Object value = descriptor.getReadMethod().invoke(pojo);
+                row.put(descriptor.getName(), value);
             }
             return row;
         } catch (Exception e) {
@@ -97,9 +99,9 @@ public class PojoMapper<T> {
     }
 
     public void assignRowToPojo(Row row, T pojo) {
-        for (PropertyDescriptor desc : this.propertyDescriptors.values()) {
-            Object value = row.get(desc.getName());
-            setValue(pojo, desc.getName(), value);
+        for (PropertyDescriptor descriptor : this.propertyDescriptors.values()) {
+            Object value = row.get(descriptor.getName());
+            setValue(pojo, descriptor.getName(), value);
         }
     }
 

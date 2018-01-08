@@ -27,14 +27,14 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementNoParameter() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person").query().toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person").query().toList();
         assertEquals(rows.size(), 5);
     }
 
     @Test(expectedExceptions = QueryException.class)
     public void statementUnusedParameter() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id = /*xxxxx=*/ -1 /**/;").query(
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id = /*xxxxx=*/ -1 /**/;").query(
                 "id", 1
         ).toList();
         assertEquals(rows.size(), 1);
@@ -43,70 +43,70 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementOneParameter() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id = /*id=*/ -1 /**/;").query("id", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id = /*id=*/ -1 /**/;").query("id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneUnnamed() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id = /*=*/ -1 /**/;").query("id", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id = /*=*/ -1 /**/;").query("id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneUnnamed2() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id != /*=*/ -1 /**/;").query("id", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id != /*=*/ -1 /**/;").query("id", 1).toList();
         assertEquals(rows.size(), 4);
     }
 
     @Test
     public void statementOneUnnamed3() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id!= /*=*/ -1 /**/;").query("id", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id!= /*=*/ -1 /**/;").query("id", 1).toList();
         assertEquals(rows.size(), 4);
     }
 
     @Test
     public void statementOneUnnamedWithTableNameInQuery() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE person.id = /*=*/ -1 /**/;").query("person.id", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE person.id = /*=*/ -1 /**/;").query("person.id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterSpecialName1() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id = /*id_a=*/ -1 /**/;").query("id_a", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id = /*id_a=*/ -1 /**/;").query("id_a", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterSpecialName2() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id = /*id_1=*/ -1 /**/;").query("id_1", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id = /*id_1=*/ -1 /**/;").query("id_1", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterSpecialName3() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id = /*person.id=*/ -1 /**/;").query("person.id", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id = /*person.id=*/ -1 /**/;").query("person.id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterSpecialName4() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE id = /* person.id = */ -1 /**/;").query("person.id", 1).toList();
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE id = /* person.id = */ -1 /**/;").query("person.id", 1).toList();
         assertEquals(rows.size(), 1);
     }
 
     @Test
     public void statementOneParameterMultipleOccurence() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE " +
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE " +
                 "id > /*val=*/ 99999 /**/\n" +
                 "AND age > /*val=*/ 99999 /**/" +
                 ";")
@@ -117,7 +117,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementTwoParameters() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE " +
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE " +
                 "id = /*id=*/ -1 /**/\n" +
                 "AND age = /*age=*/ -1 /**/" +
                 ";")
@@ -131,7 +131,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementThreeParameters() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE " +
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE " +
                 "id = /*id=*/ -1 /**/\n" +
                 "AND age = /*age=*/ -1 /**/\n" +
                 "AND fullname = /*fullname=*/ 'xxx' /**/" +
@@ -147,7 +147,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementThreeParametersInOneLine() {
         setup();
-        List<Row> rows = lSql.executeQuery(
+        List<Row> rows = lSql.createSqlStatement(
                 "SELECT * FROM person WHERE " +
                         "id = /*id=*/ -1 /**/ AND age = /*age=*/ -1 /**/ AND fullname = /*fullname=*/ 'xxx' /**/;")
                 .query(
@@ -161,7 +161,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementThreeParametersUnused() {
         setup();
-        List<Row> rows = lSql.executeQuery(
+        List<Row> rows = lSql.createSqlStatement(
                 "SELECT * FROM person WHERE " +
                         "id = /*id=*/ 1 /**/ AND age = /*age=*/ 11 /**/ AND fullname = /*fullname=*/ 'a' /**/;")
                 .query().toList();
@@ -171,7 +171,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementThreeParametersUnnamed() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE " +
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE " +
                 "id = /*=*/ -1 /**/" +
                 "AND age = /*=*/ -1 /**/" +
                 "AND fullname = /*=*/ 'xxx' /**/" +
@@ -187,7 +187,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementThreeParametersUnnamedMissingSpace() {
         setup();
-        List<Row> rows = lSql.executeQuery("SELECT * FROM person WHERE " +
+        List<Row> rows = lSql.createSqlStatement("SELECT * FROM person WHERE " +
                 "id = /*=*/ -1 /**/" +
                 "AND age = /*=*/ -1 /**/" +
                 "AND fullname= /*=*/ 'xxx' /**/" +
@@ -203,7 +203,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementThreeParametersMultipleOccurences() {
         setup();
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("SELECT * FROM person WHERE " +
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement("SELECT * FROM person WHERE " +
                 "id > /*val=*/ 99999 /**/" +
                 "AND age > /*val=*/ 99999 /**/" +
                 "AND fullname= /*=*/ 'c' /**/" +
@@ -220,7 +220,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         lSql.executeRawSql("delete from person;");
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "insert into person (id, age) \n" +
                         "values ( /*id=*/ 100 /**/,/*age=*/ 100 /**/);"
         );
@@ -228,14 +228,14 @@ public class SqlStatementTest extends AbstractLSqlTest {
         statement.execute("id", 100, "age", 100);
         statement.execute("id", 101, "age", 101);
 
-        List<Row> rows = lSql.executeQuery("select * from person").query().toList();
+        List<Row> rows = lSql.createSqlStatement("select * from person").query().toList();
         assertEquals(rows.size(), 2);
     }
 
     @Test
     public void statementQueryParameter() {
         setup();
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("SELECT * FROM \n" +
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement("SELECT * FROM \n" +
                 "person \n" +
                 "WHERE \n" +
                 "id = /*=*/ 99999 /**/\n" +
@@ -258,7 +258,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void nullValueAsQueryParameter() {
         createTable();
         insert(0, 50, null);
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "SELECT * FROM person WHERE fullname IS /*=*/ NULL /**/;");
 
         List<Row> rows = statement.query("fullname", null).toList();
@@ -269,7 +269,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void nullValueAsNamedQueryParameter() {
         createTable();
         insert(0, 50, null);
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "SELECT * FROM person WHERE fullname IS /*aaa=*/ NULL /**/;");
 
         List<Row> rows = statement.query("aaa", null).toList();
@@ -281,7 +281,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         List<Row> rows;
 
-        AbstractSqlStatement<RowQuery> statement = this.lSql.executeQuery("select * from person where " +
+        AbstractSqlStatement<RowQuery> statement = this.lSql.createSqlStatement("select * from person where " +
                 "age in (/*ages=*/ 11, 12, 13 /**/) " +
                 "and 1 = /*param=*/ 1 /**/;");
 
@@ -336,7 +336,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         List<Row> rows;
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("select * from person where" +
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement("select * from person where" +
                 " age in (/*ages=*/ 11, 12, 13 /**/) " +
                 "and 1 = /*param=*/ 1 /**/;");
 
@@ -360,7 +360,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void listLiteralQueryParameterWithPlaceholderStrings() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("select * from person where" +
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement("select * from person where" +
                 " fullname in (/*fullnames=*/ 'a', 'b', 'c' /**/) ;");
 
         List<Row> rows = statement.query("fullnames", ListLiteralQueryParameter.of("a", "x")).toList();
@@ -377,7 +377,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         List<Row> rows;
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery("select * from person where" +
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement("select * from person where" +
                 " age in (/*ages=*/ 11, 12, 13 /**/) " +
                 "and 1 = /*param=*/ 1 /**/;");
 
@@ -393,7 +393,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void resultSetTypeAnnotations() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select count(id) as count_id /*:string*/, max(age) as max_age /*:long*/ from person;");
         RowQuery query = statement.query();
         List<Row> rows = query.toList();
@@ -407,7 +407,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void resultSetTypeAnnotationsWithQuotedIdentifier() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select count(id) as \"count_id\" /*:string*/, max(age) as \"max_age\" /*:long*/ from person;");
         RowQuery query = statement.query();
         List<Row> rows = query.toList();
@@ -421,7 +421,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void explicitParameterConverter() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select * from person where id = /*=*/ 1 /**/;")
                 .setParameterConverter("id", new Converter(String.class, Types.INTEGER) {
                     @Override
@@ -443,7 +443,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations1() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /*:int=*/ 18 /**/;");
 
         SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("age").get(0);
@@ -454,7 +454,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations2() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /* :  int  =*/ 18 /**/;");
 
         SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("age").get(0);
@@ -465,7 +465,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations3() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /*p1:int=*/ 18 /**/;");
 
         SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
@@ -476,7 +476,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations4() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /* p1 : int =*/ 18 /**/;");
 
         SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
@@ -487,7 +487,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotationsAreCheckedAtQueryTime() {
         setup();
 
-        AbstractSqlStatement<RowQuery> statement = lSql.executeQuery(
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /*:int =*/ 18 /**/;");
 
         statement.query("age", "3").toList();

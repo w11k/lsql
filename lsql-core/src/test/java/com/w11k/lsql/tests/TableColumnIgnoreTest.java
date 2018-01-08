@@ -22,7 +22,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
                 "firstName", "Adam"
         ));
 
-        Row row = this.lSql.executeRawQuery(PersonTestData.SELECT_ALL_ORDER_BY_ID).first().get();
+        Row row = this.lSql.createSqlStatement(PersonTestData.SELECT_ALL_ORDER_BY_ID).query().first().get();
         assertNull(row.get("firstName"));
     }
 
@@ -42,7 +42,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
         Table person = this.lSql.table("person");
         person.column("firstName").setIgnored(true);
 
-        Row row = lSql.executeRawQuery("select * from person").toList().get(0);
+        Row row = lSql.createSqlStatement("select * from person").query().toList().get(0);
         assertNull(row.get("firstName"));
     }
 
@@ -55,7 +55,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
         person.column("age").setIgnoreOnUpdate(true);
         person.column("title").setIgnoreOnUpdate(true);
 
-        Row row = lSql.executeRawQuery("select * from person").toList().get(0);
+        Row row = lSql.createSqlStatement("select * from person").query().toList().get(0);
         assertEquals(row.get("firstName"), "Adam");
         assertEquals(row.get("age"), 30);
         assertEquals(row.get("title"), "n/a");
@@ -65,7 +65,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
         row.put("title", "n/a2");
         person.update(row);
 
-        row = lSql.executeRawQuery("select * from person").toList().get(0);
+        row = lSql.createSqlStatement("select * from person").query().toList().get(0);
         assertEquals(row.get("firstName"), "Adam2");
         assertEquals(row.get("age"), 30);
         assertEquals(row.get("title"), "n/a");
