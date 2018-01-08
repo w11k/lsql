@@ -1,4 +1,4 @@
-package com.w11k.lsql.cli.tests.cli_tests_tests_subdir;
+package com.w11k.lsql.cli.tests.subdir;
 
 public class Stmts2 {
 

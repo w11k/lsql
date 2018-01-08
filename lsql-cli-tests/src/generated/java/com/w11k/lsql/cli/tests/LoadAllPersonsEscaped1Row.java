@@ -1,4 +1,4 @@
-package com.w11k.lsql.cli.tests.cli_tests_tests;
+package com.w11k.lsql.cli.tests;
 
 import com.w11k.lsql.cli.tests.*;
 

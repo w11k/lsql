@@ -19,26 +19,26 @@ export namespace public_ {
     }
 }
 
-export namespace cli_tests_tests {
+export namespace  {
     export interface LoadAllPersonsEscaped2 {
         theid: number;
     }
 }
 
-export namespace cli_tests_tests {
+export namespace  {
     export interface LoadAllPersons {
         firstName: string;
         id: number;
     }
 }
 
-export namespace cli_tests_tests {
+export namespace  {
     export interface LoadAllPersonsEscaped1 {
         theid: number;
     }
 }
 
-export namespace cli_tests_tests_subdir {
+export namespace subdir {
     export interface LoadPersonsByAgeAndFirstName {
         firstName: string;
         id: number;

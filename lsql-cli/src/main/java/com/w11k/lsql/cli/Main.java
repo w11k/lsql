@@ -51,10 +51,6 @@ public class Main {
 
         this.parseArgs(args);
 
-        log("output dir: " + this.outDirJava);
-        log("sql statements dir: " + this.sqlStatements);
-
-
         // Config
         @SuppressWarnings("unchecked")
         Class<? extends Config> configClass =
@@ -111,7 +107,9 @@ public class Main {
 
     private void processStatements(LSql lSql, JavaExporter javaExporter) {
         if (this.sqlStatements != null) {
-            Iterable<Path> children = MoreFiles.directoryTreeTraverser().preOrderTraversal(new File(this.sqlStatements).toPath());
+            Path statementRootDir = new File(this.sqlStatements).toPath();
+//            log("Reading statements in " + statementRootDir.toString());
+            Iterable<Path> children = MoreFiles.directoryTreeTraverser().preOrderTraversal(statementRootDir);
             for (Path child : children) {
                 File file = child.toFile();
                 if (file.isFile() && file.getName().endsWith(".sql")) {

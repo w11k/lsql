@@ -1,34 +1,54 @@
-package com.w11k.lsql.cli.tests.cli_tests_tests;
+package com.w11k.lsql.cli.tests.subdir;
 
 import com.w11k.lsql.cli.tests.*;
 
-public class LoadAllPersonsRow implements com.w11k.lsql.TableRow,FirstNameString,IdInteger {
+public class LoadPersonsByAgeAndFirstNameRow implements com.w11k.lsql.TableRow,AgeInteger,FirstNameString,IdInteger {
 
     @SuppressWarnings("unchecked")
     public static <T extends 
-            FirstNameString
-            & IdInteger> LoadAllPersonsRow from(T source) {
-        Object target = new LoadAllPersonsRow();
+            AgeInteger
+            & FirstNameString
+            & IdInteger> LoadPersonsByAgeAndFirstNameRow from(T source) {
+        Object target = new LoadPersonsByAgeAndFirstNameRow();
+        target = ((AgeInteger) target).withAge(source.getAge());
         target = ((FirstNameString) target).withFirstName(source.getFirstName());
         target = ((IdInteger) target).withId(source.getId());
-        return (LoadAllPersonsRow) target;
+        return (LoadPersonsByAgeAndFirstNameRow) target;
     }
 
-    public LoadAllPersonsRow() {
+    public LoadPersonsByAgeAndFirstNameRow() {
+        this.age = null;
         this.firstName = null;
         this.id = null;
     }
 
-    private LoadAllPersonsRow(
+    private LoadPersonsByAgeAndFirstNameRow(
+            java.lang.Integer age,
             java.lang.String firstName,
             java.lang.Integer id) {
+        this.age = age;
         this.firstName = firstName;
         this.id = id;
     }
 
-    public LoadAllPersonsRow(java.util.Map<String, Object> from) {
+    public LoadPersonsByAgeAndFirstNameRow(java.util.Map<String, Object> from) {
+        this.age = (java.lang.Integer) from.get("age");
         this.firstName = (java.lang.String) from.get("firstName");
         this.id = (java.lang.Integer) from.get("id");
+    }
+
+    // ------------------------------------------------------------
+
+    public static final String COL_AGE = "age";
+
+    public final java.lang.Integer age;
+
+    public java.lang.Integer getAge() {
+        return this.age;
+    }
+
+    public LoadPersonsByAgeAndFirstNameRow withAge(java.lang.Integer age) {
+        return new LoadPersonsByAgeAndFirstNameRow(age,firstName,id);
     }
 
     // ------------------------------------------------------------
@@ -41,8 +61,8 @@ public class LoadAllPersonsRow implements com.w11k.lsql.TableRow,FirstNameString
         return this.firstName;
     }
 
-    public LoadAllPersonsRow withFirstName(java.lang.String firstName) {
-        return new LoadAllPersonsRow(firstName,id);
+    public LoadPersonsByAgeAndFirstNameRow withFirstName(java.lang.String firstName) {
+        return new LoadPersonsByAgeAndFirstNameRow(age,firstName,id);
     }
 
     // ------------------------------------------------------------
@@ -55,17 +75,19 @@ public class LoadAllPersonsRow implements com.w11k.lsql.TableRow,FirstNameString
         return this.id;
     }
 
-    public LoadAllPersonsRow withId(java.lang.Integer id) {
-        return new LoadAllPersonsRow(firstName,id);
+    public LoadPersonsByAgeAndFirstNameRow withId(java.lang.Integer id) {
+        return new LoadPersonsByAgeAndFirstNameRow(age,firstName,id);
     }
 
     // ------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
     public <T extends 
-            FirstNameString
+            AgeInteger
+            & FirstNameString
             & IdInteger> T as(T targetStart) {
         Object target = targetStart;
+        target = ((AgeInteger) target).withAge(this.getAge());
         target = ((FirstNameString) target).withFirstName(this.getFirstName());
         target = ((IdInteger) target).withId(this.getId());
         return (T) target;
@@ -73,7 +95,8 @@ public class LoadAllPersonsRow implements com.w11k.lsql.TableRow,FirstNameString
 
     @SuppressWarnings("unchecked")
     public <T extends 
-            FirstNameString
+            AgeInteger
+            & FirstNameString
             & IdInteger> T as(Class<? extends T> targetClass) {
         try {
             Object target = targetClass.newInstance();
@@ -83,6 +106,7 @@ public class LoadAllPersonsRow implements com.w11k.lsql.TableRow,FirstNameString
 
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        map.put("age", this.age);
         map.put("firstName", this.firstName);
         map.put("id", this.id);
         return map;

@@ -41,7 +41,6 @@ public final class TestCliProjectGenerationTest {
 
     @Test
     public void runCli() throws SQLException, ClassNotFoundException, IOException {
-
         File genJavaDir = pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/generated/java");
         if (genJavaDir.exists()) {
             MoreFiles.deleteRecursively(genJavaDir.toPath());
@@ -67,7 +66,7 @@ public final class TestCliProjectGenerationTest {
                 "url:" + url,
                 "user:",
                 "password:",
-                "sqlStatements:" + pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/test/java/com/w11k/lsql"),
+                "sqlStatements:" + pathRelativeToProjectRoot("pom.xml", "./src/test/java/com/w11k/lsql/cli/tests"),
                 "package:" + TestCliConfig.class.getPackage().getName(),
                 "di:guice",
                 "outDirJava:" + genJavaDir.getAbsolutePath(),

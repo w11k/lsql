@@ -5,8 +5,6 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.cli.tests.TestCliConfig;
-import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.LoadPersonsByAgeAndFirstNameRow;
-import com.w11k.lsql.cli.tests.cli_tests_tests_subdir.Stmts2;
 import com.w11k.lsql.cli.tests.schema_public.Person1Row;
 import com.w11k.lsql.cli.tests.schema_public.Person1Table;
 import com.w11k.lsql.cli.tests.schema_public.Person2Row;
@@ -19,7 +17,6 @@ import org.testng.annotations.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.UUID;
 
 import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
