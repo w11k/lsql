@@ -2,7 +2,6 @@ package com.w11k.lsql;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,15 +17,15 @@ import com.w11k.lsql.validation.KeyError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newLinkedList;
 
 public class Table implements TableLike {
 
@@ -60,15 +59,6 @@ public class Table implements TableLike {
             logger.debug(msg.toString());
         }
     }
-
-//    public Map<String, Converter> getColumnConverters() {
-//        Map<String, Converter> converters = Maps.newLinkedHashMap();
-//        for (String name : this.columns.keySet()) {
-//            Column column = this.columns.get(name);
-//            converters.put(name, column.getConverter());
-//        }
-//        return converters;
-//    }
 
     public LSql getlSql() {
         return lSql;
@@ -109,6 +99,7 @@ public class Table implements TableLike {
      * @param columnName the name of the column
      * @return the column instance
      */
+    @Nullable
     public synchronized Column column(String columnName) {
         if (!columns.containsKey(columnName)) {
             return null;
@@ -117,7 +108,7 @@ public class Table implements TableLike {
     }
 
     public <T> PojoTable<T> withPojo(Class<T> pojoClass) {
-        return new PojoTable<T>(this, pojoClass);
+        return new PojoTable<>(this, pojoClass);
     }
 
     /**
@@ -276,9 +267,6 @@ public class Table implements TableLike {
      * If the passed row does not contain a primary key value, {@link #insert(Row)} will be called. If the passed
      * row contains a primary key value, it will be checked if this key is already existent in the database. If it
      * is, {@link #update(Row)} will be called, {@link #insert(Row)} otherwise.
-     *
-     * @throws InsertException
-     * @throws UpdateException
      */
     public Optional<?> save(Row row) {
         if (!primaryKeyColumn.isPresent()) {
@@ -396,8 +384,9 @@ public class Table implements TableLike {
     /**
      * @see com.w11k.lsql.Table#newLinkedRow(java.util.Map)
      */
+    @Deprecated
     public LinkedRow newLinkedRow() {
-        Map<String, Object> empty = new HashMap<String, Object>();
+        Map<String, Object> empty = new HashMap<>();
         return newLinkedRow(empty);
     }
 
@@ -493,25 +482,23 @@ public class Table implements TableLike {
 
     private List<String> createColumnList(final Row row, final boolean filterIgnoreOnUpdateColumns) {
         List<String> columns = Lists.newLinkedList(row.keySet());
-        columns = newLinkedList(filter(columns, new Predicate<String>() {
-            public boolean apply(String input) {
-                Column column = column(input);
-                if (column == null) {
-                    String message = "Column '" + input + "' does not exist in table '" + schemaAndTableName + "'. ";
-                    message += "Known columns: [";
-                    message += Joiner.on(",").join(Table.this.columns.keySet());
-                    message += "]";
-                    throw new RuntimeException(message);
-                }
-
-                if (filterIgnoreOnUpdateColumns && column.isIgnoreOnUpdate()) {
-                    return false;
-                } else {
-                    return !column.isIgnored();
-                }
-
+        columns = columns.stream().filter(input -> {
+            Column column = column(input);
+            if (column == null) {
+                String message = "Column '" + input + "' does not exist in table '" + schemaAndTableName + "'. ";
+                message += "Known columns: [";
+                message += Joiner.on(",").join(Table.this.columns.keySet());
+                message += "]";
+                throw new RuntimeException(message);
             }
-        }));
+
+            if (filterIgnoreOnUpdateColumns && column.isIgnoreOnUpdate()) {
+                return false;
+            } else {
+                return !column.isIgnored();
+            }
+
+        }).collect(Collectors.toList());
         return columns;
     }
 

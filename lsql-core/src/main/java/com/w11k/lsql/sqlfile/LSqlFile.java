@@ -64,6 +64,7 @@ public class LSqlFile {
         };
     }
 
+    @Deprecated
     public <T> AbstractSqlStatement<PojoQuery<T>> statement(String name, final Class<T> pojoClass) {
         final SqlStatementToPreparedStatement stmtToPs = getStatement(name);
         return new AbstractSqlStatement<PojoQuery<T>>(stmtToPs) {
