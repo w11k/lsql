@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.ConverterRegistry;
-import com.w11k.lsql.converter.sqltypes.*;
+import com.w11k.lsql.converter.types.*;
 import org.joda.time.DateTime;
 
 import java.sql.ResultSet;
@@ -27,6 +27,9 @@ public class GenericDialect {
 
     public GenericDialect() {
         // http://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html
+
+        // Number
+        this.converterRegistry.addConverter(new NumberConverter(), false);
 
         // int
         for (int sqlType : IntConverter.SQL_TYPES) {
@@ -75,6 +78,7 @@ public class GenericDialect {
         this.converterRegistry.addConverter(new JodaLocalDateConverter(), false);
 
         // Aliases
+        this.converterRegistry.addTypeAlias("number", Number.class);
         this.converterRegistry.addTypeAlias("int", Integer.class);
         this.converterRegistry.addTypeAlias("integer", Integer.class);
         this.converterRegistry.addTypeAlias("long", Long.class);

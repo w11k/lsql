@@ -125,10 +125,11 @@ public class SqlStatementToPreparedStatement {
                 String placeHolderValue = sqlString.substring(matcher.end(0), paramEnd).trim();
                 if (placeHolderValue.startsWith("'") && placeHolderValue.endsWith("'")) {
                     p.javaTypeAlias = "string";
+                } else if (NumberUtils.isNumber(placeHolderValue) && placeHolderValue.contains(".")) {
+                    p.javaTypeAlias = "double";
                 } else if (NumberUtils.isNumber(placeHolderValue)) {
-                    p.javaTypeAlias = "int";
+                    p.javaTypeAlias = "number";
                 }
-
             }
 
             paramEnd += QUERY_ARG_END.length();
@@ -139,7 +140,6 @@ public class SqlStatementToPreparedStatement {
             p.placeholder = "?" + Strings.repeat(" ", p.endIndex - p.startIndex - 1);
 
             List<Parameter> parametersForName = found.containsKey(p.name) ? found.get(p.name) : Lists.<Parameter>newLinkedList();
-
 
             parametersForName.add(p);
             found.put(p.name, parametersForName);

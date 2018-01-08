@@ -2,7 +2,7 @@ package com.w11k.lsql.tests;
 
 import com.w11k.lsql.Row;
 import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
-import com.w11k.lsql.converter.sqltypes.IntConverter;
+import com.w11k.lsql.converter.types.IntConverter;
 import com.w11k.lsql.query.RowQuery;
 import org.testng.annotations.Test;
 

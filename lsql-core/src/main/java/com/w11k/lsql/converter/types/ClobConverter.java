@@ -1,4 +1,4 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.converter.types;
 
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;

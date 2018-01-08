@@ -1,4 +1,13 @@
 
+**0.30.0**
+
+- in SQL statements:
+    placeholder values like "/*=*/ 1.2 /**/" are not inferred with type double
+    placeholder values like "/*=*/ 1 /**/" are not inferred with type number
+
+- new converter: NumberConverter (can only be used to set parameters in prepared statements)
+
+
 **0.29.6**
 
 escape quotes in SQL statements during TypedStatement export

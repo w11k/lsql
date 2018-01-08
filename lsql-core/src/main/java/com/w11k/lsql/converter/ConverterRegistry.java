@@ -52,6 +52,10 @@ public class ConverterRegistry {
     }
 
     public void addSqlToJavaConverter(Converter converter, boolean replaceExisting) {
+        if (converter.isWriteOnly()) {
+            return;
+        }
+
         if (!replaceExisting && this.sqlToJavaConverters.containsKey(converter.getSqlType())) {
             throw new IllegalStateException(
                     "A converter for the SQL type "

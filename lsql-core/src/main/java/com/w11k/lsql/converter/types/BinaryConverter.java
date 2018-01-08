@@ -1,4 +1,4 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.converter.types;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;

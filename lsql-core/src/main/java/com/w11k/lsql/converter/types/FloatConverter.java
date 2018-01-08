@@ -1,4 +1,4 @@
-package com.w11k.lsql.converter.sqltypes;
+package com.w11k.lsql.converter.types;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
@@ -8,24 +8,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class DoubleConverter extends Converter {
+public class FloatConverter extends Converter {
 
-    public static int[] SQL_TYPES = new int[]{
-            Types.DOUBLE, Types.REAL, Types.DECIMAL, Types.NUMERIC
-    };
-
-    public DoubleConverter(int sqlType) {
-        super(Double.class, sqlType);
+    public FloatConverter() {
+        super(Float.class, Types.FLOAT);
     }
 
     @Override
     protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
-        ps.setDouble(index, (Double) val);
+        ps.setFloat(index, (Integer) val);
     }
 
     @Override
     protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
-        return rs.getDouble(index);
+        return rs.getFloat(index);
 
     }
 }

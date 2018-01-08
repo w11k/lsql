@@ -3,6 +3,7 @@ package com.w11k.lsql.converter;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.utils.SqlTypesNames;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,11 +33,12 @@ public abstract class Converter {
 
     private final int sqlType;
 
+    private boolean writeOnly = false;
+
     public Converter(Class<?> javaType, int sqlType) {
         this.javaType = javaType;
         this.sqlType = sqlType;
     }
-
 
     public void setValueInStatement(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         if (val != null) {
@@ -62,6 +64,7 @@ public abstract class Converter {
         if (rs.wasNull()) {
             return this.getDefaultValueForNull(lSql, rs, index);
         }
+
         return getValue(lSql, rs, index);
     }
 
@@ -81,6 +84,14 @@ public abstract class Converter {
         return sqlType;
     }
 
+    public boolean isWriteOnly() {
+        return writeOnly;
+    }
+
+    public void setWriteOnly(boolean writeOnly) {
+        this.writeOnly = writeOnly;
+    }
+
     @Override
     public String toString() {
         return "Converter{" +
@@ -98,6 +109,7 @@ public abstract class Converter {
         return true;
     }
 
+    @Nullable
     protected Object getDefaultValueForNull(LSql lSql, ResultSet rs, int index) {
         return null;
     }

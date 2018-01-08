@@ -9,7 +9,7 @@ public class Stmts2 {
             return this;
         }
 
-        public loadPersonsByAgeAndFirstName age(java.lang.Integer value) {
+        public loadPersonsByAgeAndFirstName age(java.lang.Number value) {
             parameterValues.put("age", value);
             return this;
         }

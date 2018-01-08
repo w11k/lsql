@@ -32,7 +32,7 @@ public class PostgresDialect extends GenericDialect {
     }
 
     public PostgresDialect() {
-        for (int sqlType : com.w11k.lsql.converter.sqltypes.BooleanConverter.SQL_TYPES) {
+        for (int sqlType : com.w11k.lsql.converter.types.BooleanConverter.SQL_TYPES) {
             getConverterRegistry().addSqlToJavaConverter(new BooleanConverter(sqlType), true);
         }
         getConverterRegistry().addJavaToSqlConverter(
