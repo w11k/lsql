@@ -1,47 +1,25 @@
 package com.w11k.lsql.cli;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.MoreFiles;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.TableLike;
+import com.w11k.lsql.cli.java.CliArgs;
 import com.w11k.lsql.cli.java.JavaExporter;
-import com.w11k.lsql.cli.java.StatementFileExporter;
-import com.w11k.lsql.cli.java.StatementRowColumnContainer;
-import com.w11k.lsql.cli.typescript.TypeScriptExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.List;
 
 import static com.w11k.lsql.cli.CodeGenUtils.log;
 
 public class Main {
 
-    private String configClassName;
 
-    private String url;
-
-    private String user;
-
-    private String password;
-
-    private String packageName;
-
-    private String sqlStatements;
-
-    private boolean guice = false;
-
-    private String outDirJava;
-
-    private String outDirTypeScript;
-
-    private List<StatementFileExporter> statementFileExporters = Lists.newLinkedList();
+//    private List<StatementFileExporter> statementFileExporters = Lists.newLinkedList();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public Main(String[] args) throws ClassNotFoundException, SQLException {
@@ -49,55 +27,51 @@ public class Main {
         log("LSql CLI Exporter");
         log("========================================================\n");
 
-        this.parseArgs(args);
+        CliArgs cliArgs = new CliArgs(args);
 
         // Config
         @SuppressWarnings("unchecked")
         Class<? extends Config> configClass =
-                (Class<? extends Config>) Main.class.getClassLoader().loadClass(configClassName);
+                (Class<? extends Config>) Main.class.getClassLoader().loadClass(cliArgs.getConfigClassName());
 
         log("Config class:", configClass.getCanonicalName(), "\n");
 
-        Connection connection = DriverManager.getConnection(url, user, password);
+        Connection connection = DriverManager.getConnection(cliArgs.getUrl(), cliArgs.getUser(), cliArgs.getPassword());
         connection.setAutoCommit(false);
 
-        log("JDBC URL:", url, "\n");
+        log("JDBC URL:", cliArgs.getUrl(), "\n");
 
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
         LinkedList<TableLike> tables = Lists.newLinkedList(lSql.getTables());
 
-        if (this.outDirJava != null) {
-            String packageFolder = this.packageName.replaceAll("\\.", File.separator);
-            File outputRootPackageDir = new File(this.outDirJava, packageFolder);
-            outputRootPackageDir.mkdirs();
-            assert outputRootPackageDir.isDirectory();
-
+        if (cliArgs.getOutDirJava() != null) {
             JavaExporter javaExporter = new JavaExporter(lSql, tables);
-            javaExporter.setPackageName(this.packageName);
-            javaExporter.setOutputRootPackageDir(outputRootPackageDir);
-            javaExporter.setGuice(this.guice);
+            javaExporter.setPackageName(cliArgs.getGenPackageName());
+            File outputRootPackageDir = new File(cliArgs.getOutDirJava());
+            javaExporter.setOutputDir(outputRootPackageDir);
+            javaExporter.setGuice(cliArgs.isGuice());
 
             // Java statements
-            processStatements(lSql, javaExporter);
-            javaExporter.setStatementFileExporters(this.statementFileExporters);
+//            processStatements(lSql, javaExporter);
+//            javaExporter.setStatementFileExporters(this.statementFileExporters);
 
             javaExporter.export();
         }
 
-        if (this.outDirTypeScript != null) {
+//        if (this.outDirTypeScript != null) {
             // add statement rows
-            for (StatementFileExporter statementFileExporter : this.statementFileExporters) {
-                List<StatementRowColumnContainer> statementRows = statementFileExporter.getStatementRows();
-                tables.addAll(statementRows);
-            }
-
-            TypeScriptExporter tse = new TypeScriptExporter(tables);
-            File outDirTs = new File(this.outDirTypeScript);
-            tse.setOutputDir(outDirTs);
-            tse.export();
-        }
+//            for (StatementFileExporter statementFileExporter : this.statementFileExporters) {
+//                List<StatementRowColumnContainer> statementRows = statementFileExporter.getStatementRows();
+//                tables.addAll(statementRows);
+//            }
+//
+//            TypeScriptExporter tse = new TypeScriptExporter(tables);
+//            File outDirTs = new File(this.outDirTypeScript);
+//            tse.setOutputDir(outDirTs);
+//            tse.export();
+//        }
 
     }
 
@@ -105,50 +79,21 @@ public class Main {
         new Main(args);
     }
 
-    private void processStatements(LSql lSql, JavaExporter javaExporter) {
-        if (this.sqlStatements != null) {
-            Path statementRootDir = new File(this.sqlStatements).toPath();
-//            log("Reading statements in " + statementRootDir.toString());
+    /*private void processStatements(LSql lSql, JavaExporter javaExporter, CliArgs cliArgs) {
+        if (cliArgs.getSqlStatements() != null) {
+            Path statementRootDir = new File(cliArgs.getSqlStatements()).toPath();
             Iterable<Path> children = MoreFiles.directoryTreeTraverser().preOrderTraversal(statementRootDir);
             for (Path child : children) {
                 File file = child.toFile();
                 if (file.isFile() && file.getName().endsWith(".sql")) {
                     StatementFileExporter statementFileExporter =
-                            new StatementFileExporter(lSql, file, javaExporter, this.sqlStatements);
+                            new StatementFileExporter(lSql, file, javaExporter, cliArgs.getSqlStatements());
                     this.statementFileExporters.add(statementFileExporter);
                 }
             }
         }
     }
+*/
 
-    private void parseArgs(String[] args) {
-        for (String arg : args) {
-            String value = getParamValue(arg);
-            if (arg.startsWith("config:")) {
-                this.configClassName = value;
-            } else if (arg.startsWith("url:")) {
-                this.url = value;
-            } else if (arg.startsWith("user:")) {
-                this.user = value;
-            } else if (arg.startsWith("password:")) {
-                this.password = value;
-            } else if (arg.startsWith("package:")) {
-                this.packageName = value;
-            } else if (arg.startsWith("sqlStatements:")) {
-                this.sqlStatements = value;
-            } else if (arg.startsWith("outDirJava:")) {
-                this.outDirJava = value;
-            } else if (arg.startsWith("outDirTypeScript:")) {
-                this.outDirTypeScript = value;
-            } else if (arg.startsWith("di:")) {
-                if (value.equalsIgnoreCase("guice")) {
-                    this.guice = true;
-                }
-            }
-        }
-    }
 
-    private String getParamValue(String param) {
-        return param.substring(param.indexOf(":") + 1).trim();
-    }
 }

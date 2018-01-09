@@ -47,7 +47,7 @@ public class StructuralTypingFieldExporter {
     }
 
     protected File getOutputFile() {
-        return new File(this.javaExporter.getOutputRootPackageDir(), this.stf.getInterfaceName() + ".java");
+        return new File(this.javaExporter.getOutputDir(), this.stf.getInterfaceName() + ".java");
     }
 
 }

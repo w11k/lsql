@@ -1,12 +1,15 @@
+/*
 package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
-import com.w11k.lsql.*;
+import com.w11k.lsql.Column;
+import com.w11k.lsql.ResultSetColumn;
+import com.w11k.lsql.ResultSetWithColumns;
+import com.w11k.lsql.TableLike;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 
-import java.io.File;
 import java.util.Map;
 
 public final class StatementRowColumnContainer implements TableLike {
@@ -19,10 +22,7 @@ public final class StatementRowColumnContainer implements TableLike {
 
     public StatementRowColumnContainer(StatementFileExporter statementFileExporter,
                                        TypedStatementMeta typedStatementMeta,
-                                       LSql lSql,
-                                       AbstractSqlStatement<RowQuery> query,
-                                       String sqlStatementsLocation,
-                                       File statementFile) {
+                                       AbstractSqlStatement<RowQuery> query) {
 
         this.statementFileExporter = statementFileExporter;
         this.typedStatementMeta = typedStatementMeta;
@@ -64,3 +64,4 @@ public final class StatementRowColumnContainer implements TableLike {
         return Optional.absent();
     }
 }
+*/

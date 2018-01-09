@@ -43,7 +43,7 @@ public class TypeScriptExporter {
         //noinspection ResultOfMethodCallIgnored
         this.outputDir.mkdirs();
         File output = new File(this.outputDir, "domain.ts");
-        CodeGenUtils.writeContentIfChanged(content.toString(), output);
+        CodeGenUtils.writeContent(content.toString(), output);
     }
 
     private void exportTables(StringBuilder content) {

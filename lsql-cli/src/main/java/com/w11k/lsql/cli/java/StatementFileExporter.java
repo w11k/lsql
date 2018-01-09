@@ -1,3 +1,4 @@
+/*
 package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Joiner;
@@ -7,12 +8,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.MoreFiles;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.cli.java.*;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 
@@ -77,10 +81,8 @@ public final class StatementFileExporter {
                 this.statementRows.add(new StatementRowColumnContainer(
                         this,
                         typedStatementMeta,
-                        lSql,
-                        query,
-                        sqlStatementsRootDir,
-                        sourceFile));
+                        query
+                ));
             }
 
             rollback(lSql);
@@ -98,7 +100,8 @@ public final class StatementFileExporter {
         File outputFile = this.getOutputFile(packageName, className);
         StringBuilder content = new StringBuilder();
 
-        content.append("package ").append(this.getFullPackageName(packageName)).append(";\n\n");
+        String fullPackageName = joinStringsAsPackageName(javaExporter.getPackageName(), packageName);
+        content.append("package ").append(fullPackageName).append(";\n\n");
 
         content.append("public class ")
                 .append(className)
@@ -122,15 +125,11 @@ public final class StatementFileExporter {
 
         content.append("}\n");
 
-        writeContentIfChanged(content.toString(), outputFile);
+        writeContent(content.toString(), outputFile);
     }
 
     public String getPackageName() {
         return packageName;
-    }
-
-    public String getClassName() {
-        return className;
     }
 
     private void exportStatementRowClasses(Set<StructuralTypingField> structuralTypingFields) {
@@ -143,15 +142,18 @@ public final class StatementFileExporter {
         }
     }
 
-    private String getFullPackageName(String localPackageName) {
-        return this.javaExporter.getPackageName() + "." + localPackageName;
-    }
-
     private File getOutputFile(String packageName, String className) {
-        File packageFolder = new File(
-                this.javaExporter.getOutputRootPackageDir(), packageName);
+        File parentPackage = this.javaExporter.getOutputDir();
+        String subDirPath = Joiner.on(File.separatorChar).join(Splitter.on(".").split(packageName).iterator());
 
-        return new File(packageFolder, className + ".java");
+        File fileToOutputPackage = new File(parentPackage, subDirPath);
+        try {
+            Files.createDirectories(fileToOutputPackage.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new File(fileToOutputPackage, className + ".java");
     }
 
     public List<StatementRowColumnContainer> getStatementRows() {
@@ -159,13 +161,16 @@ public final class StatementFileExporter {
     }
 
     private String getPackageNameFromStmtPath(String sqlStatementsRootDir, File sourceFile) {
-        String filePath = sourceFile.getAbsolutePath();
-        int start = filePath.lastIndexOf(sqlStatementsRootDir) + sqlStatementsRootDir.length();
-        String relativePath = filePath.substring(start);
+        String sourceFilePath = sourceFile.getAbsolutePath();
+        int start = sourceFilePath.lastIndexOf(sqlStatementsRootDir) + sqlStatementsRootDir.length();
+        String relativePath = sourceFilePath.substring(start);
         Iterable<String> pathSlitIt = Splitter.on(File.separatorChar).omitEmptyStrings().split(relativePath);
         List<String> pathSplit = Lists.newLinkedList(pathSlitIt);
-        pathSplit.remove(pathSplit.size() - 1);
-        return Joiner.on("_").join(pathSplit);
+        pathSplit.remove(pathSplit.size() - 1); // remove filename
+        String joined = Joiner.on(".").join(pathSplit);
+        return joined;
     }
 
 }
+
+ */

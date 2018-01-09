@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface TableLike {
 
-    public final class NoPrimaryKeyColumn {
+    final class NoPrimaryKeyColumn {
         private NoPrimaryKeyColumn() {
         }
     }

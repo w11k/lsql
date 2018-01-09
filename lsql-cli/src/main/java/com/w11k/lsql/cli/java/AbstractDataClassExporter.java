@@ -10,10 +10,12 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.w11k.lsql.cli.CodeGenUtils.writeContentIfChanged;
+import static com.w11k.lsql.cli.CodeGenUtils.createFileFromBaseDirAndPackageName;
+import static com.w11k.lsql.cli.CodeGenUtils.createSaveNameForClass;
+import static com.w11k.lsql.cli.CodeGenUtils.writeContent;
 import static java.util.stream.Collectors.toList;
 
-abstract public class AbstractTableBasedExporter {
+abstract public class AbstractDataClassExporter {
 
     private final List<StructuralTypingField> structuralTypingFields;
 
@@ -27,12 +29,19 @@ abstract public class AbstractTableBasedExporter {
 
     protected final JavaExporter javaExporter;
 
+    private final String fullPackageName;
+
+    private final String className;
+
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractTableBasedExporter(LSql lSql, TableLike cc, JavaExporter javaExporter) {
+    public AbstractDataClassExporter(LSql lSql, TableLike cc, JavaExporter javaExporter) {
         this.lSql = lSql;
         this.tableLike = cc;
         this.javaExporter = javaExporter;
+        this.fullPackageName = javaExporter.createFullPackageNameForTableLike(getTableLike());
+        this.className = createSaveNameForClass(tableLike.getTableName() + getClassNameSuffix());
+
         this.columns = Lists.newLinkedList(cc.getColumns().values());
         this.columns.sort(Comparator.comparing(Column::getJavaColumnName));
 
@@ -48,6 +57,10 @@ abstract public class AbstractTableBasedExporter {
         return tableLike;
     }
 
+    public String getFullPackageName() {
+        return fullPackageName;
+    }
+
     private List<StructuralTypingField> createStructuralTypingFieldList() {
         List<StructuralTypingField> list = Lists.newLinkedList();
         for (Column column : columns) {
@@ -56,44 +69,25 @@ abstract public class AbstractTableBasedExporter {
         return list;
     }
 
-    final public void export() {
+    protected String getClassNameSuffix() {
+        return "";
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void export() {
         this.createContent();
         File pojoSourceFile = getOutputFile();
-        writeContentIfChanged(this.content.toString(), pojoSourceFile);
+        writeContent(this.content.toString(), pojoSourceFile);
     }
 
     protected abstract void createContent();
 
-    protected File getOutputFile() {
-        File packageWithSchema = new File(
-                this.javaExporter.getOutputRootPackageDir(), this.getLastPackageSegmentForSchema());
-
-        return new File(packageWithSchema, getOutputFileName());
-    }
-
-    abstract public String getOutputFileName();
-
-    public String getLastPackageSegmentForSchema() {
-        String schemaName = this.tableLike.getSchemaName();
-
-        // no schema
-        if (schemaName.length() == 0) {
-            return "";
-        }
-
-        // with schema nma
-        return "schema_" + schemaName.toLowerCase();
-    }
-
-    protected String getFullPackageName() {
-        String packageSchemaSegment = this.getLastPackageSegmentForSchema();
-        return packageSchemaSegment.equals("")
-                ? this.javaExporter.getPackageName()
-                : this.javaExporter.getPackageName() + "." + packageSchemaSegment;
-    }
-
-    protected void contentSeperator() {
-        content.append("\n    // ------------------------------------------------------------").append("\n\n");
+    public File getOutputFile() {
+        File baseDir = createFileFromBaseDirAndPackageName(javaExporter.getOutputDir(), fullPackageName);
+        return new File(baseDir, getClassName() + ".java");
     }
 
     public List<StructuralTypingField> getStructuralTypingFields() {

@@ -6,7 +6,7 @@ import com.w11k.lsql.TypedTable;
 
 import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 
-public class TableExporter extends AbstractTableBasedExporter {
+public class TableExporter extends AbstractDataClassExporter {
 
     public TableExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
         super(lSql, tableLike, javaExporter);
@@ -35,11 +35,6 @@ public class TableExporter extends AbstractTableBasedExporter {
                 .append("\";\n\n");
     }
 
-    @Override
-    public String getOutputFileName() {
-        return getClassName() + ".java";
-    }
-
     private void contentConstructor() {
         if (this.javaExporter.isGuice()) {
             content.append("    @com.google.inject.Inject\n");
@@ -58,8 +53,8 @@ public class TableExporter extends AbstractTableBasedExporter {
         return firstCharUpperCase(this.getTableLike().getTableName() + "Row");
     }
 
-    protected String getClassName() {
-        return firstCharUpperCase(this.getTableLike().getTableName()) + "Table";
+    @Override
+    protected String getClassNameSuffix() {
+        return "Table";
     }
-
 }

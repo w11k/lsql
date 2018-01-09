@@ -9,6 +9,8 @@ import com.w11k.lsql.cli.tests.schema_public.Person1Row;
 import com.w11k.lsql.cli.tests.schema_public.Person1Table;
 import com.w11k.lsql.cli.tests.schema_public.Person2Row;
 import com.w11k.lsql.cli.tests.schema_public.Person2Table;
+import com.w11k.lsql.cli.tests.subdir.subsubdir.LoadPersonsByAgeAndFirstNameRow;
+import com.w11k.lsql.cli.tests.subdir.subsubdir.Stmts2;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.Assert;
@@ -17,6 +19,7 @@ import org.testng.annotations.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
@@ -106,7 +109,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void insert() throws SQLException {
+    public void insert() {
         createTables(lSql);
 
         Person1Table person1Table = new Person1Table(lSql);
@@ -115,7 +118,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void insertAndLoad() throws SQLException {
+    public void insertAndLoad() {
         createTables(lSql);
 
         Person1Table person1Table = new Person1Table(lSql);
@@ -125,7 +128,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void load() throws SQLException {
+    public void load() {
         createTables(lSql);
 
         Person1Table person1Table = new Person1Table(lSql);
@@ -139,7 +142,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void delete() throws SQLException {
+    public void delete() {
         createTables(lSql);
 
         Person1Table person1Table = new Person1Table(lSql);
@@ -151,7 +154,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void deleteById() throws SQLException {
+    public void deleteById() {
         createTables(lSql);
 
         Person1Table person1Table = new Person1Table(lSql);
@@ -163,7 +166,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void update() throws SQLException {
+    public void update() {
         createTables(lSql);
 
         Person1Table person1Table = new Person1Table(lSql);
@@ -177,7 +180,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void statementSelect() throws SQLException {
+    public void statementSelect() {
         createTables(lSql);
 
         Person2Table person2Table = new Person2Table(lSql);
@@ -201,7 +204,7 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
-    public void statementDelete() throws SQLException {
+    public void statementDelete() {
         createTables(lSql);
 
         // insert

@@ -7,12 +7,13 @@ import com.w11k.lsql.TableLike;
 import com.w11k.lsql.TableRow;
 
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
+import static com.w11k.lsql.cli.CodeGenUtils.addSeperator;
 import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 import static java.util.stream.Collectors.toList;
 
-public class JavaRowClassExporter extends AbstractTableBasedExporter {
+public class TableRowDataClassExporter extends AbstractDataClassExporter {
 
-    public JavaRowClassExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
+    public TableRowDataClassExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
         super(lSql, tableLike, javaExporter);
     }
 
@@ -32,7 +33,7 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
 
         // Field instances and getter/setter
         for (Column column : this.columns) {
-            contentSeperator();
+            addSeperator(content);
             Class<?> javaType = column.getConverter().getJavaType();
             contentStaticFieldName(column);
             contentField(column, javaType);
@@ -40,7 +41,7 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
             contentGetterSetterForField(column);
         }
 
-        contentSeperator();
+        addSeperator(content);
 
         // StructuralTyping methods
         contentAsInstance();
@@ -53,12 +54,8 @@ public class JavaRowClassExporter extends AbstractTableBasedExporter {
     }
 
     @Override
-    public String getOutputFileName() {
-        return getClassName() + ".java";
-    }
-
-    protected String getClassName() {
-        return firstCharUpperCase(this.getTableLike().getTableName()) + "Row";
+    public String getClassNameSuffix() {
+        return "Row";
     }
 
     private void contentToMap() {
