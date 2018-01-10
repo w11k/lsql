@@ -1,10 +1,11 @@
 package com.w11k.lsql.cli.java;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
+import com.w11k.lsql.cli.CodeGenUtils;
 
 import java.io.File;
-import java.io.IOException;
+
+import static com.w11k.lsql.cli.CodeGenUtils.getFileFromBaseDirAndPackageName;
+import static com.w11k.lsql.cli.CodeGenUtils.joinStringsAsPackageName;
 
 public class StructuralTypingFieldExporter {
 
@@ -20,34 +21,33 @@ public class StructuralTypingFieldExporter {
     }
 
     public void export() {
-        content.append("package ").append(javaExporter.getPackageName()).append(";\n\n");
+        content.append("package ").append(joinStringsAsPackageName(javaExporter.getPackageName(), "structural_fields")).append(";\n\n");
         content.append("public interface ").append(stf.getInterfaceName()).append(" {\n\n");
 
         content.append("    ")
-                .append(stf.getFieldClass().getCanonicalName())
+                .append(stf.getFieldType().getCanonicalName())
                 .append(" ").append(stf.getGetterMethodName())
                 .append("();\n\n");
 
         content.append("    ")
                 .append(stf.getInterfaceName())
                 .append(" ").append("with").append(stf.getUppercaseName()).append("(")
-                .append(stf.getFieldClass().getCanonicalName()).append(" val")
+                .append(stf.getFieldType().getCanonicalName()).append(" val")
                 .append(");\n\n");
 
         content.append("}");
 
 
         File pojoSourceFile = getOutputFile();
-        try {
-            // TODO only write if content changed
-            Files.write(content.toString().getBytes(Charsets.UTF_8), pojoSourceFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        CodeGenUtils.writeContent(content.toString(), pojoSourceFile);
     }
 
     protected File getOutputFile() {
-        return new File(this.javaExporter.getOutputDir(), this.stf.getInterfaceName() + ".java");
+        File baseDir = getFileFromBaseDirAndPackageName(
+                javaExporter.getOutputDir(),
+                joinStringsAsPackageName(javaExporter.getPackageName(), "structural_fields"));
+
+        return new File(baseDir, this.stf.getInterfaceName() + ".java");
     }
 
 }

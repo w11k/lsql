@@ -1,25 +1,26 @@
 package com.w11k.lsql.cli;
 
-import com.google.common.collect.Lists;
+import com.google.common.io.MoreFiles;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.TableLike;
 import com.w11k.lsql.cli.java.CliArgs;
 import com.w11k.lsql.cli.java.JavaExporter;
+import com.w11k.lsql.cli.java.StatementFileExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.List;
 
+import static com.google.common.collect.Lists.newLinkedList;
 import static com.w11k.lsql.cli.CodeGenUtils.log;
 
 public class Main {
-
-
-//    private List<StatementFileExporter> statementFileExporters = Lists.newLinkedList();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public Main(String[] args) throws ClassNotFoundException, SQLException {
@@ -44,7 +45,7 @@ public class Main {
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
-        LinkedList<TableLike> tables = Lists.newLinkedList(lSql.getTables());
+        LinkedList<TableLike> tables = newLinkedList(lSql.getTables());
 
         if (cliArgs.getOutDirJava() != null) {
             JavaExporter javaExporter = new JavaExporter(lSql, tables);
@@ -54,8 +55,8 @@ public class Main {
             javaExporter.setGuice(cliArgs.isGuice());
 
             // Java statements
-//            processStatements(lSql, javaExporter);
-//            javaExporter.setStatementFileExporters(this.statementFileExporters);
+            List<StatementFileExporter> statementFileExporters = createStatements(lSql, javaExporter, cliArgs);
+            javaExporter.setStatementFileExporters(statementFileExporters);
 
             javaExporter.export();
         }
@@ -79,7 +80,10 @@ public class Main {
         new Main(args);
     }
 
-    /*private void processStatements(LSql lSql, JavaExporter javaExporter, CliArgs cliArgs) {
+    private List<StatementFileExporter> createStatements(LSql lSql, JavaExporter javaExporter, CliArgs cliArgs) {
+
+        List<StatementFileExporter> list = newLinkedList();
+
         if (cliArgs.getSqlStatements() != null) {
             Path statementRootDir = new File(cliArgs.getSqlStatements()).toPath();
             Iterable<Path> children = MoreFiles.directoryTreeTraverser().preOrderTraversal(statementRootDir);
@@ -87,13 +91,14 @@ public class Main {
                 File file = child.toFile();
                 if (file.isFile() && file.getName().endsWith(".sql")) {
                     StatementFileExporter statementFileExporter =
-                            new StatementFileExporter(lSql, file, javaExporter, cliArgs.getSqlStatements());
-                    this.statementFileExporters.add(statementFileExporter);
+                            new StatementFileExporter(lSql, javaExporter, file, cliArgs.getSqlStatements());
+
+                    list.add(statementFileExporter);
                 }
             }
         }
-    }
-*/
 
+        return list;
+    }
 
 }

@@ -5,7 +5,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
-import com.google.common.io.MoreFiles;
 import com.w11k.lsql.LSql;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public final class CodeGenUtils {
         boolean lastWasLowerCase = false;
         while (idx < className.length()) {
             char ch = className.charAt(idx);
-            if (Character.isLowerCase(ch)) {
+            if (!Character.isUpperCase(ch)) {
                 lastWasLowerCase = true;
             } else {
                 if (lastWasLowerCase) {
@@ -53,23 +52,23 @@ public final class CodeGenUtils {
         }
     }
 
-    public static File createFileFromBaseDirAndPackageName(File baseDir, String packageName) {
+    public static File getFileFromBaseDirAndPackageName(File baseDir, String packageName) {
 
         Iterable<String> packageSegments = Splitter.on(".").split(packageName);
         String packagePath = Joiner.on(File.separatorChar).join(packageSegments);
         File target = new File(baseDir, packagePath);
-        try {
-            Files.createParentDirs(target);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            Files.createParentDirs(target);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
         return target;
     }
 
     public static void writeContent(String content, File target) {
         try {
             log("Writing", target.getAbsolutePath());
-            MoreFiles.createParentDirectories(target.toPath());
+            Files.createParentDirs(target);
             Files.write(content.getBytes(Charsets.UTF_8), target);
         } catch (IOException e) {
             throw new RuntimeException(e);

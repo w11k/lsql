@@ -1,4 +1,3 @@
-/*
 package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Optional;
@@ -12,7 +11,7 @@ import com.w11k.lsql.statement.AbstractSqlStatement;
 
 import java.util.Map;
 
-public final class StatementRowColumnContainer implements TableLike {
+public final class StatementRowDataClassColumnContainer implements TableLike {
 
     private final StatementFileExporter statementFileExporter;
 
@@ -20,9 +19,9 @@ public final class StatementRowColumnContainer implements TableLike {
 
     private Map<String, Column> columns = Maps.newHashMap();
 
-    public StatementRowColumnContainer(StatementFileExporter statementFileExporter,
-                                       TypedStatementMeta typedStatementMeta,
-                                       AbstractSqlStatement<RowQuery> query) {
+    public StatementRowDataClassColumnContainer(StatementFileExporter statementFileExporter,
+                                                TypedStatementMeta typedStatementMeta,
+                                                AbstractSqlStatement<RowQuery> query) {
 
         this.statementFileExporter = statementFileExporter;
         this.typedStatementMeta = typedStatementMeta;
@@ -46,22 +45,24 @@ public final class StatementRowColumnContainer implements TableLike {
 
     @Override
     public String getSchemaName() {
-        return this.statementFileExporter.getPackageName();
+        return "aaaaaaaaaaaaaaaaaaaaaaaaaa";
     }
 
     @Override
     public String getSchemaAndTableName() {
-        return this.getSchemaName() + "___" + this.getTableName();
+        throw new RuntimeException();
+//        return this.getSchemaName() + "___" + this.getTableName();
     }
 
     @Override
     public String getTableName() {
+//        throw new RuntimeException();
         return this.typedStatementMeta.getStatement().getStatementName();
     }
 
     @Override
     public Optional<Class<?>> getPrimaryKeyType() {
-        return Optional.absent();
+        throw new RuntimeException();
+//        return Optional.absent();
     }
 }
-*/

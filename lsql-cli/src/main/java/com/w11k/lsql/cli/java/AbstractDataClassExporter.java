@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.w11k.lsql.cli.CodeGenUtils.createFileFromBaseDirAndPackageName;
+import static com.w11k.lsql.cli.CodeGenUtils.getFileFromBaseDirAndPackageName;
 import static com.w11k.lsql.cli.CodeGenUtils.createSaveNameForClass;
 import static com.w11k.lsql.cli.CodeGenUtils.writeContent;
 import static java.util.stream.Collectors.toList;
@@ -35,14 +35,14 @@ abstract public class AbstractDataClassExporter {
 
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractDataClassExporter(LSql lSql, TableLike cc, JavaExporter javaExporter) {
+    public AbstractDataClassExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
         this.lSql = lSql;
-        this.tableLike = cc;
+        this.tableLike = tableLike;
         this.javaExporter = javaExporter;
-        this.fullPackageName = javaExporter.createFullPackageNameForTableLike(getTableLike());
+        this.fullPackageName = javaExporter.createFullPackageNameForTableLike(tableLike);
         this.className = createSaveNameForClass(tableLike.getTableName() + getClassNameSuffix());
 
-        this.columns = Lists.newLinkedList(cc.getColumns().values());
+        this.columns = Lists.newLinkedList(tableLike.getColumns().values());
         this.columns.sort(Comparator.comparing(Column::getJavaColumnName));
 
         this.structuralTypingFields = createStructuralTypingFieldList();
@@ -86,7 +86,7 @@ abstract public class AbstractDataClassExporter {
     protected abstract void createContent();
 
     public File getOutputFile() {
-        File baseDir = createFileFromBaseDirAndPackageName(javaExporter.getOutputDir(), fullPackageName);
+        File baseDir = getFileFromBaseDirAndPackageName(javaExporter.getOutputDir(), fullPackageName);
         return new File(baseDir, getClassName() + ".java");
     }
 

@@ -2,44 +2,48 @@ package com.w11k.lsql.cli.java;
 
 import com.google.common.base.CaseFormat;
 
+import static com.w11k.lsql.cli.CodeGenUtils.createSaveNameForClass;
+import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
+
 public final class StructuralTypingField {
+
+    private final String interfaceName;
 
     private final String uppercaseName;
 
-    private final Class<?> fieldClass;
+    private final Class<?> fieldType;
 
-    private final String typeName;
+    public StructuralTypingField(String name, Class<?> fieldType) {
+        this.uppercaseName = firstCharUpperCase(name);
+        this.fieldType = fieldType;
 
-    public StructuralTypingField(String name, Class<?> fieldClass) {
-        this.uppercaseName = name.substring(0, 1).toUpperCase() +  name.substring(1);
-        this.fieldClass = fieldClass;
-
-        String canonicalNameWithUnderscores = fieldClass.getCanonicalName().replace('.', '_').toLowerCase();
+        String canonicalNameWithUnderscores = fieldType.getCanonicalName().replace('.', '_').toLowerCase();
         String typeName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, canonicalNameWithUnderscores);
 
         if (typeName.startsWith("JavaLang")) {
             typeName = typeName.substring("JavaLang".length());
         }
-        this.typeName = typeName;
+
+        this.interfaceName = createSaveNameForClass(name + typeName);
+    }
+
+    public String getInterfaceName() {
+        return interfaceName;
     }
 
     public String getUppercaseName() {
         return uppercaseName;
     }
 
-    public Class<?> getFieldClass() {
-        return fieldClass;
-    }
-
-    public String getInterfaceName() {
-        return this.uppercaseName + this.typeName;
+    public Class<?> getFieldType() {
+        return fieldType;
     }
 
     public String getGetterMethodName() {
-        if (getFieldClass().isAssignableFrom(Boolean.class)) {
-            return "is" + getUppercaseName();
+        if (fieldType.isAssignableFrom(Boolean.class)) {
+            return "is" + uppercaseName;
         } else {
-            return "get" + getUppercaseName();
+            return "get" + uppercaseName;
         }
     }
 
@@ -48,21 +52,18 @@ public final class StructuralTypingField {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StructuralTypingField that = (StructuralTypingField) o;
-        return uppercaseName.equals(that.uppercaseName) && typeName.equals(that.typeName);
+        return interfaceName.equals(that.interfaceName);
     }
 
     @Override
     public int hashCode() {
-        int result = uppercaseName.hashCode();
-        result = 31 * result + typeName.hashCode();
-        return result;
+        return interfaceName.hashCode() * 31;
     }
 
     @Override
     public String toString() {
         return "StructuralTypingField{" +
-                "name='" + uppercaseName + '\'' +
-                ", typeName='" + typeName + '\'' +
+                "interfaceName='" + interfaceName + '\'' +
                 '}';
     }
 }

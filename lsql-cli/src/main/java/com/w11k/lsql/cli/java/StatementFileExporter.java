@@ -1,4 +1,3 @@
-/*
 package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Joiner;
@@ -6,58 +5,55 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.io.MoreFiles;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.cli.java.*;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.io.MoreFiles.getNameWithoutExtension;
 import static com.w11k.lsql.cli.CodeGenUtils.*;
 
 public final class StatementFileExporter {
 
     private final LSql lSql;
 
-    private final File sourceFile;
+    private final File stmtSourceFile;
 
     private final JavaExporter javaExporter;
 
-    private final String sqlStatementsRootDir;
+    private final String stmtFilesRootDir;
 
     private final List<TypedStatementMeta> typedStatementMetas = Lists.newLinkedList();
 
-    private final List<StatementRowColumnContainer> statementRows = Lists.newLinkedList();
+    private final List<StatementRowDataClassColumnContainer> statementRowDataClassList = Lists.newLinkedList();
 
-    private final String packageName;
+    private final String targetPackageName;
 
-    private final String className;
+    private final String stmtFileClassName;
 
     public StatementFileExporter(LSql lSql,
-                                 File sourceFile,
                                  JavaExporter javaExporter,
-                                 String sqlStatementsRootDir) {
+                                 File stmtSourceFile,
+                                 String stmtFilesRootDir) {
 
         this.lSql = lSql;
-        this.sourceFile = sourceFile;
         this.javaExporter = javaExporter;
-        this.sqlStatementsRootDir = sqlStatementsRootDir;
+        this.stmtSourceFile = stmtSourceFile;
+        this.stmtFilesRootDir = stmtFilesRootDir;
 
-        this.packageName = this.getPackageNameFromStmtPath(this.sqlStatementsRootDir, this.sourceFile);
+        this.targetPackageName = this.getPackageNameForStatement();
+        this.stmtFileClassName = getNameWithoutExtension(this.stmtSourceFile.toPath());
 
-        this.className = MoreFiles.getNameWithoutExtension(this.sourceFile.toPath());
-
-        LSqlFile lSqlFile = new LSqlFile(lSql, sourceFile.getAbsolutePath(), sourceFile.getAbsolutePath());
-
+        // read statements in file
+        LSqlFile lSqlFile = new LSqlFile(lSql, stmtSourceFile.getAbsolutePath(), stmtSourceFile.getAbsolutePath());
         ImmutableMap<String, SqlStatementToPreparedStatement> statements = lSqlFile.getStatements();
 
+        // process statements
         for (String stmtName : statements.keySet()) {
             AbstractSqlStatement<RowQuery> query = lSqlFile.statement(stmtName);
             SqlStatementToPreparedStatement stmt = lSqlFile.getSqlStatementToPreparedStatement(stmtName);
@@ -71,14 +67,14 @@ public final class StatementFileExporter {
                     lSql,
                     query,
                     stmt,
-                    sqlStatementsRootDir,
-                    sourceFile
+                    stmtFilesRootDir,
+                    stmtSourceFile
             );
             this.typedStatementMetas.add(typedStatementMeta);
 
             // out
             if (!stmt.getTypeAnnotation().toLowerCase().equals("void")) {
-                this.statementRows.add(new StatementRowColumnContainer(
+                this.statementRowDataClassList.add(new StatementRowDataClassColumnContainer(
                         this,
                         typedStatementMeta,
                         query
@@ -97,14 +93,12 @@ public final class StatementFileExporter {
     }
 
     private void exportTypedStatementClass() {
-        File outputFile = this.getOutputFile(packageName, className);
         StringBuilder content = new StringBuilder();
 
-        String fullPackageName = joinStringsAsPackageName(javaExporter.getPackageName(), packageName);
-        content.append("package ").append(fullPackageName).append(";\n\n");
+        content.append("package ").append(this.targetPackageName).append(";\n\n");
 
         content.append("public class ")
-                .append(className)
+                .append(stmtFileClassName)
                 .append(" {\n\n");
 
         for (TypedStatementMeta typedStatementMeta : this.typedStatementMetas) {
@@ -118,23 +112,28 @@ public final class StatementFileExporter {
         if (this.javaExporter.isGuice()) {
             content.append("    @com.google.inject.Inject\n");
         }
-        content.append("    public ").append(className).append("(")
+        content.append("    public ").append(stmtFileClassName).append("(")
                 .append(LSql.class.getCanonicalName()).append(" lSql) {\n")
                 .append("        this.lSql = lSql;\n")
                 .append("    }\n\n");
 
         content.append("}\n");
 
+        File outputFile = this.getOutputFile();
         writeContent(content.toString(), outputFile);
     }
 
-    public String getPackageName() {
-        return packageName;
+    public String getTargetPackageName() {
+        return targetPackageName;
     }
 
+    //    public List<StatementRowColumnContainer> getStatementRows() {
+//        return statementRowDataClassList;
+//    }
+
     private void exportStatementRowClasses(Set<StructuralTypingField> structuralTypingFields) {
-        for (StatementRowColumnContainer statementRow : this.statementRows) {
-            StatementRowExporter stmtInRowClass = new StatementRowExporter(
+        for (StatementRowDataClassColumnContainer statementRow : this.statementRowDataClassList) {
+            TableRowDataClassExporter stmtInRowClass = new TableRowDataClassExporter(
                     this.lSql, statementRow, this.javaExporter);
 
             structuralTypingFields.addAll(stmtInRowClass.getStructuralTypingFields());
@@ -142,35 +141,26 @@ public final class StatementFileExporter {
         }
     }
 
-    private File getOutputFile(String packageName, String className) {
-        File parentPackage = this.javaExporter.getOutputDir();
-        String subDirPath = Joiner.on(File.separatorChar).join(Splitter.on(".").split(packageName).iterator());
-
-        File fileToOutputPackage = new File(parentPackage, subDirPath);
-        try {
-            Files.createDirectories(fileToOutputPackage.toPath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new File(fileToOutputPackage, className + ".java");
+    private File getOutputFile() {
+        File baseDir = getFileFromBaseDirAndPackageName(javaExporter.getOutputDir(), this.targetPackageName);
+        return new File(baseDir, this.stmtFileClassName + ".java");
     }
 
-    public List<StatementRowColumnContainer> getStatementRows() {
-        return statementRows;
-    }
+    private String getPackageNameForStatement() {
+        // root part for all statements
+        String stmtsRootPackageName = joinStringsAsPackageName(javaExporter.getPackageName(), "statements");
 
-    private String getPackageNameFromStmtPath(String sqlStatementsRootDir, File sourceFile) {
-        String sourceFilePath = sourceFile.getAbsolutePath();
-        int start = sourceFilePath.lastIndexOf(sqlStatementsRootDir) + sqlStatementsRootDir.length();
+        // sub part for this statement
+        String sourceFilePath = this.stmtSourceFile.getAbsolutePath();
+        int start = sourceFilePath.lastIndexOf(this.stmtFilesRootDir) + this.stmtFilesRootDir.length();
         String relativePath = sourceFilePath.substring(start);
         Iterable<String> pathSlitIt = Splitter.on(File.separatorChar).omitEmptyStrings().split(relativePath);
         List<String> pathSplit = Lists.newLinkedList(pathSlitIt);
         pathSplit.remove(pathSplit.size() - 1); // remove filename
-        String joined = Joiner.on(".").join(pathSplit);
-        return joined;
+        String subPart = Joiner.on(".").join(pathSplit);
+
+        return joinStringsAsPackageName(stmtsRootPackageName, subPart);
     }
 
 }
 
- */

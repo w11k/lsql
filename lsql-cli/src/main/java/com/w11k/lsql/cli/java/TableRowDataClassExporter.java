@@ -7,8 +7,7 @@ import com.w11k.lsql.TableLike;
 import com.w11k.lsql.TableRow;
 
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
-import static com.w11k.lsql.cli.CodeGenUtils.addSeperator;
-import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
+import static com.w11k.lsql.cli.CodeGenUtils.*;
 import static java.util.stream.Collectors.toList;
 
 public class TableRowDataClassExporter extends AbstractDataClassExporter {
@@ -19,7 +18,10 @@ public class TableRowDataClassExporter extends AbstractDataClassExporter {
 
     public void createContent() {
         content.append("package ").append(getFullPackageName()).append(";\n\n");
-        content.append("import ").append(this.javaExporter.getPackageName()).append(".*;\n\n");
+
+        String stmtFieldsPackageName = joinStringsAsPackageName(
+                this.javaExporter.getPackageName(), "structural_fields");
+        content.append("import ").append(stmtFieldsPackageName).append(".*;\n\n");
         content.append("public class ").append(getClassName());
         content.append(" implements ").append(TableRow.class.getCanonicalName());
         contentImplements();
@@ -139,10 +141,10 @@ public class TableRowDataClassExporter extends AbstractDataClassExporter {
 
     private void contentImplements() {
         if (getStructuralTypingFields().size() > 0) {
-            content.append(",");
+            content.append(", ");
         }
         content.append(
-                Joiner.on(",")
+                Joiner.on(", ")
                         .join(getStructuralTypingFields().stream()
                                 .map(StructuralTypingField::getInterfaceName).collect(toList())));
 
