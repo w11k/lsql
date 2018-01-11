@@ -45,7 +45,7 @@ public final class StatementRowDataClassColumnContainer implements TableLike {
 
     @Override
     public String getSchemaName() {
-        return "aaaaaaaaaaaaaaaaaaaaaaaaaa";
+        return this.statementFileExporter.getSubPackageName();
     }
 
     @Override

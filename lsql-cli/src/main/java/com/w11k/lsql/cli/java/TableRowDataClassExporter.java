@@ -12,8 +12,8 @@ import static java.util.stream.Collectors.toList;
 
 public class TableRowDataClassExporter extends AbstractDataClassExporter {
 
-    public TableRowDataClassExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
-        super(lSql, tableLike, javaExporter);
+    public TableRowDataClassExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter, String packagePrefix) {
+        super(lSql, tableLike, javaExporter, packagePrefix);
     }
 
     public void createContent() {

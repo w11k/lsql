@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import static com.w11k.lsql.cli.CodeGenUtils.joinStringsAsPackageName;
 import static com.w11k.lsql.cli.CodeGenUtils.log;
 import static java.util.Collections.emptyList;
 
@@ -64,14 +63,6 @@ public class JavaExporter {
         this.statementFileExporters = statementFileExporters;
     }
 
-    public String createFullPackageNameForTableLike(TableLike tableLike) {
-        String schemaName = tableLike.getSchemaName();
-        String lastPackageSegment = schemaName.length() == 0 ? "" : "schema_" + schemaName.toLowerCase();
-        return joinStringsAsPackageName(packageName, lastPackageSegment);
-    }
-
-
-
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void export() {
         List<TableRowDataClassExporter> tableRowDataClassExporters = Lists.newLinkedList();
@@ -82,7 +73,8 @@ public class JavaExporter {
         // Tables
         for (TableLike cc : tables) {
             // collect all row classes
-            TableRowDataClassExporter tableRowDataClassExporter = new TableRowDataClassExporter(this.lSql, cc, this);
+            TableRowDataClassExporter tableRowDataClassExporter = new TableRowDataClassExporter(
+                    this.lSql, cc, this, "schema");
             tableRowDataClassExporters.add(tableRowDataClassExporter);
 
             // generate table classes

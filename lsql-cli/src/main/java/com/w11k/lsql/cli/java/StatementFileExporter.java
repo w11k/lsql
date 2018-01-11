@@ -134,7 +134,7 @@ public final class StatementFileExporter {
     private void exportStatementRowClasses(Set<StructuralTypingField> structuralTypingFields) {
         for (StatementRowDataClassColumnContainer statementRow : this.statementRowDataClassList) {
             TableRowDataClassExporter stmtInRowClass = new TableRowDataClassExporter(
-                    this.lSql, statementRow, this.javaExporter);
+                    this.lSql, statementRow, this.javaExporter, null);
 
             structuralTypingFields.addAll(stmtInRowClass.getStructuralTypingFields());
             stmtInRowClass.export();
@@ -146,11 +146,7 @@ public final class StatementFileExporter {
         return new File(baseDir, this.stmtFileClassName + ".java");
     }
 
-    private String getPackageNameForStatement() {
-        // root part for all statements
-        String stmtsRootPackageName = joinStringsAsPackageName(javaExporter.getPackageName(), "statements");
-
-        // sub part for this statement
+    public String getSubPackageName() {
         String sourceFilePath = this.stmtSourceFile.getAbsolutePath();
         int start = sourceFilePath.lastIndexOf(this.stmtFilesRootDir) + this.stmtFilesRootDir.length();
         String relativePath = sourceFilePath.substring(start);
@@ -158,8 +154,16 @@ public final class StatementFileExporter {
         List<String> pathSplit = Lists.newLinkedList(pathSlitIt);
         pathSplit.remove(pathSplit.size() - 1); // remove filename
         String subPart = Joiner.on(".").join(pathSplit);
+        return subPart;
+    }
 
-        return joinStringsAsPackageName(stmtsRootPackageName, subPart);
+    private String getPackageNameForStatement() {
+        // root part for all statements
+        String stmtsRootPackageName = javaExporter.getPackageName();
+
+        // sub part for this statement
+
+        return joinStringsAsPackageName(stmtsRootPackageName, getSubPackageName());
     }
 
 }

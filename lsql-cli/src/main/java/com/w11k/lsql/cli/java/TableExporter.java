@@ -9,7 +9,7 @@ import static com.w11k.lsql.cli.CodeGenUtils.createSaveNameForClass;
 public class TableExporter extends AbstractDataClassExporter {
 
     public TableExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
-        super(lSql, tableLike, javaExporter);
+        super(lSql, tableLike, javaExporter, "schema");
     }
 
     @Override

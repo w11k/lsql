@@ -6,13 +6,12 @@ import com.w11k.lsql.Column;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.TableLike;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.w11k.lsql.cli.CodeGenUtils.getFileFromBaseDirAndPackageName;
-import static com.w11k.lsql.cli.CodeGenUtils.createSaveNameForClass;
-import static com.w11k.lsql.cli.CodeGenUtils.writeContent;
+import static com.w11k.lsql.cli.CodeGenUtils.*;
 import static java.util.stream.Collectors.toList;
 
 abstract public class AbstractDataClassExporter {
@@ -35,11 +34,18 @@ abstract public class AbstractDataClassExporter {
 
     protected StringBuilder content = new StringBuilder();
 
-    public AbstractDataClassExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter) {
+    public AbstractDataClassExporter(LSql lSql, TableLike tableLike, JavaExporter javaExporter, @Nullable String packagePrefix) {
         this.lSql = lSql;
         this.tableLike = tableLike;
         this.javaExporter = javaExporter;
-        this.fullPackageName = javaExporter.createFullPackageNameForTableLike(tableLike);
+
+        String schemaName = tableLike.getSchemaName();
+        String lastPackageSegment = schemaName.length() == 0
+                ? ""
+                : Joiner.on("_").skipNulls().join(packagePrefix, schemaName.toLowerCase());
+
+        this.fullPackageName = joinStringsAsPackageName(javaExporter.getPackageName(), lastPackageSegment);
+
         this.className = createSaveNameForClass(tableLike.getTableName() + getClassNameSuffix());
 
         this.columns = Lists.newLinkedList(tableLike.getColumns().values());
