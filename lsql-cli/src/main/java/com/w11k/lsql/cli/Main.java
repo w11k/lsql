@@ -3,7 +3,6 @@ package com.w11k.lsql.cli;
 import com.google.common.io.MoreFiles;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.TableLike;
 import com.w11k.lsql.cli.java.CliArgs;
 import com.w11k.lsql.cli.java.JavaExporter;
 import com.w11k.lsql.cli.java.StatementFileExporter;
@@ -14,7 +13,6 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newLinkedList;
@@ -45,10 +43,8 @@ public class Main {
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
-        LinkedList<TableLike> tables = newLinkedList(lSql.getTables());
-
         if (cliArgs.getOutDirJava() != null) {
-            JavaExporter javaExporter = new JavaExporter(lSql, tables);
+            JavaExporter javaExporter = new JavaExporter(lSql);
             javaExporter.setPackageName(cliArgs.getGenPackageName());
             File outputRootPackageDir = new File(cliArgs.getOutDirJava());
             javaExporter.setOutputDir(outputRootPackageDir);
@@ -65,10 +61,10 @@ public class Main {
             // add statement rows
 //            for (StatementFileExporter statementFileExporter : this.statementFileExporters) {
 //                List<StatementRowColumnContainer> statementRows = statementFileExporter.getStatementRows();
-//                tables.addAll(statementRows);
+//                tableDataClassMetaList.addAll(statementRows);
 //            }
 //
-//            TypeScriptExporter tse = new TypeScriptExporter(tables);
+//            TypeScriptExporter tse = new TypeScriptExporter(tableDataClassMetaList);
 //            File outDirTs = new File(this.outDirTypeScript);
 //            tse.setOutputDir(outDirTs);
 //            tse.export();

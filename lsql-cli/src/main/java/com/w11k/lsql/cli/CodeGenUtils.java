@@ -65,6 +65,11 @@ public final class CodeGenUtils {
         return target;
     }
 
+    public static File getOutputFile(File exportRootDir, String packageName, String fileName) {
+        File baseDir = getFileFromBaseDirAndPackageName(exportRootDir, packageName);
+        return new File(baseDir, fileName);
+    }
+
     public static void writeContent(String content, File target) {
         try {
             log("Writing", target.getAbsolutePath());

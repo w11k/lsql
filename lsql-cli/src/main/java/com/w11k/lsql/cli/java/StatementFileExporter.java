@@ -20,8 +20,6 @@ import static com.w11k.lsql.cli.CodeGenUtils.*;
 
 public final class StatementFileExporter {
 
-    private final LSql lSql;
-
     private final File stmtSourceFile;
 
     private final JavaExporter javaExporter;
@@ -30,7 +28,7 @@ public final class StatementFileExporter {
 
     private final List<TypedStatementMeta> typedStatementMetas = Lists.newLinkedList();
 
-    private final List<StatementRowDataClassColumnContainer> statementRowDataClassList = Lists.newLinkedList();
+    private final List<DataClassMeta> stmtRowDataClassMetaList = Lists.newLinkedList();
 
     private final String targetPackageName;
 
@@ -41,7 +39,6 @@ public final class StatementFileExporter {
                                  File stmtSourceFile,
                                  String stmtFilesRootDir) {
 
-        this.lSql = lSql;
         this.javaExporter = javaExporter;
         this.stmtSourceFile = stmtSourceFile;
         this.stmtFilesRootDir = stmtFilesRootDir;
@@ -74,11 +71,13 @@ public final class StatementFileExporter {
 
             // out
             if (!stmt.getTypeAnnotation().toLowerCase().equals("void")) {
-                this.statementRowDataClassList.add(new StatementRowDataClassColumnContainer(
-                        this,
-                        typedStatementMeta,
-                        query
-                ));
+                DataClassMeta dcm = new DataClassMeta(
+                        firstCharUpperCase(stmt.getStatementName()),
+                        joinStringsAsPackageName(this.javaExporter.getPackageName(), this.getSubPackageName()));
+                query.query().createResultSetWithColumns().getColumns().forEach(c -> {
+                    dcm.addField(c.getName(), c.getConverter().getJavaType());
+                });
+                this.stmtRowDataClassMetaList.add(dcm);
             }
 
             rollback(lSql);
@@ -102,8 +101,9 @@ public final class StatementFileExporter {
                 .append(" {\n\n");
 
         for (TypedStatementMeta typedStatementMeta : this.typedStatementMetas) {
+            content.append("    // ------------------------------------------------------------------\n\n");
             TypedStatementExporter typedStatementExporter = new TypedStatementExporter(
-                    typedStatementMeta, this);
+                    this.javaExporter, typedStatementMeta, this);
             typedStatementExporter.export(content);
         }
 
@@ -128,16 +128,14 @@ public final class StatementFileExporter {
     }
 
     //    public List<StatementRowColumnContainer> getStatementRows() {
-//        return statementRowDataClassList;
+//        return stmtRowDataClassMetaList;
 //    }
 
     private void exportStatementRowClasses(Set<StructuralTypingField> structuralTypingFields) {
-        for (StatementRowDataClassColumnContainer statementRow : this.statementRowDataClassList) {
-            TableRowDataClassExporter stmtInRowClass = new TableRowDataClassExporter(
-                    this.lSql, statementRow, this.javaExporter, null);
-
-            structuralTypingFields.addAll(stmtInRowClass.getStructuralTypingFields());
-            stmtInRowClass.export();
+        for (DataClassMeta dataClassMeta : this.stmtRowDataClassMetaList) {
+            DataClassExporter dataClassExporter = new DataClassExporter(this.javaExporter, dataClassMeta, "");
+            structuralTypingFields.addAll(dataClassExporter.getStructuralTypingFields());
+            dataClassExporter.export();
         }
     }
 
@@ -158,12 +156,7 @@ public final class StatementFileExporter {
     }
 
     private String getPackageNameForStatement() {
-        // root part for all statements
-        String stmtsRootPackageName = javaExporter.getPackageName();
-
-        // sub part for this statement
-
-        return joinStringsAsPackageName(stmtsRootPackageName, getSubPackageName());
+        return joinStringsAsPackageName(javaExporter.getPackageName(), getSubPackageName());
     }
 
 }

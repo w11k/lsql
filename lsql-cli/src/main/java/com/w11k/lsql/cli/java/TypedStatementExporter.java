@@ -1,15 +1,22 @@
 package com.w11k.lsql.cli.java;
 
+import com.w11k.lsql.TypedStatementCommand;
+import com.w11k.lsql.TypedStatementQuery;
+
 import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
 
 public final class TypedStatementExporter {
+
+    private final JavaExporter javaExporter;
 
     private final TypedStatementMeta typedStatementMeta;
 
     private final StatementFileExporter statementFileExporter;
 
-    public TypedStatementExporter(TypedStatementMeta typedStatementMeta,
+    public TypedStatementExporter(JavaExporter javaExporter,
+                                  TypedStatementMeta typedStatementMeta,
                                   StatementFileExporter statementFileExporter) {
+        this.javaExporter = javaExporter;
         this.typedStatementMeta = typedStatementMeta;
         this.statementFileExporter = statementFileExporter;
     }
@@ -18,21 +25,35 @@ public final class TypedStatementExporter {
         String queryClassName = this.typedStatementMeta.getStatement().getStatementName();
 
         boolean isVoid = this.typedStatementMeta.getStatement().getTypeAnnotation().toLowerCase().equals("void");
-        String rowClassName = !isVoid ? firstCharUpperCase(queryClassName + "Row") : Void.class.getCanonicalName();
+        String rowClassName = !isVoid ? firstCharUpperCase(queryClassName) : Void.class.getCanonicalName();
+
+
+        DataClassMeta dcm = new DataClassMeta(queryClassName, "");
+        DataClassExporter dcExporter = new DataClassExporter(this.javaExporter, dcm, "");
+
+        String extendsClause = " extends ";
+        if (!isVoid) {
+            extendsClause += TypedStatementQuery.class.getCanonicalName();
+            extendsClause += "<";
+            extendsClause += rowClassName;
+            extendsClause += ">";
+        } else {
+            extendsClause += TypedStatementCommand.class.getCanonicalName();
+        }
+
+        dcExporter.createClass(
+                content,
+                true,
+                true,
+                extendsClause
+        );
+
 
         // query class
 //        content.append("    public class ")
 //                .append(queryClassName)
 //                .append(" extends ");
 //
-//        if (!isVoid) {
-//            content.append(TypedStatementQuery.class.getCanonicalName())
-//                    .append("<")
-//                    .append(rowClassName)
-//                    .append(">");
-//        } else {
-//            content.append(TypedStatementCommand.class.getCanonicalName());
-//        }
 //
 //        content.append(" {\n\n");
 
@@ -74,9 +95,8 @@ public final class TypedStatementExporter {
 
         // new query
         content.append("    public ").append(queryClassName).append(" ").append(queryClassName).append("() {\n")
-                .append("        return ").append("new ").append(queryClassName).append("(this.lSql);\n")
+                .append("        return ").append("new ").append(queryClassName).append("();\n")
                 .append("    }\n\n");
-
 
     }
 

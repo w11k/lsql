@@ -4,7 +4,6 @@ import com.w11k.lsql.cli.CodeGenUtils;
 
 import java.io.File;
 
-import static com.w11k.lsql.cli.CodeGenUtils.getFileFromBaseDirAndPackageName;
 import static com.w11k.lsql.cli.CodeGenUtils.joinStringsAsPackageName;
 
 public class StructuralTypingFieldExporter {
@@ -37,17 +36,11 @@ public class StructuralTypingFieldExporter {
 
         content.append("}");
 
-
-        File pojoSourceFile = getOutputFile();
+        File pojoSourceFile = CodeGenUtils.getOutputFile(
+                this.javaExporter.getOutputDir(),
+                joinStringsAsPackageName(this.javaExporter.getPackageName(), "structural_fields"),
+                this.stf.getInterfaceName() + ".java"
+        );
         CodeGenUtils.writeContent(content.toString(), pojoSourceFile);
     }
-
-    protected File getOutputFile() {
-        File baseDir = getFileFromBaseDirAndPackageName(
-                javaExporter.getOutputDir(),
-                joinStringsAsPackageName(javaExporter.getPackageName(), "structural_fields"));
-
-        return new File(baseDir, this.stf.getInterfaceName() + ".java");
-    }
-
 }

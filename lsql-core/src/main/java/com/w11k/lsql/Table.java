@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 
-public class Table implements TableLike {
+public class Table {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -80,7 +80,6 @@ public class Table implements TableLike {
         return primaryKeyColumn;
     }
 
-    @Override
     public Optional<Class<?>> getPrimaryKeyType() {
         Optional<String> pkNameOpt = this.getPrimaryKeyColumn();
         if (!pkNameOpt.isPresent()) {

@@ -1,3 +1,4 @@
+/*
 package com.w11k.lsql.cli.typescript;
 
 import com.w11k.lsql.Column;
@@ -97,3 +98,4 @@ public class TypeScriptExporter {
     }
 
 }
+*/
