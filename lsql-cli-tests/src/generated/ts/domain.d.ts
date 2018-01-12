@@ -51,6 +51,13 @@ export namespace com.w11k.lsql.cli.tests.stmts1 {
     }
 }
 
+export namespace com.w11k.lsql.cli.tests.stmts1 {
+    export interface QueryParamsWithDot {
+        id: number;
+        firstName: string;
+    }
+}
+
 export namespace com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2 {
     export interface LoadPersonsByAgeAndFirstName {
         id: number;

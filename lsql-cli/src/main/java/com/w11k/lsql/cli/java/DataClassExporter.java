@@ -245,13 +245,13 @@ public class DataClassExporter {
                             + " "
                             + field.getFieldName())
                     .collect(toList()));
-            content.append(arguments);
+            content.append(indentString()).append(arguments);
             content.append(") {\n");
 
             // assign member
             content.append(indentString()).append("        ").append(constructorBody).append("\n");
             for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
-                content.append("        ")
+                content.append(indentString()).append("        ")
                         .append("this.").append(field.getFieldName())
                         .append(" = ")
                         .append(field.getFieldName())

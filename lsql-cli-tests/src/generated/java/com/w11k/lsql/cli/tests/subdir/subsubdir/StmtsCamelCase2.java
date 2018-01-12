@@ -33,11 +33,11 @@ public class StmtsCamelCase2 {
         }
 
         private loadPersonsByAgeAndFirstName(
-            java.lang.String firstName,
+                java.lang.String firstName,
             java.lang.Number age) {
             super(lSql, sql_loadPersonsByAgeAndFirstName);
-        this.firstName = firstName;
-        this.age = age;
+            this.firstName = firstName;
+            this.age = age;
     }
 
         public loadPersonsByAgeAndFirstName(java.util.Map<String, Object> from) {
@@ -103,9 +103,9 @@ public class StmtsCamelCase2 {
         }
 
         private deletePersonByFirstName(
-            java.lang.String firstName) {
+                java.lang.String firstName) {
             super(lSql, sql_deletePersonByFirstName);
-        this.firstName = firstName;
+            this.firstName = firstName;
     }
 
         public deletePersonByFirstName(java.util.Map<String, Object> from) {

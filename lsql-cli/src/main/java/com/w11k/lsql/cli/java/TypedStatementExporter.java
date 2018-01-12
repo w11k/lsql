@@ -61,8 +61,10 @@ public final class TypedStatementExporter {
         // fields
         for (String parameterName : this.typedStatementMeta.getParameters().keySet()) {
             Class<?> paramType = this.typedStatementMeta.getParameters().get(parameterName);
-            String javaName = this.javaExporter.getlSql().identifierSqlToJava(parameterName);
-            dcm.addField(javaName, parameterName, paramType);
+
+            String saveParameterName = parameterName.replace(".", "_");
+            String javaName = this.javaExporter.getlSql().identifierSqlToJava(saveParameterName);
+            dcm.addField(javaName, saveParameterName, paramType);
         }
 
         DataClassExporter dcExporter = new DataClassExporter(this.javaExporter, dcm, "");

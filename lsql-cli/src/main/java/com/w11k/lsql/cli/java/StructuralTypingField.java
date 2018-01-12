@@ -40,7 +40,7 @@ public final class StructuralTypingField {
     }
 
     public String getGetterMethodName() {
-        if (fieldType.isAssignableFrom(Boolean.class)) {
+        if (Boolean.class.isAssignableFrom(fieldType)) {
             return "is" + uppercaseName;
         } else {
             return "get" + uppercaseName;
