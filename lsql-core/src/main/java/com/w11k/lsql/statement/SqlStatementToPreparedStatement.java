@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -105,6 +104,8 @@ public class SqlStatementToPreparedStatement {
             } else if (name.startsWith(":")) {
                 type = name.substring(1);
                 name = "";
+            } else if (name.endsWith(":")) {
+                name = name.substring(0, name.length() - 1);
             } else if (name.contains(":")) {
                 String[] split = name.split(":");
                 name = split[0];
@@ -301,14 +302,15 @@ public class SqlStatementToPreparedStatement {
 
                 // -1 because one ? was already set
                 offset += dqp.getNumberOfQueryParameters() - 1;
-            } else if (pips.value == null) {
-                ps.setNull(i + offset + 1, Types.OTHER);
-            } else {
+            }
+//            else if (pips.value == null) {
+//                ps.setNull(i + offset + 1, Types.OTHER);
+//            }
+            else {
                 // converter by param type
-                if (pips.converter == null) {
+                if (pips.converter == null && pips.value != null) {
                     pips.converter = this.lSql.getConverterForJavaType(pips.value.getClass());
                 }
-
                 if (pips.converter == null) {
                     throw new IllegalArgumentException(this.statementName + ": no registered converter for parameter " + pips);
                 }

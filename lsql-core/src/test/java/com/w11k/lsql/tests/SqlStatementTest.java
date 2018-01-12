@@ -259,7 +259,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         createTable();
         insert(0, 50, null);
         AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
-                "SELECT * FROM person WHERE fullname IS /*=*/ NULL /**/;");
+                "SELECT * FROM person WHERE fullname IS /*: string =*/ NULL /**/;");
 
         List<Row> rows = statement.query("fullname", null).toList();
         assertEquals(rows.size(), 1);
@@ -270,7 +270,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         createTable();
         insert(0, 50, null);
         AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
-                "SELECT * FROM person WHERE fullname IS /*aaa=*/ NULL /**/;");
+                "SELECT * FROM person WHERE fullname IS /*aaa: string =*/ NULL /**/;");
 
         List<Row> rows = statement.query("aaa", null).toList();
         assertEquals(rows.size(), 1);
@@ -478,6 +478,17 @@ public class SqlStatementTest extends AbstractLSqlTest {
 
         AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /* p1 : int =*/ 18 /**/;");
+
+        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
+        Assert.assertEquals(param.getJavaTypeAlias(), "int");
+    }
+
+    @Test()
+    public void queryParameterTypeAnnotations5() {
+        setup();
+
+        AbstractSqlStatement<RowQuery> statement = lSql.createSqlStatement(
+                "select * from person where age > /*p1: int =*/ 18 /**/;");
 
         SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
         Assert.assertEquals(param.getJavaTypeAlias(), "int");

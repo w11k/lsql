@@ -72,7 +72,7 @@ public final class StatementFileExporter {
                 DataClassMeta dcm = new DataClassMeta(
                         firstCharUpperCase(stmt.getStatementName()),
                         joinStringsAsPackageName(
-                                this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName));
+                                this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()));
                 query.query().createResultSetWithColumns().getColumns().forEach(c -> {
                     dcm.addField(c.getName(), c.getConverter().getJavaType());
                 });
@@ -98,6 +98,11 @@ public final class StatementFileExporter {
         content.append("import ")
                 .append(this.javaExporter.getPackageName())
                 .append(".structural_fields")
+                .append(".*;\n\n");
+
+        content.append("import ")
+                .append(joinStringsAsPackageName(
+                        this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()))
                 .append(".*;\n\n");
 
         content.append("public class ")
@@ -131,14 +136,6 @@ public final class StatementFileExporter {
         File outputFile = this.getOutputFile();
         writeContent(content.toString(), outputFile);
     }
-
-    public String getTargetPackageName() {
-        return targetPackageName;
-    }
-
-    //    public List<StatementRowColumnContainer> getStatementRows() {
-//        return stmtRowDataClassMetaList;
-//    }
 
     private void exportStatementRowClasses(Set<StructuralTypingField> structuralTypingFields) {
         for (DataClassMeta dataClassMeta : this.stmtRowDataClassMetaList) {
