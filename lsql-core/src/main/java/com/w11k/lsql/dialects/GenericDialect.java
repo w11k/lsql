@@ -48,7 +48,7 @@ public class GenericDialect {
         this.converterRegistry.addJavaToSqlConverter(
                 this.converterRegistry.getConverterForSqlType(Types.DOUBLE), false);
 
-        this.converterRegistry.addSqlToJavaConverter(new FloatConverter(), false);
+        this.converterRegistry.addConverter(new FloatConverter(), false);
 
         // boolean
         for (int sqlType : BooleanConverter.SQL_TYPES) {
