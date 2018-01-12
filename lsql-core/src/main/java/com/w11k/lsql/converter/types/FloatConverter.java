@@ -16,7 +16,7 @@ public class FloatConverter extends Converter {
 
     @Override
     protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
-        ps.setFloat(index, (Integer) val);
+        ps.setFloat(index, (Float) val);
     }
 
     @Override
