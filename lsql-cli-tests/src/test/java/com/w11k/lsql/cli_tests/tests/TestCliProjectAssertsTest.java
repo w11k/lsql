@@ -4,11 +4,13 @@ import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.cli.tests.Stmts1;
 import com.w11k.lsql.cli.tests.TestCliConfig;
 import com.w11k.lsql.cli.tests.schema_public.Person1_Row;
 import com.w11k.lsql.cli.tests.schema_public.Person1_Table;
 import com.w11k.lsql.cli.tests.schema_public.Person2_Row;
 import com.w11k.lsql.cli.tests.schema_public.Person2_Table;
+import com.w11k.lsql.cli.tests.stmts1.QueryParamsWithDot;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.StmtsCamelCase2;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
 import com.w11k.lsql.jdbc.ConnectionProviders;
@@ -204,6 +206,27 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
+    public void queryParameterWithDot() {
+        createTables(lSql);
+
+        Person1_Table person1Table = new Person1_Table(lSql);
+        person1Table.insert(new Person1_Row()
+                .withId(99)
+                .withFirstName("a"));
+
+        Stmts1 statement = new Stmts1(lSql);
+        List<QueryParamsWithDot> list = statement.queryParamsWithDot()
+                .withPerson1Id(99)
+                .toList();
+
+        assertEquals(list.size(), 1);
+
+        QueryParamsWithDot row = list.get(0);
+        assertEquals(row.getId(), new Integer(99));
+        assertEquals(row.getFirstName(), "a");
+    }
+
+    @Test
     public void statementDelete() {
         createTables(lSql);
 
@@ -222,7 +245,7 @@ public final class TestCliProjectAssertsTest {
                 .first();
         assertTrue(row.isPresent());
         assertEquals(row.get().getFirstName(), "a");
-        assertEquals(row.get().getAge(), new  Integer(50));
+        assertEquals(row.get().getAge(), new Integer(50));
 
         // delete
         statement.deletePersonByFirstName().withFirstName("a").execute();

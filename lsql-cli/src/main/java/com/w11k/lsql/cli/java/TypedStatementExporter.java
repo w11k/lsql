@@ -64,7 +64,7 @@ public final class TypedStatementExporter {
 
             String saveParameterName = parameterName.replace(".", "_");
             String javaName = this.javaExporter.getlSql().identifierSqlToJava(saveParameterName);
-            dcm.addField(javaName, saveParameterName, paramType);
+            dcm.addField(javaName, parameterName, paramType);
         }
 
         DataClassExporter dcExporter = new DataClassExporter(this.javaExporter, dcm, "");

@@ -199,7 +199,7 @@ public class Stmts1 {
 
         public queryParamsWithDot(java.util.Map<String, Object> from) {
             super(lSql, sql_queryParamsWithDot);
-            this.person1Id = (java.lang.Number) from.get("person1_id");
+            this.person1Id = (java.lang.Number) from.get("person1.id");
         }
 
         public final java.lang.Number person1Id;
@@ -216,7 +216,7 @@ public class Stmts1 {
 
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
-            map.put("person1_id", this.person1Id);
+            map.put("person1.id", this.person1Id);
             return map;
         }
 
