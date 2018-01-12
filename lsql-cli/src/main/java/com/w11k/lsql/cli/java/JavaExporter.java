@@ -27,6 +27,8 @@ public class JavaExporter {
 
     private boolean guice = false;
 
+    private List<DataClassMeta> generatedDataClasses = emptyList();
+
     public JavaExporter(LSql lSql) {
         this.lSql = lSql;
     }
@@ -37,8 +39,8 @@ public class JavaExporter {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void export() {
-        List<DataClassExporter> dataClassExporters = Lists.newLinkedList();
-
+        this.generatedDataClasses = Lists.newLinkedList();
+        List<DataClassExporter> tableDataClassExporters = Lists.newLinkedList();
         Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
 
         // Tables
@@ -58,21 +60,24 @@ public class JavaExporter {
                         dcm.addField(c.getJavaColumnName(), c.getConverter().getJavaType());
                     });
 
+            this.generatedDataClasses.add(dcm);
             DataClassExporter dataClassExporter = new DataClassExporter(this, dcm, "_Row");
-            dataClassExporters.add(dataClassExporter);
+            tableDataClassExporters.add(dataClassExporter);
 
             // generate table classes
-            new TableExporter(this.lSql, this, table, dataClassExporter).export();
+            new TableExporter(this, table, dataClassExporter).export();
         }
 
         // StatementFileExporter
         for (StatementFileExporter statementFileExporter : this.statementFileExporters) {
             Set<StructuralTypingField> stfs = statementFileExporter.exportAndGetStructuralTypingFields();
             structuralTypingFields.addAll(stfs);
+            List<DataClassMeta> stmtRowDataClassMetaList = statementFileExporter.getStmtRowDataClassMetaList();
+            this.generatedDataClasses.addAll(stmtRowDataClassMetaList);
         }
 
         // find unique StructuralTypingFields
-        for (DataClassExporter tableRowClassExporter : dataClassExporters) {
+        for (DataClassExporter tableRowClassExporter : tableDataClassExporters) {
             structuralTypingFields.addAll(tableRowClassExporter.getStructuralTypingFields());
         }
 
@@ -82,7 +87,7 @@ public class JavaExporter {
         }
 
         // generate row classes
-        for (DataClassExporter tableRowClassExporter : dataClassExporters) {
+        for (DataClassExporter tableRowClassExporter : tableDataClassExporters) {
             tableRowClassExporter.export();
         }
 
@@ -114,4 +119,11 @@ public class JavaExporter {
         this.guice = guice;
     }
 
+    public LSql getlSql() {
+        return lSql;
+    }
+
+    public List<DataClassMeta> getGeneratedDataClasses() {
+        return generatedDataClasses;
+    }
 }

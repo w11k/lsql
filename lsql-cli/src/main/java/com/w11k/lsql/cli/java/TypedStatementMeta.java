@@ -9,7 +9,6 @@ import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -23,9 +22,7 @@ public final class TypedStatementMeta {
 
     public TypedStatementMeta(LSql lSql,
                               AbstractSqlStatement<RowQuery> query,
-                              SqlStatementToPreparedStatement statement,
-                              String sqlStatementsDir,
-                              File statementSourceFile) {
+                              SqlStatementToPreparedStatement statement) {
 
         this.lSql = lSql;
         this.statement = statement;

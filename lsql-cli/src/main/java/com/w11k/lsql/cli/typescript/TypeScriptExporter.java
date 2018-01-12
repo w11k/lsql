@@ -1,13 +1,9 @@
-/*
 package com.w11k.lsql.cli.typescript;
 
-import com.w11k.lsql.Column;
-import com.w11k.lsql.TableLike;
 import com.w11k.lsql.cli.CodeGenUtils;
+import com.w11k.lsql.cli.java.DataClassMeta;
 
 import java.io.File;
-import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -20,17 +16,12 @@ public class TypeScriptExporter {
             "private",
             "protected"
     );
-
-    private final LinkedList<? extends TableLike> tables;
+    private final List<DataClassMeta> dataClassMetaList;
 
     private File outputDir = null;
 
-    public TypeScriptExporter(LinkedList<? extends TableLike> tables) throws SQLException {
-        this.tables = tables;
-    }
-
-    public File getOutputDir() {
-        return outputDir;
+    public TypeScriptExporter(List<DataClassMeta> dataClassMetaList) {
+        this.dataClassMetaList = dataClassMetaList;
     }
 
     public void setOutputDir(File outputDir) {
@@ -39,56 +30,50 @@ public class TypeScriptExporter {
 
     public void export() {
         StringBuilder content = new StringBuilder();
-        this.exportTables(content);
+        this.exportClasses(content);
 
         //noinspection ResultOfMethodCallIgnored
         this.outputDir.mkdirs();
-        File output = new File(this.outputDir, "domain.ts");
+        File output = new File(this.outputDir, "domain.d.ts");
         CodeGenUtils.writeContent(content.toString(), output);
     }
 
-    private void exportTables(StringBuilder content) {
-        for (TableLike table : this.tables) {
-            this.exportTable(content, table);
+    private void exportClasses(StringBuilder content) {
+        for (DataClassMeta dcm : this.dataClassMetaList) {
+            this.exportDataClass(content, dcm);
         }
     }
 
-    private void exportTable(StringBuilder content, TableLike table) {
-        content.append("export namespace ").append(mayPrefixSchemaName(table)).append(" {\n");
-        content.append("    export interface ").append(firstCharUpperCase(table.getTableName())).append(" {\n");
-        this.exportColumns(content, table);
+    private void exportDataClass(StringBuilder content, DataClassMeta dcMeta) {
+        content.append("export namespace ").append(mayPrefixSchemaName(dcMeta)).append(" {\n");
+        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName())).append(" {\n");
+        this.exportFields(content, dcMeta);
         content.append("    }\n");
         content.append("}\n\n");
     }
 
-    private String mayPrefixSchemaName(TableLike table) {
-        String schema = table.getSchemaName();
+    private String mayPrefixSchemaName(DataClassMeta dcMeta) {
+        String schema = dcMeta.getPackageName();
         return RESERVED_TS_NAMES.contains(schema) ? schema + "_" : schema;
     }
 
-    private void exportColumns(StringBuilder content, TableLike table) {
-        for (Column column : table.getColumns().values()) {
-            this.exportColumn(content, column);
+    private void exportFields(StringBuilder content, DataClassMeta dcMeta) {
+        for (DataClassMeta.DataClassFieldMeta field : dcMeta.getFields()) {
+            this.exportField(content, field);
         }
     }
 
-    private void exportColumn(StringBuilder content, Column column) {
-        Class<?> javaType = column.getConverter().getJavaType();
+    private void exportField(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
+        Class<?> javaType = field.getFieldType();
         String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);
         content.append("        ")
-                .append(column.getJavaColumnName()).append(": ").append(tsTypeName).append(";\n");
+                .append(field.getFieldName()).append(": ").append(tsTypeName).append(";\n");
     }
 
     private String getTypeScriptTypeNameForJavaType(Class<?> javaType) {
         if (String.class.isAssignableFrom(javaType)) {
             return "string";
-        } else if (Integer.class.isAssignableFrom(javaType)) {
-            return "number";
-        } else if (Long.class.isAssignableFrom(javaType)) {
-            return "number";
-        } else if (Float.class.isAssignableFrom(javaType)) {
-            return "number";
-        } else if (Double.class.isAssignableFrom(javaType)) {
+        } else if (Number.class.isAssignableFrom(javaType)) {
             return "number";
         } else if (Boolean.class.isAssignableFrom(javaType)) {
             return "boolean";
@@ -98,4 +83,3 @@ public class TypeScriptExporter {
     }
 
 }
-*/

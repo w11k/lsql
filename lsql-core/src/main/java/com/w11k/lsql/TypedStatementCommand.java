@@ -1,7 +1,5 @@
 package com.w11k.lsql;
 
-import com.google.common.collect.Maps;
-
 import java.util.Map;
 
 public abstract class TypedStatementCommand {
@@ -10,15 +8,15 @@ public abstract class TypedStatementCommand {
 
     private final String sqlStatement;
 
-    protected Map<String, Object> parameterValues = Maps.newHashMap();
-
     public TypedStatementCommand(LSql lSql, String sqlStatement) {
         this.lSql = lSql;
         this.sqlStatement = sqlStatement;
     }
 
     public void execute() {
-        this.lSql.createSqlStatement(this.sqlStatement).execute(this.parameterValues);
+        this.lSql.createSqlStatement(this.sqlStatement).execute(this.getQueryParameters());
     }
+
+    protected abstract Map<String, Object> getQueryParameters();
 
 }

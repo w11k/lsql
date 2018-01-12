@@ -18,7 +18,11 @@ public final class DataClassMeta {
     }
 
     public void addField(String fieldName, Class<?> fieldType) {
-        this.fields.add(new DataClassFieldMeta(fieldName, fieldType));
+        this.addField(fieldName, fieldName, fieldType);
+    }
+
+    public void addField(String fieldName, String fieldKeyInMap, Class<?> fieldType) {
+        this.fields.add(new DataClassFieldMeta(fieldName, fieldKeyInMap, fieldType));
     }
 
     public String getClassName() {
@@ -37,10 +41,13 @@ public final class DataClassMeta {
 
         private final String fieldName;
 
+        private final String fieldKeyName;
+
         private final Class<?> fieldType;
 
-        public DataClassFieldMeta(String fieldName, Class<?> fieldType) {
+        public DataClassFieldMeta(String fieldName, String fieldKeyName, Class<?> fieldType) {
             this.fieldName = fieldName;
+            this.fieldKeyName = fieldKeyName;
             this.fieldType = fieldType;
         }
 
@@ -50,6 +57,10 @@ public final class DataClassMeta {
 
         public Class<?> getFieldType() {
             return fieldType;
+        }
+
+        public String getFieldKeyName() {
+            return fieldKeyName;
         }
     }
 }

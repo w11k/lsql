@@ -63,9 +63,7 @@ public final class StatementFileExporter {
             TypedStatementMeta typedStatementMeta = new TypedStatementMeta(
                     lSql,
                     query,
-                    stmt,
-                    stmtFilesRootDir,
-                    stmtSourceFile
+                    stmt
             );
             this.typedStatementMetas.add(typedStatementMeta);
 
@@ -73,7 +71,8 @@ public final class StatementFileExporter {
             if (!stmt.getTypeAnnotation().toLowerCase().equals("void")) {
                 DataClassMeta dcm = new DataClassMeta(
                         firstCharUpperCase(stmt.getStatementName()),
-                        joinStringsAsPackageName(this.javaExporter.getPackageName(), this.getSubPackageName()));
+                        joinStringsAsPackageName(
+                                this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName));
                 query.query().createResultSetWithColumns().getColumns().forEach(c -> {
                     dcm.addField(c.getName(), c.getConverter().getJavaType());
                 });
@@ -86,25 +85,35 @@ public final class StatementFileExporter {
 
     public Set<StructuralTypingField> exportAndGetStructuralTypingFields() {
         Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
-        exportTypedStatementClass();
+        exportTypedStatementClass(structuralTypingFields);
         exportStatementRowClasses(structuralTypingFields);
         return structuralTypingFields;
     }
 
-    private void exportTypedStatementClass() {
+    private void exportTypedStatementClass(Set<StructuralTypingField> structuralTypingFields) {
         StringBuilder content = new StringBuilder();
 
         content.append("package ").append(this.targetPackageName).append(";\n\n");
+
+        content.append("import ")
+                .append(this.javaExporter.getPackageName())
+                .append(".structural_fields")
+                .append(".*;\n\n");
 
         content.append("public class ")
                 .append(stmtFileClassName)
                 .append(" {\n\n");
 
         for (TypedStatementMeta typedStatementMeta : this.typedStatementMetas) {
-            content.append("    // ------------------------------------------------------------------\n\n");
+            content.append("    // Statement: ")
+                    .append(typedStatementMeta.getStatement().getStatementName())
+                    .append(" ----------------------------\n\n");
+
             TypedStatementExporter typedStatementExporter = new TypedStatementExporter(
-                    this.javaExporter, typedStatementMeta, this);
-            typedStatementExporter.export(content);
+                    this.javaExporter, typedStatementMeta);
+            List<DataClassExporter> dataClassExportersForQueryParams = typedStatementExporter.export(content);
+            dataClassExportersForQueryParams
+                    .forEach(e -> structuralTypingFields.addAll(e.getStructuralTypingFields()));
         }
 
         // constructor
@@ -159,5 +168,8 @@ public final class StatementFileExporter {
         return joinStringsAsPackageName(javaExporter.getPackageName(), getSubPackageName());
     }
 
+    public List<DataClassMeta> getStmtRowDataClassMetaList() {
+        return stmtRowDataClassMetaList;
+    }
 }
 

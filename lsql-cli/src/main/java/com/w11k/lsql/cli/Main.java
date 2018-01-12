@@ -4,8 +4,10 @@ import com.google.common.io.MoreFiles;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.java.CliArgs;
+import com.w11k.lsql.cli.java.DataClassMeta;
 import com.w11k.lsql.cli.java.JavaExporter;
 import com.w11k.lsql.cli.java.StatementFileExporter;
+import com.w11k.lsql.cli.typescript.TypeScriptExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 
 import java.io.File;
@@ -43,8 +45,9 @@ public class Main {
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
         lSql.fetchMetaDataForAllTables();
 
+        JavaExporter javaExporter = null;
         if (cliArgs.getOutDirJava() != null) {
-            JavaExporter javaExporter = new JavaExporter(lSql);
+            javaExporter = new JavaExporter(lSql);
             javaExporter.setPackageName(cliArgs.getGenPackageName());
             File outputRootPackageDir = new File(cliArgs.getOutDirJava());
             javaExporter.setOutputDir(outputRootPackageDir);
@@ -57,18 +60,21 @@ public class Main {
             javaExporter.export();
         }
 
-//        if (this.outDirTypeScript != null) {
+        if (cliArgs.getOutDirTypeScript() != null && javaExporter != null) {
+            List<DataClassMeta> allDataClasses = javaExporter.getGeneratedDataClasses();
+
             // add statement rows
-//            for (StatementFileExporter statementFileExporter : this.statementFileExporters) {
+//            for (StatementFileExporter statementFileExporter : statementFileExporters) {
 //                List<StatementRowColumnContainer> statementRows = statementFileExporter.getStatementRows();
 //                tableDataClassMetaList.addAll(statementRows);
 //            }
-//
-//            TypeScriptExporter tse = new TypeScriptExporter(tableDataClassMetaList);
-//            File outDirTs = new File(this.outDirTypeScript);
-//            tse.setOutputDir(outDirTs);
-//            tse.export();
-//        }
+
+            TypeScriptExporter tse = new TypeScriptExporter(allDataClasses);
+
+            File outDirTs = new File(cliArgs.getOutDirTypeScript());
+            tse.setOutputDir(outDirTs);
+            tse.export();
+        }
 
     }
 

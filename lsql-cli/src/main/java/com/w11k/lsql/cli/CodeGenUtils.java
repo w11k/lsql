@@ -3,12 +3,14 @@ package com.w11k.lsql.cli;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import com.w11k.lsql.LSql;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class CodeGenUtils {
 
@@ -16,6 +18,19 @@ public final class CodeGenUtils {
         return line
                 .replaceAll("\n", " \\\\n ")
                 .replaceAll("\"", "\\\\\"");
+    }
+
+    public static String escapeSqlStringForJavaDoc(String line) {
+        Iterable<String> lines = Splitter.on("\n").split(line);
+        StringBuilder doc = new StringBuilder();
+        for (String l : lines) {
+            doc.append("\n     * ").append(l).append("<br>");
+        }
+        doc.append("\n");
+
+        return doc.toString()
+                .replaceAll("/\\*", "&#42;&#47;")
+                .replaceAll("\\*/", "&#47;&#42;");
     }
 
     public static String firstCharUpperCase(String name) {
@@ -44,12 +59,12 @@ public final class CodeGenUtils {
         return firstCharUpperCase(className);
     }
 
-    public static String joinStringsAsPackageName(String rootPackageName, String childPackageName) {
-        if (Strings.isNullOrEmpty(childPackageName)) {
-            return rootPackageName;
-        } else {
-            return rootPackageName + "." + childPackageName;
-        }
+    public static String joinStringsAsPackageName(String... packageNames) {
+        List<String> packages = Arrays.stream(packageNames)
+                .map(p -> p.trim().equals("") ? null : p) // change '' to null so that `skipNulls()` can filter
+                .collect(Collectors.toList());
+
+        return Joiner.on(".").skipNulls().join(packages);
     }
 
     public static File getFileFromBaseDirAndPackageName(File baseDir, String packageName) {
@@ -91,10 +106,6 @@ public final class CodeGenUtils {
     public static void log(String... strings) {
         String joined = Joiner.on(" ").join(strings);
         System.out.println(joined);
-    }
-
-    public static void addSeperator(StringBuilder content) {
-        content.append("\n    // ------------------------------------------------------------").append("\n\n");
     }
 
 }

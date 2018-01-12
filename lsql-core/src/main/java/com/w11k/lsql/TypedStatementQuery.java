@@ -1,7 +1,6 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -16,26 +15,24 @@ public abstract class TypedStatementQuery<T> {
 
     private final String sqlStatement;
 
-    protected Map<String, Object> parameterValues = Maps.newHashMap();
-
     public TypedStatementQuery(LSql lSql, String sqlStatement) {
         this.lSql = lSql;
         this.sqlStatement = sqlStatement;
     }
 
-    public Observable<T> toStream() {
+    public Observable<T> toObservable() {
         return this.lSql.createSqlStatement(this.sqlStatement)
-                .query(this.parameterValues)
+                .query(this.getQueryParameters())
                 .rx()
                 .map(this::createTypedRow);
     }
 
     public List<T> toList() {
-        return this.toStream().toList().toBlocking().first();
+        return this.toObservable().toList().toBlocking().first();
     }
 
     public <R> List<R> map(Func1<T, R> fn) {
-        return this.toStream()
+        return this.toObservable()
                 .map(fn)
                 .toList()
                 .toBlocking()
@@ -43,7 +40,7 @@ public abstract class TypedStatementQuery<T> {
     }
 
     public Optional<T> first() {
-        List<T> first = this.toStream().take(1).toList().toBlocking().first();
+        List<T> first = this.toObservable().take(1).toList().toBlocking().first();
         if (first.isEmpty()) {
             return Optional.absent();
         } else {
@@ -52,5 +49,7 @@ public abstract class TypedStatementQuery<T> {
     }
 
     protected abstract T createTypedRow(Row row);
+
+    protected abstract Map<String, Object> getQueryParameters();
 
 }

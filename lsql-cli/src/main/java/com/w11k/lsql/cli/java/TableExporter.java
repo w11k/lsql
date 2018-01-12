@@ -12,15 +12,13 @@ import static com.w11k.lsql.cli.CodeGenUtils.writeContent;
 
 public class TableExporter {
 
-    private final LSql lSql;
     private final JavaExporter javaExporter;
     private final Table table;
     private final DataClassExporter dataClassExporter;
     private StringBuilder content;
 
 
-    public TableExporter(LSql lSql, JavaExporter javaExporter, Table table, DataClassExporter dataClassExporter) {
-        this.lSql = lSql;
+    public TableExporter(JavaExporter javaExporter, Table table, DataClassExporter dataClassExporter) {
         this.javaExporter = javaExporter;
         this.table = table;
         this.dataClassExporter = dataClassExporter;
