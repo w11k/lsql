@@ -85,6 +85,7 @@ public class GenericDialect {
         this.converterRegistry.addTypeAlias("float", Float.class);
         this.converterRegistry.addTypeAlias("double", Double.class);
         this.converterRegistry.addTypeAlias("string", String.class);
+        this.converterRegistry.addTypeAlias("boolean", Boolean.class);
         this.converterRegistry.addTypeAlias("date", DateTime.class);
     }
 

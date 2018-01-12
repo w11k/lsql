@@ -243,7 +243,7 @@ public class Stmts1 {
         return new changeYesno();
     }
 
-    public final class changeYesno extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Object {
+    public final class changeYesno extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
         public changeYesno() {
             super(lSql, sql_changeYesno);
@@ -251,23 +251,23 @@ public class Stmts1 {
         }
 
         private changeYesno(
-                java.lang.Object yesno) {
+                java.lang.Boolean yesno) {
             super(lSql, sql_changeYesno);
             this.yesno = yesno;
     }
 
         public changeYesno(java.util.Map<String, Object> from) {
             super(lSql, sql_changeYesno);
-            this.yesno = (java.lang.Object) from.get("yesno");
+            this.yesno = (java.lang.Boolean) from.get("yesno");
         }
 
-        public final java.lang.Object yesno;
+        public final java.lang.Boolean yesno;
 
-        public java.lang.Object getYesno() {
+        public java.lang.Boolean isYesno() {
             return this.yesno;
         }
 
-        public changeYesno withYesno(java.lang.Object yesno) {
+        public changeYesno withYesno(java.lang.Boolean yesno) {
             return new changeYesno(yesno);
         }
 

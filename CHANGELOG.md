@@ -1,4 +1,9 @@
 
+**0.31.5**
+
+- infers Boolean from TRUE/FALSE in statements
+- several CLI bugfixes
+
 **0.30.0**
 
 - in SQL statements:

@@ -133,6 +133,8 @@ public class SqlStatementToPreparedStatement {
                     p.javaTypeAlias = "double";
                 } else if (NumberUtils.isNumber(placeHolderValue)) {
                     p.javaTypeAlias = "number";
+                } else if (placeHolderValue.equalsIgnoreCase("false") || placeHolderValue.equalsIgnoreCase("true")) {
+                    p.javaTypeAlias = "boolean";
                 }
             }
 
