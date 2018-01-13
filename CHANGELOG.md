@@ -1,4 +1,9 @@
 
+**0.31.8**
+
+- CLI now generates equals()/hashCode()/toString() methods
+
+
 **0.31.7**
 
 - CaseFormat for generated code can now be different from the dialect's "to" case format

@@ -1,8 +1,11 @@
 package com.w11k.lsql.cli.tests.schema_public;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
+import java.util.*;
 
 public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String, Age_Integer {
+
+    // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
@@ -15,6 +18,8 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
         target = ((Age_Integer) target).withAge(source.getAge());
         return (Person2_Row) target;
     }
+
+    // constructors ----------
 
     public Person2_Row() {
         
@@ -39,6 +44,8 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
         this.firstName = (java.lang.String) from.get("first_name");
         this.age = (java.lang.Integer) from.get("age");
     }
+
+    // fields ----------
 
     public static final String COL_ID = "id";
 
@@ -105,6 +112,30 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
         map.put("first_name", this.firstName);
         map.put("age", this.age);
         return map;
+    }
+
+    // Object methods ----------
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person2_Row that = (Person2_Row) o;
+        return     Objects.equals(id, that.id) && 
+            Objects.equals(firstName, that.firstName) && 
+            Objects.equals(age, that.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, age);
+    }
+
+    @Override
+    public String toString() {
+        return "Person2_Row{" + "id=" + id
+            + ", " + "firstName=" + firstName
+            + ", " + "age=" + age + "}";
     }
 
 }

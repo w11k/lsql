@@ -1,8 +1,11 @@
 package com.w11k.lsql.cli.tests.stmts1;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
+import java.util.*;
 
 public final class LoadAllPersonsEscaped2 implements com.w11k.lsql.TableRow, Theid_Integer {
+
+    // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
@@ -11,6 +14,8 @@ public final class LoadAllPersonsEscaped2 implements com.w11k.lsql.TableRow, The
         target = ((Theid_Integer) target).withTheid(source.getTheid());
         return (LoadAllPersonsEscaped2) target;
     }
+
+    // constructors ----------
 
     public LoadAllPersonsEscaped2() {
         
@@ -27,6 +32,8 @@ public final class LoadAllPersonsEscaped2 implements com.w11k.lsql.TableRow, The
         
         this.theid = (java.lang.Integer) from.get("theid");
     }
+
+    // fields ----------
 
     public static final String COL_THEID = "theid";
 
@@ -63,6 +70,26 @@ public final class LoadAllPersonsEscaped2 implements com.w11k.lsql.TableRow, The
         java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
         map.put("theid", this.theid);
         return map;
+    }
+
+    // Object methods ----------
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LoadAllPersonsEscaped2 that = (LoadAllPersonsEscaped2) o;
+        return     Objects.equals(theid, that.theid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(theid);
+    }
+
+    @Override
+    public String toString() {
+        return "LoadAllPersonsEscaped2{" + "theid=" + theid + "}";
     }
 
 }

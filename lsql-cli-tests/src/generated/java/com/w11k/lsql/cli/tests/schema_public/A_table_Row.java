@@ -1,8 +1,11 @@
 package com.w11k.lsql.cli.tests.schema_public;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
+import java.util.*;
 
 public final class A_table_Row implements com.w11k.lsql.TableRow, Id_Integer {
+
+    // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
@@ -11,6 +14,8 @@ public final class A_table_Row implements com.w11k.lsql.TableRow, Id_Integer {
         target = ((Id_Integer) target).withId(source.getId());
         return (A_table_Row) target;
     }
+
+    // constructors ----------
 
     public A_table_Row() {
         
@@ -27,6 +32,8 @@ public final class A_table_Row implements com.w11k.lsql.TableRow, Id_Integer {
         
         this.id = (java.lang.Integer) from.get("id");
     }
+
+    // fields ----------
 
     public static final String COL_ID = "id";
 
@@ -63,6 +70,26 @@ public final class A_table_Row implements com.w11k.lsql.TableRow, Id_Integer {
         java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
         map.put("id", this.id);
         return map;
+    }
+
+    // Object methods ----------
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        A_table_Row that = (A_table_Row) o;
+        return     Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "A_table_Row{" + "id=" + id + "}";
     }
 
 }

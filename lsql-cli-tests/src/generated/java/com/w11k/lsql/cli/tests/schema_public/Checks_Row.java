@@ -1,8 +1,11 @@
 package com.w11k.lsql.cli.tests.schema_public;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
+import java.util.*;
 
 public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
+
+    // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
@@ -11,6 +14,8 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
         target = ((Yesno_Boolean) target).withYesno(source.isYesno());
         return (Checks_Row) target;
     }
+
+    // constructors ----------
 
     public Checks_Row() {
         
@@ -27,6 +32,8 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
         
         this.yesno = (java.lang.Boolean) from.get("yesno");
     }
+
+    // fields ----------
 
     public static final String COL_YESNO = "yesno";
 
@@ -63,6 +70,26 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
         java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
         map.put("yesno", this.yesno);
         return map;
+    }
+
+    // Object methods ----------
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Checks_Row that = (Checks_Row) o;
+        return     Objects.equals(yesno, that.yesno);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(yesno);
+    }
+
+    @Override
+    public String toString() {
+        return "Checks_Row{" + "yesno=" + yesno + "}";
     }
 
 }

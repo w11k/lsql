@@ -1,8 +1,8 @@
 package com.w11k.lsql.cli.tests.subdir.subsubdir;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
-
 import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.*;
+import java.util.*;
 
 public class StmtsCamelCase2 {
 
@@ -26,6 +26,8 @@ public class StmtsCamelCase2 {
 
     public final class loadPersonsByAgeAndFirstName extends com.w11k.lsql.TypedStatementQuery<LoadPersonsByAgeAndFirstName> implements com.w11k.lsql.TableRow, First_Name_String, Age_Number {
 
+        // constructors ----------
+
         public loadPersonsByAgeAndFirstName() {
             super(lSql, sql_loadPersonsByAgeAndFirstName);
             this.firstName = null;
@@ -45,6 +47,8 @@ public class StmtsCamelCase2 {
             this.firstName = (java.lang.String) from.get("first_name");
             this.age = (java.lang.Number) from.get("age");
         }
+
+        // fields ----------
 
         public final java.lang.String firstName;
 
@@ -74,6 +78,28 @@ public class StmtsCamelCase2 {
             return map;
         }
 
+        // Object methods ----------
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            loadPersonsByAgeAndFirstName that = (loadPersonsByAgeAndFirstName) o;
+            return     Objects.equals(firstName, that.firstName) && 
+                Objects.equals(age, that.age);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(firstName, age);
+        }
+
+        @Override
+        public String toString() {
+            return "loadPersonsByAgeAndFirstName{" + "firstName=" + firstName
+                + ", " + "age=" + age + "}";
+        }
+
         protected LoadPersonsByAgeAndFirstName createTypedRow(com.w11k.lsql.Row row) {
             return new LoadPersonsByAgeAndFirstName(row);
         }
@@ -97,6 +123,8 @@ public class StmtsCamelCase2 {
 
     public final class deletePersonByFirstName extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, First_Name_String {
 
+        // constructors ----------
+
         public deletePersonByFirstName() {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = null;
@@ -112,6 +140,8 @@ public class StmtsCamelCase2 {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = (java.lang.String) from.get("first_name");
         }
+
+        // fields ----------
 
         public final java.lang.String firstName;
 
@@ -129,6 +159,26 @@ public class StmtsCamelCase2 {
             java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
             map.put("first_name", this.firstName);
             return map;
+        }
+
+        // Object methods ----------
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            deletePersonByFirstName that = (deletePersonByFirstName) o;
+            return     Objects.equals(firstName, that.firstName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(firstName);
+        }
+
+        @Override
+        public String toString() {
+            return "deletePersonByFirstName{" + "firstName=" + firstName + "}";
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {

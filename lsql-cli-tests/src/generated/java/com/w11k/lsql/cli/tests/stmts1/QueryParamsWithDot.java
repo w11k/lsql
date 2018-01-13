@@ -1,8 +1,11 @@
 package com.w11k.lsql.cli.tests.stmts1;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
+import java.util.*;
 
 public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String {
+
+    // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
@@ -13,6 +16,8 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
         target = ((First_Name_String) target).withFirstName(source.getFirstName());
         return (QueryParamsWithDot) target;
     }
+
+    // constructors ----------
 
     public QueryParamsWithDot() {
         
@@ -33,6 +38,8 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
         this.id = (java.lang.Integer) from.get("id");
         this.firstName = (java.lang.String) from.get("first_name");
     }
+
+    // fields ----------
 
     public static final String COL_ID = "id";
 
@@ -84,6 +91,28 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
         map.put("id", this.id);
         map.put("first_name", this.firstName);
         return map;
+    }
+
+    // Object methods ----------
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QueryParamsWithDot that = (QueryParamsWithDot) o;
+        return     Objects.equals(id, that.id) && 
+            Objects.equals(firstName, that.firstName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName);
+    }
+
+    @Override
+    public String toString() {
+        return "QueryParamsWithDot{" + "id=" + id
+            + ", " + "firstName=" + firstName + "}";
     }
 
 }

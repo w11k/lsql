@@ -1,8 +1,11 @@
 package com.w11k.lsql.cli.tests.stmts1;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
+import java.util.*;
 
 public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow, A_Field_Integer, Afield_String {
+
+    // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
@@ -13,6 +16,8 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
         target = ((Afield_String) target).withAfield(source.getAfield());
         return (KeepUnderscoreForCamelCase) target;
     }
+
+    // constructors ----------
 
     public KeepUnderscoreForCamelCase() {
         
@@ -33,6 +38,8 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
         this.aField = (java.lang.Integer) from.get("a_field");
         this.afield = (java.lang.String) from.get("afield");
     }
+
+    // fields ----------
 
     public static final String COL_A_FIELD = "a_field";
 
@@ -84,6 +91,28 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
         map.put("a_field", this.aField);
         map.put("afield", this.afield);
         return map;
+    }
+
+    // Object methods ----------
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KeepUnderscoreForCamelCase that = (KeepUnderscoreForCamelCase) o;
+        return     Objects.equals(aField, that.aField) && 
+            Objects.equals(afield, that.afield);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(aField, afield);
+    }
+
+    @Override
+    public String toString() {
+        return "KeepUnderscoreForCamelCase{" + "aField=" + aField
+            + ", " + "afield=" + afield + "}";
     }
 
 }

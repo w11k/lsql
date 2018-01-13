@@ -99,12 +99,16 @@ public final class StatementFileExporter {
         content.append("import ")
                 .append(this.javaExporter.getPackageName())
                 .append(".structural_fields")
-                .append(".*;\n\n");
+                .append(".*;\n");
 
         content.append("import ")
                 .append(joinStringsAsPackageName(
                         this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()))
-                .append(".*;\n\n");
+                .append(".*;\n");
+
+        content.append("import java.util.*;\n");
+
+        content.append("\n");
 
         content.append("public class ")
                 .append(stmtFileClassName)

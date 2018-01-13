@@ -74,7 +74,9 @@ public class DataClassExporter {
 
         String stmtFieldsPackageName = joinStringsAsPackageName(
                 this.javaExporter.getPackageName(), "structural_fields");
-        content.append("import ").append(stmtFieldsPackageName).append(".*;\n\n");
+        content.append("import ").append(stmtFieldsPackageName).append(".*;\n");
+        content.append("import java.util.*;\n");
+        content.append("\n");
 
         createClass(content);
     }
@@ -102,12 +104,18 @@ public class DataClassExporter {
         content.append(" {\n\n");
 
         if (!skipStaticAndUtilElements) {
+            content.append(indentString()).append("    // static methods ----------\n\n");
+
             // static from
             contentFrom(content);
         }
 
+        content.append(indentString()).append("    // constructors ----------\n\n");
+
         // constructors
         contentConstructors(content, constructorBody);
+
+        content.append(indentString()).append("    // fields ----------\n\n");
 
         // Field instances and getter/setter
         for (DataClassMeta.DataClassFieldMeta field : dcm.getFields()) {
@@ -132,10 +140,75 @@ public class DataClassExporter {
         // toMap
         contentToMap(content);
 
+        content.append(indentString()).append("    // Object methods ----------\n\n");
+        contentEquals(content);
+        contentHash(content);
+        contentToString(content);
+
         if (!keepClassBodyOpen) {
             content.append("}\n");
         }
 
+    }
+
+    private void contentEquals(StringBuilder content) {
+        content.append(indentString()).append("    @Override\n");
+        content.append(indentString()).append("    public boolean equals(Object o) {\n");
+        content.append(indentString()).append("        if (this == o) return true;\n");
+        content.append(indentString()).append("        if (o == null || getClass() != o.getClass()) return false;\n");
+        content.append(indentString()).append("        ").append(this.getClassName()).append(" that = ")
+                .append("(").append(this.getClassName()).append(") o;\n");
+
+        if (this.dataClassMeta.getFields().size() == 0) {
+            content.append(indentString()).append("        return true;\n");
+        } else {
+            content.append(indentString()).append("        return ");
+
+            List<String> fieldEquals = this.dataClassMeta.getFields().stream()
+                    .map(f -> "    Objects.equals(" + f.getFieldName() + ", that." + f.getFieldName() + ")")
+                    .collect(toList());
+
+            content.append(Joiner.on(" && \n" + indentString() + "        ").join(fieldEquals));
+            content.append(";\n");
+        }
+
+        content.append(indentString()).append("    }\n\n");
+    }
+
+    private void contentHash(StringBuilder content) {
+        content.append(indentString()).append("    @Override\n");
+        content.append(indentString()).append("    public int hashCode() {\n");
+        content.append(indentString()).append("        return Objects.hash(");
+
+        if (this.dataClassMeta.getFields().size() == 0) {
+            content.append("\"").append(this.getClassName()).append("\"");
+        } else {
+            List<String> fieldNames = this.dataClassMeta.getFields().stream()
+                    .map(DataClassMeta.DataClassFieldMeta::getFieldName)
+                    .collect(toList());
+
+            content.append(Joiner.on(", ").join(fieldNames));
+        }
+        content.append(");\n");
+        content.append(indentString()).append("    }\n\n");
+    }
+
+    private void contentToString(StringBuilder content) {
+        content.append(indentString()).append("    @Override\n");
+        content.append(indentString()).append("    public String toString() {\n");
+        content.append(indentString()).append("        return \"").append(getClassName()).append("{\" + ");
+
+        if (this.dataClassMeta.getFields().size() == 0) {
+            content.append("\"\"");
+        } else {
+            List<String> fieldNames = this.dataClassMeta.getFields().stream()
+                    .map(f -> "\"" + f.getFieldName() + "=\" + " + f.getFieldName())
+                    .collect(toList());
+
+            content.append(Joiner.on("\n" + this.indentString() + "            + \", \" + ").join(fieldNames));
+        }
+        content.append(" + \"}\";\n");
+        content.append(indentString()).append("    }\n\n");
     }
 
     private void contentToMap(StringBuilder content) {

@@ -111,6 +111,32 @@ public final class TestCliProjectAssertsTest {
     }
 
     @Test
+    public void dataClassEquals() {
+        Person2_Row p1 = new Person2_Row().withId(2).withFirstName("b").withAge(50);
+        Person2_Row p2 = new Person2_Row().withId(2).withFirstName("b").withAge(50);
+        assertEquals(p1, p2);
+    }
+
+    @Test
+    public void dataClassHashCode() {
+        Person2_Row p1 = new Person2_Row().withId(2).withFirstName("b").withAge(50);
+        Person2_Row p2 = new Person2_Row().withId(2).withFirstName("b").withAge(50);
+        assertEquals(p1.hashCode(), p2.hashCode());
+    }
+
+    @Test
+    public void dataClassToString() {
+        Person2_Row o = new Person2_Row().withId(123456789).withFirstName("abcdefghi").withAge(987654321);
+        assertTrue(o.toString().contains("Person2_Row"));
+        assertTrue(o.toString().contains("id="));
+        assertTrue(o.toString().contains("12345678"));
+        assertTrue(o.toString().contains("firstName="));
+        assertTrue(o.toString().contains("abcdefghi"));
+        assertTrue(o.toString().contains("age="));
+        assertTrue(o.toString().contains("987654321"));
+    }
+
+    @Test
     public void insert() {
         createTables(lSql);
 
