@@ -1,12 +1,12 @@
 export namespace com.w11k.lsql.cli.tests.schema_public {
-    export interface A_Table {
+    export interface Person1 {
         id: number;
+        firstName: string;
     }
 }
 
 export namespace com.w11k.lsql.cli.tests.schema_public {
-    export interface Person1 {
-        firstName: string;
+    export interface A_table {
         id: number;
     }
 }
@@ -19,8 +19,8 @@ export namespace com.w11k.lsql.cli.tests.schema_public {
 
 export namespace com.w11k.lsql.cli.tests.schema_public {
     export interface Person2 {
-        firstName: string;
         id: number;
+        firstName: string;
         age: number;
     }
 }

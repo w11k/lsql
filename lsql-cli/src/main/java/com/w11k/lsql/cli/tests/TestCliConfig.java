@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.dialects.H2Dialect;
+import com.w11k.lsql.dialects.IdentifierConverter;
 
 public final class TestCliConfig extends Config {
 
@@ -15,6 +16,7 @@ public final class TestCliConfig extends Config {
 
     public TestCliConfig() {
         setDialect(new H2Dialect());
+        getDialect().setIdentifierConverter(IdentifierConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
     }
 
 }

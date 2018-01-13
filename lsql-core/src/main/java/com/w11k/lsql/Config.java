@@ -1,5 +1,6 @@
 package com.w11k.lsql;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.GenericDialect;
@@ -13,6 +14,8 @@ public class Config {
     private GenericDialect dialect = new GenericDialect();
 
     private Integer defaultQueryTimeoutInSeconds = null;
+
+    private CaseFormat codeGenerationCaseFormat = CaseFormat.LOWER_CAMEL;
 
     public Config() {
     }
@@ -65,5 +68,13 @@ public class Config {
 
     protected void setDefaultQueryTimeoutInSeconds(Integer defaultQueryTimeoutInSeconds) {
         this.defaultQueryTimeoutInSeconds = defaultQueryTimeoutInSeconds;
+    }
+
+    public CaseFormat getCodeGenerationCaseFormat() {
+        return codeGenerationCaseFormat;
+    }
+
+    public void setCodeGenerationCaseFormat(CaseFormat codeGenerationCaseFormat) {
+        this.codeGenerationCaseFormat = codeGenerationCaseFormat;
     }
 }

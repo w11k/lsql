@@ -1,18 +1,23 @@
 package com.w11k.lsql.cli.java;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
+import com.w11k.lsql.Config;
+import com.w11k.lsql.dialects.IdentifierConverter;
 
 import java.util.List;
 
 public final class DataClassMeta {
 
+    private final Config config;
     private final String className;
 
     private final String packageName;
 
     private final List<DataClassFieldMeta> fields = Lists.newLinkedList();
 
-    public DataClassMeta(String className, String packageName) {
+    public DataClassMeta(Config config, String className, String packageName) {
+        this.config = config;
         this.className = className;
         this.packageName = packageName;
     }
@@ -22,6 +27,11 @@ public final class DataClassMeta {
     }
 
     public void addField(String fieldName, String fieldKeyInMap, Class<?> fieldType) {
+        // always use LOWER_CAMEL case format
+        IdentifierConverter identifierConverter = this.config.getDialect().getIdentifierConverter();
+        CaseFormat toCaseFormat = identifierConverter.getToCaseFormat();
+        fieldName = toCaseFormat.to(this.config.getCodeGenerationCaseFormat(), fieldName);
+
         this.fields.add(new DataClassFieldMeta(fieldName, fieldKeyInMap, fieldType));
     }
 

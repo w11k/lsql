@@ -280,11 +280,11 @@ public class DataClassExporter {
 
     private void contentStaticFieldName(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
         String staticName = this.javaExporter.getlSql().getConfig().getDialect().getIdentifierConverter().getToCaseFormat()
-                .to(CaseFormat.UPPER_UNDERSCORE, field.getFieldName());
+                .to(CaseFormat.UPPER_UNDERSCORE, field.getFieldKeyName());
 
         content.append(indentString()).append("    public static final String COL_").append(staticName).append(" = ")
                 .append("\"")
-                .append(field.getFieldName())
+                .append(field.getFieldKeyName())
                 .append("\";\n\n");
     }
 

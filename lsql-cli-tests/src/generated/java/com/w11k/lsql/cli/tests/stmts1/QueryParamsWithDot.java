@@ -31,7 +31,7 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
     public QueryParamsWithDot(java.util.Map<String, Object> from) {
         
         this.id = (java.lang.Integer) from.get("id");
-        this.firstName = (java.lang.String) from.get("firstName");
+        this.firstName = (java.lang.String) from.get("first_name");
     }
 
     public static final String COL_ID = "id";
@@ -45,7 +45,7 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
     public QueryParamsWithDot withId(java.lang.Integer id) {
         return new QueryParamsWithDot(id,firstName);
     }
-    public static final String COL_FIRST_NAME = "firstName";
+    public static final String COL_FIRST_NAME = "first_name";
 
     public final java.lang.String firstName;
 
@@ -82,7 +82,7 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
         map.put("id", this.id);
-        map.put("firstName", this.firstName);
+        map.put("first_name", this.firstName);
         return map;
     }
 

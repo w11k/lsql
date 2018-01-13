@@ -56,13 +56,14 @@ public final class TypedStatementExporter {
         // constructor body
         String constructorBody = "super(lSql, sql_" + queryClassName + ");";
 
-        DataClassMeta dcm = new DataClassMeta(queryClassName, "");
+        DataClassMeta dcm = new DataClassMeta(
+                this.javaExporter.getlSql().getConfig(), queryClassName, "");
 
         // fields
         for (String parameterName : this.typedStatementMeta.getParameters().keySet()) {
             Class<?> paramType = this.typedStatementMeta.getParameters().get(parameterName);
 
-            String saveParameterName = parameterName.replace(".", "_");
+            String saveParameterName = parameterName.replace(".", "__");
             String javaName = this.javaExporter.getlSql().identifierSqlToJava(saveParameterName);
             dcm.addField(javaName, parameterName, paramType);
         }

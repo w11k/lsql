@@ -54,7 +54,7 @@ public class JavaExporter {
             String fullPackageName = joinStringsAsPackageName(packageName, lastPackageSegment);
             String className = createSaveNameForClass(table.getTableName());
 
-            DataClassMeta dcm = new DataClassMeta(className, fullPackageName);
+            DataClassMeta dcm = new DataClassMeta(this.lSql.getConfig(), className, fullPackageName);
             table.getColumns().values()
                     .forEach(c -> {
                         dcm.addField(c.getJavaColumnName(), c.getConverter().getJavaType());

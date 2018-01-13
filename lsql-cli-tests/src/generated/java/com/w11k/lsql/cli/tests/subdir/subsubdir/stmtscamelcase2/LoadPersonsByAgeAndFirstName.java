@@ -36,7 +36,7 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
     public LoadPersonsByAgeAndFirstName(java.util.Map<String, Object> from) {
         
         this.id = (java.lang.Integer) from.get("id");
-        this.firstName = (java.lang.String) from.get("firstName");
+        this.firstName = (java.lang.String) from.get("first_name");
         this.age = (java.lang.Integer) from.get("age");
     }
 
@@ -51,7 +51,7 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
     public LoadPersonsByAgeAndFirstName withId(java.lang.Integer id) {
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
-    public static final String COL_FIRST_NAME = "firstName";
+    public static final String COL_FIRST_NAME = "first_name";
 
     public final java.lang.String firstName;
 
@@ -102,7 +102,7 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
         map.put("id", this.id);
-        map.put("firstName", this.firstName);
+        map.put("first_name", this.firstName);
         map.put("age", this.age);
         return map;
     }

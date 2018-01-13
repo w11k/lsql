@@ -30,11 +30,11 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
 
     public KeepUnderscoreForCamelCase(java.util.Map<String, Object> from) {
         
-        this.aField = (java.lang.Integer) from.get("aField");
+        this.aField = (java.lang.Integer) from.get("a_field");
         this.afield = (java.lang.String) from.get("afield");
     }
 
-    public static final String COL_A_FIELD = "aField";
+    public static final String COL_A_FIELD = "a_field";
 
     public final java.lang.Integer aField;
 
@@ -81,7 +81,7 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
 
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
-        map.put("aField", this.aField);
+        map.put("a_field", this.aField);
         map.put("afield", this.afield);
         return map;
     }

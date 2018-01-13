@@ -1,4 +1,9 @@
 
+**0.31.7**
+
+- CaseFormat for generated code can now be different from the dialect's "to" case format
+
+
 **0.31.5**
 
 - infers Boolean from TRUE/FALSE in statements
