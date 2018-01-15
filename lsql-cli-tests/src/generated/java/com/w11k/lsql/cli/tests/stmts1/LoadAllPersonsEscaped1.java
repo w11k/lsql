@@ -35,7 +35,7 @@ public final class LoadAllPersonsEscaped1 implements com.w11k.lsql.TableRow, The
 
     // fields ----------
 
-    public static final String COL_THEID = "theid";
+    public static final String FIELD_theid = "theid";
 
     public final java.lang.Integer theid;
 

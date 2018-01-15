@@ -49,9 +49,9 @@ public class Main {
         if (cliArgs.getOutDirJava() != null) {
             javaExporter = new JavaExporter(lSql);
             javaExporter.setPackageName(cliArgs.getGenPackageName());
-            File outputRootPackageDir = new File(cliArgs.getOutDirJava());
-            javaExporter.setOutputDir(outputRootPackageDir);
+            javaExporter.setOutputDir(new File(cliArgs.getOutDirJava()));
             javaExporter.setGuice(cliArgs.isGuice());
+            javaExporter.setDtoDeclarationSearchDir(cliArgs.getDto());
 
             // Java statements
             List<StatementFileExporter> statementFileExporters = createStatements(lSql, javaExporter, cliArgs);
@@ -62,13 +62,6 @@ public class Main {
 
         if (cliArgs.getOutDirTypeScript() != null && javaExporter != null) {
             List<DataClassMeta> allDataClasses = javaExporter.getGeneratedDataClasses();
-
-            // add statement rows
-//            for (StatementFileExporter statementFileExporter : statementFileExporters) {
-//                List<StatementRowColumnContainer> statementRows = statementFileExporter.getStatementRows();
-//                tableDataClassMetaList.addAll(statementRows);
-//            }
-
             TypeScriptExporter tse = new TypeScriptExporter(allDataClasses);
 
             File outDirTs = new File(cliArgs.getOutDirTypeScript());
@@ -83,7 +76,6 @@ public class Main {
     }
 
     private List<StatementFileExporter> createStatements(LSql lSql, JavaExporter javaExporter, CliArgs cliArgs) {
-
         List<StatementFileExporter> list = newLinkedList();
 
         if (cliArgs.getSqlStatements() != null) {

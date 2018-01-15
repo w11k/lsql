@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.cli.tests.DummyDto;
 import com.w11k.lsql.cli.tests.Stmts1;
 import com.w11k.lsql.cli.tests.TestCliConfig;
 import com.w11k.lsql.cli.tests.schema_public.Person1_Row;
@@ -11,6 +12,7 @@ import com.w11k.lsql.cli.tests.schema_public.Person1_Table;
 import com.w11k.lsql.cli.tests.schema_public.Person2_Row;
 import com.w11k.lsql.cli.tests.schema_public.Person2_Table;
 import com.w11k.lsql.cli.tests.stmts1.QueryParamsWithDot;
+import com.w11k.lsql.cli.tests.sub_for_dto.SubDummyDto;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.StmtsCamelCase2;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
 import com.w11k.lsql.jdbc.ConnectionProviders;
@@ -48,8 +50,8 @@ public final class TestCliProjectAssertsTest {
         // insert with static util fields
         Table table = this.lSql.table(Person1_Table.NAME);
         Row person1Row = Row.fromKeyVals(
-                Person1_Row.COL_ID, 1,
-                Person1_Row.COL_FIRST_NAME, "a"
+                Person1_Row.FIELD_id, 1,
+                Person1_Row.FIELD_first_name, "a"
         );
         table.insert(person1Row);
 
@@ -284,4 +286,12 @@ public final class TestCliProjectAssertsTest {
         assertFalse(row.isPresent());
     }
 
+    @Test
+    public void dto() {
+        SubDummyDto dto = new DummyDto()
+                .withFieldA("a")
+                .as(SubDummyDto.class);
+
+        assertEquals(dto.fieldA, "a");
+    }
 }

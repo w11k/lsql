@@ -35,7 +35,7 @@ public final class A_table_Row implements com.w11k.lsql.TableRow, Id_Integer {
 
     // fields ----------
 
-    public static final String COL_ID = "id";
+    public static final String FIELD_id = "id";
 
     public final java.lang.Integer id;
 

@@ -67,6 +67,7 @@ public final class TestCliProjectGenerationTest {
                 "user:",
                 "password:",
                 "sqlStatements:" + pathRelativeToProjectRoot("pom.xml", "./src/test/java/com/w11k/lsql/cli/tests"),
+                "dto:" + pathRelativeToProjectRoot("pom.xml", "./src/test/java/com/w11k/lsql/cli/tests"),
                 "package:" + TestCliConfig.class.getPackage().getName(),
                 "di:guice",
                 "outDirJava:" + genJavaDir.getAbsolutePath(),
@@ -75,5 +76,13 @@ public final class TestCliProjectGenerationTest {
         Main.main(args);
     }
 
+    /**
+     * dto: DummyDto
+     * - fieldA: string
+     */
+    @SuppressWarnings("unused")
+    public void dummyForDto() {
+
+    }
 
 }

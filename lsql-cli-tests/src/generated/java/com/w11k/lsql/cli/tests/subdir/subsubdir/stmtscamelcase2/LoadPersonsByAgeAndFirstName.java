@@ -47,7 +47,7 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
 
     // fields ----------
 
-    public static final String COL_ID = "id";
+    public static final String FIELD_id = "id";
 
     public final java.lang.Integer id;
 
@@ -58,7 +58,7 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
     public LoadPersonsByAgeAndFirstName withId(java.lang.Integer id) {
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
-    public static final String COL_FIRST_NAME = "first_name";
+    public static final String FIELD_first_name = "first_name";
 
     public final java.lang.String firstName;
 
@@ -69,7 +69,7 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
     public LoadPersonsByAgeAndFirstName withFirstName(java.lang.String firstName) {
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
-    public static final String COL_AGE = "age";
+    public static final String FIELD_age = "age";
 
     public final java.lang.Integer age;
 

@@ -1,10 +1,13 @@
 package com.w11k.lsql.cli;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.dialects.IdentifierConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +21,12 @@ public final class CodeGenUtils {
         return line
                 .replaceAll("\n", " \\\\n ")
                 .replaceAll("\"", "\\\\\"");
+    }
+
+    public static String getJavaCodeName(LSql lSql, String input) {
+        IdentifierConverter identifierConverter = lSql.getConfig().getDialect().getIdentifierConverter();
+        CaseFormat toCaseFormat = identifierConverter.getToCaseFormat();
+        return toCaseFormat.to(lSql.getConfig().getCodeGenerationCaseFormat(), input);
     }
 
     public static String escapeSqlStringForJavaDoc(String line) {
@@ -67,16 +76,20 @@ public final class CodeGenUtils {
         return Joiner.on(".").skipNulls().join(packages);
     }
 
-    public static File getFileFromBaseDirAndPackageName(File baseDir, String packageName) {
+    public static String getSubPathFromFileInParent(String parent, String childInParent) {
+        int start = childInParent.lastIndexOf(parent) + parent.length();
+        String relativePath = childInParent.substring(start);
+        Iterable<String> pathSlitIt = Splitter.on(File.separatorChar).omitEmptyStrings().split(relativePath);
+        List<String> pathSplit = Lists.newLinkedList(pathSlitIt);
+        pathSplit.remove(pathSplit.size() - 1); // remove filename
+        return Joiner.on(".").join(pathSplit);
 
+    }
+
+    public static File getFileFromBaseDirAndPackageName(File baseDir, String packageName) {
         Iterable<String> packageSegments = Splitter.on(".").split(packageName);
         String packagePath = Joiner.on(File.separatorChar).join(packageSegments);
         File target = new File(baseDir, packagePath);
-//        try {
-//            Files.createParentDirs(target);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
         return target;
     }
 

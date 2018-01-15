@@ -1,6 +1,5 @@
 package com.w11k.lsql.cli.java;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -352,10 +351,11 @@ public class DataClassExporter {
     }
 
     private void contentStaticFieldName(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
-        String staticName = this.javaExporter.getlSql().getConfig().getDialect().getIdentifierConverter().getToCaseFormat()
-                .to(CaseFormat.UPPER_UNDERSCORE, field.getFieldKeyName());
+//        String staticName = this.javaExporter.getlSql().getConfig().getDialect().getIdentifierConverter().getToCaseFormat()
+//                .to(CaseFormat.UPPER_UNDERSCORE, field.getFieldName());
+        String staticName = field.getFieldKeyName();
 
-        content.append(indentString()).append("    public static final String COL_").append(staticName).append(" = ")
+        content.append(indentString()).append("    public static final String FIELD_").append(staticName).append(" = ")
                 .append("\"")
                 .append(field.getFieldKeyName())
                 .append("\";\n\n");

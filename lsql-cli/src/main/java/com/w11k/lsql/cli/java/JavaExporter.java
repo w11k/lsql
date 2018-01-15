@@ -10,9 +10,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import static com.w11k.lsql.cli.CodeGenUtils.createSaveNameForClass;
-import static com.w11k.lsql.cli.CodeGenUtils.joinStringsAsPackageName;
-import static com.w11k.lsql.cli.CodeGenUtils.log;
+import static com.w11k.lsql.cli.CodeGenUtils.*;
 import static java.util.Collections.emptyList;
 
 public class JavaExporter {
@@ -27,6 +25,8 @@ public class JavaExporter {
 
     private boolean guice = false;
 
+    private String dtoDeclarationSearchDir;
+
     private List<DataClassMeta> generatedDataClasses = emptyList();
 
     public JavaExporter(LSql lSql) {
@@ -40,7 +40,7 @@ public class JavaExporter {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void export() {
         this.generatedDataClasses = Lists.newLinkedList();
-        List<DataClassExporter> tableDataClassExporters = Lists.newLinkedList();
+        List<DataClassExporter> dataClassExporters = Lists.newLinkedList();
         Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
 
         List<String> guiceModuleClasses = Lists.newLinkedList();
@@ -59,12 +59,14 @@ public class JavaExporter {
             DataClassMeta dcm = new DataClassMeta(this.lSql.getConfig(), className, fullPackageName);
             table.getColumns().values()
                     .forEach(c -> {
-                        dcm.addField(c.getJavaColumnName(), c.getConverter().getJavaType());
+                        String colName = c.getJavaColumnName();
+                        String fieldName = getJavaCodeName(this.lSql, colName);
+                        dcm.addField(fieldName, colName, c.getConverter().getJavaType());
                     });
 
             this.generatedDataClasses.add(dcm);
             DataClassExporter dataClassExporter = new DataClassExporter(this, dcm, "_Row");
-            tableDataClassExporters.add(dataClassExporter);
+            dataClassExporters.add(dataClassExporter);
 
             // generate table classes
             TableExporter tableExporter = new TableExporter(this, table, dataClassExporter);
@@ -81,8 +83,14 @@ public class JavaExporter {
             guiceModuleClasses.add(statementFileExporter.getTargetPackageName() + "." + statementFileExporter.getStmtFileClassName());
         }
 
+        // DTOs
+        if (this.dtoDeclarationSearchDir != null) {
+            DtoDeclarationFinder dtoDeclarationFinder = new DtoDeclarationFinder(this, dtoDeclarationSearchDir);
+            dataClassExporters.addAll(dtoDeclarationFinder.getDataClassExporters());
+        }
+
         // find unique StructuralTypingFields
-        for (DataClassExporter tableRowClassExporter : tableDataClassExporters) {
+        for (DataClassExporter tableRowClassExporter : dataClassExporters) {
             structuralTypingFields.addAll(tableRowClassExporter.getStructuralTypingFields());
         }
 
@@ -92,7 +100,7 @@ public class JavaExporter {
         }
 
         // generate row classes
-        for (DataClassExporter tableRowClassExporter : tableDataClassExporters) {
+        for (DataClassExporter tableRowClassExporter : dataClassExporters) {
             tableRowClassExporter.export();
         }
 
@@ -135,5 +143,9 @@ public class JavaExporter {
 
     public List<DataClassMeta> getGeneratedDataClasses() {
         return generatedDataClasses;
+    }
+
+    public void setDtoDeclarationSearchDir(String dtoDeclarationSearchDir) {
+        this.dtoDeclarationSearchDir = dtoDeclarationSearchDir;
     }
 }

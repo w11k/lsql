@@ -1,11 +1,10 @@
 package com.w11k.lsql.cli.java;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.cli.CodeGenUtils;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.statement.AbstractSqlStatement;
@@ -79,7 +78,9 @@ public final class StatementFileExporter {
                         joinStringsAsPackageName(
                                 this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()));
                 query.query().createResultSetWithColumns().getColumns().forEach(c -> {
-                    dcm.addField(c.getName(), c.getConverter().getJavaType());
+                    String colName = c.getName();
+                    String fieldName = getJavaCodeName(this.javaExporter.getlSql(), colName);
+                    dcm.addField(fieldName, colName, c.getConverter().getJavaType());
                 });
                 this.stmtRowDataClassMetaList.add(dcm);
             }
@@ -163,14 +164,10 @@ public final class StatementFileExporter {
     }
 
     public String getSubPackageName() {
-        String sourceFilePath = this.stmtSourceFile.getAbsolutePath();
-        int start = sourceFilePath.lastIndexOf(this.stmtFilesRootDir) + this.stmtFilesRootDir.length();
-        String relativePath = sourceFilePath.substring(start);
-        Iterable<String> pathSlitIt = Splitter.on(File.separatorChar).omitEmptyStrings().split(relativePath);
-        List<String> pathSplit = Lists.newLinkedList(pathSlitIt);
-        pathSplit.remove(pathSplit.size() - 1); // remove filename
-        String subPart = Joiner.on(".").join(pathSplit);
-        return subPart;
+        return CodeGenUtils.getSubPathFromFileInParent(
+                this.stmtFilesRootDir,
+                this.stmtSourceFile.getAbsolutePath()
+        );
     }
 
     private String getPackageNameForStatement() {

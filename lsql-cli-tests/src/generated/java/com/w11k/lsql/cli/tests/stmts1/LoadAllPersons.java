@@ -41,7 +41,7 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
 
     // fields ----------
 
-    public static final String COL_ID = "id";
+    public static final String FIELD_id = "id";
 
     public final java.lang.Integer id;
 
@@ -52,7 +52,7 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     public LoadAllPersons withId(java.lang.Integer id) {
         return new LoadAllPersons(id,firstName);
     }
-    public static final String COL_FIRST_NAME = "first_name";
+    public static final String FIELD_first_name = "first_name";
 
     public final java.lang.String firstName;
 

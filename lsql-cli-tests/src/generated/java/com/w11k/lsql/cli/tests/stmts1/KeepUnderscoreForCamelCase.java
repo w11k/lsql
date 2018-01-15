@@ -41,7 +41,7 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
 
     // fields ----------
 
-    public static final String COL_A_FIELD = "a_field";
+    public static final String FIELD_a_field = "a_field";
 
     public final java.lang.Integer aField;
 
@@ -52,7 +52,7 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
     public KeepUnderscoreForCamelCase withAField(java.lang.Integer aField) {
         return new KeepUnderscoreForCamelCase(aField,afield);
     }
-    public static final String COL_AFIELD = "afield";
+    public static final String FIELD_afield = "afield";
 
     public final java.lang.String afield;
 
