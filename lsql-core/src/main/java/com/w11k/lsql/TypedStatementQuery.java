@@ -20,7 +20,7 @@ public abstract class TypedStatementQuery<T> {
         this.sqlStatement = sqlStatement;
     }
 
-    public Observable<T> toObservable() {
+    public Observable<T> rx() {
         return this.lSql.createSqlStatement(this.sqlStatement)
                 .query(this.getQueryParameters())
                 .rx()
@@ -28,11 +28,11 @@ public abstract class TypedStatementQuery<T> {
     }
 
     public List<T> toList() {
-        return this.toObservable().toList().toBlocking().first();
+        return this.rx().toList().toBlocking().first();
     }
 
     public <R> List<R> map(Func1<T, R> fn) {
-        return this.toObservable()
+        return this.rx()
                 .map(fn)
                 .toList()
                 .toBlocking()
@@ -40,7 +40,7 @@ public abstract class TypedStatementQuery<T> {
     }
 
     public Optional<T> first() {
-        List<T> first = this.toObservable().take(1).toList().toBlocking().first();
+        List<T> first = this.rx().take(1).toList().toBlocking().first();
         if (first.isEmpty()) {
             return Optional.absent();
         } else {
