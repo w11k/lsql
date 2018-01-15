@@ -65,7 +65,8 @@ public final class StatementFileExporter {
             TypedStatementMeta typedStatementMeta = new TypedStatementMeta(
                     lSql,
                     query,
-                    stmt
+                    stmt,
+                    stmtSourceFile.getName()
             );
             this.typedStatementMetas.add(typedStatementMeta);
 

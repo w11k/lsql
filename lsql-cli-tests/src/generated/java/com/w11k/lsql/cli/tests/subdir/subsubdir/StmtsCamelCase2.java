@@ -108,6 +108,14 @@ public class StmtsCamelCase2 {
             return this.toMap();
         }
 
+        public String getStatementFileName() {
+            return "StmtsCamelCase2.sql";
+        }
+
+        public String getStatementName() {
+            return "loadPersonsByAgeAndFirstName";
+        }
+
     }
 
     // Statement: deletePersonByFirstName ----------------------------
@@ -183,6 +191,14 @@ public class StmtsCamelCase2 {
 
         protected java.util.Map<String, Object>  getQueryParameters() {
             return this.toMap();
+        }
+
+        public String getStatementFileName() {
+            return "StmtsCamelCase2.sql";
+        }
+
+        public String getStatementName() {
+            return "deletePersonByFirstName";
         }
 
     }

@@ -274,8 +274,17 @@ public class LSql {
      * @param sqlString the SQL SELECT string
      */
     public AbstractSqlStatement<RowQuery> createSqlStatement(String sqlString) {
+        return this.createSqlStatement(sqlString, "LSql", "createSqlStatement");
+    }
+
+    /**
+     * Executes the SQL statement.
+     *
+     * @param sqlString the SQL SELECT string
+     */
+    public AbstractSqlStatement<RowQuery> createSqlStatement(String sqlString, String sourceName, String stmtName) {
         final SqlStatementToPreparedStatement stmtToPs =
-                new SqlStatementToPreparedStatement(this, "LSql", "createSqlStatement", "", sqlString);
+                new SqlStatementToPreparedStatement(this, sourceName, stmtName, "", sqlString);
 
         return new AbstractSqlStatement<RowQuery>(stmtToPs) {
             @Override

@@ -21,7 +21,7 @@ public abstract class TypedStatementQuery<T> {
     }
 
     public Observable<T> rx() {
-        return this.lSql.createSqlStatement(this.sqlStatement)
+        return this.lSql.createSqlStatement(this.sqlStatement, this.getStatementFileName(), this.getStatementName())
                 .query(this.getQueryParameters())
                 .rx()
                 .map(this::createTypedRow);
@@ -47,6 +47,10 @@ public abstract class TypedStatementQuery<T> {
             return of(first.get(0));
         }
     }
+
+    public abstract String getStatementFileName();
+
+    public abstract String getStatementName();
 
     protected abstract T createTypedRow(Row row);
 

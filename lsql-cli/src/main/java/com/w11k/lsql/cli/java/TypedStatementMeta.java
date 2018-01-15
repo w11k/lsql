@@ -9,6 +9,7 @@ import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -17,15 +18,19 @@ public final class TypedStatementMeta {
     private final LSql lSql;
 
     private final SqlStatementToPreparedStatement statement;
+    @Nullable
+    private final String sourceFileName;
 
     private Map<String, Class<?>> parameters = Maps.newHashMap();
 
     public TypedStatementMeta(LSql lSql,
                               AbstractSqlStatement<RowQuery> query,
-                              SqlStatementToPreparedStatement statement) {
+                              SqlStatementToPreparedStatement statement,
+                              @Nullable String sourceFileName) {
 
         this.lSql = lSql;
         this.statement = statement;
+        this.sourceFileName = sourceFileName;
 
         ImmutableMap<String, List<SqlStatementToPreparedStatement.Parameter>> queryParameters =
                 query.getParameters();
@@ -59,4 +64,8 @@ public final class TypedStatementMeta {
         return parameters;
     }
 
+    @Nullable
+    public String getSourceFileName() {
+        return sourceFileName;
+    }
 }

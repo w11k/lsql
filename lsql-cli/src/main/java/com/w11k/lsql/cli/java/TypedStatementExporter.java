@@ -97,6 +97,19 @@ public final class TypedStatementExporter {
                 .append("            return this.toMap();\n");
         content.append("        }\n\n");
 
+        // statement name
+        content.append("        public String getStatementFileName() {\n");
+        content.append("            return \"")
+                .append(this.typedStatementMeta.getSourceFileName())
+                .append("\";\n");
+        content.append("        }\n\n");
+        content.append("        public String getStatementName() {\n");
+        content.append("            return \"")
+                .append(this.typedStatementMeta.getStatement().getStatementName())
+                .append("\";\n");
+        content.append("        }\n\n");
+
+        // end
         content.append("    }\n\n");
 
         return dataClassExportersForQueryParams;

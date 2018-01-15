@@ -1,4 +1,10 @@
 
+**0.31.12**
+
+- CLI: added support for DTO generation
+- CLI: generated statements contain their origin for logging
+
+
 **0.31.11**
 
 FIXED CLI: wrong table name embedded in generated table class

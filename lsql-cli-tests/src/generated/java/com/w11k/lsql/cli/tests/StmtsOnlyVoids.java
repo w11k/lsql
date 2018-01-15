@@ -82,6 +82,14 @@ public class StmtsOnlyVoids {
             return this.toMap();
         }
 
+        public String getStatementFileName() {
+            return "StmtsOnlyVoids.sql";
+        }
+
+        public String getStatementName() {
+            return "statementA";
+        }
+
     }
 
     // Statement: statementB ----------------------------
@@ -159,6 +167,14 @@ public class StmtsOnlyVoids {
 
         protected java.util.Map<String, Object>  getQueryParameters() {
             return this.toMap();
+        }
+
+        public String getStatementFileName() {
+            return "StmtsOnlyVoids.sql";
+        }
+
+        public String getStatementName() {
+            return "statementB";
         }
 
     }

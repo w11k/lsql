@@ -69,6 +69,14 @@ public class Stmts1 {
             return this.toMap();
         }
 
+        public String getStatementFileName() {
+            return "Stmts1.sql";
+        }
+
+        public String getStatementName() {
+            return "loadAllPersonsEscaped2";
+        }
+
     }
 
     // Statement: loadAllPersons ----------------------------
@@ -130,6 +138,14 @@ public class Stmts1 {
 
         protected java.util.Map<String, Object>  getQueryParameters() {
             return this.toMap();
+        }
+
+        public String getStatementFileName() {
+            return "Stmts1.sql";
+        }
+
+        public String getStatementName() {
+            return "loadAllPersons";
         }
 
     }
@@ -197,6 +213,14 @@ public class Stmts1 {
             return this.toMap();
         }
 
+        public String getStatementFileName() {
+            return "Stmts1.sql";
+        }
+
+        public String getStatementName() {
+            return "loadAllPersonsEscaped1";
+        }
+
     }
 
     // Statement: keepUnderscoreForCamelCase ----------------------------
@@ -261,6 +285,14 @@ public class Stmts1 {
 
         protected java.util.Map<String, Object>  getQueryParameters() {
             return this.toMap();
+        }
+
+        public String getStatementFileName() {
+            return "Stmts1.sql";
+        }
+
+        public String getStatementName() {
+            return "keepUnderscoreForCamelCase";
         }
 
     }
@@ -348,6 +380,14 @@ public class Stmts1 {
             return this.toMap();
         }
 
+        public String getStatementFileName() {
+            return "Stmts1.sql";
+        }
+
+        public String getStatementName() {
+            return "queryParamsWithDot";
+        }
+
     }
 
     // Statement: changeYesno ----------------------------
@@ -425,6 +465,14 @@ public class Stmts1 {
 
         protected java.util.Map<String, Object>  getQueryParameters() {
             return this.toMap();
+        }
+
+        public String getStatementFileName() {
+            return "Stmts1.sql";
+        }
+
+        public String getStatementName() {
+            return "changeYesno";
         }
 
     }
