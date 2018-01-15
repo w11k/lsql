@@ -43,6 +43,8 @@ public class JavaExporter {
         List<DataClassExporter> tableDataClassExporters = Lists.newLinkedList();
         Set<StructuralTypingField> structuralTypingFields = Sets.newHashSet();
 
+        List<String> guiceModuleClasses = Lists.newLinkedList();
+
         // Tables
         for (Table table : this.lSql.getTables()) {
             // collect all row classes
@@ -65,7 +67,9 @@ public class JavaExporter {
             tableDataClassExporters.add(dataClassExporter);
 
             // generate table classes
-            new TableExporter(this, table, dataClassExporter).export();
+            TableExporter tableExporter = new TableExporter(this, table, dataClassExporter);
+            guiceModuleClasses.add(dcm.getPackageName() + "." + tableExporter.getClassName());
+            tableExporter.export();
         }
 
         // StatementFileExporter
@@ -74,6 +78,7 @@ public class JavaExporter {
             structuralTypingFields.addAll(stfs);
             List<DataClassMeta> stmtRowDataClassMetaList = statementFileExporter.getStmtRowDataClassMetaList();
             this.generatedDataClasses.addAll(stmtRowDataClassMetaList);
+            guiceModuleClasses.add(statementFileExporter.getTargetPackageName() + "." + statementFileExporter.getStmtFileClassName());
         }
 
         // find unique StructuralTypingFields
@@ -89,6 +94,11 @@ public class JavaExporter {
         // generate row classes
         for (DataClassExporter tableRowClassExporter : tableDataClassExporters) {
             tableRowClassExporter.export();
+        }
+
+        // generate Guice module
+        if (this.guice) {
+            new GuiceModuleExporter(this, guiceModuleClasses).export();
         }
 
         log("");

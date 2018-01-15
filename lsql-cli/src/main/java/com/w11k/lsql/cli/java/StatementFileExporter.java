@@ -180,5 +180,13 @@ public final class StatementFileExporter {
     public List<DataClassMeta> getStmtRowDataClassMetaList() {
         return stmtRowDataClassMetaList;
     }
+
+    public String getTargetPackageName() {
+        return targetPackageName;
+    }
+
+    public String getStmtFileClassName() {
+        return stmtFileClassName;
+    }
 }
 

@@ -1,4 +1,9 @@
 
+**0.31.10**
+
+CLI: generate Guice module that include all table and statement files
+
+
 **0.31.9**
 
 FIXED: invalid import in generated statement files if all statements are void 
