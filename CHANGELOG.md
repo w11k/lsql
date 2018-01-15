@@ -1,4 +1,8 @@
 
+**0.31.11**
+
+FIXED CLI: wrong table name embedded in generated table class
+
 **0.31.10**
 
 CLI: generate Guice module that include all table and statement files

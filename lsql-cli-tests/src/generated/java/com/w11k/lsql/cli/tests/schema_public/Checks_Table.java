@@ -4,9 +4,9 @@ public class Checks_Table extends com.w11k.lsql.TypedTable<Checks_Row, com.w11k.
 
     @com.google.inject.Inject
     public Checks_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "Checks", Checks_Row.class);
+        super(lSql, "checks", Checks_Row.class);
     }
 
-    public static final String NAME = "Checks";
+    public static final String NAME = "checks";
 
 }

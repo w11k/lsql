@@ -59,7 +59,7 @@ public class TableExporter {
     private void contentStaticFieldName() {
         content.append("    public static final String NAME = ")
                 .append("\"")
-                .append(this.dataClassExporter.getDataClassMeta().getClassName())
+                .append(this.table.getTableName())
                 .append("\";\n\n");
     }
 
@@ -71,7 +71,7 @@ public class TableExporter {
                 .append("(").append(LSql.class.getCanonicalName()).append(" lSql) {\n");
 
         content.append("        super(lSql, \"")
-                .append(this.dataClassExporter.getDataClassMeta().getClassName()).append("\", ")
+                .append(this.table.getTableName()).append("\", ")
                 .append(this.dataClassExporter.getClassName()).append(".class);\n");
 
         content.append("    }\n\n");
