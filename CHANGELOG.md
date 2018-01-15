@@ -1,4 +1,9 @@
 
+**0.31.9**
+
+FIXED: invalid import in generated statement files if all statements are void 
+
+
 **0.31.8**
 
 - CLI now generates equals()/hashCode()/toString() methods

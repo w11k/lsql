@@ -30,6 +30,8 @@ public final class StatementFileExporter {
 
     private final List<DataClassMeta> stmtRowDataClassMetaList = Lists.newLinkedList();
 
+    private final boolean containsOnlyVoidStatements;
+
     private final String targetPackageName;
 
     private final String stmtFileClassName;
@@ -51,6 +53,7 @@ public final class StatementFileExporter {
         ImmutableMap<String, SqlStatementToPreparedStatement> statements = lSqlFile.getStatements();
 
         // process statements
+        boolean containsOnlyVoidStatements = true;
         for (String stmtName : statements.keySet()) {
             AbstractSqlStatement<RowQuery> query = lSqlFile.statement(stmtName);
             SqlStatementToPreparedStatement stmt = lSqlFile.getSqlStatementToPreparedStatement(stmtName);
@@ -69,6 +72,7 @@ public final class StatementFileExporter {
 
             // out
             if (!stmt.getTypeAnnotation().toLowerCase().equals("void")) {
+                containsOnlyVoidStatements = false;
                 DataClassMeta dcm = new DataClassMeta(
                         this.javaExporter.getlSql().getConfig(),
                         firstCharUpperCase(stmt.getStatementName()),
@@ -79,9 +83,10 @@ public final class StatementFileExporter {
                 });
                 this.stmtRowDataClassMetaList.add(dcm);
             }
-
             rollback(lSql);
         }
+
+        this.containsOnlyVoidStatements = containsOnlyVoidStatements;
     }
 
     public Set<StructuralTypingField> exportAndGetStructuralTypingFields() {
@@ -101,10 +106,12 @@ public final class StatementFileExporter {
                 .append(".structural_fields")
                 .append(".*;\n");
 
-        content.append("import ")
-                .append(joinStringsAsPackageName(
-                        this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()))
-                .append(".*;\n");
+        if (!this.containsOnlyVoidStatements) {
+            content.append("import ")
+                    .append(joinStringsAsPackageName(
+                            this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()))
+                    .append(".*;\n");
+        }
 
         content.append("import java.util.*;\n");
 
