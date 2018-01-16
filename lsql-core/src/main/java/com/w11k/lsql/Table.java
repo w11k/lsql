@@ -586,12 +586,6 @@ public class Table {
                 String javaColumnName = lSql.identifierSqlToJava(sqlColumnName);
                 int sqlType = columnsMetaData.getInt(5);
                 boolean isNotNullable = columnsMetaData.getString(18).equalsIgnoreCase("NO");
-
-                System.out.println("sqlColumnName = " + sqlColumnName);
-                System.out.println("isNotNullable = " + isNotNullable);
-                System.out.println();
-
-
                 Converter converter = this.lSql.getConverterForTableColumn(
                         this.schemaAndTableName, javaColumnName, sqlType);
 
