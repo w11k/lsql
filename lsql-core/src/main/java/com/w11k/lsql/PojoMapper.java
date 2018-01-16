@@ -2,8 +2,9 @@ package com.w11k.lsql;
 
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
-import org.apache.commons.beanutils.PropertyUtils;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.util.Map;
@@ -34,8 +35,12 @@ public class PojoMapper<T> {
         this.pojoClass = pojoClass;
 
         // Extract property names
-        PropertyDescriptor[] descs = PropertyUtils.getPropertyDescriptors(pojoClass);
-
+        PropertyDescriptor[] descs;
+        try {
+            descs = Introspector.getBeanInfo(pojoClass).getPropertyDescriptors();
+        } catch (IntrospectionException e) {
+            throw new RuntimeException(e);
+        }
 
         for (PropertyDescriptor desc : descs) {
             Class<?> declaringClass = desc.getReadMethod().getDeclaringClass();

@@ -22,6 +22,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <!--<optional>true</optional>-->
     </dependency>
 
     <dependency>
@@ -55,17 +56,6 @@
       <artifactId>joda-time</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <!--<optional>true</optional>-->
-    </dependency>
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-      <!--<optional>true</optional>-->
-    </dependency>
-
     <!-- for dialect -->
     <dependency>
       <groupId>org.postgresql</groupId>
@@ -95,11 +85,12 @@
     </dependency>
   </dependencies>
 
-  <!--<build>-->
-    <!--<plugins>-->
+  <build>
+    <plugins>
       <!--<plugin>-->
         <!--<groupId>org.apache.maven.plugins</groupId>-->
         <!--<artifactId>maven-shade-plugin</artifactId>-->
+        <!--<version>3.1.0</version>-->
         <!--<executions>-->
           <!--<execution>-->
             <!--<phase>package</phase>-->
@@ -107,17 +98,14 @@
               <!--<goal>shade</goal>-->
             <!--</goals>-->
             <!--<configuration>-->
-              <!--<artifactSet>-->
-                <!--<includes>-->
-                  <!--<include>commons-beanutils:*</include>-->
-                  <!--<include>com.fasterxml.jackson.core:*</include>-->
-                  <!--<include>com.fasterxml.jackson.datatype*</include>-->
-                <!--</includes>-->
-              <!--</artifactSet>-->
               <!--<relocations>-->
                 <!--<relocation>-->
-                  <!--<pattern>org.apache.commons</pattern>-->
-                  <!--<shadedPattern>com.w11k.lsql.shaded.org.apache.commons</shadedPattern>-->
+                  <!--<pattern>com.google</pattern>-->
+                  <!--<shadedPattern>com.w11k.lsql.shaded.com.google</shadedPattern>-->
+                  <!--<excludes>-->
+                    <!--<exclude>com.google.common.base.*</exclude>-->
+                    <!--<exclude>com.google.common.collect.*</exclude>-->
+                  <!--</excludes>-->
                 <!--</relocation>-->
                 <!--<relocation>-->
                   <!--<pattern>com.fasterxml</pattern>-->
@@ -128,8 +116,8 @@
           <!--</execution>-->
         <!--</executions>-->
       <!--</plugin>-->
-    <!--</plugins>-->
-  <!--</build>-->
+    </plugins>
+  </build>
 
 </project>
 

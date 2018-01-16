@@ -38,6 +38,7 @@ public class LSqlDao {
         return getlSqlFile().statement(name);
     }
 
+    @Deprecated
     public <T> AbstractSqlStatement<PojoQuery<T>> statement(String name, Class<T> pojoClass) {
         return getlSqlFile().statement(name, pojoClass);
     }

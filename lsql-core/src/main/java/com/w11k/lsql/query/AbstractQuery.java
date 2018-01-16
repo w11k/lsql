@@ -1,6 +1,5 @@
 package com.w11k.lsql.query;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -115,12 +114,7 @@ public abstract class AbstractQuery<T> {
     }
 
     public <R> Optional<R> first(final Func1<T, R> mapper) {
-        return this.first().transform(new Function<T, R>() {
-            @Override
-            public R apply(T input) {
-                return mapper.call(input);
-            }
-        });
+        return this.first().transform(mapper::call);
     }
 
 

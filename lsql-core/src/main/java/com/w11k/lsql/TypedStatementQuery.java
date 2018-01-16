@@ -31,12 +31,8 @@ public abstract class TypedStatementQuery<T> {
         return this.rx().toList().toBlocking().first();
     }
 
-    public <R> List<R> map(Func1<T, R> fn) {
-        return this.rx()
-                .map(fn)
-                .toList()
-                .toBlocking()
-                .first();
+    public <R> List<R> toList(Func1<T, R> mapper) {
+        return rx().map(mapper).toList().toBlocking().first();
     }
 
     public Optional<T> first() {
@@ -46,6 +42,10 @@ public abstract class TypedStatementQuery<T> {
         } else {
             return of(first.get(0));
         }
+    }
+
+    public <R> Optional<R> first(final Func1<T, R> mapper) {
+        return this.first().transform(mapper::call);
     }
 
     public abstract String getStatementFileName();

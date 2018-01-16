@@ -4,13 +4,14 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Longs;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.ListLiteralQueryParameter;
 import com.w11k.lsql.LiteralQueryParameter;
 import com.w11k.lsql.QueryParameter;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.exceptions.QueryException;
-import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,9 +130,9 @@ public class SqlStatementToPreparedStatement {
                 String placeHolderValue = sqlString.substring(matcher.end(0), paramEnd).trim();
                 if (placeHolderValue.startsWith("'") && placeHolderValue.endsWith("'")) {
                     p.javaTypeAlias = "string";
-                } else if (NumberUtils.isNumber(placeHolderValue) && placeHolderValue.contains(".")) {
+                } else if (Doubles.tryParse(placeHolderValue) != null && placeHolderValue.contains(".")) {
                     p.javaTypeAlias = "double";
-                } else if (NumberUtils.isNumber(placeHolderValue)) {
+                } else if (Longs.tryParse(placeHolderValue) != null) {
                     p.javaTypeAlias = "number";
                 } else if (placeHolderValue.equalsIgnoreCase("false") || placeHolderValue.equalsIgnoreCase("true")) {
                     p.javaTypeAlias = "boolean";
