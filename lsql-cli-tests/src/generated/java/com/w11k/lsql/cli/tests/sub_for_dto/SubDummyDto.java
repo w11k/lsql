@@ -43,24 +43,24 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
 
     public static final String FIELD_fieldA = "fieldA";
 
-    public final java.lang.String fieldA;
+    @javax.annotation.Nullable public final java.lang.String fieldA;
 
-    public java.lang.String getFieldA() {
+    @javax.annotation.Nullable public java.lang.String getFieldA() {
         return this.fieldA;
     }
 
-    public SubDummyDto withFieldA(java.lang.String fieldA) {
+    public SubDummyDto withFieldA(@javax.annotation.Nullable java.lang.String fieldA) {
         return new SubDummyDto(fieldA,fieldB);
     }
     public static final String FIELD_fieldB = "fieldB";
 
-    public final java.lang.Number fieldB;
+    @javax.annotation.Nullable public final java.lang.Number fieldB;
 
-    public java.lang.Number getFieldB() {
+    @javax.annotation.Nullable public java.lang.Number getFieldB() {
         return this.fieldB;
     }
 
-    public SubDummyDto withFieldB(java.lang.Number fieldB) {
+    public SubDummyDto withFieldB(@javax.annotation.Nullable java.lang.Number fieldB) {
         return new SubDummyDto(fieldA,fieldB);
     }
 

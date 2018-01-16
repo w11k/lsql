@@ -37,13 +37,13 @@ public final class LoadAllPersonsEscaped1 implements com.w11k.lsql.TableRow, The
 
     public static final String FIELD_theid = "theid";
 
-    public final java.lang.Integer theid;
+    @javax.annotation.Nullable public final java.lang.Integer theid;
 
-    public java.lang.Integer getTheid() {
+    @javax.annotation.Nullable public java.lang.Integer getTheid() {
         return this.theid;
     }
 
-    public LoadAllPersonsEscaped1 withTheid(java.lang.Integer theid) {
+    public LoadAllPersonsEscaped1 withTheid(@javax.annotation.Nullable java.lang.Integer theid) {
         return new LoadAllPersonsEscaped1(theid);
     }
 

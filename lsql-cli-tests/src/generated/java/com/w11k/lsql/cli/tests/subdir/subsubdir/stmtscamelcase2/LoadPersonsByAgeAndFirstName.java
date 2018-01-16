@@ -49,35 +49,35 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
 
     public static final String FIELD_id = "id";
 
-    public final java.lang.Integer id;
+    @javax.annotation.Nullable public final java.lang.Integer id;
 
-    public java.lang.Integer getId() {
+    @javax.annotation.Nullable public java.lang.Integer getId() {
         return this.id;
     }
 
-    public LoadPersonsByAgeAndFirstName withId(java.lang.Integer id) {
+    public LoadPersonsByAgeAndFirstName withId(@javax.annotation.Nullable java.lang.Integer id) {
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
     public static final String FIELD_first_name = "first_name";
 
-    public final java.lang.String firstName;
+    @javax.annotation.Nullable public final java.lang.String firstName;
 
-    public java.lang.String getFirstName() {
+    @javax.annotation.Nullable public java.lang.String getFirstName() {
         return this.firstName;
     }
 
-    public LoadPersonsByAgeAndFirstName withFirstName(java.lang.String firstName) {
+    public LoadPersonsByAgeAndFirstName withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
     public static final String FIELD_age = "age";
 
-    public final java.lang.Integer age;
+    @javax.annotation.Nullable public final java.lang.Integer age;
 
-    public java.lang.Integer getAge() {
+    @javax.annotation.Nullable public java.lang.Integer getAge() {
         return this.age;
     }
 
-    public LoadPersonsByAgeAndFirstName withAge(java.lang.Integer age) {
+    public LoadPersonsByAgeAndFirstName withAge(@javax.annotation.Nullable java.lang.Integer age) {
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
 

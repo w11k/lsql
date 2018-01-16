@@ -40,13 +40,13 @@ public class StmtsOnlyVoids {
 
         // fields ----------
 
-        public final java.lang.Boolean yesno;
+        @javax.annotation.Nullable public final java.lang.Boolean yesno;
 
-        public java.lang.Boolean isYesno() {
+        @javax.annotation.Nullable public java.lang.Boolean isYesno() {
             return this.yesno;
         }
 
-        public statementA withYesno(java.lang.Boolean yesno) {
+        public statementA withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
             return new statementA(yesno);
         }
 
@@ -127,13 +127,13 @@ public class StmtsOnlyVoids {
 
         // fields ----------
 
-        public final java.lang.Boolean yesno;
+        @javax.annotation.Nullable public final java.lang.Boolean yesno;
 
-        public java.lang.Boolean isYesno() {
+        @javax.annotation.Nullable public java.lang.Boolean isYesno() {
             return this.yesno;
         }
 
-        public statementB withYesno(java.lang.Boolean yesno) {
+        public statementB withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
             return new statementB(yesno);
         }
 

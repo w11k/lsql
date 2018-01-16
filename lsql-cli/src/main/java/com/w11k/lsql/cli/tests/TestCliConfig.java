@@ -11,7 +11,7 @@ public final class TestCliConfig extends Config {
         lSql.executeRawSql("create table person1 (id integer primary key, first_name text)");
         lSql.executeRawSql("create table person2 (id integer primary key, first_name text, age integer)");
         lSql.executeRawSql("create table a_table (id integer primary key)");
-        lSql.executeRawSql("create table checks (yesno BOOLEAN);");
+        lSql.executeRawSql("create table checks (yesno BOOLEAN NOT NULL);");
     }
 
     public TestCliConfig() {

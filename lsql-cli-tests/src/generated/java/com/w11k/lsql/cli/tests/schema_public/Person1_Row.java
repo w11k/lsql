@@ -43,24 +43,24 @@ public final class Person1_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
 
     public static final String FIELD_id = "id";
 
-    public final java.lang.Integer id;
+    @javax.annotation.Nonnull public final java.lang.Integer id;
 
-    public java.lang.Integer getId() {
+    @javax.annotation.Nonnull public java.lang.Integer getId() {
         return this.id;
     }
 
-    public Person1_Row withId(java.lang.Integer id) {
+    public Person1_Row withId(@javax.annotation.Nonnull java.lang.Integer id) {
         return new Person1_Row(id,firstName);
     }
     public static final String FIELD_first_name = "first_name";
 
-    public final java.lang.String firstName;
+    @javax.annotation.Nullable public final java.lang.String firstName;
 
-    public java.lang.String getFirstName() {
+    @javax.annotation.Nullable public java.lang.String getFirstName() {
         return this.firstName;
     }
 
-    public Person1_Row withFirstName(java.lang.String firstName) {
+    public Person1_Row withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
         return new Person1_Row(id,firstName);
     }
 

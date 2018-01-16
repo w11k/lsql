@@ -49,35 +49,35 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
 
     public static final String FIELD_id = "id";
 
-    public final java.lang.Integer id;
+    @javax.annotation.Nonnull public final java.lang.Integer id;
 
-    public java.lang.Integer getId() {
+    @javax.annotation.Nonnull public java.lang.Integer getId() {
         return this.id;
     }
 
-    public Person2_Row withId(java.lang.Integer id) {
+    public Person2_Row withId(@javax.annotation.Nonnull java.lang.Integer id) {
         return new Person2_Row(id,firstName,age);
     }
     public static final String FIELD_first_name = "first_name";
 
-    public final java.lang.String firstName;
+    @javax.annotation.Nullable public final java.lang.String firstName;
 
-    public java.lang.String getFirstName() {
+    @javax.annotation.Nullable public java.lang.String getFirstName() {
         return this.firstName;
     }
 
-    public Person2_Row withFirstName(java.lang.String firstName) {
+    public Person2_Row withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
         return new Person2_Row(id,firstName,age);
     }
     public static final String FIELD_age = "age";
 
-    public final java.lang.Integer age;
+    @javax.annotation.Nullable public final java.lang.Integer age;
 
-    public java.lang.Integer getAge() {
+    @javax.annotation.Nullable public java.lang.Integer getAge() {
         return this.age;
     }
 
-    public Person2_Row withAge(java.lang.Integer age) {
+    public Person2_Row withAge(@javax.annotation.Nullable java.lang.Integer age) {
         return new Person2_Row(id,firstName,age);
     }
 

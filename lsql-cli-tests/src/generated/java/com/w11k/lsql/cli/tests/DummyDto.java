@@ -37,13 +37,13 @@ public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
 
     public static final String FIELD_fieldA = "fieldA";
 
-    public final java.lang.String fieldA;
+    @javax.annotation.Nullable public final java.lang.String fieldA;
 
-    public java.lang.String getFieldA() {
+    @javax.annotation.Nullable public java.lang.String getFieldA() {
         return this.fieldA;
     }
 
-    public DummyDto withFieldA(java.lang.String fieldA) {
+    public DummyDto withFieldA(@javax.annotation.Nullable java.lang.String fieldA) {
         return new DummyDto(fieldA);
     }
 

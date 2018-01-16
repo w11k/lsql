@@ -362,14 +362,14 @@ public class DataClassExporter {
     }
 
     private void contentField(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
-        content.append(indentString()).append("    public final ");
+        content.append(indentString()).append("    ").append(this.getNullableOrNonnullAnnotation(field)).append("public final ");
         content.append(field.getFieldType().getCanonicalName()).append(" ").append(field.getFieldName());
         content.append(";\n");
     }
 
     private void contentGetterSetterForField(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
         // Getter
-        content.append(indentString()).append("    public ");
+        content.append(indentString()).append("    ").append(this.getNullableOrNonnullAnnotation(field)).append("public ");
         content.append(field.getFieldType().getCanonicalName());
         content.append(" ");
         boolean isBool = Boolean.class.isAssignableFrom(field.getFieldType());
@@ -381,6 +381,7 @@ public class DataClassExporter {
         // Setter
         content.append(indentString()).append("    public ").append(this.getClassName()).append(" ");
         content.append("with").append(firstCharUpperCase(field.getFieldName())).append("(");
+        content.append(this.getNullableOrNonnullAnnotation(field));
         content.append(field.getFieldType().getCanonicalName());
         content.append(" ").append(field.getFieldName());
         content.append(") {\n");
@@ -390,7 +391,14 @@ public class DataClassExporter {
         content.append(constructorCallArgs);
         content.append(");\n");
         content.append(indentString()).append("    }\n");
+    }
 
+    private String getNullableOrNonnullAnnotation(DataClassMeta.DataClassFieldMeta field) {
+        if (field.isNullable()) {
+            return "@javax.annotation.Nullable ";
+        } else {
+            return "@javax.annotation.Nonnull ";
+        }
     }
 
     private String indentString() {

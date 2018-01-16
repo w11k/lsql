@@ -43,24 +43,24 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
 
     public static final String FIELD_id = "id";
 
-    public final java.lang.Integer id;
+    @javax.annotation.Nullable public final java.lang.Integer id;
 
-    public java.lang.Integer getId() {
+    @javax.annotation.Nullable public java.lang.Integer getId() {
         return this.id;
     }
 
-    public QueryParamsWithDot withId(java.lang.Integer id) {
+    public QueryParamsWithDot withId(@javax.annotation.Nullable java.lang.Integer id) {
         return new QueryParamsWithDot(id,firstName);
     }
     public static final String FIELD_first_name = "first_name";
 
-    public final java.lang.String firstName;
+    @javax.annotation.Nullable public final java.lang.String firstName;
 
-    public java.lang.String getFirstName() {
+    @javax.annotation.Nullable public java.lang.String getFirstName() {
         return this.firstName;
     }
 
-    public QueryParamsWithDot withFirstName(java.lang.String firstName) {
+    public QueryParamsWithDot withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
         return new QueryParamsWithDot(id,firstName);
     }
 

@@ -21,8 +21,10 @@ public final class DataClassMeta {
         this.packageName = packageName;
     }
 
-    public void addField(String fieldName, String fieldKeyInMap, Class<?> fieldType) {
-        this.fields.add(new DataClassFieldMeta(fieldName, fieldKeyInMap, fieldType));
+    public DataClassFieldMeta addField(String fieldName, String fieldKeyInMap, Class<?> fieldType) {
+        DataClassFieldMeta field = new DataClassFieldMeta(fieldName, fieldKeyInMap, fieldType);
+        this.fields.add(field);
+        return field;
     }
 
     public String getClassName() {
@@ -45,6 +47,8 @@ public final class DataClassMeta {
 
         private final Class<?> fieldType;
 
+        private boolean nullable = true;
+
         public DataClassFieldMeta(String fieldName, String fieldKeyName, Class<?> fieldType) {
             this.fieldName = fieldName;
             this.fieldKeyName = fieldKeyName;
@@ -61,6 +65,14 @@ public final class DataClassMeta {
 
         public String getFieldKeyName() {
             return fieldKeyName;
+        }
+
+        public boolean isNullable() {
+            return nullable;
+        }
+
+        public void setNullable(boolean nullable) {
+            this.nullable = nullable;
         }
     }
 }

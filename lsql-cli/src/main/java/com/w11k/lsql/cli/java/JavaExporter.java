@@ -61,7 +61,8 @@ public class JavaExporter {
                     .forEach(c -> {
                         String colName = c.getJavaColumnName();
                         String fieldName = getJavaCodeName(this.lSql, colName);
-                        dcm.addField(fieldName, colName, c.getConverter().getJavaType());
+                        dcm.addField(fieldName, colName, c.getConverter().getJavaType())
+                                .setNullable(c.isNullable());
                     });
 
             this.generatedDataClasses.add(dcm);

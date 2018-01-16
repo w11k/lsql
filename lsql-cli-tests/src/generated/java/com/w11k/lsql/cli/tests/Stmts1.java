@@ -334,13 +334,13 @@ public class Stmts1 {
 
         // fields ----------
 
-        public final java.lang.Number person1Id;
+        @javax.annotation.Nullable public final java.lang.Number person1Id;
 
-        public java.lang.Number getPerson1Id() {
+        @javax.annotation.Nullable public java.lang.Number getPerson1Id() {
             return this.person1Id;
         }
 
-        public queryParamsWithDot withPerson1Id(java.lang.Number person1Id) {
+        public queryParamsWithDot withPerson1Id(@javax.annotation.Nullable java.lang.Number person1Id) {
             return new queryParamsWithDot(person1Id);
         }
 
@@ -425,13 +425,13 @@ public class Stmts1 {
 
         // fields ----------
 
-        public final java.lang.Boolean yesno;
+        @javax.annotation.Nullable public final java.lang.Boolean yesno;
 
-        public java.lang.Boolean isYesno() {
+        @javax.annotation.Nullable public java.lang.Boolean isYesno() {
             return this.yesno;
         }
 
-        public changeYesno withYesno(java.lang.Boolean yesno) {
+        public changeYesno withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
             return new changeYesno(yesno);
         }
 

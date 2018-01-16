@@ -26,6 +26,8 @@ public class Column {
 
     private boolean ignoreOnUpdate = false;
 
+    private boolean nullable;
+
 //    public static Column create(Table table,
 //                                    String columnName,
 //                                    int sqlType,
@@ -138,5 +140,13 @@ public class Column {
                 ", sqlType=" + SqlTypesNames.getName(sqlType) +
                 ", javaType=" + converter.getJavaType().getCanonicalName() +
                 '}';
+    }
+
+    public void setNullable(boolean nullable) {
+        this.nullable = nullable;
+    }
+
+    public boolean isNullable() {
+        return nullable;
     }
 }

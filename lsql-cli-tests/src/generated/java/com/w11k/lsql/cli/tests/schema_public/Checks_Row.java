@@ -37,13 +37,13 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
     public static final String FIELD_yesno = "yesno";
 
-    public final java.lang.Boolean yesno;
+    @javax.annotation.Nonnull public final java.lang.Boolean yesno;
 
-    public java.lang.Boolean isYesno() {
+    @javax.annotation.Nonnull public java.lang.Boolean isYesno() {
         return this.yesno;
     }
 
-    public Checks_Row withYesno(java.lang.Boolean yesno) {
+    public Checks_Row withYesno(@javax.annotation.Nonnull java.lang.Boolean yesno) {
         return new Checks_Row(yesno);
     }
 

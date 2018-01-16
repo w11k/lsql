@@ -585,9 +585,19 @@ public class Table {
                 int columnSize = columnsMetaData.getInt(7);
                 String javaColumnName = lSql.identifierSqlToJava(sqlColumnName);
                 int sqlType = columnsMetaData.getInt(5);
+                boolean isNotNullable = columnsMetaData.getString(18).equalsIgnoreCase("NO");
+
+                System.out.println("sqlColumnName = " + sqlColumnName);
+                System.out.println("isNotNullable = " + isNotNullable);
+                System.out.println();
+
+
                 Converter converter = this.lSql.getConverterForTableColumn(
                         this.schemaAndTableName, javaColumnName, sqlType);
+
                 Column column = new Column(this, javaColumnName, sqlType, converter, columnSize);
+                column.setNullable(!isNotNullable);
+
                 lSql.getInitColumnCallback().onNewColumn(column);
                 this.columns.put(javaColumnName, column);
             }

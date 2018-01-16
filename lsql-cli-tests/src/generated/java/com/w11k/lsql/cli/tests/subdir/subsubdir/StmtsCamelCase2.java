@@ -50,22 +50,22 @@ public class StmtsCamelCase2 {
 
         // fields ----------
 
-        public final java.lang.String firstName;
+        @javax.annotation.Nullable public final java.lang.String firstName;
 
-        public java.lang.String getFirstName() {
+        @javax.annotation.Nullable public java.lang.String getFirstName() {
             return this.firstName;
         }
 
-        public loadPersonsByAgeAndFirstName withFirstName(java.lang.String firstName) {
+        public loadPersonsByAgeAndFirstName withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
             return new loadPersonsByAgeAndFirstName(firstName,age);
         }
-        public final java.lang.Number age;
+        @javax.annotation.Nullable public final java.lang.Number age;
 
-        public java.lang.Number getAge() {
+        @javax.annotation.Nullable public java.lang.Number getAge() {
             return this.age;
         }
 
-        public loadPersonsByAgeAndFirstName withAge(java.lang.Number age) {
+        public loadPersonsByAgeAndFirstName withAge(@javax.annotation.Nullable java.lang.Number age) {
             return new loadPersonsByAgeAndFirstName(firstName,age);
         }
 
@@ -151,13 +151,13 @@ public class StmtsCamelCase2 {
 
         // fields ----------
 
-        public final java.lang.String firstName;
+        @javax.annotation.Nullable public final java.lang.String firstName;
 
-        public java.lang.String getFirstName() {
+        @javax.annotation.Nullable public java.lang.String getFirstName() {
             return this.firstName;
         }
 
-        public deletePersonByFirstName withFirstName(java.lang.String firstName) {
+        public deletePersonByFirstName withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
             return new deletePersonByFirstName(firstName);
         }
 

@@ -1,16 +1,14 @@
 package com.w11k.lsql.cli_tests.tests;
 
 import com.google.common.base.Optional;
+import com.google.common.reflect.Invokable;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.cli.tests.DummyDto;
 import com.w11k.lsql.cli.tests.Stmts1;
 import com.w11k.lsql.cli.tests.TestCliConfig;
-import com.w11k.lsql.cli.tests.schema_public.Person1_Row;
-import com.w11k.lsql.cli.tests.schema_public.Person1_Table;
-import com.w11k.lsql.cli.tests.schema_public.Person2_Row;
-import com.w11k.lsql.cli.tests.schema_public.Person2_Table;
+import com.w11k.lsql.cli.tests.schema_public.*;
 import com.w11k.lsql.cli.tests.stmts1.QueryParamsWithDot;
 import com.w11k.lsql.cli.tests.sub_for_dto.SubDummyDto;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.StmtsCamelCase2;
@@ -21,6 +19,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -136,6 +136,15 @@ public final class TestCliProjectAssertsTest {
         assertTrue(o.toString().contains("abcdefghi"));
         assertTrue(o.toString().contains("age="));
         assertTrue(o.toString().contains("987654321"));
+    }
+
+    @Test
+    public void nullableAndNonnullAnnotation() throws NoSuchMethodException {
+        Invokable<?, Object> withId = Invokable.from(Person2_Row.class.getMethod("withId", Integer.class));
+        assertTrue(withId.getParameters().get(0).isAnnotationPresent(Nonnull.class));
+
+        Invokable<?, Object> withFirstName = Invokable.from(Person2_Row.class.getMethod("withFirstName", String.class));
+        assertTrue(withFirstName.getParameters().get(0).isAnnotationPresent(Nullable.class));
     }
 
     @Test

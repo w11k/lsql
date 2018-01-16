@@ -43,24 +43,24 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
 
     public static final String FIELD_id = "id";
 
-    public final java.lang.Integer id;
+    @javax.annotation.Nullable public final java.lang.Integer id;
 
-    public java.lang.Integer getId() {
+    @javax.annotation.Nullable public java.lang.Integer getId() {
         return this.id;
     }
 
-    public LoadAllPersons withId(java.lang.Integer id) {
+    public LoadAllPersons withId(@javax.annotation.Nullable java.lang.Integer id) {
         return new LoadAllPersons(id,firstName);
     }
     public static final String FIELD_first_name = "first_name";
 
-    public final java.lang.String firstName;
+    @javax.annotation.Nullable public final java.lang.String firstName;
 
-    public java.lang.String getFirstName() {
+    @javax.annotation.Nullable public java.lang.String getFirstName() {
         return this.firstName;
     }
 
-    public LoadAllPersons withFirstName(java.lang.String firstName) {
+    public LoadAllPersons withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
         return new LoadAllPersons(id,firstName);
     }
 

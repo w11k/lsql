@@ -43,24 +43,24 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
 
     public static final String FIELD_a_field = "a_field";
 
-    public final java.lang.Integer aField;
+    @javax.annotation.Nullable public final java.lang.Integer aField;
 
-    public java.lang.Integer getAField() {
+    @javax.annotation.Nullable public java.lang.Integer getAField() {
         return this.aField;
     }
 
-    public KeepUnderscoreForCamelCase withAField(java.lang.Integer aField) {
+    public KeepUnderscoreForCamelCase withAField(@javax.annotation.Nullable java.lang.Integer aField) {
         return new KeepUnderscoreForCamelCase(aField,afield);
     }
     public static final String FIELD_afield = "afield";
 
-    public final java.lang.String afield;
+    @javax.annotation.Nullable public final java.lang.String afield;
 
-    public java.lang.String getAfield() {
+    @javax.annotation.Nullable public java.lang.String getAfield() {
         return this.afield;
     }
 
-    public KeepUnderscoreForCamelCase withAfield(java.lang.String afield) {
+    public KeepUnderscoreForCamelCase withAfield(@javax.annotation.Nullable java.lang.String afield) {
         return new KeepUnderscoreForCamelCase(aField,afield);
     }
 

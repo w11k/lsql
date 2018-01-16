@@ -37,13 +37,13 @@ public final class A_table_Row implements com.w11k.lsql.TableRow, Id_Integer {
 
     public static final String FIELD_id = "id";
 
-    public final java.lang.Integer id;
+    @javax.annotation.Nonnull public final java.lang.Integer id;
 
-    public java.lang.Integer getId() {
+    @javax.annotation.Nonnull public java.lang.Integer getId() {
         return this.id;
     }
 
-    public A_table_Row withId(java.lang.Integer id) {
+    public A_table_Row withId(@javax.annotation.Nonnull java.lang.Integer id) {
         return new A_table_Row(id);
     }
 
