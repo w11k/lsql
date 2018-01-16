@@ -96,6 +96,7 @@ public class DataClassExporter {
                             String constructorBody) {
         DataClassMeta dcm = this.dataClassMeta;
 
+        content.append(indentString()).append("@SuppressWarnings({\"Duplicates\", \"WeakerAccess\"})\n");
         content.append(indentString()).append("public final class ").append(this.getClassName());
         content.append(extendsClause);
         content.append(" implements ").append(TableRow.class.getCanonicalName());
@@ -109,14 +110,12 @@ public class DataClassExporter {
             contentFrom(content);
         }
 
-        content.append(indentString()).append("    // constructors ----------\n\n");
-
         // constructors
+        content.append(indentString()).append("    // constructors ----------\n\n");
         contentConstructors(content, constructorBody);
 
-        content.append(indentString()).append("    // fields ----------\n\n");
-
         // Field instances and getter/setter
+        content.append(indentString()).append("    // fields ----------\n\n");
         for (DataClassMeta.DataClassFieldMeta field : dcm.getFields()) {
 //            addSeperator(content);
             if (!skipStaticAndUtilElements) {
@@ -212,7 +211,7 @@ public class DataClassExporter {
 
     private void contentToMap(StringBuilder content) {
         content.append(indentString()).append("    public java.util.Map<String, Object> toMap() {\n");
-        content.append(indentString()).append("        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();\n");
+        content.append(indentString()).append("        java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
 
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
@@ -299,8 +298,11 @@ public class DataClassExporter {
 
     private void contentConstructors(StringBuilder content, String constructorBody) {
         // empty constructor
+        content.append(indentString()).append("    @SuppressWarnings(\"ConstantConditions\")\n");
         content.append(indentString()).append("    public ").append(this.getClassName()).append("() {\n");
-        content.append(indentString()).append("        ").append(constructorBody).append("\n");
+        if (!Strings.isNullOrEmpty(constructorBody)) {
+            content.append(indentString()).append("        ").append(constructorBody).append("\n");
+        }
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
                     .append("this.").append(field.getFieldName())
@@ -313,6 +315,7 @@ public class DataClassExporter {
             content.append(indentString()).append("    private ").append(this.getClassName()).append("(\n");
             String arguments = Joiner.on(",\n").join(this.dataClassMeta.getFields().stream().map(field ->
                     "            "
+                            + this.getNullableOrNonnullAnnotation(field)
                             + field.getFieldType().getCanonicalName()
                             + " "
                             + field.getFieldName())
@@ -321,7 +324,9 @@ public class DataClassExporter {
             content.append(") {\n");
 
             // assign member
-            content.append(indentString()).append("        ").append(constructorBody).append("\n");
+            if (!Strings.isNullOrEmpty(constructorBody)) {
+                content.append(indentString()).append("        ").append(constructorBody).append("\n");
+            }
             for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
                 content.append(indentString()).append("        ")
                         .append("this.").append(field.getFieldName())
@@ -334,8 +339,11 @@ public class DataClassExporter {
         }
 
         // constructor from map
+        this.addSuppressWarningsUnused(4, content);
         content.append(indentString()).append("    public ").append(this.getClassName()).append("(java.util.Map<String, Object> from) {\n");
-        content.append(indentString()).append("        ").append(constructorBody).append("\n");
+        if (!Strings.isNullOrEmpty(constructorBody)) {
+            content.append(indentString()).append("        ").append(constructorBody).append("\n");
+        }
 
         // assign member
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
@@ -355,10 +363,18 @@ public class DataClassExporter {
 //                .to(CaseFormat.UPPER_UNDERSCORE, field.getFieldName());
         String staticName = field.getFieldKeyName();
 
+        this.addSuppressWarningsUnused(4, content);
         content.append(indentString()).append("    public static final String FIELD_").append(staticName).append(" = ")
                 .append("\"")
                 .append(field.getFieldKeyName())
                 .append("\";\n\n");
+    }
+
+    private void addSuppressWarningsUnused(int indent, StringBuilder content) {
+        content
+                .append(this.indentString())
+                .append(Strings.repeat(" ", indent))
+                .append("@SuppressWarnings(\"unused\")\n");
     }
 
     private void contentField(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {

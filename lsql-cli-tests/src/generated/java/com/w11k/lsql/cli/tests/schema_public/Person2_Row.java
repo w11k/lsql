@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests.schema_public;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String, Age_Integer {
 
     // static methods ----------
@@ -21,25 +22,24 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public Person2_Row() {
-        
         this.id = null;
         this.firstName = null;
         this.age = null;
     }
 
     private Person2_Row(
-            java.lang.Integer id,
-            java.lang.String firstName,
-            java.lang.Integer age) {
-        
+            @javax.annotation.Nonnull java.lang.Integer id,
+            @javax.annotation.Nullable java.lang.String firstName,
+            @javax.annotation.Nullable java.lang.Integer age) {
         this.id = id;
         this.firstName = firstName;
         this.age = age;
     }
 
+    @SuppressWarnings("unused")
     public Person2_Row(java.util.Map<String, Object> from) {
-        
         this.id = (java.lang.Integer) from.get("id");
         this.firstName = (java.lang.String) from.get("first_name");
         this.age = (java.lang.Integer) from.get("age");
@@ -47,6 +47,7 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_id = "id";
 
     @javax.annotation.Nonnull public final java.lang.Integer id;
@@ -58,6 +59,7 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
     public Person2_Row withId(@javax.annotation.Nonnull java.lang.Integer id) {
         return new Person2_Row(id,firstName,age);
     }
+    @SuppressWarnings("unused")
     public static final String FIELD_first_name = "first_name";
 
     @javax.annotation.Nullable public final java.lang.String firstName;
@@ -69,6 +71,7 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
     public Person2_Row withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
         return new Person2_Row(id,firstName,age);
     }
+    @SuppressWarnings("unused")
     public static final String FIELD_age = "age";
 
     @javax.annotation.Nullable public final java.lang.Integer age;
@@ -107,7 +110,7 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
         map.put("first_name", this.firstName);
         map.put("age", this.age);

@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests.schema_public;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field_Integer {
 
     // static methods ----------
@@ -17,24 +18,24 @@ public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public Custom_Converter_Row() {
-        
         this.field = null;
     }
 
     private Custom_Converter_Row(
-            java.lang.Integer field) {
-        
+            @javax.annotation.Nullable java.lang.Integer field) {
         this.field = field;
     }
 
+    @SuppressWarnings("unused")
     public Custom_Converter_Row(java.util.Map<String, Object> from) {
-        
         this.field = (java.lang.Integer) from.get("field");
     }
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_field = "field";
 
     @javax.annotation.Nullable public final java.lang.Integer field;
@@ -67,7 +68,7 @@ public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("field", this.field);
         return map;
     }

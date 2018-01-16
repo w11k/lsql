@@ -19,21 +19,24 @@ public class StmtsWithCustomConverter {
         return new load();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class load extends com.w11k.lsql.TypedStatementQuery<Load> implements com.w11k.lsql.TableRow, Field_Com_W11k_Lsql_Cli_Tests_Testcliconfig_Customtype {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public load() {
             super(lSql, sql_load);
             this.field = null;
         }
 
         private load(
-                com.w11k.lsql.cli.tests.TestCliConfig.CustomType field) {
+                @javax.annotation.Nullable com.w11k.lsql.cli.tests.TestCliConfig.CustomType field) {
             super(lSql, sql_load);
             this.field = field;
     }
 
+        @SuppressWarnings("unused")
         public load(java.util.Map<String, Object> from) {
             super(lSql, sql_load);
             this.field = (com.w11k.lsql.cli.tests.TestCliConfig.CustomType) from.get("field");
@@ -54,7 +57,7 @@ public class StmtsWithCustomConverter {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("field", this.field);
             return map;
         }

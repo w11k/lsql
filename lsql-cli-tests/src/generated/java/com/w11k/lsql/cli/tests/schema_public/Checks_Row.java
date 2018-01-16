@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests.schema_public;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
     // static methods ----------
@@ -17,24 +18,24 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public Checks_Row() {
-        
         this.yesno = null;
     }
 
     private Checks_Row(
-            java.lang.Boolean yesno) {
-        
+            @javax.annotation.Nonnull java.lang.Boolean yesno) {
         this.yesno = yesno;
     }
 
+    @SuppressWarnings("unused")
     public Checks_Row(java.util.Map<String, Object> from) {
-        
         this.yesno = (java.lang.Boolean) from.get("yesno");
     }
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_yesno = "yesno";
 
     @javax.annotation.Nonnull public final java.lang.Boolean yesno;
@@ -67,7 +68,7 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("yesno", this.yesno);
         return map;
     }

@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests.stmts1;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class LoadAllPersonsEscaped2 implements com.w11k.lsql.TableRow, Theid_Integer {
 
     // static methods ----------
@@ -17,24 +18,24 @@ public final class LoadAllPersonsEscaped2 implements com.w11k.lsql.TableRow, The
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public LoadAllPersonsEscaped2() {
-        
         this.theid = null;
     }
 
     private LoadAllPersonsEscaped2(
-            java.lang.Integer theid) {
-        
+            @javax.annotation.Nonnull java.lang.Integer theid) {
         this.theid = theid;
     }
 
+    @SuppressWarnings("unused")
     public LoadAllPersonsEscaped2(java.util.Map<String, Object> from) {
-        
         this.theid = (java.lang.Integer) from.get("theid");
     }
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_theid = "theid";
 
     @javax.annotation.Nonnull public final java.lang.Integer theid;
@@ -67,7 +68,7 @@ public final class LoadAllPersonsEscaped2 implements com.w11k.lsql.TableRow, The
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("theid", this.theid);
         return map;
     }

@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests.stmts1;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String {
 
     // static methods ----------
@@ -19,28 +20,28 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public QueryParamsWithDot() {
-        
         this.id = null;
         this.firstName = null;
     }
 
     private QueryParamsWithDot(
-            java.lang.Integer id,
-            java.lang.String firstName) {
-        
+            @javax.annotation.Nonnull java.lang.Integer id,
+            @javax.annotation.Nullable java.lang.String firstName) {
         this.id = id;
         this.firstName = firstName;
     }
 
+    @SuppressWarnings("unused")
     public QueryParamsWithDot(java.util.Map<String, Object> from) {
-        
         this.id = (java.lang.Integer) from.get("id");
         this.firstName = (java.lang.String) from.get("first_name");
     }
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_id = "id";
 
     @javax.annotation.Nonnull public final java.lang.Integer id;
@@ -52,6 +53,7 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
     public QueryParamsWithDot withId(@javax.annotation.Nonnull java.lang.Integer id) {
         return new QueryParamsWithDot(id,firstName);
     }
+    @SuppressWarnings("unused")
     public static final String FIELD_first_name = "first_name";
 
     @javax.annotation.Nullable public final java.lang.String firstName;
@@ -87,7 +89,7 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
         map.put("first_name", this.firstName);
         return map;

@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests.schema_public;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class A_Table_Row implements com.w11k.lsql.TableRow, Id_Integer {
 
     // static methods ----------
@@ -17,24 +18,24 @@ public final class A_Table_Row implements com.w11k.lsql.TableRow, Id_Integer {
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public A_Table_Row() {
-        
         this.id = null;
     }
 
     private A_Table_Row(
-            java.lang.Integer id) {
-        
+            @javax.annotation.Nonnull java.lang.Integer id) {
         this.id = id;
     }
 
+    @SuppressWarnings("unused")
     public A_Table_Row(java.util.Map<String, Object> from) {
-        
         this.id = (java.lang.Integer) from.get("id");
     }
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_id = "id";
 
     @javax.annotation.Nonnull public final java.lang.Integer id;
@@ -67,7 +68,7 @@ public final class A_Table_Row implements com.w11k.lsql.TableRow, Id_Integer {
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
         return map;
     }

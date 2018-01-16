@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests.sub_for_dto;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString, Field_BNumber {
 
     // static methods ----------
@@ -19,28 +20,28 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public SubDummyDto() {
-        
         this.fieldA = null;
         this.fieldB = null;
     }
 
     private SubDummyDto(
-            java.lang.String fieldA,
-            java.lang.Number fieldB) {
-        
+            @javax.annotation.Nullable java.lang.String fieldA,
+            @javax.annotation.Nullable java.lang.Number fieldB) {
         this.fieldA = fieldA;
         this.fieldB = fieldB;
     }
 
+    @SuppressWarnings("unused")
     public SubDummyDto(java.util.Map<String, Object> from) {
-        
         this.fieldA = (java.lang.String) from.get("fieldA");
         this.fieldB = (java.lang.Number) from.get("fieldB");
     }
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_fieldA = "fieldA";
 
     @javax.annotation.Nullable public final java.lang.String fieldA;
@@ -52,6 +53,7 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
     public SubDummyDto withFieldA(@javax.annotation.Nullable java.lang.String fieldA) {
         return new SubDummyDto(fieldA,fieldB);
     }
+    @SuppressWarnings("unused")
     public static final String FIELD_fieldB = "fieldB";
 
     @javax.annotation.Nullable public final java.lang.Number fieldB;
@@ -87,7 +89,7 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("fieldA", this.fieldA);
         map.put("fieldB", this.fieldB);
         return map;

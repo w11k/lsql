@@ -19,14 +19,17 @@ public class Stmts1 {
         return new loadAllPersonsEscaped2();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class loadAllPersonsEscaped2 extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsEscaped2> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public loadAllPersonsEscaped2() {
             super(lSql, sql_loadAllPersonsEscaped2);
         }
 
+        @SuppressWarnings("unused")
         public loadAllPersonsEscaped2(java.util.Map<String, Object> from) {
             super(lSql, sql_loadAllPersonsEscaped2);
         }
@@ -37,7 +40,7 @@ public class Stmts1 {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
         }
 
@@ -90,14 +93,17 @@ public class Stmts1 {
         return new loadAllPersons();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class loadAllPersons extends com.w11k.lsql.TypedStatementQuery<LoadAllPersons> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public loadAllPersons() {
             super(lSql, sql_loadAllPersons);
         }
 
+        @SuppressWarnings("unused")
         public loadAllPersons(java.util.Map<String, Object> from) {
             super(lSql, sql_loadAllPersons);
         }
@@ -108,7 +114,7 @@ public class Stmts1 {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
         }
 
@@ -163,14 +169,17 @@ public class Stmts1 {
         return new loadAllPersonsEscaped1();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class loadAllPersonsEscaped1 extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsEscaped1> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public loadAllPersonsEscaped1() {
             super(lSql, sql_loadAllPersonsEscaped1);
         }
 
+        @SuppressWarnings("unused")
         public loadAllPersonsEscaped1(java.util.Map<String, Object> from) {
             super(lSql, sql_loadAllPersonsEscaped1);
         }
@@ -181,7 +190,7 @@ public class Stmts1 {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
         }
 
@@ -237,14 +246,17 @@ public class Stmts1 {
         return new keepUnderscoreForCamelCase();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class keepUnderscoreForCamelCase extends com.w11k.lsql.TypedStatementQuery<KeepUnderscoreForCamelCase> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public keepUnderscoreForCamelCase() {
             super(lSql, sql_keepUnderscoreForCamelCase);
         }
 
+        @SuppressWarnings("unused")
         public keepUnderscoreForCamelCase(java.util.Map<String, Object> from) {
             super(lSql, sql_keepUnderscoreForCamelCase);
         }
@@ -255,7 +267,7 @@ public class Stmts1 {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
         }
 
@@ -312,21 +324,24 @@ public class Stmts1 {
         return new queryParamsWithDot();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class queryParamsWithDot extends com.w11k.lsql.TypedStatementQuery<QueryParamsWithDot> implements com.w11k.lsql.TableRow, Person1_Id_Number {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public queryParamsWithDot() {
             super(lSql, sql_queryParamsWithDot);
             this.person1Id = null;
         }
 
         private queryParamsWithDot(
-                java.lang.Number person1Id) {
+                @javax.annotation.Nullable java.lang.Number person1Id) {
             super(lSql, sql_queryParamsWithDot);
             this.person1Id = person1Id;
     }
 
+        @SuppressWarnings("unused")
         public queryParamsWithDot(java.util.Map<String, Object> from) {
             super(lSql, sql_queryParamsWithDot);
             this.person1Id = (java.lang.Number) from.get("person1.id");
@@ -347,7 +362,7 @@ public class Stmts1 {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("person1.id", this.person1Id);
             return map;
         }
@@ -403,21 +418,24 @@ public class Stmts1 {
         return new changeYesno();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class changeYesno extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public changeYesno() {
             super(lSql, sql_changeYesno);
             this.yesno = null;
         }
 
         private changeYesno(
-                java.lang.Boolean yesno) {
+                @javax.annotation.Nullable java.lang.Boolean yesno) {
             super(lSql, sql_changeYesno);
             this.yesno = yesno;
     }
 
+        @SuppressWarnings("unused")
         public changeYesno(java.util.Map<String, Object> from) {
             super(lSql, sql_changeYesno);
             this.yesno = (java.lang.Boolean) from.get("yesno");
@@ -438,7 +456,7 @@ public class Stmts1 {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
             return map;
         }

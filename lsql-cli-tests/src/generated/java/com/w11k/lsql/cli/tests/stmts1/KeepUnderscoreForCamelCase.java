@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests.stmts1;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow, A_Field_Integer, Afield_String {
 
     // static methods ----------
@@ -19,28 +20,28 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public KeepUnderscoreForCamelCase() {
-        
         this.aField = null;
         this.afield = null;
     }
 
     private KeepUnderscoreForCamelCase(
-            java.lang.Integer aField,
-            java.lang.String afield) {
-        
+            @javax.annotation.Nonnull java.lang.Integer aField,
+            @javax.annotation.Nullable java.lang.String afield) {
         this.aField = aField;
         this.afield = afield;
     }
 
+    @SuppressWarnings("unused")
     public KeepUnderscoreForCamelCase(java.util.Map<String, Object> from) {
-        
         this.aField = (java.lang.Integer) from.get("a_field");
         this.afield = (java.lang.String) from.get("afield");
     }
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_a_field = "a_field";
 
     @javax.annotation.Nonnull public final java.lang.Integer aField;
@@ -52,6 +53,7 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
     public KeepUnderscoreForCamelCase withAField(@javax.annotation.Nonnull java.lang.Integer aField) {
         return new KeepUnderscoreForCamelCase(aField,afield);
     }
+    @SuppressWarnings("unused")
     public static final String FIELD_afield = "afield";
 
     @javax.annotation.Nullable public final java.lang.String afield;
@@ -87,7 +89,7 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("a_field", this.aField);
         map.put("afield", this.afield);
         return map;

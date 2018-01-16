@@ -18,21 +18,24 @@ public class StmtsOnlyVoids {
         return new statementA();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class statementA extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public statementA() {
             super(lSql, sql_statementA);
             this.yesno = null;
         }
 
         private statementA(
-                java.lang.Boolean yesno) {
+                @javax.annotation.Nullable java.lang.Boolean yesno) {
             super(lSql, sql_statementA);
             this.yesno = yesno;
     }
 
+        @SuppressWarnings("unused")
         public statementA(java.util.Map<String, Object> from) {
             super(lSql, sql_statementA);
             this.yesno = (java.lang.Boolean) from.get("yesno");
@@ -53,7 +56,7 @@ public class StmtsOnlyVoids {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
             return map;
         }
@@ -105,21 +108,24 @@ public class StmtsOnlyVoids {
         return new statementB();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class statementB extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public statementB() {
             super(lSql, sql_statementB);
             this.yesno = null;
         }
 
         private statementB(
-                java.lang.Boolean yesno) {
+                @javax.annotation.Nullable java.lang.Boolean yesno) {
             super(lSql, sql_statementB);
             this.yesno = yesno;
     }
 
+        @SuppressWarnings("unused")
         public statementB(java.util.Map<String, Object> from) {
             super(lSql, sql_statementB);
             this.yesno = (java.lang.Boolean) from.get("yesno");
@@ -140,7 +146,7 @@ public class StmtsOnlyVoids {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
             return map;
         }

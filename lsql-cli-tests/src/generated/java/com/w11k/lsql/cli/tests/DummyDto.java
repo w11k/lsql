@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
 
     // static methods ----------
@@ -17,24 +18,24 @@ public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
 
     // constructors ----------
 
+    @SuppressWarnings("ConstantConditions")
     public DummyDto() {
-        
         this.fieldA = null;
     }
 
     private DummyDto(
-            java.lang.String fieldA) {
-        
+            @javax.annotation.Nullable java.lang.String fieldA) {
         this.fieldA = fieldA;
     }
 
+    @SuppressWarnings("unused")
     public DummyDto(java.util.Map<String, Object> from) {
-        
         this.fieldA = (java.lang.String) from.get("fieldA");
     }
 
     // fields ----------
 
+    @SuppressWarnings("unused")
     public static final String FIELD_fieldA = "fieldA";
 
     @javax.annotation.Nullable public final java.lang.String fieldA;
@@ -67,7 +68,7 @@ public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
     }
 
     public java.util.Map<String, Object> toMap() {
-        java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("fieldA", this.fieldA);
         return map;
     }

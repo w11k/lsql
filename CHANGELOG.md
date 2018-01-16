@@ -1,4 +1,9 @@
 
+**0.32.1**
+
+- added several SuppressWarnings to generated classes
+
+
 **0.32.0**
 
 - updated ReactiveX version

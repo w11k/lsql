@@ -24,10 +24,12 @@ public class StmtsCamelCase2 {
         return new loadPersonsByAgeAndFirstName();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class loadPersonsByAgeAndFirstName extends com.w11k.lsql.TypedStatementQuery<LoadPersonsByAgeAndFirstName> implements com.w11k.lsql.TableRow, First_Name_String, Age_Number {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public loadPersonsByAgeAndFirstName() {
             super(lSql, sql_loadPersonsByAgeAndFirstName);
             this.firstName = null;
@@ -35,13 +37,14 @@ public class StmtsCamelCase2 {
         }
 
         private loadPersonsByAgeAndFirstName(
-                java.lang.String firstName,
-            java.lang.Number age) {
+                @javax.annotation.Nullable java.lang.String firstName,
+            @javax.annotation.Nullable java.lang.Number age) {
             super(lSql, sql_loadPersonsByAgeAndFirstName);
             this.firstName = firstName;
             this.age = age;
     }
 
+        @SuppressWarnings("unused")
         public loadPersonsByAgeAndFirstName(java.util.Map<String, Object> from) {
             super(lSql, sql_loadPersonsByAgeAndFirstName);
             this.firstName = (java.lang.String) from.get("first_name");
@@ -72,7 +75,7 @@ public class StmtsCamelCase2 {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("first_name", this.firstName);
             map.put("age", this.age);
             return map;
@@ -129,21 +132,24 @@ public class StmtsCamelCase2 {
         return new deletePersonByFirstName();
     }
 
+    @SuppressWarnings({"Duplicates", "WeakerAccess"})
     public final class deletePersonByFirstName extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, First_Name_String {
 
         // constructors ----------
 
+        @SuppressWarnings("ConstantConditions")
         public deletePersonByFirstName() {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = null;
         }
 
         private deletePersonByFirstName(
-                java.lang.String firstName) {
+                @javax.annotation.Nullable java.lang.String firstName) {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = firstName;
     }
 
+        @SuppressWarnings("unused")
         public deletePersonByFirstName(java.util.Map<String, Object> from) {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = (java.lang.String) from.get("first_name");
@@ -164,7 +170,7 @@ public class StmtsCamelCase2 {
         // class methods ----------
 
         public java.util.Map<String, Object> toMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("first_name", this.firstName);
             return map;
         }
