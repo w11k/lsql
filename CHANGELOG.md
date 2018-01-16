@@ -4,6 +4,7 @@
 - CLI: added support for DTO generation
 - CLI: generated statements contain their origin for logging
 - CLI: bindings in generated Guice modules now use `.in(com.google.inject.Scopes.SINGLETON)` 
+- CLI: fields in DataClasses now contain @Nonnull and @Nullable annotations
 
 **0.31.11**
 
