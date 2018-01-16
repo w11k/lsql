@@ -2,6 +2,7 @@
 **0.31.15**
 
 - converters can now be targeted with type aliases
+- improved code name generation
 
 
 **0.31.14**

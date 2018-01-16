@@ -57,7 +57,7 @@ public final class TypedStatementExporter {
         String constructorBody = "super(lSql, sql_" + queryClassName + ");";
 
         DataClassMeta dcm = new DataClassMeta(
-                this.javaExporter.getlSql().getConfig(), queryClassName, "");
+                queryClassName, "");
 
         // fields
         for (String parameterName : this.typedStatementMeta.getParameters().keySet()) {

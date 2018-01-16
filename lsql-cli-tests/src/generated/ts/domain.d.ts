@@ -6,7 +6,7 @@ export namespace com.w11k.lsql.cli.tests.schema_public {
 }
 
 export namespace com.w11k.lsql.cli.tests.schema_public {
-    export interface A_table {
+    export interface A_Table {
         id: number;
     }
 }
@@ -26,7 +26,7 @@ export namespace com.w11k.lsql.cli.tests.schema_public {
 }
 
 export namespace com.w11k.lsql.cli.tests.schema_public {
-    export interface Custom_converter {
+    export interface Custom_Converter {
         field: number;
     }
 }

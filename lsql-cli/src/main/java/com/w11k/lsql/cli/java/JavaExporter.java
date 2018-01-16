@@ -54,9 +54,11 @@ public class JavaExporter {
                     ? ""
                     : Joiner.on("_").skipNulls().join("schema", schemaName.toLowerCase());
             String fullPackageName = joinStringsAsPackageName(packageName, lastPackageSegment);
-            String className = createSaveNameForClass(table.getTableName());
+            String tableName = table.getTableName();
+            String javaCodeName = getJavaCodeName(this.lSql, tableName);
+            String className = createSaveNameForClass(javaCodeName);
 
-            DataClassMeta dcm = new DataClassMeta(this.lSql.getConfig(), className, fullPackageName);
+            DataClassMeta dcm = new DataClassMeta(className, fullPackageName);
             table.getColumns().values()
                     .forEach(c -> {
                         String colName = c.getJavaColumnName();

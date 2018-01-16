@@ -1,13 +1,10 @@
 package com.w11k.lsql.cli.java;
 
 import com.google.common.collect.Lists;
-import com.w11k.lsql.Config;
 
 import java.util.List;
 
 public final class DataClassMeta {
-
-    private final Config config;
 
     private final String className;
 
@@ -15,8 +12,7 @@ public final class DataClassMeta {
 
     private final List<DataClassFieldMeta> fields = Lists.newLinkedList();
 
-    public DataClassMeta(Config config, String className, String packageName) {
-        this.config = config;
+    public DataClassMeta(String className, String packageName) {
         this.className = className;
         this.packageName = packageName;
     }

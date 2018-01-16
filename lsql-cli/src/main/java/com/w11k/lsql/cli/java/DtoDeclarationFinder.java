@@ -56,7 +56,6 @@ public final class DtoDeclarationFinder {
 
                 if (line.toLowerCase().contains(DTO_MARKER)) {
                     last = new DataClassMeta(
-                            this.javaExporter.getlSql().getConfig(),
                             this.getDtoNameFromLine(line),
                             packageName);
 

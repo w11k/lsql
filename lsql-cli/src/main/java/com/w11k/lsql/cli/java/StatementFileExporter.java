@@ -74,7 +74,6 @@ public final class StatementFileExporter {
             if (!stmt.getTypeAnnotation().toLowerCase().equals("void")) {
                 containsOnlyVoidStatements = false;
                 DataClassMeta dcm = new DataClassMeta(
-                        this.javaExporter.getlSql().getConfig(),
                         firstCharUpperCase(stmt.getStatementName()),
                         joinStringsAsPackageName(
                                 this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()));
