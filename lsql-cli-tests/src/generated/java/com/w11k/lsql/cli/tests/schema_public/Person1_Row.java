@@ -26,9 +26,10 @@ public final class Person1_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
         this.firstName = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private Person1_Row(
-            @javax.annotation.Nonnull java.lang.Integer id,
-            @javax.annotation.Nullable java.lang.String firstName) {
+            java.lang.Integer id,
+            java.lang.String firstName) {
         this.id = id;
         this.firstName = firstName;
     }

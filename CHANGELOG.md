@@ -1,4 +1,9 @@
 
+**0.32.2**
+
+- CLI: generated TypeScript files honors nullable attribute
+
+
 **0.32.1**
 
 - added several SuppressWarnings to generated classes

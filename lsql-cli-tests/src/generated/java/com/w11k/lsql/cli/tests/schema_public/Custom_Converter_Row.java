@@ -23,8 +23,9 @@ public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field
         this.field = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private Custom_Converter_Row(
-            @javax.annotation.Nullable java.lang.Integer field) {
+            java.lang.Integer field) {
         this.field = field;
     }
 

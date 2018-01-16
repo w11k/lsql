@@ -23,8 +23,9 @@ public final class Load implements com.w11k.lsql.TableRow, Field_Integer {
         this.field = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private Load(
-            @javax.annotation.Nullable java.lang.Integer field) {
+            java.lang.Integer field) {
         this.field = field;
     }
 

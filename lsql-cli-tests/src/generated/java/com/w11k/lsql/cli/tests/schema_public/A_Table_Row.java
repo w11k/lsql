@@ -23,8 +23,9 @@ public final class A_Table_Row implements com.w11k.lsql.TableRow, Id_Integer {
         this.id = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private A_Table_Row(
-            @javax.annotation.Nonnull java.lang.Integer id) {
+            java.lang.Integer id) {
         this.id = id;
     }
 

@@ -29,8 +29,9 @@ public class StmtsOnlyVoids {
             this.yesno = null;
         }
 
+        @SuppressWarnings("NullableProblems")
         private statementA(
-                @javax.annotation.Nullable java.lang.Boolean yesno) {
+                java.lang.Boolean yesno) {
             super(lSql, sql_statementA);
             this.yesno = yesno;
     }
@@ -119,8 +120,9 @@ public class StmtsOnlyVoids {
             this.yesno = null;
         }
 
+        @SuppressWarnings("NullableProblems")
         private statementB(
-                @javax.annotation.Nullable java.lang.Boolean yesno) {
+                java.lang.Boolean yesno) {
             super(lSql, sql_statementB);
             this.yesno = yesno;
     }

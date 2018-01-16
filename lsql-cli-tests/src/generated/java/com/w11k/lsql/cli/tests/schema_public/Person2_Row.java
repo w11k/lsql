@@ -29,10 +29,11 @@ public final class Person2_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
         this.age = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private Person2_Row(
-            @javax.annotation.Nonnull java.lang.Integer id,
-            @javax.annotation.Nullable java.lang.String firstName,
-            @javax.annotation.Nullable java.lang.Integer age) {
+            java.lang.Integer id,
+            java.lang.String firstName,
+            java.lang.Integer age) {
         this.id = id;
         this.firstName = firstName;
         this.age = age;

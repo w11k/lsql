@@ -30,8 +30,9 @@ public class StmtsWithCustomConverter {
             this.field = null;
         }
 
+        @SuppressWarnings("NullableProblems")
         private load(
-                @javax.annotation.Nullable com.w11k.lsql.cli.tests.TestCliConfig.CustomType field) {
+                com.w11k.lsql.cli.tests.TestCliConfig.CustomType field) {
             super(lSql, sql_load);
             this.field = field;
     }

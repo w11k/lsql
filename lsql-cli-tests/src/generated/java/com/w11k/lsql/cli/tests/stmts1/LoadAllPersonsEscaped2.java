@@ -23,8 +23,9 @@ public final class LoadAllPersonsEscaped2 implements com.w11k.lsql.TableRow, The
         this.theid = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private LoadAllPersonsEscaped2(
-            @javax.annotation.Nonnull java.lang.Integer theid) {
+            java.lang.Integer theid) {
         this.theid = theid;
     }
 

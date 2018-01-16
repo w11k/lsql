@@ -26,9 +26,10 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
         this.afield = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private KeepUnderscoreForCamelCase(
-            @javax.annotation.Nonnull java.lang.Integer aField,
-            @javax.annotation.Nullable java.lang.String afield) {
+            java.lang.Integer aField,
+            java.lang.String afield) {
         this.aField = aField;
         this.afield = afield;
     }

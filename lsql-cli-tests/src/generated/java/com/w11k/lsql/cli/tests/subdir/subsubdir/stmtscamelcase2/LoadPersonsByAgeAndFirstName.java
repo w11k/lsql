@@ -29,10 +29,11 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
         this.age = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private LoadPersonsByAgeAndFirstName(
-            @javax.annotation.Nonnull java.lang.Integer id,
-            @javax.annotation.Nullable java.lang.String firstName,
-            @javax.annotation.Nullable java.lang.Integer age) {
+            java.lang.Integer id,
+            java.lang.String firstName,
+            java.lang.Integer age) {
         this.id = id;
         this.firstName = firstName;
         this.age = age;

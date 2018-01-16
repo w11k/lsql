@@ -335,8 +335,9 @@ public class Stmts1 {
             this.person1Id = null;
         }
 
+        @SuppressWarnings("NullableProblems")
         private queryParamsWithDot(
-                @javax.annotation.Nullable java.lang.Number person1Id) {
+                java.lang.Number person1Id) {
             super(lSql, sql_queryParamsWithDot);
             this.person1Id = person1Id;
     }
@@ -429,8 +430,9 @@ public class Stmts1 {
             this.yesno = null;
         }
 
+        @SuppressWarnings("NullableProblems")
         private changeYesno(
-                @javax.annotation.Nullable java.lang.Boolean yesno) {
+                java.lang.Boolean yesno) {
             super(lSql, sql_changeYesno);
             this.yesno = yesno;
     }

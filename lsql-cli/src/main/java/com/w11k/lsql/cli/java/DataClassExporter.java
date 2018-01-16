@@ -312,10 +312,10 @@ public class DataClassExporter {
 
         // constructor with field initializer
         if (this.dataClassMeta.getFields().size() > 0) {
+            content.append(indentString()).append("    @SuppressWarnings(\"NullableProblems\")\n");
             content.append(indentString()).append("    private ").append(this.getClassName()).append("(\n");
             String arguments = Joiner.on(",\n").join(this.dataClassMeta.getFields().stream().map(field ->
                     "            "
-                            + this.getNullableOrNonnullAnnotation(field)
                             + field.getFieldType().getCanonicalName()
                             + " "
                             + field.getFieldName())

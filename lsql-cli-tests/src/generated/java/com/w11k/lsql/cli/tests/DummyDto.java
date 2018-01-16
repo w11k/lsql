@@ -23,8 +23,9 @@ public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
         this.fieldA = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private DummyDto(
-            @javax.annotation.Nullable java.lang.String fieldA) {
+            java.lang.String fieldA) {
         this.fieldA = fieldA;
     }
 

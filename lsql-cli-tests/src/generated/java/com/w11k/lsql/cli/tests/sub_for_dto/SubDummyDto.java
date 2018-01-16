@@ -26,9 +26,10 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
         this.fieldB = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private SubDummyDto(
-            @javax.annotation.Nullable java.lang.String fieldA,
-            @javax.annotation.Nullable java.lang.Number fieldB) {
+            java.lang.String fieldA,
+            java.lang.Number fieldB) {
         this.fieldA = fieldA;
         this.fieldB = fieldB;
     }

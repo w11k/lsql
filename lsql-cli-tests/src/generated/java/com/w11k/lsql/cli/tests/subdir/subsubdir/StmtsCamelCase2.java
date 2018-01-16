@@ -36,9 +36,10 @@ public class StmtsCamelCase2 {
             this.age = null;
         }
 
+        @SuppressWarnings("NullableProblems")
         private loadPersonsByAgeAndFirstName(
-                @javax.annotation.Nullable java.lang.String firstName,
-            @javax.annotation.Nullable java.lang.Number age) {
+                java.lang.String firstName,
+            java.lang.Number age) {
             super(lSql, sql_loadPersonsByAgeAndFirstName);
             this.firstName = firstName;
             this.age = age;
@@ -143,8 +144,9 @@ public class StmtsCamelCase2 {
             this.firstName = null;
         }
 
+        @SuppressWarnings("NullableProblems")
         private deletePersonByFirstName(
-                @javax.annotation.Nullable java.lang.String firstName) {
+                java.lang.String firstName) {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = firstName;
     }

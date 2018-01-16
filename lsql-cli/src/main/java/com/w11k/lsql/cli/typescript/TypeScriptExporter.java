@@ -66,8 +66,11 @@ public class TypeScriptExporter {
     private void exportField(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
         Class<?> javaType = field.getFieldType();
         String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);
-        content.append("        ")
-                .append(field.getFieldName()).append(": ").append(tsTypeName).append(";\n");
+        content.append("        ").append(field.getFieldName());
+        if (field.isNullable()) {
+            content.append("?");
+        }
+        content.append(": ").append(tsTypeName).append(";\n");
     }
 
     private String getTypeScriptTypeNameForJavaType(Class<?> javaType) {

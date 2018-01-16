@@ -26,9 +26,10 @@ public final class QueryParamsWithDot implements com.w11k.lsql.TableRow, Id_Inte
         this.firstName = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private QueryParamsWithDot(
-            @javax.annotation.Nonnull java.lang.Integer id,
-            @javax.annotation.Nullable java.lang.String firstName) {
+            java.lang.Integer id,
+            java.lang.String firstName) {
         this.id = id;
         this.firstName = firstName;
     }

@@ -23,8 +23,9 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
         this.yesno = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     private Checks_Row(
-            @javax.annotation.Nonnull java.lang.Boolean yesno) {
+            java.lang.Boolean yesno) {
         this.yesno = yesno;
     }
 
