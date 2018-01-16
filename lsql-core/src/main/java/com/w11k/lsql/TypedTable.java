@@ -20,18 +20,18 @@ public class TypedTable<T extends TableRow, I> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public Optional<I> insert(T row) {
-        Map<String, Object> map = row.toMap();
+    public Optional<I> insert(T instance) {
+        Map<String, Object> map = instance.toMap();
 
         // Remove null values so that the DB can insert the default values
         map.entrySet().removeIf(entry -> entry.getValue() == null);
 
+        //noinspection unchecked
         return (Optional<I>) this.table.insert(new Row(map));
     }
 
-    public T insertAndLoad(T row) {
-        Optional<I> pk = this.insert(row);
+    public T insertAndLoad(T instance) {
+        Optional<I> pk = this.insert(instance);
         if (pk.isPresent()) {
             return this.load(pk.get()).get();
         } else {
@@ -54,8 +54,8 @@ public class TypedTable<T extends TableRow, I> {
         return Optional.of(tableRow);
     }
 
-    public void delete(T row) {
-        Map<String, Object> map = row.toMap();
+    public void delete(T instance) {
+        Map<String, Object> map = instance.toMap();
         this.table.delete(new Row(map));
     }
 
@@ -63,19 +63,28 @@ public class TypedTable<T extends TableRow, I> {
         this.table.delete(id);
     }
 
-    public void update(T row) {
-        Map<String, Object> map = row.toMap();
+    public void update(T instance) {
+        Map<String, Object> map = instance.toMap();
         this.table.update(new Row(map));
     }
 
-    public void updateWhere(T row, Map<String, Object> where) {
-        Map<String, Object> map = row.toMap();
+    public void updateWhere(T instance, Map<String, Object> where) {
+        Map<String, Object> map = instance.toMap();
         this.table.updateWhere(new Row(map), new Row(where));
     }
 
-    public void save(T row) {
-        Map<String, Object> map = row.toMap();
-        this.table.save(new Row(map));
+    public Optional<I> save(T instance) {
+        Map<String, Object> map = instance.toMap();
+
+        //noinspection unchecked
+        return (Optional<I>) this.table.save(new Row(map));
+    }
+
+    public T saveAndLoad(T instance) {
+        Object pk = this.save(instance);
+
+        //noinspection unchecked
+        return this.load((I) pk).get();
     }
 
 }
