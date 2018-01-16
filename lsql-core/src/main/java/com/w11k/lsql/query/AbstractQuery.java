@@ -183,7 +183,10 @@ public abstract class AbstractQuery<T> {
 
                 Optional<Converter> converter = getConverterForResultSetColumn(metaData, i, columnLabel, false);
                 if (converter.isPresent()) {
-                    resultSetColumns.add(new ResultSetColumn(i, columnLabel, converter.get()));
+                    ResultSetColumn resultSetColumn = new ResultSetColumn(i, columnLabel, converter.get());
+                    boolean nullable = metaData.isNullable(i) == ResultSetMetaData.columnNullable;
+                    resultSetColumn.setNullable(nullable);
+                    resultSetColumns.add(resultSetColumn);
                     converters.put(columnLabel, converter.get());
                 }
             }

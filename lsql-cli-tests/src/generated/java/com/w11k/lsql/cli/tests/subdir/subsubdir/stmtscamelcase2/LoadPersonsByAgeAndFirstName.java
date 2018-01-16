@@ -49,13 +49,13 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
 
     public static final String FIELD_id = "id";
 
-    @javax.annotation.Nullable public final java.lang.Integer id;
+    @javax.annotation.Nonnull public final java.lang.Integer id;
 
-    @javax.annotation.Nullable public java.lang.Integer getId() {
+    @javax.annotation.Nonnull public java.lang.Integer getId() {
         return this.id;
     }
 
-    public LoadPersonsByAgeAndFirstName withId(@javax.annotation.Nullable java.lang.Integer id) {
+    public LoadPersonsByAgeAndFirstName withId(@javax.annotation.Nonnull java.lang.Integer id) {
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
     public static final String FIELD_first_name = "first_name";

@@ -1,4 +1,9 @@
 
+**0.31.14**
+
+- CLI: detect nullable properties for statements
+
+
 **0.31.12**
 
 - CLI: added support for DTO generation

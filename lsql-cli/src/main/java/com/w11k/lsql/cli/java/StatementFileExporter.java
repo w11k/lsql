@@ -81,7 +81,8 @@ public final class StatementFileExporter {
                 query.query().createResultSetWithColumns().getColumns().forEach(c -> {
                     String colName = c.getName();
                     String fieldName = getJavaCodeName(this.javaExporter.getlSql(), colName);
-                    dcm.addField(fieldName, colName, c.getConverter().getJavaType());
+                    dcm.addField(fieldName, colName, c.getConverter().getJavaType())
+                    .setNullable(c.isNullable());
                 });
                 this.stmtRowDataClassMetaList.add(dcm);
             }

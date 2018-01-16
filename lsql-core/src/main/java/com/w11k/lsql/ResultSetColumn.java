@@ -12,6 +12,8 @@ public class ResultSetColumn {
 
     private final Converter converter;
 
+    private boolean nullable;
+
     // Tree Marker columns
 
     private final boolean markerColumn;
@@ -73,5 +75,13 @@ public class ResultSetColumn {
 
     public String getFullPath() {
         return this.fullPath;
+    }
+
+    public void setNullable(boolean nullable) {
+        this.nullable = nullable;
+    }
+
+    public boolean isNullable() {
+        return nullable;
     }
 }
