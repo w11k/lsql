@@ -20,13 +20,13 @@ public class TypedTable<T extends TableRow, I> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Optional<I> insert(T instance) {
         Map<String, Object> map = instance.toMap();
 
         // Remove null values so that the DB can insert the default values
         map.entrySet().removeIf(entry -> entry.getValue() == null);
 
-        //noinspection unchecked
         return (Optional<I>) this.table.insert(new Row(map));
     }
 
@@ -73,17 +73,15 @@ public class TypedTable<T extends TableRow, I> {
         this.table.updateWhere(new Row(map), new Row(where));
     }
 
+    @SuppressWarnings("unchecked")
     public Optional<I> save(T instance) {
         Map<String, Object> map = instance.toMap();
-
-        //noinspection unchecked
         return (Optional<I>) this.table.save(new Row(map));
     }
 
+    @SuppressWarnings("unchecked")
     public T saveAndLoad(T instance) {
         Object pk = this.save(instance);
-
-        //noinspection unchecked
         return this.load((I) pk).get();
     }
 
