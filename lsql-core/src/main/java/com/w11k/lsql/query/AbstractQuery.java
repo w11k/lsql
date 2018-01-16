@@ -9,12 +9,11 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.ResultSetColumn;
 import com.w11k.lsql.ResultSetWithColumns;
 import com.w11k.lsql.converter.Converter;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+import io.reactivex.subjects.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Func1;
-import rx.subjects.Subject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -92,11 +91,11 @@ public abstract class AbstractQuery<T> {
     }
 
     public List<T> toList() {
-        return rx().toList().toBlocking().first();
+        return rx().toList().blockingGet();
     }
 
-    public <R> List<R> toList(Func1<T, R> mapper) {
-        return rx().map(mapper).toList().toBlocking().first();
+    public <R> List<R> toList(Function<T, R> mapper) {
+        return rx().map(mapper).toList().blockingGet();
     }
 
     public abstract List<T> toTree();
@@ -105,7 +104,7 @@ public abstract class AbstractQuery<T> {
      * Executes the query and returns the first row in the result set. Return absent() if the result set is empty.
      */
     public Optional<T> first() {
-        List<T> list = rx().take(1).toList().toBlocking().first();
+        List<T> list = rx().take(1).toList().blockingGet();
         if (list.isEmpty()) {
             return Optional.absent();
         } else {
@@ -113,8 +112,14 @@ public abstract class AbstractQuery<T> {
         }
     }
 
-    public <R> Optional<R> first(final Func1<T, R> mapper) {
-        return this.first().transform(mapper::call);
+    public <R> Optional<R> first(final Function<T, R> mapper) {
+        return this.first().transform(t -> {
+            try {
+                return mapper.apply(t);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
 
@@ -124,12 +129,7 @@ public abstract class AbstractQuery<T> {
      * @return the Observable
      */
     public Observable<T> rx() {
-        return rxResultSet().map(new Func1<ResultSetWithColumns, T>() {
-            @Override
-            public T call(ResultSetWithColumns resultSetWithColumns) {
-                return extractEntity(resultSetWithColumns);
-            }
-        });
+        return rxResultSet().map(this::extractEntity);
     }
 
     /**
@@ -141,21 +141,18 @@ public abstract class AbstractQuery<T> {
      */
     public Observable<ResultSetWithColumns> rxResultSet() {
 
-        return Subject.create(new Observable.OnSubscribe<ResultSetWithColumns>() {
-            @Override
-            public void call(Subscriber<? super ResultSetWithColumns> subscriber) {
-                try {
-                    ResultSetWithColumns resultSetWithColumns = createResultSetWithColumns();
-                    checkConformity(resultSetWithColumns.getConverters());
+        return Subject.create(emitter -> {
+            try {
+                ResultSetWithColumns resultSetWithColumns = createResultSetWithColumns();
+                checkConformity(resultSetWithColumns.getConverters());
 
-                    while (resultSetWithColumns.getResultSet().next() && !subscriber.isUnsubscribed()) {
-                        subscriber.onNext(resultSetWithColumns);
-                    }
-                    resultSetWithColumns.getResultSet().close();
-                    subscriber.onCompleted();
-                } catch (SQLException e) {
-                    subscriber.onError(e);
+                while (resultSetWithColumns.getResultSet().next() && !emitter.isDisposed()) {
+                    emitter.onNext(resultSetWithColumns);
                 }
+                resultSetWithColumns.getResultSet().close();
+                emitter.onComplete();
+            } catch (SQLException e) {
+                emitter.onError(e);
             }
         });
     }

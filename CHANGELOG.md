@@ -1,4 +1,9 @@
 
+**0.32.0**
+
+- updated ReactiveX version
+
+
 **0.31.15**
 
 - converters can now be targeted with type aliases

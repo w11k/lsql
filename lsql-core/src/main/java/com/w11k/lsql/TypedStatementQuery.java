@@ -1,8 +1,8 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 import java.util.List;
 import java.util.Map;
@@ -28,15 +28,15 @@ public abstract class TypedStatementQuery<T> {
     }
 
     public List<T> toList() {
-        return this.rx().toList().toBlocking().first();
+        return this.rx().toList().blockingGet();
     }
 
-    public <R> List<R> toList(Func1<T, R> mapper) {
-        return rx().map(mapper).toList().toBlocking().first();
+    public <R> List<R> toList(Function<T, R> mapper) {
+        return rx().map(mapper).toList().blockingGet();
     }
 
     public Optional<T> first() {
-        List<T> first = this.rx().take(1).toList().toBlocking().first();
+        List<T> first = this.rx().take(1).toList().blockingGet();
         if (first.isEmpty()) {
             return Optional.absent();
         } else {
@@ -44,8 +44,14 @@ public abstract class TypedStatementQuery<T> {
         }
     }
 
-    public <R> Optional<R> first(final Func1<T, R> mapper) {
-        return this.first().transform(mapper::call);
+    public <R> Optional<R> first(final Function<T, R> mapper) {
+        return this.first().transform(t -> {
+            try {
+                return mapper.apply(t);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public abstract String getStatementFileName();
