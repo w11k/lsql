@@ -37,7 +37,7 @@ public final class GuiceModuleExporter {
         content.append("    @Override\n");
         content.append("    public void configure(com.google.inject.Binder binder) {\n");
         for (String className : this.guiceModuleClasses) {
-            content.append("        binder.bind(").append(className).append(".class).asEagerSingleton();\n");
+            content.append("        binder.bind(").append(className).append(".class).in(com.google.inject.Scopes.SINGLETON);\n");
         }
         content.append("    }\n\n");
         content.append("}\n");
