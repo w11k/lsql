@@ -1,4 +1,9 @@
 
+**0.31.15**
+
+- converters can now be targeted with type aliases
+
+
 **0.31.14**
 
 - CLI: detect nullable properties for statements

@@ -1,11 +1,10 @@
 package com.w11k.lsql.tests;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.H2Dialect;
-import com.w11k.lsql.dialects.IdentifierConverter;
 import com.w11k.lsql.dialects.PostgresDialect;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -16,25 +15,16 @@ import org.testng.annotations.Parameters;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class AbstractLSqlTest {
 
     private Connection connection;
 
+    private static List<Consumer<TestConfig>> CONFIG_HOOKS = Lists.newLinkedList();
+
     public static class TestConfig extends Config {
-
-        public static Map<String, Map<String, Converter>> CONVERTERS = Maps.newHashMap();
-
-        public static boolean USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP = false;
-
-        public static IdentifierConverter IDENTIFIER_CONVERTER = null;
-
-        public static void reset() {
-            CONVERTERS = Maps.newHashMap();
-            USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP = false;
-            IDENTIFIER_CONVERTER = null;
-        }
 
         static String driverClassName = null;
 
@@ -45,37 +35,30 @@ public abstract class AbstractLSqlTest {
                 this.setDialect(new PostgresDialect());
             }
 
-            this.setConverters(CONVERTERS);
-            if (IDENTIFIER_CONVERTER != null) {
-                this.getDialect().setIdentifierConverter(IDENTIFIER_CONVERTER);
-            }
-            this.setUseColumnTypeForConverterLookupInQueries(USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP);
+            CONFIG_HOOKS.forEach(hook -> hook.accept(this));
+        }
+
+        @Override
+        public void setConverter(String tableName, String columnName, Class<?> classForConverterLookup) {
+            super.setConverter(tableName, columnName, classForConverterLookup);
+        }
+
+        @Override
+        public void setConverter(String tableName, String columnName, Converter converter) {
+            super.setConverter(tableName, columnName, converter);
+        }
+
+        @Override
+        public void setUseColumnTypeForConverterLookupInQueries(boolean useColumnTypeForConverterLookupInQueries) {
+            super.setUseColumnTypeForConverterLookupInQueries(useColumnTypeForConverterLookupInQueries);
         }
 
     }
 
     protected LSql lSql;
 
-    public void setConverter(String tableName, String columnName, Class<?> classForConverterLookup) {
-        this.setConverter(
-                tableName,
-                columnName,
-                this.lSql.getConverterForJavaType(classForConverterLookup));
-    }
-
-    public void setConverter(String tableName, String columnName, Converter converter) {
-        if (!TestConfig.CONVERTERS.containsKey(tableName)) {
-            TestConfig.CONVERTERS.put(tableName, Maps.<String, Converter>newHashMap());
-        }
-
-        Map<String, Converter> columnClassMap = TestConfig.CONVERTERS.get(tableName);
-        columnClassMap.put(columnName, converter);
-
-        this.createLSqlInstance();
-    }
-
-    public void setIdentifierConverter(IdentifierConverter identifierConverter) {
-        TestConfig.IDENTIFIER_CONVERTER = identifierConverter;
+    protected void addConfigHook(Consumer<TestConfig> hook) {
+        CONFIG_HOOKS.add(hook);
         this.createLSqlInstance();
     }
 
@@ -91,7 +74,7 @@ public abstract class AbstractLSqlTest {
                                    @Optional String username,
                                    @Optional String password) {
 
-        TestConfig.reset();
+        this.reset();
 
         driverClassName = driverClassName != null ? driverClassName : "org.h2.Driver";
         url = url != null ? url : "jdbc:h2:mem:testdb;mode=postgresql";
@@ -120,6 +103,10 @@ public abstract class AbstractLSqlTest {
     @AfterMethod
     public final void afterMethod() throws Exception {
         lSql.getConnectionProvider().call().close();
+    }
+
+    protected void reset() {
+        CONFIG_HOOKS = Lists.newLinkedList();
     }
 
     protected void beforeMethodHook() {

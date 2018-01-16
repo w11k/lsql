@@ -113,8 +113,8 @@ public class PojoTableTest extends AbstractLSqlTest {
     @Test
     public void fieldsUsesColumnConverter() {
         PersonTestData.init(this.lSql, false);
-
-        this.setConverter("person", "age", new AtomicIntegerConverter());
+        this.addConfigHook(c ->
+                c.setConverter("person", "age", new AtomicIntegerConverter()));
 
         PojoTable<PersonWithAtomicIntegerAge> personTable = this.lSql.table("person")
                 .withPojo(PersonWithAtomicIntegerAge.class);

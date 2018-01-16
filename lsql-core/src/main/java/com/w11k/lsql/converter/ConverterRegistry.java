@@ -11,7 +11,7 @@ public class ConverterRegistry {
 
     private final Map<Class<?>, Converter> javaToSqlConverters = Maps.newHashMap();
 
-    private final Map<String, Class<?>> typeAliases = Maps.newHashMap();
+    private final Map<String, Converter> typeAliasesForConverter = Maps.newHashMap();
 
     private final Map<Integer, Converter> sqlToJavaConverters = Maps.newHashMap();
 
@@ -36,8 +36,8 @@ public class ConverterRegistry {
 
     public Converter getConverterForAlias(String aliasName) {
         aliasName = aliasName.toLowerCase();
-        if (this.typeAliases.containsKey(aliasName)) {
-            return this.getConverterForJavaType(this.typeAliases.get(aliasName));
+        if (this.typeAliasesForConverter.containsKey(aliasName)) {
+            return this.typeAliasesForConverter.get(aliasName);
         }
 
         throw new IllegalStateException("No converter for alias '" + aliasName + "' registered!");
@@ -82,8 +82,12 @@ public class ConverterRegistry {
         this.addJavaToSqlConverter(converter, replaceExisting);
     }
 
-    public void addTypeAlias(String alias, Class<?> forClass) {
-        this.typeAliases.put(alias.toLowerCase(), forClass);
+    public void addTypeAlias(String alias, Converter converter) {
+        this.typeAliasesForConverter.put(alias.toLowerCase(), converter);
+    }
+
+    public void addTypeAlias(String alias, Class<?> javaType) {
+        this.typeAliasesForConverter.put(alias.toLowerCase(), this.getConverterForJavaType(javaType));
     }
 
 }

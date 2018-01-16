@@ -81,7 +81,8 @@ public class TypeMapperTypeTest extends AbstractLSqlTest {
     @Test
     public void converterForColumnValue() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, yesno1 TEXT, yesno2 TEXT)");
-        this.setConverter("table1", "yesno1", javaBoolToSqlYesNoStringConverter);
+        this.addConfigHook(c ->
+                c.setConverter("table1", "yesno1", javaBoolToSqlYesNoStringConverter));
 
         Table t1 = lSql.table("table1");
         t1.insert(Row.fromKeyVals("id", 1, "yesno1", true, "yesno2", "true"));

@@ -2,51 +2,31 @@ package com.w11k.lsql.cli_tests.tests;
 
 import com.google.common.base.Optional;
 import com.google.common.reflect.Invokable;
-import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.cli.tests.DummyDto;
 import com.w11k.lsql.cli.tests.Stmts1;
-import com.w11k.lsql.cli.tests.TestCliConfig;
-import com.w11k.lsql.cli.tests.schema_public.*;
+import com.w11k.lsql.cli.tests.schema_public.Person1_Row;
+import com.w11k.lsql.cli.tests.schema_public.Person1_Table;
+import com.w11k.lsql.cli.tests.schema_public.Person2_Row;
+import com.w11k.lsql.cli.tests.schema_public.Person2_Table;
 import com.w11k.lsql.cli.tests.stmts1.QueryParamsWithDot;
 import com.w11k.lsql.cli.tests.sub_for_dto.SubDummyDto;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.StmtsCamelCase2;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
-import com.w11k.lsql.jdbc.ConnectionProviders;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
-import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
 import static org.testng.Assert.*;
 
-public final class TestCliProjectAssertsTest {
-
-    private LSql lSql;
-
-    @BeforeMethod
-    public void before() throws SQLException {
-        String url = "jdbc:h2:mem:" + UUID.randomUUID() + ";mode=postgresql";
-        BasicDataSource ds = new BasicDataSource();
-        ds.setUrl(url);
-        ds.setDefaultAutoCommit(false);
-        Connection connection = ds.getConnection();
-        this.lSql = new LSql(TestCliConfig.class, ConnectionProviders.fromInstance(connection));
-    }
+public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
 
     @Test
     public void useStaticUtilFields() {
-        createTables(lSql);
-
         // insert with static util fields
         Table table = this.lSql.table(Person1_Table.NAME);
         Row person1Row = Row.fromKeyVals(
@@ -149,8 +129,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void insert() {
-        createTables(lSql);
-
         Person1_Table Person1_Table = new Person1_Table(lSql);
         Optional<Integer> pk = Person1_Table.insert(new Person1_Row().withId(1).withFirstName("a"));
         assertEquals(pk.get(), new Integer(1));
@@ -158,8 +136,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void insertAndLoad() {
-        createTables(lSql);
-
         Person1_Table Person1_Table = new Person1_Table(lSql);
         Person1_Row p1 = Person1_Table.insertAndLoad(new Person1_Row().withId(1).withFirstName("a"));
         assertEquals(p1.getId(), new Integer(1));
@@ -168,8 +144,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void load() {
-        createTables(lSql);
-
         Person1_Table Person1_Table = new Person1_Table(lSql);
         Person1_Table.insert(new Person1_Row().withId(1).withFirstName("a"));
 
@@ -182,8 +156,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void delete() {
-        createTables(lSql);
-
         Person1_Table Person1_Table = new Person1_Table(lSql);
         Person1_Table.insert(new Person1_Row().withId(1).withFirstName("a"));
         Person1_Table.delete(new Person1_Row().withId(1));
@@ -194,8 +166,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void deleteById() {
-        createTables(lSql);
-
         Person1_Table Person1_Table = new Person1_Table(lSql);
         Person1_Table.insert(new Person1_Row().withId(1).withFirstName("a"));
         Person1_Table.deleteById(1);
@@ -206,8 +176,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void update() {
-        createTables(lSql);
-
         Person1_Table Person1_Table = new Person1_Table(lSql);
         Person1_Row p1 = new Person1_Row().withId(1).withFirstName("a");
         Person1_Table.insert(p1);
@@ -220,8 +188,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void statementSelect() {
-        createTables(lSql);
-
         Person2_Table person2Table = new Person2_Table(lSql);
         person2Table.insert(new Person2_Row()
                 .withId(1)
@@ -244,8 +210,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void queryParameterWithDot() {
-        createTables(lSql);
-
         Person1_Table person1Table = new Person1_Table(lSql);
         person1Table.insert(new Person1_Row()
                 .withId(99)
@@ -265,8 +229,6 @@ public final class TestCliProjectAssertsTest {
 
     @Test
     public void statementDelete() {
-        createTables(lSql);
-
         // insert
         Person2_Table person2Table = new Person2_Table(lSql);
         person2Table.insert(new Person2_Row()

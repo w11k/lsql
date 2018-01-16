@@ -13,6 +13,7 @@ import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -245,12 +246,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         assertEquals(params.get("id").get(0).getName(), "id");
         assertEquals(params.get("age").get(0).getName(), "age");
 
-        List<Row> rows = statement.query("id", new QueryParameter() {
-            @Override
-            public void set(PreparedStatement ps, int index) throws SQLException {
-                ps.setInt(index, 1);
-            }
-        }).toList();
+        List<Row> rows = statement.query("id", (QueryParameter) (ps, index) -> ps.setInt(index, 1)).toList();
         assertEquals(rows.size(), 1);
     }
 
@@ -301,7 +297,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
                     }
 
                     @Override
-                    public void set(PreparedStatement ps, int preparedStatementIndex, int localIndex) throws SQLException {
+                    public void set(PreparedStatement ps, int preparedStatementIndex, int localIndex) {
                     }
                 },
                 "param", 1
@@ -429,8 +425,9 @@ public class SqlStatementTest extends AbstractLSqlTest {
                         ps.setInt(1, Integer.parseInt(val.toString()));
                     }
 
+                    @Nullable
                     @Override
-                    protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+                    protected Object getValue(LSql lSql, ResultSet rs, int index) {
                         return null;
                     }
                 });

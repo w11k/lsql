@@ -146,7 +146,7 @@ public class SqlStatementToPreparedStatement {
             // Placeholder for PreparedStatement
             p.placeholder = "?" + Strings.repeat(" ", p.endIndex - p.startIndex - 1);
 
-            List<Parameter> parametersForName = found.containsKey(p.name) ? found.get(p.name) : Lists.<Parameter>newLinkedList();
+            List<Parameter> parametersForName = found.containsKey(p.name) ? found.get(p.name) : Lists.newLinkedList();
 
             parametersForName.add(p);
             found.put(p.name, parametersForName);
@@ -194,17 +194,12 @@ public class SqlStatementToPreparedStatement {
     private void log(Map<String, Object> queryParameters) {
         if (this.logger.isTraceEnabled()) {
             ArrayList<String> keys = Lists.newArrayList(queryParameters.keySet());
-            Collections.sort(keys, new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.compareToIgnoreCase(o2);
-                }
-            });
-            String msg = "Executing statement '" + getDescriptiveStatementName() + "' with parameters:\n";
+            keys.sort(String::compareToIgnoreCase);
+            StringBuilder msg = new StringBuilder("Executing statement '" + getDescriptiveStatementName() + "' with parameters:\n");
             for (String key : keys) {
-                msg += String.format("%15s = %s\n", key, queryParameters.get(key));
+                msg.append(String.format("%20s = %s\n", key, queryParameters.get(key)));
             }
-            this.logger.trace(msg);
+            this.logger.trace(msg.toString());
         } else if (this.logger.isDebugEnabled()) {
             this.logger.debug("Executing statement '{}' with parameters {}", getDescriptiveStatementName(), queryParameters.keySet());
         }
@@ -212,20 +207,20 @@ public class SqlStatementToPreparedStatement {
 
     private String processRawConversions(String sql, List<ParameterInPreparedStatement> parameterInPreparedStatements) {
         int lastIndex = 0;
-        String sqlCopy = "";
+        StringBuilder sqlCopy = new StringBuilder();
 
         // Separate iteration because the following iteration will destroy the indexes
         for (ParameterInPreparedStatement pips : parameterInPreparedStatements) {
             if (pips.value instanceof LiteralQueryParameter) {
                 LiteralQueryParameter literalQueryParameter = (LiteralQueryParameter) pips.value;
-                sqlCopy += sql.substring(lastIndex, pips.parameter.startIndex);
-                sqlCopy += literalQueryParameter.getSqlString();
+                sqlCopy.append(sql.substring(lastIndex, pips.parameter.startIndex));
+                sqlCopy.append(literalQueryParameter.getSqlString());
                 lastIndex = pips.parameter.endIndex;
             }
         }
-        sqlCopy += sql.substring(lastIndex);
+        sqlCopy.append(sql.substring(lastIndex));
 
-        return sqlCopy;
+        return sqlCopy.toString();
     }
 
     public PreparedStatement createPreparedStatement(Map<String, Object> queryParameters,
@@ -278,11 +273,7 @@ public class SqlStatementToPreparedStatement {
         }
 
         // sort parameters by their position in the SQL statement
-        Collections.sort(parameterInPreparedStatements, new Comparator<ParameterInPreparedStatement>() {
-            public int compare(ParameterInPreparedStatement o1, ParameterInPreparedStatement o2) {
-                return o1.parameter.startIndex - o2.parameter.startIndex;
-            }
-        });
+        parameterInPreparedStatements.sort(Comparator.comparingInt(o -> o.parameter.startIndex));
 
         // RAW conversions
         sqlStringCopy = processRawConversions(sqlStringCopy, parameterInPreparedStatements);

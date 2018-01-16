@@ -19,8 +19,9 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     @Test
     public void pojo() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, person TEXT)");
-        this.setConverter("table1", "person", new ObjectToJsonStringConverter(Person.class, new TypeReference<Person>() {
-        }));
+        this.addConfigHook(c ->
+                c.setConverter("table1", "person", new ObjectToJsonStringConverter(Person.class, new TypeReference<Person>() {
+                })));
 
         Table t1 = this.lSql.table("table1");
 
@@ -33,8 +34,9 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     @Test
     public void listOfString() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
-        this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class, new TypeReference<List<String>>() {
-        }));
+        this.addConfigHook(c ->
+                c.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class, new TypeReference<List<String>>() {
+                })));
 
         Table t1 = lSql.table("table1");
 
@@ -50,8 +52,10 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     @Test
     public void listOfMapStringString() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, data TEXT)");
-        this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
-        }));
+        this.addConfigHook(c ->
+                c.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
+                })));
+
 
         Table t1 = lSql.table("table1");
 
@@ -70,9 +74,12 @@ public class ObjectToJsonStringConverterTest extends AbstractLSqlTest {
     @Test
     public void listOfMapStringStringInALinkedRow() {
         createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, data TEXT)");
-        this.setConverter("table1", "data", new ObjectToJsonStringConverter(List.class,
-                new TypeReference<List<Map<String, String>>>() {
-                }));
+        this.addConfigHook(c ->
+                c.setConverter(
+                        "table1",
+                        "data",
+                        new ObjectToJsonStringConverter(List.class, new TypeReference<List<Map<String, String>>>() {
+                        })));
 
         Table t1 = lSql.table("table1");
 

@@ -13,18 +13,11 @@ import static org.testng.Assert.assertTrue;
 
 public class RowQueryConverterTest extends AbstractLSqlTest {
 
-//    public static class Conf extends TestConfig {
-//        public Conf() {
-//            this.setConverter("table1", "field1", );
-//        }
-//    }
-
-
     @Test
     public void normalColumn() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field VARCHAR(10))");
-
-        this.setConverter("table1", "field", new JavaBoolToSqlStringConverter("ja", "nein"));
+        this.addConfigHook(c ->
+                c.setConverter("table1", "field", new JavaBoolToSqlStringConverter("ja", "nein")));
 
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 'ja')");
         Row row = lSql.executeRawQuery("SELECT * FROM table1").first().get();
@@ -36,8 +29,8 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
         JavaBoolToSqlStringConverter converter = new JavaBoolToSqlStringConverter("ja", "nein");
 
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field VARCHAR(10))");
-
-        this.setConverter("table1", "field", new JavaBoolToSqlStringConverter("ja", "nein"));
+        this.addConfigHook(c ->
+                c.setConverter("table1", "field", new JavaBoolToSqlStringConverter("ja", "nein")));
 
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 'ja')");
         RowQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
@@ -86,7 +79,9 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
         assertTrue(error);
 
         // change
-        TestConfig.USE_COLUMN_TYPE_FOR_CONVERTER_LOOKUP = true;
+        this.addConfigHook(c ->
+                c.setUseColumnTypeForConverterLookupInQueries(true));
+
         this.createLSqlInstance();
         lSql.executeRawQuery("SELECT id, field as aaa FROM table1").toList();
     }
