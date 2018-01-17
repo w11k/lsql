@@ -25,10 +25,15 @@ public class Main {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public Main(String[] args) throws ClassNotFoundException, SQLException {
         log("========================================================");
-        log("LSql CLI Exporter");
+        log("LSql CLI");
         log("========================================================\n");
 
-        CliArgs cliArgs = new CliArgs(args);
+        CliArgs cliArgs;
+        try {
+            cliArgs = new CliArgs(args);
+        } catch (Exception e) {
+            return;
+        }
 
         // Config
         @SuppressWarnings("unchecked")
@@ -50,7 +55,7 @@ public class Main {
             javaExporter = new JavaExporter(lSql);
             javaExporter.setPackageName(cliArgs.getGenPackageName());
             javaExporter.setOutputDir(new File(cliArgs.getOutDirJava()));
-            javaExporter.setGuice(cliArgs.isGuice());
+            javaExporter.setGuice(cliArgs.isDiGuice());
             javaExporter.setDtoDeclarationSearchDir(cliArgs.getDto());
 
             // Java statements

@@ -1,4 +1,8 @@
 
+**0.32.3**
+
+- CLI: print help on wrong settings
+
 **0.32.2**
 
 - CLI: generated TypeScript files honors nullable attribute

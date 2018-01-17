@@ -9,11 +9,10 @@ Our philosophy:
 
 * LSql is *not* yet another object/relational mapper. We believe that functional application data (in particular stored in a relational model) should not be mapped to a strict classes/objects model. Every time a programmer creates a new class (even a simple POJO), it will be incompatible with existing API, whereas using well-known classes like Maps, Lists, etc. enables access to amazing libraries like [Google Guava](http://code.google.com/p/guava-libraries/wiki/CollectionUtilitiesExplained).
 
-* A row (e.g. from a table or from a `ResultSet`) gets mapped to `com.w11k.lsql.Row` (which is a subclass of `java.util.Map`) and the full `ResultSet` gets mapped to `java.util.List<Row>`. 
+* Database first
 
 * It is not important to use SQL databases in a vendor-agnostic way. The RDBMS should be choosen (once) depending on the project requirements and database access libraries should not try to hide their characteristics.
 
-* Software architectures currently shift towards rich browser and stand-alone application. The main responsibility for server code will be to query and return the stored data as quickly as possible and to serialize, maybe even intentionally denormalized, views as JSON string. Traditional Java persistence frameworks, based on the concept of handling all tasks within the server process (including HTML rendering), are less suitable for those environments.
 
 ## Quick Example
 
@@ -68,7 +67,7 @@ All released files are stored in a Maven repository:
 
 Add the following dependency to your POM. The latest version number can always be found here:
 
-[Latest Released Version](https://raw.github.com/weiglewilczek/lsql/master/LATEST_RELEASED_VERSION)
+[Latest Released Version](https://raw.github.com/w11k/lsql/master/LATEST_RELEASED_VERSION)
 
 ```{.language-xml}
 <dependency>
@@ -79,28 +78,4 @@ Add the following dependency to your POM. The latest version number can always b
 ```
 
 # Documentation
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
