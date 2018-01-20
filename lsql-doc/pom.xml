@@ -14,27 +14,37 @@
   <artifactId>lsql-doc</artifactId>
 
   <properties>
-    <github.global.server>github</github.global.server>
-    <pandoc.path>/usr/bin/pandoc</pandoc.path>
+    <!--<github.global.server>github</github.global.server>-->
+    <!--<pandoc.path>/usr/bin/pandoc</pandoc.path>-->
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>com.w11k.lsql</groupId>
       <artifactId>lsql-core</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.w11k.lsql</groupId>
+      <artifactId>lsql-cli</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.3.172</version>
     </dependency>
+
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <version>6.8.5</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -61,6 +71,24 @@
             <include>**/com/w11k/lsql/example/*.java</include>
           </includes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/generated/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <!--<plugin>-->
         <!--<artifactId>maven-deploy-plugin</artifactId>-->
