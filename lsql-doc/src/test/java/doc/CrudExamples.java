@@ -4,8 +4,6 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.Main;
 import com.w11k.lsql.dialects.H2Config;
 import com.w11k.lsql.jdbc.ConnectionProviders;
-import doc.schema_public.Person_Row;
-import doc.schema_public.Person_Table;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import setup.Db;
@@ -52,11 +50,11 @@ public class CrudExamples {
         ```
         */
 
-        Person_Table personTable = new Person_Table(this.lSql);
-        Person_Row personRow = new Person_Row()
-                .withId(1)
-                .withFirstName("Linda");
-        personTable.insert(personRow);
+//        Person_Table personTable = new Person_Table(this.lSql);
+//        Person_Row personRow = new Person_Row()
+//                .withId(1)
+//                .withFirstName("Linda");
+//        personTable.insert(personRow);
     }
 
 }

@@ -34,7 +34,7 @@ public class TypeScriptExporter {
 
         //noinspection ResultOfMethodCallIgnored
         this.outputDir.mkdirs();
-        File output = new File(this.outputDir, "domain.d.ts");
+        File output = new File(this.outputDir, "lsql.ts");
         CodeGenUtils.writeContent(content.toString(), output);
     }
 
@@ -45,11 +45,15 @@ public class TypeScriptExporter {
     }
 
     private void exportDataClass(StringBuilder content, DataClassMeta dcMeta) {
-        content.append("export namespace ").append(mayPrefixSchemaName(dcMeta)).append(" {\n");
+        content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
         content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName())).append(" {\n");
         this.exportFields(content, dcMeta);
         content.append("    }\n");
         content.append("}\n\n");
+    }
+
+    private String createNamespaceNameFromPackage(DataClassMeta dcMeta) {
+        return mayPrefixSchemaName(dcMeta).replace('.', '_');
     }
 
     private String mayPrefixSchemaName(DataClassMeta dcMeta) {
