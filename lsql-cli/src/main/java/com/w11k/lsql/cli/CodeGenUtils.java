@@ -1,13 +1,11 @@
 package com.w11k.lsql.cli;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.dialects.IdentifierConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +21,43 @@ public final class CodeGenUtils {
                 .replaceAll("\"", "\\\\\"");
     }
 
-    public static String getJavaCodeName(LSql lSql, String input) {
-        IdentifierConverter identifierConverter = lSql.getConfig().getDialect().getIdentifierConverter();
-        CaseFormat toCaseFormat = identifierConverter.getToCaseFormat();
-        return toCaseFormat.to(lSql.getConfig().getCodeGenerationCaseFormat(), input);
+    public static String getJavaCodeName(String str,
+                                         boolean insertUnderscoreOnCaseChange,
+                                         boolean startUppercase) {
+
+        StringBuilder result = new StringBuilder();
+
+        if (str.length() == 1) {
+            result.append(str);
+        } else {
+            int idx = 0;
+            while (idx < str.length() - 1) {
+                char ch = str.charAt(idx);
+                if (!Character.isUpperCase(ch)) {
+                    lastWasLowerCase = true;
+                } else {
+                    if (lastWasLowerCase) {
+                        str = str.substring(0, idx)
+                                + "_"
+                                + str.substring(idx);
+                    }
+
+                    lastWasLowerCase = false;
+
+                }
+                idx++;
+            }
+        }
+
+
+
+        return firstCharUpperCase(str);
+
+
+//        IdentifierConverter identifierConverter = lSql.getConfig().getDialect().getIdentifierConverter();
+//        CaseFormat toCaseFormat = identifierConverter.getToCaseFormat();
+//        return toCaseFormat.to(lSql.getConfig().getCodeGenerationCaseFormat(), input);
+
     }
 
     public static String escapeSqlStringForJavaDoc(String line) {
@@ -46,27 +77,27 @@ public final class CodeGenUtils {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    public static String createSaveNameForClass(String className) {
-        int idx = 0;
-        boolean lastWasLowerCase = false;
-        while (idx < className.length()) {
-            char ch = className.charAt(idx);
-            if (!Character.isUpperCase(ch)) {
-                lastWasLowerCase = true;
-            } else {
-                if (lastWasLowerCase) {
-                    className = className.substring(0, idx)
-                            + "_"
-                            + className.substring(idx);
-                }
-
-                lastWasLowerCase = false;
-
-            }
-            idx++;
-        }
-        return firstCharUpperCase(className);
-    }
+//    public static String createSaveNameForClass(String className) {
+//        int idx = 0;
+//        boolean lastWasLowerCase = false;
+//        while (idx < className.length()) {
+//            char ch = className.charAt(idx);
+//            if (!Character.isUpperCase(ch)) {
+//                lastWasLowerCase = true;
+//            } else {
+//                if (lastWasLowerCase) {
+//                    className = className.substring(0, idx)
+//                            + "_"
+//                            + className.substring(idx);
+//                }
+//
+//                lastWasLowerCase = false;
+//
+//            }
+//            idx++;
+//        }
+//        return firstCharUpperCase(className);
+//    }
 
     public static String joinStringsAsPackageName(String... packageNames) {
         List<String> packages = Arrays.stream(packageNames)

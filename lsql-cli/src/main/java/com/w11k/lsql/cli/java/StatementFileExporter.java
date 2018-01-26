@@ -79,7 +79,7 @@ public final class StatementFileExporter {
                                 this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()));
                 query.query().createResultSetWithColumns().getColumns().forEach(c -> {
                     String colName = c.getName();
-                    String fieldName = getJavaCodeName(this.javaExporter.getlSql(), colName);
+                    String fieldName = getJavaCodeName(colName);
                     dcm.addField(fieldName, colName, c.getConverter().getJavaType())
                     .setNullable(c.isNullable());
                 });

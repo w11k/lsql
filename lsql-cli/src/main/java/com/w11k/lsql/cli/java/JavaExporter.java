@@ -55,14 +55,14 @@ public class JavaExporter {
                     : Joiner.on("_").skipNulls().join("schema", schemaName.toLowerCase());
             String fullPackageName = joinStringsAsPackageName(packageName, lastPackageSegment);
             String tableName = table.getTableName();
-            String javaCodeName = getJavaCodeName(this.lSql, tableName);
+            String javaCodeName = getJavaCodeName(tableName);
             String className = createSaveNameForClass(javaCodeName);
 
             DataClassMeta dcm = new DataClassMeta(className, fullPackageName);
             table.getColumns().values()
                     .forEach(c -> {
                         String colName = c.getJavaColumnName();
-                        String fieldName = getJavaCodeName(this.lSql, colName);
+                        String fieldName = getJavaCodeName(colName);
                         dcm.addField(fieldName, colName, c.getConverter().getJavaType())
                                 .setNullable(c.isNullable());
                     });
