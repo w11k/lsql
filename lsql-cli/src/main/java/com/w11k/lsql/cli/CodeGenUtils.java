@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.Character.*;
+
 public final class CodeGenUtils {
 
     public static String escapeSqlStringForJavaSourceFile(String line) {
@@ -25,39 +27,42 @@ public final class CodeGenUtils {
                                          boolean insertUnderscoreOnCaseChange,
                                          boolean startUppercase) {
 
-        StringBuilder result = new StringBuilder();
-
-        if (str.length() == 1) {
-            result.append(str);
-        } else {
-            int idx = 0;
-            while (idx < str.length() - 1) {
-                char ch = str.charAt(idx);
-                if (!Character.isUpperCase(ch)) {
-                    lastWasLowerCase = true;
-                } else {
-                    if (lastWasLowerCase) {
-                        str = str.substring(0, idx)
-                                + "_"
-                                + str.substring(idx);
-                    }
-
-                    lastWasLowerCase = false;
-
-                }
-                idx++;
-            }
+        if (str.length() == 0) {
+            return str;
         }
 
+        StringBuilder result = new StringBuilder();
+
+        String firstChar = str.substring(0, 1);
+        result.append(startUppercase ? firstChar.toUpperCase() : firstChar);
+
+        int idx = 1;
+        while (idx < str.length()) {
+            char prevChar = str.charAt(idx - 1);
+            char currChar = str.charAt(idx);
+
+            boolean isCaseChange = isLowerCase(prevChar) && isUpperCase(currChar);
+            boolean isWordSep = prevChar == '_';
+            boolean changeCase = isCaseChange || isWordSep;
+
+            if (changeCase) {
+                if (insertUnderscoreOnCaseChange) {
+                    result.append("_");
+                }
+                if (currChar != '_') {
+                    result.append(toUpperCase(currChar));
+                }
+            } else {
+                if (currChar != '_') {
+                    result.append(currChar);
+                }
+            }
 
 
-        return firstCharUpperCase(str);
+            idx++;
+        }
 
-
-//        IdentifierConverter identifierConverter = lSql.getConfig().getDialect().getIdentifierConverter();
-//        CaseFormat toCaseFormat = identifierConverter.getToCaseFormat();
-//        return toCaseFormat.to(lSql.getConfig().getCodeGenerationCaseFormat(), input);
-
+        return result.toString();
     }
 
     public static String escapeSqlStringForJavaDoc(String line) {
@@ -76,28 +81,6 @@ public final class CodeGenUtils {
     public static String firstCharUpperCase(String name) {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
-
-//    public static String createSaveNameForClass(String className) {
-//        int idx = 0;
-//        boolean lastWasLowerCase = false;
-//        while (idx < className.length()) {
-//            char ch = className.charAt(idx);
-//            if (!Character.isUpperCase(ch)) {
-//                lastWasLowerCase = true;
-//            } else {
-//                if (lastWasLowerCase) {
-//                    className = className.substring(0, idx)
-//                            + "_"
-//                            + className.substring(idx);
-//                }
-//
-//                lastWasLowerCase = false;
-//
-//            }
-//            idx++;
-//        }
-//        return firstCharUpperCase(className);
-//    }
 
     public static String joinStringsAsPackageName(String... packageNames) {
         List<String> packages = Arrays.stream(packageNames)

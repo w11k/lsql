@@ -74,12 +74,12 @@ public final class StatementFileExporter {
             if (!stmt.getTypeAnnotation().toLowerCase().equals("void")) {
                 containsOnlyVoidStatements = false;
                 DataClassMeta dcm = new DataClassMeta(
-                        firstCharUpperCase(stmt.getStatementName()),
+                        getJavaCodeName(stmt.getStatementName(), false, true),
                         joinStringsAsPackageName(
                                 this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()));
                 query.query().createResultSetWithColumns().getColumns().forEach(c -> {
                     String colName = c.getName();
-                    String fieldName = getJavaCodeName(colName);
+                    String fieldName = getJavaCodeName(colName, false, false);
                     dcm.addField(fieldName, colName, c.getConverter().getJavaType())
                     .setNullable(c.isNullable());
                 });

@@ -1,4 +1,9 @@
 
+**0.32.4**
+
+- CLI: improvement generated Java code names
+
+
 **0.32.3**
 
 - CLI: print help on wrong settings

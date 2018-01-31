@@ -2,8 +2,8 @@ package com.w11k.lsql.cli.java;
 
 import com.google.common.base.CaseFormat;
 
-import static com.w11k.lsql.cli.CodeGenUtils.createSaveNameForClass;
 import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
+import static com.w11k.lsql.cli.CodeGenUtils.getJavaCodeName;
 
 public final class StructuralTypingField {
 
@@ -24,7 +24,7 @@ public final class StructuralTypingField {
             typeName = typeName.substring("JavaLang".length());
         }
 
-        this.interfaceName = createSaveNameForClass(name + typeName);
+        this.interfaceName = getJavaCodeName(name + typeName, true, true);
     }
 
     public String getInterfaceName() {

@@ -325,7 +325,7 @@ public class Stmts1 {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class queryParamsWithDot extends com.w11k.lsql.TypedStatementQuery<QueryParamsWithDot> implements com.w11k.lsql.TableRow, Person1_Id_Number {
+    public final class queryParamsWithDot extends com.w11k.lsql.TypedStatementQuery<QueryParamsWithDot> implements com.w11k.lsql.TableRow, Person1Id_Number {
 
         // constructors ----------
 

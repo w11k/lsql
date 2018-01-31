@@ -204,7 +204,9 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
 
         LoadPersonsByAgeAndFirstName row = list.get(0);
         assertEquals(row.getId(), new Integer(1));
+        assertEquals(row.id, new Integer(1));
         assertEquals(row.getFirstName(), "a");
+        assertEquals(row.firstName, "a");
         assertEquals(row.getAge(), new Integer(50));
     }
 
