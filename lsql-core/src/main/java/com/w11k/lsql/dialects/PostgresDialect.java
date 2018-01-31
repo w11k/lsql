@@ -2,7 +2,7 @@ package com.w11k.lsql.dialects;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
-import org.postgresql.jdbc4.Jdbc4ResultSetMetaData;
+import org.postgresql.jdbc.PgResultSetMetaData;
 
 import java.sql.*;
 
@@ -44,7 +44,7 @@ public class PostgresDialect extends GenericDialect {
     public String getSqlSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,
                                                                 int columnIndex) throws SQLException {
 
-        Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
+        PgResultSetMetaData postgresMetaData = (PgResultSetMetaData) metaData;
 
         String schema = postgresMetaData.getBaseSchemaName(columnIndex);
         String table =  postgresMetaData.getBaseTableName(columnIndex);
@@ -55,7 +55,7 @@ public class PostgresDialect extends GenericDialect {
     @Override
     public String getSqlColumnNameFromResultSetMetaData(ResultSetMetaData metaData,
                                                         int columnIndex) throws SQLException {
-        Jdbc4ResultSetMetaData postgresMetaData = (Jdbc4ResultSetMetaData) metaData;
+        PgResultSetMetaData postgresMetaData = (PgResultSetMetaData) metaData;
         return postgresMetaData.getBaseColumnName(columnIndex);
     }
 
