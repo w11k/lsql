@@ -562,6 +562,7 @@ public class Table {
                 this.schemaAndTableName = lSql.identifierSqlToJava(sqlTableName);
             }
 
+            sqlSchema = sqlSchema != null ? sqlSchema : "";
             this.schemaName = lSql.identifierSqlToJava(sqlSchema);
             this.tableName = lSql.identifierSqlToJava(sqlTableName);
 
