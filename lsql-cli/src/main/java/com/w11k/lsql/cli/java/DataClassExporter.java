@@ -384,25 +384,6 @@ public class DataClassExporter {
 
             content.append("    }\n\n");
         }
-
-        // constructor from map
-//        this.addSuppressWarningsUnused(4, content);
-//        content.append(indentString()).append("    public ").append(this.getClassName()).append("(java.util.Map<String, Object> from) {\n");
-//        if (!Strings.isNullOrEmpty(constructorBody)) {
-//            content.append(indentString()).append("        ").append(constructorBody).append("\n");
-//        }
-
-        // assign member
-//        for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
-//            content.append(indentString()).append("        ")
-//                    .append("this.").append(field.getFieldName())
-//                    .append(" = ")
-//                    .append("(").append(field.getFieldType().getCanonicalName()).append(") ")
-//                    .append("from.get(\"")
-//                    .append(field.getFieldKeyName())
-//                    .append("\");\n");
-//        }
-//        content.append(indentString()).append("    }\n\n");
     }
 
     private void contentStaticFieldNames(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
