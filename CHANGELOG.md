@@ -5,6 +5,8 @@
 - CLI: generate toMap and toInternalMap in DataClasses
 - CLI: TypeScript generator now generates 2 interfaces per DataClass: typed and map
 - CLI: generate TypeScript interfaces for DTOs
+- CLI: DataClasses contain 2 static methods: fromMap / fromInternalMap
+
 
 **0.32.4**
 

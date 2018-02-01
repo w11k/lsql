@@ -52,8 +52,22 @@ public class TableExporter {
 
         contentConstructor();
         contentStaticFieldName();
+        contentCreateFromInternalMap();
 
         content.append("}\n");
+    }
+
+    private void contentCreateFromInternalMap() {
+        content.append("    ")
+                .append("protected ")
+                .append(this.dataClassExporter.getClassName())
+                .append(" createFromInternalMap(java.util.Map<String, Object> internalMap) {\n");
+
+        content.append("        return ")
+                .append(this.dataClassExporter.getClassName())
+                .append(".fromInternalMap(internalMap);\n");
+
+        content.append("    }\n\n");
     }
 
     private void contentStaticFieldName() {

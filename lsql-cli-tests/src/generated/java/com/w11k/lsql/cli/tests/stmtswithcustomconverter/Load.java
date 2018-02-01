@@ -16,6 +16,16 @@ public final class Load implements com.w11k.lsql.TableRow, Field_Integer {
         return (Load) target;
     }
 
+    @SuppressWarnings("unused")
+    public static Load fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new Load((java.lang.Integer) internalMap.get("field"));
+    }
+
+    @SuppressWarnings("unused")
+    public static Load fromMap(java.util.Map<String, Object> map) {
+        return new Load((java.lang.Integer) map.get("field"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -27,11 +37,6 @@ public final class Load implements com.w11k.lsql.TableRow, Field_Integer {
     private Load(
             java.lang.Integer field) {
         this.field = field;
-    }
-
-    @SuppressWarnings("unused")
-    public Load(java.util.Map<String, Object> from) {
-        this.field = (java.lang.Integer) from.get("field");
     }
 
     // fields ----------

@@ -16,6 +16,16 @@ public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
         return (DummyDto) target;
     }
 
+    @SuppressWarnings("unused")
+    public static DummyDto fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new DummyDto((java.lang.String) internalMap.get("fieldA"));
+    }
+
+    @SuppressWarnings("unused")
+    public static DummyDto fromMap(java.util.Map<String, Object> map) {
+        return new DummyDto((java.lang.String) map.get("fieldA"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -27,11 +37,6 @@ public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
     private DummyDto(
             java.lang.String fieldA) {
         this.fieldA = fieldA;
-    }
-
-    @SuppressWarnings("unused")
-    public DummyDto(java.util.Map<String, Object> from) {
-        this.fieldA = (java.lang.String) from.get("fieldA");
     }
 
     // fields ----------

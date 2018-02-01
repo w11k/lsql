@@ -9,4 +9,8 @@ public class Checks_Table extends com.w11k.lsql.TypedTable<Checks_Row, com.w11k.
 
     public static final String NAME = "checks";
 
+    protected Checks_Row createFromInternalMap(java.util.Map<String, Object> internalMap) {
+        return Checks_Row.fromInternalMap(internalMap);
+    }
+
 }

@@ -9,4 +9,8 @@ public class Custom_Converter_Table extends com.w11k.lsql.TypedTable<Custom_Conv
 
     public static final String NAME = "custom_converter";
 
+    protected Custom_Converter_Row createFromInternalMap(java.util.Map<String, Object> internalMap) {
+        return Custom_Converter_Row.fromInternalMap(internalMap);
+    }
+
 }

@@ -18,6 +18,16 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
         return (KeepUnderscoreForCamelCase) target;
     }
 
+    @SuppressWarnings("unused")
+    public static KeepUnderscoreForCamelCase fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new KeepUnderscoreForCamelCase((java.lang.Integer) internalMap.get("a_field"), (java.lang.String) internalMap.get("afield"));
+    }
+
+    @SuppressWarnings("unused")
+    public static KeepUnderscoreForCamelCase fromMap(java.util.Map<String, Object> map) {
+        return new KeepUnderscoreForCamelCase((java.lang.Integer) map.get("aField"), (java.lang.String) map.get("afield"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -32,12 +42,6 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
             java.lang.String afield) {
         this.aField = aField;
         this.afield = afield;
-    }
-
-    @SuppressWarnings("unused")
-    public KeepUnderscoreForCamelCase(java.util.Map<String, Object> from) {
-        this.aField = (java.lang.Integer) from.get("a_field");
-        this.afield = (java.lang.String) from.get("afield");
     }
 
     // fields ----------

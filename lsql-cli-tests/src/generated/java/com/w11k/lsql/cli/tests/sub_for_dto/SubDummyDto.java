@@ -18,6 +18,16 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
         return (SubDummyDto) target;
     }
 
+    @SuppressWarnings("unused")
+    public static SubDummyDto fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new SubDummyDto((java.lang.String) internalMap.get("fieldA"), (java.lang.Number) internalMap.get("fieldB"));
+    }
+
+    @SuppressWarnings("unused")
+    public static SubDummyDto fromMap(java.util.Map<String, Object> map) {
+        return new SubDummyDto((java.lang.String) map.get("fieldA"), (java.lang.Number) map.get("fieldB"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -32,12 +42,6 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
             java.lang.Number fieldB) {
         this.fieldA = fieldA;
         this.fieldB = fieldB;
-    }
-
-    @SuppressWarnings("unused")
-    public SubDummyDto(java.util.Map<String, Object> from) {
-        this.fieldA = (java.lang.String) from.get("fieldA");
-        this.fieldB = (java.lang.Number) from.get("fieldB");
     }
 
     // fields ----------

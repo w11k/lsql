@@ -16,6 +16,16 @@ public final class LoadAllPersonsEscaped1 implements com.w11k.lsql.TableRow, The
         return (LoadAllPersonsEscaped1) target;
     }
 
+    @SuppressWarnings("unused")
+    public static LoadAllPersonsEscaped1 fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new LoadAllPersonsEscaped1((java.lang.Integer) internalMap.get("theid"));
+    }
+
+    @SuppressWarnings("unused")
+    public static LoadAllPersonsEscaped1 fromMap(java.util.Map<String, Object> map) {
+        return new LoadAllPersonsEscaped1((java.lang.Integer) map.get("theid"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -27,11 +37,6 @@ public final class LoadAllPersonsEscaped1 implements com.w11k.lsql.TableRow, The
     private LoadAllPersonsEscaped1(
             java.lang.Integer theid) {
         this.theid = theid;
-    }
-
-    @SuppressWarnings("unused")
-    public LoadAllPersonsEscaped1(java.util.Map<String, Object> from) {
-        this.theid = (java.lang.Integer) from.get("theid");
     }
 
     // fields ----------

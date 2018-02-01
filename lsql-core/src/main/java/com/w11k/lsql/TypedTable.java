@@ -2,22 +2,21 @@ package com.w11k.lsql;
 
 import com.google.common.base.Optional;
 
-import java.lang.reflect.Constructor;
 import java.util.Map;
 
-public class TypedTable<T extends TableRow, I> {
+public abstract class TypedTable<T extends TableRow, I> {
 
     private final Table table;
-    private final Constructor<T> tableRowConstructor;
+//    private final Constructor<T> tableRowConstructor;
 
     public TypedTable(LSql lSql, String tableName, Class<T> tableRowClass) {
         this.table = lSql.table(tableName);
 
-        try {
-            this.tableRowConstructor = tableRowClass.getConstructor(Map.class);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            this.tableRowConstructor = tableRowClass.getConstructor(Map.class);
+//        } catch (NoSuchMethodException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     @SuppressWarnings("unchecked")
@@ -47,7 +46,7 @@ public class TypedTable<T extends TableRow, I> {
 
         T tableRow;
         try {
-            tableRow = this.tableRowConstructor.newInstance(row.get());
+            tableRow = this.createFromInternalMap(row.get());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -84,5 +83,7 @@ public class TypedTable<T extends TableRow, I> {
         Object pk = this.save(instance);
         return this.load((I) pk).get();
     }
+
+    protected abstract T createFromInternalMap(Map<String, Object> internalMap);
 
 }

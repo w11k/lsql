@@ -37,12 +37,6 @@ public class StmtsWithCustomConverter {
             this.field = field;
     }
 
-        @SuppressWarnings("unused")
-        public load(java.util.Map<String, Object> from) {
-            super(lSql, sql_load);
-            this.field = (com.w11k.lsql.cli.tests.TestCliConfig.CustomType) from.get("field");
-        }
-
         // fields ----------
 
         @javax.annotation.Nullable public final com.w11k.lsql.cli.tests.TestCliConfig.CustomType field;
@@ -90,7 +84,7 @@ public class StmtsWithCustomConverter {
         }
 
         protected Load createTypedRow(com.w11k.lsql.Row row) {
-            return new Load(row);
+            return Load.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {

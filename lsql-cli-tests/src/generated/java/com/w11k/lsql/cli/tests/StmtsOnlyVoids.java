@@ -36,12 +36,6 @@ public class StmtsOnlyVoids {
             this.yesno = yesno;
     }
 
-        @SuppressWarnings("unused")
-        public statementA(java.util.Map<String, Object> from) {
-            super(lSql, sql_statementA);
-            this.yesno = (java.lang.Boolean) from.get("yesno");
-        }
-
         // fields ----------
 
         @javax.annotation.Nullable public final java.lang.Boolean yesno;
@@ -132,12 +126,6 @@ public class StmtsOnlyVoids {
             super(lSql, sql_statementB);
             this.yesno = yesno;
     }
-
-        @SuppressWarnings("unused")
-        public statementB(java.util.Map<String, Object> from) {
-            super(lSql, sql_statementB);
-            this.yesno = (java.lang.Boolean) from.get("yesno");
-        }
 
         // fields ----------
 

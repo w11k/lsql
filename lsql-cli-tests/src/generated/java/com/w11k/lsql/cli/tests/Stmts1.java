@@ -29,11 +29,6 @@ public class Stmts1 {
             super(lSql, sql_loadAllPersonsEscaped2);
         }
 
-        @SuppressWarnings("unused")
-        public loadAllPersonsEscaped2(java.util.Map<String, Object> from) {
-            super(lSql, sql_loadAllPersonsEscaped2);
-        }
-
         // fields ----------
 
 
@@ -70,7 +65,7 @@ public class Stmts1 {
         }
 
         protected LoadAllPersonsEscaped2 createTypedRow(com.w11k.lsql.Row row) {
-            return new LoadAllPersonsEscaped2(row);
+            return LoadAllPersonsEscaped2.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -105,11 +100,6 @@ public class Stmts1 {
 
         @SuppressWarnings("ConstantConditions")
         public loadAllPersons() {
-            super(lSql, sql_loadAllPersons);
-        }
-
-        @SuppressWarnings("unused")
-        public loadAllPersons(java.util.Map<String, Object> from) {
             super(lSql, sql_loadAllPersons);
         }
 
@@ -149,7 +139,7 @@ public class Stmts1 {
         }
 
         protected LoadAllPersons createTypedRow(com.w11k.lsql.Row row) {
-            return new LoadAllPersons(row);
+            return LoadAllPersons.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -189,11 +179,6 @@ public class Stmts1 {
             super(lSql, sql_loadAllPersonsEscaped1);
         }
 
-        @SuppressWarnings("unused")
-        public loadAllPersonsEscaped1(java.util.Map<String, Object> from) {
-            super(lSql, sql_loadAllPersonsEscaped1);
-        }
-
         // fields ----------
 
 
@@ -230,7 +215,7 @@ public class Stmts1 {
         }
 
         protected LoadAllPersonsEscaped1 createTypedRow(com.w11k.lsql.Row row) {
-            return new LoadAllPersonsEscaped1(row);
+            return LoadAllPersonsEscaped1.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -271,11 +256,6 @@ public class Stmts1 {
             super(lSql, sql_keepUnderscoreForCamelCase);
         }
 
-        @SuppressWarnings("unused")
-        public keepUnderscoreForCamelCase(java.util.Map<String, Object> from) {
-            super(lSql, sql_keepUnderscoreForCamelCase);
-        }
-
         // fields ----------
 
 
@@ -312,7 +292,7 @@ public class Stmts1 {
         }
 
         protected KeepUnderscoreForCamelCase createTypedRow(com.w11k.lsql.Row row) {
-            return new KeepUnderscoreForCamelCase(row);
+            return KeepUnderscoreForCamelCase.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -362,12 +342,6 @@ public class Stmts1 {
             this.person1Id = person1Id;
     }
 
-        @SuppressWarnings("unused")
-        public queryParamsWithDot(java.util.Map<String, Object> from) {
-            super(lSql, sql_queryParamsWithDot);
-            this.person1Id = (java.lang.Number) from.get("person1.id");
-        }
-
         // fields ----------
 
         @javax.annotation.Nullable public final java.lang.Number person1Id;
@@ -415,7 +389,7 @@ public class Stmts1 {
         }
 
         protected QueryParamsWithDot createTypedRow(com.w11k.lsql.Row row) {
-            return new QueryParamsWithDot(row);
+            return QueryParamsWithDot.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -462,12 +436,6 @@ public class Stmts1 {
             super(lSql, sql_changeYesno);
             this.yesno = yesno;
     }
-
-        @SuppressWarnings("unused")
-        public changeYesno(java.util.Map<String, Object> from) {
-            super(lSql, sql_changeYesno);
-            this.yesno = (java.lang.Boolean) from.get("yesno");
-        }
 
         // fields ----------
 

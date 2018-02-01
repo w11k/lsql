@@ -45,13 +45,6 @@ public class StmtsCamelCase2 {
             this.age = age;
     }
 
-        @SuppressWarnings("unused")
-        public loadPersonsByAgeAndFirstName(java.util.Map<String, Object> from) {
-            super(lSql, sql_loadPersonsByAgeAndFirstName);
-            this.firstName = (java.lang.String) from.get("first_name");
-            this.age = (java.lang.Number) from.get("age");
-        }
-
         // fields ----------
 
         @javax.annotation.Nullable public final java.lang.String firstName;
@@ -112,7 +105,7 @@ public class StmtsCamelCase2 {
         }
 
         protected LoadPersonsByAgeAndFirstName createTypedRow(com.w11k.lsql.Row row) {
-            return new LoadPersonsByAgeAndFirstName(row);
+            return LoadPersonsByAgeAndFirstName.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -157,12 +150,6 @@ public class StmtsCamelCase2 {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = firstName;
     }
-
-        @SuppressWarnings("unused")
-        public deletePersonByFirstName(java.util.Map<String, Object> from) {
-            super(lSql, sql_deletePersonByFirstName);
-            this.firstName = (java.lang.String) from.get("first_name");
-        }
 
         // fields ----------
 

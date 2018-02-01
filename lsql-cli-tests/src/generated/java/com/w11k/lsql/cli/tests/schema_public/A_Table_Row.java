@@ -16,6 +16,16 @@ public final class A_Table_Row implements com.w11k.lsql.TableRow, Id_Integer {
         return (A_Table_Row) target;
     }
 
+    @SuppressWarnings("unused")
+    public static A_Table_Row fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new A_Table_Row((java.lang.Integer) internalMap.get("id"));
+    }
+
+    @SuppressWarnings("unused")
+    public static A_Table_Row fromMap(java.util.Map<String, Object> map) {
+        return new A_Table_Row((java.lang.Integer) map.get("id"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -27,11 +37,6 @@ public final class A_Table_Row implements com.w11k.lsql.TableRow, Id_Integer {
     private A_Table_Row(
             java.lang.Integer id) {
         this.id = id;
-    }
-
-    @SuppressWarnings("unused")
-    public A_Table_Row(java.util.Map<String, Object> from) {
-        this.id = (java.lang.Integer) from.get("id");
     }
 
     // fields ----------

@@ -16,6 +16,16 @@ public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field
         return (Custom_Converter_Row) target;
     }
 
+    @SuppressWarnings("unused")
+    public static Custom_Converter_Row fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new Custom_Converter_Row((java.lang.Integer) internalMap.get("field"));
+    }
+
+    @SuppressWarnings("unused")
+    public static Custom_Converter_Row fromMap(java.util.Map<String, Object> map) {
+        return new Custom_Converter_Row((java.lang.Integer) map.get("field"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -27,11 +37,6 @@ public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field
     private Custom_Converter_Row(
             java.lang.Integer field) {
         this.field = field;
-    }
-
-    @SuppressWarnings("unused")
-    public Custom_Converter_Row(java.util.Map<String, Object> from) {
-        this.field = (java.lang.Integer) from.get("field");
     }
 
     // fields ----------

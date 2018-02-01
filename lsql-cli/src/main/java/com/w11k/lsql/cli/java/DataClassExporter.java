@@ -278,6 +278,7 @@ public class DataClassExporter {
     }
 
     private void contentFrom(StringBuilder content) {
+        // from object
         content.append(indentString()).append("    @SuppressWarnings(\"unchecked\")\n");
         content.append(indentString()).append("    public static <T");
 
@@ -296,6 +297,38 @@ public class DataClassExporter {
                     .append("(source.").append(stf.getGetterMethodName()).append("());\n");
         }
         content.append(indentString()).append("        return (").append(this.getClassName()).append(") target;\n");
+        content.append(indentString()).append("    }\n\n");
+
+        // fromInternalMap
+        this.addSuppressWarningsUnused(4, content);
+        content.append(indentString())
+                .append("    public static ")
+                .append(this.getClassName())
+                .append(" fromInternalMap(java.util.Map<String, Object> internalMap) {\n");
+
+        // ... assign member
+        content.append(indentString()).append("        ")
+                .append("return new ").append(this.getClassName()).append("(");
+        content.append(Joiner.on(", ").join(dataClassMeta.getFields().stream()
+                .map(f -> "(" + f.getFieldType().getCanonicalName() + ") internalMap.get(\"" + f.getFieldKeyName() + "\")")
+                .collect(toList())));
+        content.append(");\n");
+        content.append(indentString()).append("    }\n\n");
+
+        // fromMap
+        this.addSuppressWarningsUnused(4, content);
+        content.append(indentString())
+                .append("    public static ")
+                .append(this.getClassName())
+                .append(" fromMap(java.util.Map<String, Object> map) {\n");
+
+        // ... assign member
+        content.append(indentString()).append("        ")
+                .append("return new ").append(this.getClassName()).append("(");
+        content.append(Joiner.on(", ").join(dataClassMeta.getFields().stream()
+                .map(f -> "(" + f.getFieldType().getCanonicalName() + ") map.get(\"" + f.getFieldName() + "\")")
+                .collect(toList())));
+        content.append(");\n");
         content.append(indentString()).append("    }\n\n");
     }
 
@@ -353,23 +386,23 @@ public class DataClassExporter {
         }
 
         // constructor from map
-        this.addSuppressWarningsUnused(4, content);
-        content.append(indentString()).append("    public ").append(this.getClassName()).append("(java.util.Map<String, Object> from) {\n");
-        if (!Strings.isNullOrEmpty(constructorBody)) {
-            content.append(indentString()).append("        ").append(constructorBody).append("\n");
-        }
+//        this.addSuppressWarningsUnused(4, content);
+//        content.append(indentString()).append("    public ").append(this.getClassName()).append("(java.util.Map<String, Object> from) {\n");
+//        if (!Strings.isNullOrEmpty(constructorBody)) {
+//            content.append(indentString()).append("        ").append(constructorBody).append("\n");
+//        }
 
         // assign member
-        for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
-            content.append(indentString()).append("        ")
-                    .append("this.").append(field.getFieldName())
-                    .append(" = ")
-                    .append("(").append(field.getFieldType().getCanonicalName()).append(") ")
-                    .append("from.get(\"")
-                    .append(field.getFieldKeyName())
-                    .append("\");\n");
-        }
-        content.append(indentString()).append("    }\n\n");
+//        for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
+//            content.append(indentString()).append("        ")
+//                    .append("this.").append(field.getFieldName())
+//                    .append(" = ")
+//                    .append("(").append(field.getFieldType().getCanonicalName()).append(") ")
+//                    .append("from.get(\"")
+//                    .append(field.getFieldKeyName())
+//                    .append("\");\n");
+//        }
+//        content.append(indentString()).append("    }\n\n");
     }
 
     private void contentStaticFieldNames(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {

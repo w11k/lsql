@@ -86,7 +86,8 @@ public final class TypedStatementExporter {
             content.append(" createTypedRow(")
                     .append(Row.class.getCanonicalName())
                     .append(" row) {\n")
-                    .append("            return new ").append(rowClassName)
+                    .append("            return ").append(rowClassName)
+                    .append(".fromInternalMap")
                     .append("(row);\n");
             content.append("        }\n\n");
         }

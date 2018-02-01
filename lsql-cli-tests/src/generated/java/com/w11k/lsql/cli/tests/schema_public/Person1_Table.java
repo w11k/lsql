@@ -9,4 +9,8 @@ public class Person1_Table extends com.w11k.lsql.TypedTable<Person1_Row, java.la
 
     public static final String NAME = "person1";
 
+    protected Person1_Row createFromInternalMap(java.util.Map<String, Object> internalMap) {
+        return Person1_Row.fromInternalMap(internalMap);
+    }
+
 }

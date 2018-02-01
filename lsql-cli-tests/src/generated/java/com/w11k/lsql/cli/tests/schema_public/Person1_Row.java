@@ -18,6 +18,16 @@ public final class Person1_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
         return (Person1_Row) target;
     }
 
+    @SuppressWarnings("unused")
+    public static Person1_Row fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new Person1_Row((java.lang.Integer) internalMap.get("id"), (java.lang.String) internalMap.get("first_name"));
+    }
+
+    @SuppressWarnings("unused")
+    public static Person1_Row fromMap(java.util.Map<String, Object> map) {
+        return new Person1_Row((java.lang.Integer) map.get("id"), (java.lang.String) map.get("firstName"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -32,12 +42,6 @@ public final class Person1_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
             java.lang.String firstName) {
         this.id = id;
         this.firstName = firstName;
-    }
-
-    @SuppressWarnings("unused")
-    public Person1_Row(java.util.Map<String, Object> from) {
-        this.id = (java.lang.Integer) from.get("id");
-        this.firstName = (java.lang.String) from.get("first_name");
     }
 
     // fields ----------

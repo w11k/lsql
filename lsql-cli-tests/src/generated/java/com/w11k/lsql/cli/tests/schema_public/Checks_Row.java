@@ -16,6 +16,16 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
         return (Checks_Row) target;
     }
 
+    @SuppressWarnings("unused")
+    public static Checks_Row fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new Checks_Row((java.lang.Boolean) internalMap.get("yesno"));
+    }
+
+    @SuppressWarnings("unused")
+    public static Checks_Row fromMap(java.util.Map<String, Object> map) {
+        return new Checks_Row((java.lang.Boolean) map.get("yesno"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -27,11 +37,6 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
     private Checks_Row(
             java.lang.Boolean yesno) {
         this.yesno = yesno;
-    }
-
-    @SuppressWarnings("unused")
-    public Checks_Row(java.util.Map<String, Object> from) {
-        this.yesno = (java.lang.Boolean) from.get("yesno");
     }
 
     // fields ----------

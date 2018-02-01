@@ -20,6 +20,16 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
         return (LoadPersonsByAgeAndFirstName) target;
     }
 
+    @SuppressWarnings("unused")
+    public static LoadPersonsByAgeAndFirstName fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new LoadPersonsByAgeAndFirstName((java.lang.Integer) internalMap.get("id"), (java.lang.String) internalMap.get("first_name"), (java.lang.Integer) internalMap.get("age"));
+    }
+
+    @SuppressWarnings("unused")
+    public static LoadPersonsByAgeAndFirstName fromMap(java.util.Map<String, Object> map) {
+        return new LoadPersonsByAgeAndFirstName((java.lang.Integer) map.get("id"), (java.lang.String) map.get("firstName"), (java.lang.Integer) map.get("age"));
+    }
+
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
@@ -37,13 +47,6 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
         this.id = id;
         this.firstName = firstName;
         this.age = age;
-    }
-
-    @SuppressWarnings("unused")
-    public LoadPersonsByAgeAndFirstName(java.util.Map<String, Object> from) {
-        this.id = (java.lang.Integer) from.get("id");
-        this.firstName = (java.lang.String) from.get("first_name");
-        this.age = (java.lang.Integer) from.get("age");
     }
 
     // fields ----------
