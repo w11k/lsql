@@ -23,7 +23,7 @@ public class GenericDialect {
 
     private ConverterRegistry converterRegistry = new ConverterRegistry();
 
-    private IdentifierConverter identifierConverter = IdentifierConverter.JAVA_CAMEL_CASE_TO_SQL_LOWER_UNDERSCORE;
+    private IdentifierConverter identifierConverter = IdentifierConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_LOWER_UNDERSCORE;
 
     public GenericDialect() {
         // http://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html

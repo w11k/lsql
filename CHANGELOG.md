@@ -1,6 +1,7 @@
 
 **0.32.7**
 
+- **BREAKING CHANGE**: Default IdentifierConverter is now JAVA_LOWER_UNDERSCORE_TO_SQL_LOWER_UNDERSCORE
 - CLI: generate toMap and toInternalMap in DataClasses
 
 
