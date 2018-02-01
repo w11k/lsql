@@ -94,7 +94,7 @@ public final class TypedStatementExporter {
         // getQueryParameters
         content.append("        protected java.util.Map<String, Object> ");
         content.append(" getQueryParameters() {\n")
-                .append("            return this.toMap();\n");
+                .append("            return this.toInternalMap();\n");
         content.append("        }\n\n");
 
         // statement name

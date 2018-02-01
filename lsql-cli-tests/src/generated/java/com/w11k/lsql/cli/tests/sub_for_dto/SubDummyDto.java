@@ -43,7 +43,10 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_fieldA = "fieldA";
+    public static final String INTERNAL_FIELD_FIELDA = "fieldA";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_FIELDA = "fieldA";
 
     @javax.annotation.Nullable public final java.lang.String fieldA;
 
@@ -55,7 +58,10 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
         return new SubDummyDto(fieldA,fieldB);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_fieldB = "fieldB";
+    public static final String INTERNAL_FIELD_FIELDB = "fieldB";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_FIELDB = "fieldB";
 
     @javax.annotation.Nullable public final java.lang.Number fieldB;
 
@@ -87,6 +93,13 @@ public final class SubDummyDto implements com.w11k.lsql.TableRow, Field_AString,
             Object target = targetClass.newInstance();
             return this.as((T) target);
         } catch (Exception e) {throw new RuntimeException(e);}
+    }
+
+    public java.util.Map<String, Object> toInternalMap() {
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("fieldA", this.fieldA);
+        map.put("fieldB", this.fieldB);
+        return map;
     }
 
     public java.util.Map<String, Object> toMap() {

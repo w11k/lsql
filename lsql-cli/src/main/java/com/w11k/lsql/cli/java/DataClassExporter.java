@@ -119,7 +119,7 @@ public class DataClassExporter {
         for (DataClassMeta.DataClassFieldMeta field : dcm.getFields()) {
 //            addSeperator(content);
             if (!skipStaticAndUtilElements) {
-                contentStaticFieldName(content, field);
+                contentStaticFieldNames(content, field);
             }
             contentField(content, field);
             content.append("\n");
@@ -135,7 +135,8 @@ public class DataClassExporter {
             contentAsClass(content);
         }
 
-        // toMap
+        // toInternalMap
+        contentToInternalMap(content);
         contentToMap(content);
 
         content.append(indentString()).append("    // Object methods ----------\n\n");
@@ -209,13 +210,26 @@ public class DataClassExporter {
         content.append(indentString()).append("    }\n\n");
     }
 
+    private void contentToInternalMap(StringBuilder content) {
+        content.append(indentString()).append("    public java.util.Map<String, Object> toInternalMap() {\n");
+        content.append(indentString()).append("        java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
+
+        for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
+            content.append(indentString()).append("        ")
+                    .append("map.put(\"").append(field.getFieldKeyName()).append("\", this.").append(field.getFieldName()).append(");\n");
+        }
+
+        content.append(indentString()).append("        return map;\n");
+        content.append(indentString()).append("    }\n\n");
+    }
+
     private void contentToMap(StringBuilder content) {
         content.append(indentString()).append("    public java.util.Map<String, Object> toMap() {\n");
         content.append(indentString()).append("        java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
 
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
-                    .append("map.put(\"").append(field.getFieldKeyName()).append("\", this.").append(field.getFieldName()).append(");\n");
+                    .append("map.put(\"").append(field.getFieldName()).append("\", this.").append(field.getFieldName()).append(");\n");
         }
 
         content.append(indentString()).append("        return map;\n");
@@ -358,15 +372,21 @@ public class DataClassExporter {
         content.append(indentString()).append("    }\n\n");
     }
 
-    private void contentStaticFieldName(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
-//        String staticName = this.javaExporter.getlSql().getConfig().getDialect().getIdentifierConverter().getToCaseFormat()
-//                .to(CaseFormat.UPPER_UNDERSCORE, field.getFieldName());
+    private void contentStaticFieldNames(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
         String staticName = field.getFieldKeyName();
 
         this.addSuppressWarningsUnused(4, content);
-        content.append(indentString()).append("    public static final String FIELD_").append(staticName).append(" = ")
+        content.append(indentString()).append("    public static final String INTERNAL_FIELD_").append(staticName.toUpperCase())
+                .append(" = ")
                 .append("\"")
                 .append(field.getFieldKeyName())
+                .append("\";\n\n");
+
+        this.addSuppressWarningsUnused(4, content);
+        content.append(indentString()).append("    public static final String FIELD_").append(staticName.toUpperCase())
+                .append(" = ")
+                .append("\"")
+                .append(field.getFieldName())
                 .append("\";\n\n");
     }
 

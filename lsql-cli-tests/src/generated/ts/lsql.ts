@@ -31,12 +31,6 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
     }
 }
 
-export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface Load {
-        field?: number;
-    }
-}
-
 export namespace com_w11k_lsql_cli_tests_stmts1 {
     export interface LoadAllPersonsEscaped2 {
         theid: number;
@@ -67,6 +61,12 @@ export namespace com_w11k_lsql_cli_tests_stmts1 {
     export interface QueryParamsWithDot {
         id: number;
         firstName?: string;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
+    export interface Load {
+        field?: number;
     }
 }
 

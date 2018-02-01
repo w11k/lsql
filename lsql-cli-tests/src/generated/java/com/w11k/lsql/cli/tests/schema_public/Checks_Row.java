@@ -37,7 +37,10 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_yesno = "yesno";
+    public static final String INTERNAL_FIELD_YESNO = "yesno";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_YESNO = "yesno";
 
     @javax.annotation.Nonnull public final java.lang.Boolean yesno;
 
@@ -66,6 +69,12 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
             Object target = targetClass.newInstance();
             return this.as((T) target);
         } catch (Exception e) {throw new RuntimeException(e);}
+    }
+
+    public java.util.Map<String, Object> toInternalMap() {
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("yesno", this.yesno);
+        return map;
     }
 
     public java.util.Map<String, Object> toMap() {

@@ -22,7 +22,7 @@ public class TypedTable<T extends TableRow, I> {
 
     @SuppressWarnings("unchecked")
     public Optional<I> insert(T instance) {
-        Map<String, Object> map = instance.toMap();
+        Map<String, Object> map = instance.toInternalMap();
 
         // Remove null values so that the DB can insert the default values
         map.entrySet().removeIf(entry -> entry.getValue() == null);
@@ -55,7 +55,7 @@ public class TypedTable<T extends TableRow, I> {
     }
 
     public void delete(T instance) {
-        Map<String, Object> map = instance.toMap();
+        Map<String, Object> map = instance.toInternalMap();
         this.table.delete(new Row(map));
     }
 
@@ -64,18 +64,18 @@ public class TypedTable<T extends TableRow, I> {
     }
 
     public void update(T instance) {
-        Map<String, Object> map = instance.toMap();
+        Map<String, Object> map = instance.toInternalMap();
         this.table.update(new Row(map));
     }
 
     public void updateWhere(T instance, Map<String, Object> where) {
-        Map<String, Object> map = instance.toMap();
+        Map<String, Object> map = instance.toInternalMap();
         this.table.updateWhere(new Row(map), new Row(where));
     }
 
     @SuppressWarnings("unchecked")
     public Optional<I> save(T instance) {
-        Map<String, Object> map = instance.toMap();
+        Map<String, Object> map = instance.toInternalMap();
         return (Optional<I>) this.table.save(new Row(map));
     }
 

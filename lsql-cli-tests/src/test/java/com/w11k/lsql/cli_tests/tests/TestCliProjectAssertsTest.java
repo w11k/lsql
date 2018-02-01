@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -30,8 +31,8 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
         // insert with static util fields
         Table table = this.lSql.table(Person1_Table.NAME);
         Row person1Row = Row.fromKeyVals(
-                Person1_Row.FIELD_id, 1,
-                Person1_Row.FIELD_first_name, "a"
+                Person1_Row.INTERNAL_FIELD_ID, 1,
+                Person1_Row.INTERNAL_FIELD_FIRST_NAME, "a"
         );
         table.insert(person1Row);
 
@@ -116,6 +117,27 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
         assertTrue(o.toString().contains("abcdefghi"));
         assertTrue(o.toString().contains("age="));
         assertTrue(o.toString().contains("987654321"));
+    }
+
+    @Test
+    public void toInternalMap() {
+        Person1_Row person1Row = new Person1_Row()
+                .withFirstName("Max");
+
+        Map<String, Object> map = person1Row.toInternalMap();
+
+        assertTrue(map.containsKey("first_name"));
+        assertTrue(map.containsKey(Person1_Row.INTERNAL_FIELD_FIRST_NAME));
+    }
+
+    @Test
+    public void toMap() {
+        Person1_Row person1Row = new Person1_Row()
+                .withFirstName("Max");
+
+        Map<String, Object> map = person1Row.toMap();
+        assertTrue(map.containsKey("firstName"));
+        assertTrue(map.containsKey(Person1_Row.FIELD_FIRST_NAME));
     }
 
     @Test

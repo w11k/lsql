@@ -43,7 +43,10 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_a_field = "a_field";
+    public static final String INTERNAL_FIELD_A_FIELD = "a_field";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_A_FIELD = "aField";
 
     @javax.annotation.Nonnull public final java.lang.Integer aField;
 
@@ -55,7 +58,10 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
         return new KeepUnderscoreForCamelCase(aField,afield);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_afield = "afield";
+    public static final String INTERNAL_FIELD_AFIELD = "afield";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_AFIELD = "afield";
 
     @javax.annotation.Nullable public final java.lang.String afield;
 
@@ -89,9 +95,16 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
         } catch (Exception e) {throw new RuntimeException(e);}
     }
 
-    public java.util.Map<String, Object> toMap() {
+    public java.util.Map<String, Object> toInternalMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("a_field", this.aField);
+        map.put("afield", this.afield);
+        return map;
+    }
+
+    public java.util.Map<String, Object> toMap() {
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("aField", this.aField);
         map.put("afield", this.afield);
         return map;
     }

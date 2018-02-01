@@ -1,4 +1,9 @@
 
+**0.32.7**
+
+- CLI: generate toMap and toInternalMap in DataClasses
+
+
 **0.32.4**
 
 - CLI: improvement generated Java code names

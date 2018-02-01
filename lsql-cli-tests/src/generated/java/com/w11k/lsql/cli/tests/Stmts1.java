@@ -39,6 +39,11 @@ public class Stmts1 {
 
         // class methods ----------
 
+        public java.util.Map<String, Object> toInternalMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            return map;
+        }
+
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
@@ -69,7 +74,7 @@ public class Stmts1 {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {
@@ -113,6 +118,11 @@ public class Stmts1 {
 
         // class methods ----------
 
+        public java.util.Map<String, Object> toInternalMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            return map;
+        }
+
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
@@ -143,7 +153,7 @@ public class Stmts1 {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {
@@ -189,6 +199,11 @@ public class Stmts1 {
 
         // class methods ----------
 
+        public java.util.Map<String, Object> toInternalMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            return map;
+        }
+
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
@@ -219,7 +234,7 @@ public class Stmts1 {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {
@@ -266,6 +281,11 @@ public class Stmts1 {
 
         // class methods ----------
 
+        public java.util.Map<String, Object> toInternalMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            return map;
+        }
+
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
@@ -296,7 +316,7 @@ public class Stmts1 {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {
@@ -362,9 +382,15 @@ public class Stmts1 {
 
         // class methods ----------
 
-        public java.util.Map<String, Object> toMap() {
+        public java.util.Map<String, Object> toInternalMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("person1.id", this.person1Id);
+            return map;
+        }
+
+        public java.util.Map<String, Object> toMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("person1Id", this.person1Id);
             return map;
         }
 
@@ -393,7 +419,7 @@ public class Stmts1 {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {
@@ -457,6 +483,12 @@ public class Stmts1 {
 
         // class methods ----------
 
+        public java.util.Map<String, Object> toInternalMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("yesno", this.yesno);
+            return map;
+        }
+
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
@@ -484,7 +516,7 @@ public class Stmts1 {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {

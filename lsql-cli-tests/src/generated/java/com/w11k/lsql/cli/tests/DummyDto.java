@@ -37,7 +37,10 @@ public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_fieldA = "fieldA";
+    public static final String INTERNAL_FIELD_FIELDA = "fieldA";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_FIELDA = "fieldA";
 
     @javax.annotation.Nullable public final java.lang.String fieldA;
 
@@ -66,6 +69,12 @@ public final class DummyDto implements com.w11k.lsql.TableRow, Field_AString {
             Object target = targetClass.newInstance();
             return this.as((T) target);
         } catch (Exception e) {throw new RuntimeException(e);}
+    }
+
+    public java.util.Map<String, Object> toInternalMap() {
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("fieldA", this.fieldA);
+        return map;
     }
 
     public java.util.Map<String, Object> toMap() {

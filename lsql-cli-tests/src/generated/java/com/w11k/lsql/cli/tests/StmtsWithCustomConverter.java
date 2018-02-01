@@ -57,6 +57,12 @@ public class StmtsWithCustomConverter {
 
         // class methods ----------
 
+        public java.util.Map<String, Object> toInternalMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("field", this.field);
+            return map;
+        }
+
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("field", this.field);
@@ -88,7 +94,7 @@ public class StmtsWithCustomConverter {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {

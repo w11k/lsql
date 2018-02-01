@@ -75,9 +75,16 @@ public class StmtsCamelCase2 {
 
         // class methods ----------
 
-        public java.util.Map<String, Object> toMap() {
+        public java.util.Map<String, Object> toInternalMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("first_name", this.firstName);
+            map.put("age", this.age);
+            return map;
+        }
+
+        public java.util.Map<String, Object> toMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("firstName", this.firstName);
             map.put("age", this.age);
             return map;
         }
@@ -109,7 +116,7 @@ public class StmtsCamelCase2 {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {
@@ -171,9 +178,15 @@ public class StmtsCamelCase2 {
 
         // class methods ----------
 
-        public java.util.Map<String, Object> toMap() {
+        public java.util.Map<String, Object> toInternalMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("first_name", this.firstName);
+            return map;
+        }
+
+        public java.util.Map<String, Object> toMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("firstName", this.firstName);
             return map;
         }
 
@@ -198,7 +211,7 @@ public class StmtsCamelCase2 {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {

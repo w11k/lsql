@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface TableRow {
 
-    Map<String, Object> toMap();
+    Map<String, Object> toInternalMap();
 
 }

@@ -43,7 +43,10 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_id = "id";
+    public static final String INTERNAL_FIELD_ID = "id";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_ID = "id";
 
     @javax.annotation.Nonnull public final java.lang.Integer id;
 
@@ -55,7 +58,10 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         return new LoadAllPersons(id,firstName);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_first_name = "first_name";
+    public static final String INTERNAL_FIELD_FIRST_NAME = "first_name";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_FIRST_NAME = "firstName";
 
     @javax.annotation.Nullable public final java.lang.String firstName;
 
@@ -89,10 +95,17 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         } catch (Exception e) {throw new RuntimeException(e);}
     }
 
-    public java.util.Map<String, Object> toMap() {
+    public java.util.Map<String, Object> toInternalMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
         map.put("first_name", this.firstName);
+        return map;
+    }
+
+    public java.util.Map<String, Object> toMap() {
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("id", this.id);
+        map.put("firstName", this.firstName);
         return map;
     }
 

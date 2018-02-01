@@ -37,7 +37,10 @@ public final class LoadAllPersonsEscaped1 implements com.w11k.lsql.TableRow, The
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_theid = "theid";
+    public static final String INTERNAL_FIELD_THEID = "theid";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_THEID = "theid";
 
     @javax.annotation.Nonnull public final java.lang.Integer theid;
 
@@ -66,6 +69,12 @@ public final class LoadAllPersonsEscaped1 implements com.w11k.lsql.TableRow, The
             Object target = targetClass.newInstance();
             return this.as((T) target);
         } catch (Exception e) {throw new RuntimeException(e);}
+    }
+
+    public java.util.Map<String, Object> toInternalMap() {
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("theid", this.theid);
+        return map;
     }
 
     public java.util.Map<String, Object> toMap() {

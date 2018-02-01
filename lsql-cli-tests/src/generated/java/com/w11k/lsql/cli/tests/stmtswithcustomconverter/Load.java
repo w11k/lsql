@@ -37,7 +37,10 @@ public final class Load implements com.w11k.lsql.TableRow, Field_Integer {
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_field = "field";
+    public static final String INTERNAL_FIELD_FIELD = "field";
+
+    @SuppressWarnings("unused")
+    public static final String FIELD_FIELD = "field";
 
     @javax.annotation.Nullable public final java.lang.Integer field;
 
@@ -66,6 +69,12 @@ public final class Load implements com.w11k.lsql.TableRow, Field_Integer {
             Object target = targetClass.newInstance();
             return this.as((T) target);
         } catch (Exception e) {throw new RuntimeException(e);}
+    }
+
+    public java.util.Map<String, Object> toInternalMap() {
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("field", this.field);
+        return map;
     }
 
     public java.util.Map<String, Object> toMap() {

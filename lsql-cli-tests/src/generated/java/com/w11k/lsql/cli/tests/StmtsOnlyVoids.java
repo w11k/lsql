@@ -56,6 +56,12 @@ public class StmtsOnlyVoids {
 
         // class methods ----------
 
+        public java.util.Map<String, Object> toInternalMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("yesno", this.yesno);
+            return map;
+        }
+
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
@@ -83,7 +89,7 @@ public class StmtsOnlyVoids {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {
@@ -147,6 +153,12 @@ public class StmtsOnlyVoids {
 
         // class methods ----------
 
+        public java.util.Map<String, Object> toInternalMap() {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("yesno", this.yesno);
+            return map;
+        }
+
         public java.util.Map<String, Object> toMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
@@ -174,7 +186,7 @@ public class StmtsOnlyVoids {
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toMap();
+            return this.toInternalMap();
         }
 
         public String getStatementFileName() {
