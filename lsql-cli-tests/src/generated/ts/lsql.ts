@@ -158,3 +158,29 @@ export namespace com_w11k_lsql_cli_tests_subdir_subsubdir_stmtscamelcase2 {
     }
 }
 
+export namespace com_w11k_lsql_cli_tests {
+    export interface DummyDtoRow {
+        fieldA?: string;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests {
+    export interface DummyDtoMap {
+        fieldA?: string;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_sub_for_dto {
+    export interface SubDummyDtoRow {
+        fieldA?: string;
+        fieldB?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_sub_for_dto {
+    export interface SubDummyDtoMap {
+        fieldA?: string;
+        fieldB?: number;
+    }
+}
+

@@ -89,6 +89,8 @@ public class JavaExporter {
         if (this.dtoDeclarationSearchDir != null) {
             DtoDeclarationFinder dtoDeclarationFinder = new DtoDeclarationFinder(this, dtoDeclarationSearchDir);
             dataClassExporters.addAll(dtoDeclarationFinder.getDataClassExporters());
+            dtoDeclarationFinder.getDataClassExporters()
+                    .forEach(e -> this.generatedDataClasses.add(e.getDataClassMeta()));
         }
 
         // find unique StructuralTypingFields
