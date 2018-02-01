@@ -41,13 +41,30 @@ public class TypeScriptExporter {
     private void exportClasses(StringBuilder content) {
         for (DataClassMeta dcm : this.dataClassMetaList) {
             this.exportDataClass(content, dcm);
+            this.exportDataClassMap(content, dcm);
         }
     }
 
     private void exportDataClass(StringBuilder content, DataClassMeta dcMeta) {
         content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
-        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName())).append(" {\n");
+        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "Row")).append(" {\n");
         this.exportFields(content, dcMeta);
+        content.append("    }\n");
+        content.append("}\n\n");
+    }
+
+    private void exportDataClassMap(StringBuilder content, DataClassMeta dcMeta) {
+        content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
+        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "Map")).append(" {\n");
+        for (DataClassMeta.DataClassFieldMeta field : dcMeta.getFields()) {
+            Class<?> javaType = field.getFieldType();
+            String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);
+            content.append("        ").append(field.getFieldKeyName());
+            if (field.isNullable()) {
+                content.append("?");
+            }
+            content.append(": ").append(tsTypeName).append(";\n");
+        }
         content.append("    }\n");
         content.append("}\n\n");
     }

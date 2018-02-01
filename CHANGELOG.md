@@ -3,7 +3,7 @@
 
 - **BREAKING CHANGE**: Default IdentifierConverter is now JAVA_LOWER_UNDERSCORE_TO_SQL_LOWER_UNDERSCORE
 - CLI: generate toMap and toInternalMap in DataClasses
-
+- CLI: TypeScript generator now generates 2 interfaces per DataClass: typed and map
 
 **0.32.4**
 
