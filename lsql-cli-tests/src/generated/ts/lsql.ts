@@ -1,43 +1,43 @@
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Person1Row {
+    export interface Person1_Row {
         id: number;
         firstName?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Person1Map {
+    export interface Person1_Map {
         id: number;
         first_name?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface A_TableRow {
+    export interface A_Table_Row {
         id: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface A_TableMap {
+    export interface A_Table_Map {
         id: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface ChecksRow {
+    export interface Checks_Row {
         yesno: boolean;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface ChecksMap {
+    export interface Checks_Map {
         yesno: boolean;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Person2Row {
+    export interface Person2_Row {
         id: number;
         firstName?: string;
         age?: number;
@@ -45,7 +45,7 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Person2Map {
+    export interface Person2_Map {
         id: number;
         first_name?: string;
         age?: number;
@@ -53,97 +53,97 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Custom_ConverterRow {
+    export interface Custom_Converter_Row {
         field?: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Custom_ConverterMap {
+    export interface Custom_Converter_Map {
         field?: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface LoadRow {
+    export interface Load_Row {
         field?: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface LoadMap {
+    export interface Load_Map {
         field?: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsEscaped2Row {
+    export interface LoadAllPersonsEscaped2_Row {
         theid: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsEscaped2Map {
+    export interface LoadAllPersonsEscaped2_Map {
         theid: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsRow {
+    export interface LoadAllPersons_Row {
         id: number;
         firstName?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsMap {
+    export interface LoadAllPersons_Map {
         id: number;
         first_name?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsEscaped1Row {
+    export interface LoadAllPersonsEscaped1_Row {
         theid: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsEscaped1Map {
+    export interface LoadAllPersonsEscaped1_Map {
         theid: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface KeepUnderscoreForCamelCaseRow {
+    export interface KeepUnderscoreForCamelCase_Row {
         aField: number;
         afield?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface KeepUnderscoreForCamelCaseMap {
+    export interface KeepUnderscoreForCamelCase_Map {
         a_field: number;
         afield?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface QueryParamsWithDotRow {
+    export interface QueryParamsWithDot_Row {
         id: number;
         firstName?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface QueryParamsWithDotMap {
+    export interface QueryParamsWithDot_Map {
         id: number;
         first_name?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_subdir_subsubdir_stmtscamelcase2 {
-    export interface LoadPersonsByAgeAndFirstNameRow {
+    export interface LoadPersonsByAgeAndFirstName_Row {
         id: number;
         firstName?: string;
         age?: number;
@@ -151,7 +151,7 @@ export namespace com_w11k_lsql_cli_tests_subdir_subsubdir_stmtscamelcase2 {
 }
 
 export namespace com_w11k_lsql_cli_tests_subdir_subsubdir_stmtscamelcase2 {
-    export interface LoadPersonsByAgeAndFirstNameMap {
+    export interface LoadPersonsByAgeAndFirstName_Map {
         id: number;
         first_name?: string;
         age?: number;
@@ -159,26 +159,26 @@ export namespace com_w11k_lsql_cli_tests_subdir_subsubdir_stmtscamelcase2 {
 }
 
 export namespace com_w11k_lsql_cli_tests {
-    export interface DummyDtoRow {
+    export interface DummyDto_Row {
         fieldA?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests {
-    export interface DummyDtoMap {
+    export interface DummyDto_Map {
         fieldA?: string;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_sub_for_dto {
-    export interface SubDummyDtoRow {
+    export interface SubDummyDto_Row {
         fieldA?: string;
         fieldB?: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_sub_for_dto {
-    export interface SubDummyDtoMap {
+    export interface SubDummyDto_Map {
         fieldA?: string;
         fieldB?: number;
     }
