@@ -64,6 +64,18 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
     }
 }
 
+export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
+    export interface LoadRow {
+        field?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
+    export interface LoadMap {
+        field?: number;
+    }
+}
+
 export namespace com_w11k_lsql_cli_tests_stmts1 {
     export interface LoadAllPersonsEscaped2Row {
         theid: number;
@@ -127,18 +139,6 @@ export namespace com_w11k_lsql_cli_tests_stmts1 {
     export interface QueryParamsWithDotMap {
         id: number;
         first_name?: string;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface LoadRow {
-        field?: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface LoadMap {
-        field?: number;
     }
 }
 
