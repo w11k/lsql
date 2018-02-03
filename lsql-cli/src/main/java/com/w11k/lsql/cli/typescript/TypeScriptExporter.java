@@ -47,7 +47,7 @@ public class TypeScriptExporter {
 
     private void exportDataClass(StringBuilder content, DataClassMeta dcMeta) {
         content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
-        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "Row")).append(" {\n");
+        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "_Row")).append(" {\n");
         this.exportFields(content, dcMeta);
         content.append("    }\n");
         content.append("}\n\n");
@@ -55,7 +55,7 @@ public class TypeScriptExporter {
 
     private void exportDataClassMap(StringBuilder content, DataClassMeta dcMeta) {
         content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
-        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "Map")).append(" {\n");
+        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "_Map")).append(" {\n");
         for (DataClassMeta.DataClassFieldMeta field : dcMeta.getFields()) {
             Class<?> javaType = field.getFieldType();
             String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);

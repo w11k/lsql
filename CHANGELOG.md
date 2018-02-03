@@ -1,4 +1,9 @@
 
+**0.32.8**
+
+- CLI: TypeScript interfaces are now named "Name_Row" and "Name_Map" instead of "NameRow" and "NameMap"  
+
+
 **0.32.7**
 
 - **BREAKING CHANGE**: Default IdentifierConverter is now JAVA_LOWER_UNDERSCORE_TO_SQL_LOWER_UNDERSCORE
