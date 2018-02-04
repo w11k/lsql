@@ -61,6 +61,8 @@ public final class StatementFileExporter {
                 continue;
             }
 
+            log("Probing statement: " + stmt.getStatementSourceName() + "#" + stmt.getStatementName());
+
             // in
             TypedStatementMeta typedStatementMeta = new TypedStatementMeta(
                     lSql,

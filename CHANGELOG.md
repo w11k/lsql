@@ -1,4 +1,9 @@
 
+**0.32.9**
+
+- CLI: Print name of statement during execution
+
+
 **0.32.8**
 
 - CLI: TypeScript interfaces are now named "Name_Row" and "Name_Map" instead of "NameRow" and "NameMap"  

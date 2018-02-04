@@ -68,6 +68,10 @@ public class SqlStatementToPreparedStatement {
         return this.lSql;
     }
 
+    public String getStatementSourceName() {
+        return statementSourceName;
+    }
+
     public String getStatementName() {
         return statementName;
     }
