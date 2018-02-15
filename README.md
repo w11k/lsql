@@ -58,9 +58,9 @@ All released files are stored in a Maven repository:
 ```{.language-xml}
 <repositories>
     <repository>
-        <id>lsql-repo</id>
-        <name>w11k Repository</name>
-        <url>http://mvn.w11k.com/releases</url>
+        <id>bintray-repo</id>
+        <name>Bintray Repository</name>
+        <url>http://bintray.com</url>
     </repository>
 </repositories>
 ```
