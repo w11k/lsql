@@ -16,14 +16,13 @@ public class ClobConverter extends Converter {
     }
 
     @Override
-    protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         ps.setClob(index, new SerialClob(val.toString().toCharArray()));
 
     }
 
     @Override
-
-    protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+    public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
         Clob clob = rs.getClob(index);
         if (clob != null) {
             Reader reader = clob.getCharacterStream();

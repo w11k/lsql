@@ -2,6 +2,7 @@
 **0.32.9**
 
 - CLI: Print name of statement during execution
+- `Converter#setValue/getValue` are now public to allow composition/wrapping of converters
 
 
 **0.32.8**

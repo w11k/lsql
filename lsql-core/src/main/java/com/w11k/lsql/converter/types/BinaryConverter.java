@@ -17,13 +17,13 @@ public class BinaryConverter extends Converter {
     }
 
     @Override
-    protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         com.w11k.lsql.Blob blob = (com.w11k.lsql.Blob) val;
         ps.setBytes(index, blob.getData());
     }
 
     @Override
-    protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+    public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
         return new com.w11k.lsql.Blob(rs.getBytes(index));
     }
 }

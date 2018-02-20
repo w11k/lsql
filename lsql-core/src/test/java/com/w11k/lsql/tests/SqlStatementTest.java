@@ -421,13 +421,13 @@ public class SqlStatementTest extends AbstractLSqlTest {
                 "select * from person where id = /*=*/ 1 /**/;")
                 .setParameterConverter("id", new Converter(String.class, Types.INTEGER) {
                     @Override
-                    protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+                    public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                         ps.setInt(1, Integer.parseInt(val.toString()));
                     }
 
                     @Nullable
                     @Override
-                    protected Object getValue(LSql lSql, ResultSet rs, int index) {
+                    public Object getValue(LSql lSql, ResultSet rs, int index) {
                         return null;
                     }
                 });

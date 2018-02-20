@@ -15,12 +15,12 @@ public class PostgresDialect extends GenericDialect {
         }
 
         @Override
-        protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+        public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
             ps.setBoolean(index, (Boolean) val);
         }
 
         @Override
-        protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+        public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
             if (rs.getMetaData().getColumnType(index) == Types.BOOLEAN) {
                 return rs.getBoolean(index);
             } else if (rs.getMetaData().getColumnType(index) == Types.BIT) {

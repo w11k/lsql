@@ -13,12 +13,12 @@ public abstract class Converter {
     public static Converter withDefaultValueForNull(final Converter delegate, final Object defaultValueForNull) {
         return new Converter(delegate.getJavaType(), delegate.getSqlType()) {
             @Override
-            protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+            public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
                 delegate.setValue(lSql, ps, index, val);
             }
 
             @Override
-            protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+            public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
                 return delegate.getValue(lSql, rs, index);
             }
 
@@ -100,10 +100,10 @@ public abstract class Converter {
                 '}';
     }
 
-    protected abstract void setValue(LSql lSql, PreparedStatement ps, int index,
-                                     Object val) throws SQLException;
+    public abstract void setValue(LSql lSql, PreparedStatement ps, int index,
+                                  Object val) throws SQLException;
 
-    protected abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
+    public abstract Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException;
 
     protected boolean isNullValid() {
         return true;

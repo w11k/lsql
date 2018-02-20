@@ -37,12 +37,12 @@ public final class TestCliConfig extends Config {
         }
 
         @Override
-        protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+        public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
             ps.setInt(index, ((CustomType) val).getValue());
         }
 
         @Override
-        protected CustomType getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+        public CustomType getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
             return new CustomType(rs.getInt(index));
         }
     }

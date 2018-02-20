@@ -16,7 +16,7 @@ public class NumberConverter extends Converter {
     }
 
     @Override
-    protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         if (val instanceof Double) {
             ps.setDouble(index, (Double) val);
         } else if (val instanceof Float) {
@@ -29,7 +29,7 @@ public class NumberConverter extends Converter {
     }
 
     @Override
-    protected Object getValue(LSql lSql, ResultSet rs, int index) {
+    public Object getValue(LSql lSql, ResultSet rs, int index) {
         throw new IllegalStateException(getClass().getName() + " is write-only");
     }
 

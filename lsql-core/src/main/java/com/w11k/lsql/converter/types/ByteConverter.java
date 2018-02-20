@@ -15,12 +15,12 @@ public class ByteConverter extends Converter {
     }
 
     @Override
-    protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         ps.setByte(index, (Byte) val);
     }
 
     @Override
-    protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+    public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
         return rs.getByte(index);
     }
 }

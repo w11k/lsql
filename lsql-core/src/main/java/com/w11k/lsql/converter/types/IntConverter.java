@@ -19,12 +19,12 @@ public class IntConverter extends Converter {
     }
 
     @Override
-    protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         ps.setInt(index, (Integer) val);
     }
 
     @Override
-    protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+    public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
         return rs.getInt(index);
 
     }

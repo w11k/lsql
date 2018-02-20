@@ -14,12 +14,12 @@ public class MarkerColumnConverter extends com.w11k.lsql.converter.Converter {
     }
 
     @Override
-    protected void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
+    public void setValue(LSql lSql, PreparedStatement ps, int index, Object val) throws SQLException {
         throw new RuntimeException(getClass().getCanonicalName() + " must not be used to set values");
     }
 
     @Override
-    protected Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
+    public Object getValue(LSql lSql, ResultSet rs, int index) throws SQLException {
         return rs.getObject(index);
     }
 }
