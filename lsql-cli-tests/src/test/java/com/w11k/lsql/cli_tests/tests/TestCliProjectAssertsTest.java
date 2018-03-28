@@ -151,25 +151,25 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
 
     @Test
     public void insert() {
-        Person1_Table Person1_Table = new Person1_Table(lSql);
-        Optional<Integer> pk = Person1_Table.insert(new Person1_Row().withId(1).withFirstName("a"));
+        Person1_Table person1Table = new Person1_Table(lSql);
+        Optional<Integer> pk = person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
         assertEquals(pk.get(), new Integer(1));
     }
 
     @Test
     public void insertAndLoad() {
-        Person1_Table Person1_Table = new Person1_Table(lSql);
-        Person1_Row p1 = Person1_Table.insertAndLoad(new Person1_Row().withId(1).withFirstName("a"));
+        Person1_Table person1Table = new Person1_Table(lSql);
+        Person1_Row p1 = person1Table.insertAndLoad(new Person1_Row().withId(1).withFirstName("a"));
         assertEquals(p1.getId(), new Integer(1));
         assertEquals(p1.getFirstName(), "a");
     }
 
     @Test
     public void load() {
-        Person1_Table Person1_Table = new Person1_Table(lSql);
-        Person1_Table.insert(new Person1_Row().withId(1).withFirstName("a"));
+        Person1_Table person1Table = new Person1_Table(lSql);
+        person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
 
-        Optional<Person1_Row> person1RowOptional = Person1_Table.load(1);
+        Optional<Person1_Row> person1RowOptional = person1Table.load(1);
         Assert.assertTrue(person1RowOptional.isPresent());
         Person1_Row person1Row = person1RowOptional.get();
         assertEquals(person1Row.getId(), new Integer(1));
@@ -178,32 +178,32 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
 
     @Test
     public void delete() {
-        Person1_Table Person1_Table = new Person1_Table(lSql);
-        Person1_Table.insert(new Person1_Row().withId(1).withFirstName("a"));
-        Person1_Table.delete(new Person1_Row().withId(1));
+        Person1_Table person1Table = new Person1_Table(lSql);
+        person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
+        person1Table.delete(new Person1_Row().withId(1));
 
-        Optional<Person1_Row> person1RowOptional = Person1_Table.load(1);
+        Optional<Person1_Row> person1RowOptional = person1Table.load(1);
         Assert.assertFalse(person1RowOptional.isPresent());
     }
 
     @Test
     public void deleteById() {
-        Person1_Table Person1_Table = new Person1_Table(lSql);
-        Person1_Table.insert(new Person1_Row().withId(1).withFirstName("a"));
-        Person1_Table.deleteById(1);
+        Person1_Table person1Table = new Person1_Table(lSql);
+        person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
+        person1Table.deleteById(1);
 
-        Optional<Person1_Row> person1RowOptional = Person1_Table.load(1);
+        Optional<Person1_Row> person1RowOptional = person1Table.load(1);
         Assert.assertFalse(person1RowOptional.isPresent());
     }
 
     @Test
     public void update() {
-        Person1_Table Person1_Table = new Person1_Table(lSql);
+        Person1_Table person1Table = new Person1_Table(lSql);
         Person1_Row p1 = new Person1_Row().withId(1).withFirstName("a");
-        Person1_Table.insert(p1);
+        person1Table.insert(p1);
 
-        Person1_Table.update(p1.withFirstName("b"));
-        p1 = Person1_Table.load(1).get();
+        person1Table.update(p1.withFirstName("b"));
+        p1 = person1Table.load(1).get();
 
         assertEquals(p1.getFirstName(), "b");
     }

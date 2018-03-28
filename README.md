@@ -1,24 +1,26 @@
 
+[![Build Status](https://travis-ci.org/w11k/lsql.svg?branch=master)](https://travis-ci.org/w11k/lsql)
+
 # Literate SQL - A Java Database Library
 
-[![Join the chat at https://gitter.im/w11k/lsql](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/w11k/lsql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+LSql (Literate SQL) is a Java database library focusing on type-safety and the preservation of the relational data model.  
 
-LSql (Literate SQL) is a pragmatic Java database access library on top of JDBC.
+Key points:
 
-Our philosophy:
+* LSql is *not* yet another object/relational mapper. We believe that functional application data (in particular stored in a relational model) should not be mapped to a strict classes/objects model. The relational data model is elegant, well-thought-out and a reliable way to model the application data. Any abstraction between the relational model and the application logic makes things more complicated and should be avoided.
 
-* LSql is *not* yet another object/relational mapper. We believe that functional application data (in particular stored in a relational model) should not be mapped to a strict classes/objects model. Every time a programmer creates a new class (even a simple POJO), it will be incompatible with existing API, whereas using well-known classes like Maps, Lists, etc. enables access to amazing libraries like [Google Guava](http://code.google.com/p/guava-libraries/wiki/CollectionUtilitiesExplained).
+* Based on your *database schema* and *SQL statement files*, LSql generates Java classes (with an immutability API design) in order to interact with the database in a type-safe manner.   
 
-* Database first
-
-* It is not important to use SQL databases in a vendor-agnostic way. The RDBMS should be choosen (once) depending on the project requirements and database access libraries should not try to hide their characteristics.
+* SQL is a superior language for data manipulation. The RDBMS should be choosen depending on the project requirements and database access libraries should not try to hide their characteristics.
 
 
-## Quick Example
+## Example
 
-Assume the following DDL:
+### CRUD
 
-```{.language-sql}
+Given the following DDL:
+
+```sql
 CREATE TABLE person (
     id SERIAL PRIMARY KEY,
     name VARCHAR(200),
@@ -26,28 +28,49 @@ CREATE TABLE person (
 );
 ```
 
-LSql Java code:
+Java code:
 
-```{.language-java}
-DataSource dataSource = ...;
-LSql lsql = new LSql(new H2Dialect(), dataSource);
+```java
+// insert
+Person_Table personTable = new Person_Table(lSql);
+Person_Row person = new Person_Row()
+    .withName("John")
+    .withAge(20);
+Optional<Integer> pk = personTable.insert(person);
 
-// Create a new person
-Row john = new Row();
-john.put("name", "John");
-john.put("age", 20);
-
-// Insert the new person
-Table personTable = lsql.table("person");
-personTable.insert(john);
-
-// The generated ID is automatically put into the row object
-Object newId = john.get("id");
-
-// Use the ID to load the row, returns com.google.common.base.Optional
-Optional<QueriedRow> queried = personTable.load(newId);
-QueriedRow queriedJohn = queried.get();
+// load by ID
+Optional<Person_Row> personRowOptional = personTable.load(1);
+personRowOptional.get().id == 1;
+personRowOptional.get().name == "John";
+personRowOptional.get().age == 20;
 ```
+
+## Query
+
+Given the following SQL statement file `PersonStatements.sql`:
+
+```sql
+--loadPersonByAge
+SELECT * FROM person WHERE age = /*=*/ 0 /**/;
+```
+
+Java code:
+
+```java
+PersonStatements statements = new PersonStatements(lSql);
+
+List<LoadPersonByAge> list = personStatements.loadPersonByAge()
+    .withAge(20)
+    .toList();
+
+list.get(0).id == 1;
+list.get(0).name == "John";
+list.get(0).age == 20;
+```
+
+
+
+
 
 # Download
 
@@ -77,5 +100,4 @@ Add the following dependency to your POM. The latest version number can always b
 </dependency>
 ```
 
-# Documentation
 
