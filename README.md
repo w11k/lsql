@@ -39,8 +39,7 @@ Person_Row person = new Person_Row()
 Optional<Integer> pk = personTable.insert(person);
 
 // load by ID
-Optional<Person_Row> personRowOptional = personTable.load(1);
-personRowOptional.get().id == 1;
+Optional<Person_Row> personRowOptional = personTable.load(pk.get());
 personRowOptional.get().name == "John";
 personRowOptional.get().age == 20;
 ```
@@ -63,7 +62,6 @@ List<LoadPersonByAge> list = personStatements.loadPersonByAge()
     .withAge(20)
     .toList();
 
-list.get(0).id == 1;
 list.get(0).name == "John";
 list.get(0).age == 20;
 ```
