@@ -1,4 +1,9 @@
 
+**0.32.10**
+
+- fixed reading of table meta datas
+
+
 **0.32.9**
 
 - CLI: Print name of statement during execution
