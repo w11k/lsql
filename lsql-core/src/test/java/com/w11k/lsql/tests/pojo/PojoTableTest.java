@@ -116,8 +116,7 @@ public class PojoTableTest extends AbstractLSqlTest {
         this.addConfigHook(c ->
                 c.setConverter("person", "age", new AtomicIntegerConverter()));
 
-        PojoTable<PersonWithAtomicIntegerAge> personTable = this.lSql.table("person")
-                .withPojo(PersonWithAtomicIntegerAge.class);
+        PojoTable<PersonWithAtomicIntegerAge> personTable = this.lSql.table("person", PersonWithAtomicIntegerAge.class);
 
         PersonWithAtomicIntegerAge adam1 = new PersonWithAtomicIntegerAge(1, "Adam", new AtomicInteger(30));
         personTable.insert(adam1);

@@ -56,7 +56,7 @@ public class JavaExporter {
             }
 
             for (String foundTable : foundTables) {
-                this.lSql.table(foundTable);
+                this.lSql.tableBySqlName(foundTable);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -69,14 +69,12 @@ public class JavaExporter {
             List<String> foundTables = Lists.newLinkedList();
             while (tables.next()) {
                 String sqlSchemaName = tables.getString(2);
-                String javaSchemaName = this.lSql.identifierSqlToJava(sqlSchemaName);
                 String sqlTableName = tables.getString(3);
-                String javaTableName = this.lSql.identifierSqlToJava(sqlTableName);
 
-                if (javaSchemaName != null) {
-                    foundTables.add(javaSchemaName + "." + javaTableName);
+                if (sqlSchemaName != null) {
+                    foundTables.add(sqlSchemaName + "." + sqlTableName);
                 } else {
-                    foundTables.add(javaTableName);
+                    foundTables.add(sqlTableName);
                 }
             }
             return foundTables;
@@ -107,7 +105,7 @@ public class JavaExporter {
                     ? ""
                     : Joiner.on("_").skipNulls().join("schema", schemaName.toLowerCase());
             String fullPackageName = joinStringsAsPackageName(packageName, lastPackageSegment);
-            String tableName = table.getTableName();
+            String tableName = getJavaCodeName(table.getTableName().toLowerCase(), true, true);
             String className = getJavaCodeName(tableName, true, true);
 
             DataClassMeta dcm = new DataClassMeta(className, fullPackageName);

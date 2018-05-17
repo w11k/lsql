@@ -33,7 +33,7 @@ public class Table {
 
     private final LSql lSql;
 
-    private String schemaAndTableName;
+    private String sqlSchemaAndTableName;
 
     private String schemaName;
 
@@ -45,13 +45,13 @@ public class Table {
 
     private Optional<Column> revisionColumn = absent();
 
-    public Table(LSql lSql, String schemaAndTableName) {
+    Table(LSql lSql, String sqlSchemaAndTableName) {
         this.lSql = lSql;
-        this.schemaAndTableName = schemaAndTableName;
+        this.sqlSchemaAndTableName = sqlSchemaAndTableName;
         fetchMeta();
 
         if (logger.isDebugEnabled()) {
-            StringBuilder msg = new StringBuilder("Read schema for table '" + this.schemaAndTableName + "':\n");
+            StringBuilder msg = new StringBuilder("Read schema for table '" + this.sqlSchemaAndTableName + "':\n");
             for (Column column : columns.values()) {
                 msg.append("    ").append(column).append("\n");
             }
@@ -64,8 +64,8 @@ public class Table {
         return lSql;
     }
 
-    public String getSchemaAndTableName() {
-        return this.schemaAndTableName;
+    public String getSqlSchemaAndTableName() {
+        return this.sqlSchemaAndTableName;
     }
 
     public String getSchemaName() {
@@ -448,7 +448,7 @@ public class Table {
      */
     public Optional<? extends AbstractValidationError> validate(String javaColumnName, Object value) {
         if (!getColumns().containsKey(javaColumnName)) {
-            return of(new KeyError(getSchemaAndTableName(), javaColumnName));
+            return of(new KeyError(getSqlSchemaAndTableName(), javaColumnName));
         }
         return column(javaColumnName).validateValue(value);
     }
@@ -462,19 +462,19 @@ public class Table {
             return false;
         }
         Table otherTable = (Table) o;
-        return lSql == otherTable.lSql && schemaAndTableName.equals(otherTable.schemaAndTableName);
+        return lSql == otherTable.lSql && sqlSchemaAndTableName.equals(otherTable.sqlSchemaAndTableName);
     }
 
     @Override
     public int hashCode() {
         int result = lSql.hashCode();
-        result = 31 * result + schemaAndTableName.hashCode();
+        result = 31 * result + sqlSchemaAndTableName.hashCode();
         return result;
     }
 
     @Override
     public String toString() {
-        return "Table{schemaAndTableName='" + schemaAndTableName + "'}";
+        return "Table{sqlSchemaAndTableName='" + sqlSchemaAndTableName + "'}";
     }
 
     private PreparedStatement createLoadPreparedStatement() {
@@ -493,7 +493,7 @@ public class Table {
         columns = columns.stream().filter(input -> {
             Column column = column(input);
             if (column == null) {
-                String message = "Column '" + input + "' does not exist in table '" + schemaAndTableName + "'. ";
+                String message = "Column '" + input + "' does not exist in table '" + sqlSchemaAndTableName + "'. ";
                 message += "Known columns: [";
                 message += Joiner.on(",").join(Table.this.columns.keySet());
                 message += "]";
@@ -540,24 +540,22 @@ public class Table {
         try {
             DatabaseMetaData md = con.getMetaData();
 
-            String sqlSchemaAndTableName = lSql.identifierJavaToSql(this.schemaAndTableName);
-
             // Schema name
             String sqlSchema;
             String sqlTableName;
-            if (sqlSchemaAndTableName.contains(".")) {
-                int dot = sqlSchemaAndTableName.indexOf('.');
-                sqlSchema = sqlSchemaAndTableName.substring(0, dot);
-                sqlTableName = sqlSchemaAndTableName.substring(dot + 1);
+            if (this.sqlSchemaAndTableName.contains(".")) {
+                int dot = this.sqlSchemaAndTableName.indexOf('.');
+                sqlSchema = this.sqlSchemaAndTableName.substring(0, dot);
+                sqlTableName = this.sqlSchemaAndTableName.substring(dot + 1);
             } else {
                 sqlSchema = null;
-                sqlTableName = sqlSchemaAndTableName;
+                sqlTableName = this.sqlSchemaAndTableName;
             }
 
             // Check table name
             ResultSet tables = md.getTables(null, sqlSchema, sqlTableName, null);
             if (!tables.next()) {
-                throw new IllegalArgumentException("Unknown table '" + this.schemaAndTableName + "'");
+                throw new IllegalArgumentException("Unknown table '" + this.sqlSchemaAndTableName + "'");
             }
 
             // Missing schema name?
@@ -566,14 +564,14 @@ public class Table {
             }
 
             if (sqlSchema != null && !sqlSchema.equals("")) {
-                this.schemaAndTableName = lSql.identifierSqlToJava(sqlSchema + "." + sqlTableName);
+                this.sqlSchemaAndTableName = sqlSchema + "." + sqlTableName;
             } else {
-                this.schemaAndTableName = lSql.identifierSqlToJava(sqlTableName);
+                this.sqlSchemaAndTableName = sqlTableName;
             }
 
             sqlSchema = sqlSchema != null ? sqlSchema : "";
-            this.schemaName = lSql.identifierSqlToJava(sqlSchema);
-            this.tableName = lSql.identifierSqlToJava(sqlTableName);
+            this.schemaName = sqlSchema;
+            this.tableName = sqlTableName;
 
             // Fetch Primary Key
             ResultSet primaryKeys =
@@ -597,7 +595,7 @@ public class Table {
                 int sqlType = columnsMetaData.getInt(5);
                 boolean isNotNullable = columnsMetaData.getString(18).equalsIgnoreCase("NO");
                 Converter converter = this.lSql.getConverterForTableColumn(
-                        this.schemaAndTableName, javaColumnName, sqlType);
+                        this.lSql.identifierSqlToJava(this.sqlSchemaAndTableName), javaColumnName, sqlType);
 
                 Column column = new Column(this, javaColumnName, sqlType, converter, columnSize);
                 column.setNullable(!isNotNullable);
@@ -608,7 +606,7 @@ public class Table {
 
             if (tables.next()) {
                 throw new IllegalArgumentException("meta data fetch returned more than one table for '"
-                        + this.schemaAndTableName + "'");
+                        + this.sqlSchemaAndTableName + "'");
             }
         } catch (SQLException e) {
             e.printStackTrace();

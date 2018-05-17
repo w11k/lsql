@@ -4,10 +4,10 @@ public class Person1_Table extends com.w11k.lsql.TypedTable<Person1_Row, java.la
 
     @com.google.inject.Inject
     public Person1_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "person1", Person1_Row.class);
+        super(lSql, "PERSON1", Person1_Row.class);
     }
 
-    public static final String NAME = "person1";
+    public static final String NAME = "PERSON1";
 
     protected Person1_Row createFromInternalMap(java.util.Map<String, Object> internalMap) {
         return Person1_Row.fromInternalMap(internalMap);

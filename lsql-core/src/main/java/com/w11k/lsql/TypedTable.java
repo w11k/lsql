@@ -10,7 +10,7 @@ public abstract class TypedTable<T extends TableRow, I> {
 //    private final Constructor<T> tableRowConstructor;
 
     public TypedTable(LSql lSql, String tableName, Class<T> tableRowClass) {
-        this.table = lSql.table(tableName);
+        this.table = lSql.tableBySqlName(tableName);
 
 //        try {
 //            this.tableRowConstructor = tableRowClass.getConstructor(Map.class);

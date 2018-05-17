@@ -4,10 +4,10 @@ public class Custom_Converter_Table extends com.w11k.lsql.TypedTable<Custom_Conv
 
     @com.google.inject.Inject
     public Custom_Converter_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "custom_converter", Custom_Converter_Row.class);
+        super(lSql, "CUSTOM_CONVERTER", Custom_Converter_Row.class);
     }
 
-    public static final String NAME = "custom_converter";
+    public static final String NAME = "CUSTOM_CONVERTER";
 
     protected Custom_Converter_Row createFromInternalMap(java.util.Map<String, Object> internalMap) {
         return Custom_Converter_Row.fromInternalMap(internalMap);

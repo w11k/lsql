@@ -93,7 +93,7 @@ public class Column {
     public Optional<? extends AbstractValidationError> validateValue(Object value) {
         if (!this.converter.isValueValid(value)) {
             return of(new TypeError(
-              this.table.getSchemaAndTableName(),
+              this.table.getSqlSchemaAndTableName(),
                     this.columnName,
                     this.converter.getJavaType().getSimpleName(), value.getClass().getSimpleName()));
         }
@@ -103,7 +103,7 @@ public class Column {
             String string = (String) value;
             if (string != null && string.length() > this.columnSize) {
                 return of(new StringTooLongError(
-                        this.table.getSchemaAndTableName(), this.columnName, this.columnSize, string.length()));
+                        this.table.getSqlSchemaAndTableName(), this.columnName, this.columnSize, string.length()));
             }
         }
 
@@ -135,7 +135,7 @@ public class Column {
     @Override
     public String toString() {
         return "Column{" +
-                "table=" + table.getSchemaAndTableName() +
+                "table=" + table.getSqlSchemaAndTableName() +
                 ", name=" + columnName +
                 ", sqlType=" + SqlTypesNames.getName(sqlType) +
                 ", javaType=" + converter.getJavaType().getCanonicalName() +

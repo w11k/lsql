@@ -156,29 +156,40 @@ public class LSql {
     /**
      * Returns a Table instance.
      *
-     * @param schemaAndTableName the table name (Java identifier format)
+     * @param javaSchemaAndTableName the table name (Java identifier format)
      * @return the Table instance
      */
-    public synchronized Table table(String schemaAndTableName) {
+    public synchronized Table table(String javaSchemaAndTableName) {
+        return this.tableBySqlName(this.identifierJavaToSql(javaSchemaAndTableName));
+    }
+
+    /**
+     * Returns a Table instance.
+     *
+     * @param sqlSchemaAndTableName the table name (SQL identifier format)
+     * @return the Table instance
+     */
+    public synchronized Table tableBySqlName(String sqlSchemaAndTableName) {
         // check existing table names
-        if (!schemaAndTableName.contains(".")) {
+        if (!sqlSchemaAndTableName.contains(".")) {
             for (Table table : tables.values()) {
-                if (table.getTableName().equals(schemaAndTableName)) {
+                if (table.getTableName().equals(sqlSchemaAndTableName)) {
                     return table;
                 }
             }
         }
 
-        if (!this.tables.containsKey(schemaAndTableName)) {
-            Table table = new Table(this, schemaAndTableName);
-            this.tables.put(table.getSchemaAndTableName(), table);
-            schemaAndTableName = table.getSchemaAndTableName();
+        if (!this.tables.containsKey(sqlSchemaAndTableName)) {
+            Table table = new Table(this, sqlSchemaAndTableName);
+            this.tables.put(table.getSqlSchemaAndTableName(), table);
+            sqlSchemaAndTableName = table.getSqlSchemaAndTableName();
         }
 
-        return this.tables.get(schemaAndTableName);
+        return this.tables.get(sqlSchemaAndTableName);
     }
 
     @SuppressWarnings("unchecked")
+    @Deprecated
     public synchronized <T> PojoTable<T> table(String tableName, Class<T> pojoClass) {
         if (!this.pojoTables.containsKey(pojoClass)) {
             this.pojoTables.put(pojoClass, new PojoTable<>(table(tableName), pojoClass));
@@ -186,29 +197,6 @@ public class LSql {
 
         return (PojoTable<T>) this.pojoTables.get(pojoClass);
     }
-
-//    public void fetchMetaDataForAllTables() throws SQLException {
-//        Connection con = ConnectionUtils.getConnection(this);
-//        DatabaseMetaData md = con.getMetaData();
-//
-//        ResultSet tables = md.getTables(null, null, null, new String[]{"TABLE"});
-//        try {
-//            List<String> foundTables = Lists.newLinkedList();
-//            while (tables.next()) {
-//                String sqlTableName = tables.getString(3);
-//                String javaTableName = identifierSqlToJava(sqlTableName);
-//                foundTables.add(javaTableName);
-//            }
-//
-//            for (String foundTable : foundTables) {
-//                Table table = table(foundTable);
-//                this.logger.debug("Reading table " + table.getSchemaAndTableName());
-//            }
-//        } catch (Exception e) {
-//            this.logger.warn(e.getMessage());
-//        }
-//    }
-
 
     /**
      * Executes the SQL string.

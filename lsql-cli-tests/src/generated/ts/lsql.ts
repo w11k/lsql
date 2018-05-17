@@ -1,38 +1,12 @@
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Person1_Row {
-        id: number;
-        firstName?: string;
+    export interface Custom_Converter_Row {
+        field?: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Person1_Map {
-        id: number;
-        first_name?: string;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface A_Table_Row {
-        id: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface A_Table_Map {
-        id: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Checks_Row {
-        yesno: boolean;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Checks_Map {
-        yesno: boolean;
+    export interface Custom_Converter_Map {
+        field?: number;
     }
 }
 
@@ -52,6 +26,32 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
     }
 }
 
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface A_Table_Row {
+        id: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface A_Table_Map {
+        id: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Person1_Row {
+        id: number;
+        firstName?: string;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Person1_Map {
+        id: number;
+        first_name?: string;
+    }
+}
+
 export namespace com_w11k_lsql_cli_tests_schema_schema2 {
     export interface Table_A_Row {
         id: number;
@@ -67,14 +67,14 @@ export namespace com_w11k_lsql_cli_tests_schema_schema2 {
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Custom_Converter_Row {
-        field?: number;
+    export interface Checks_Row {
+        yesno: boolean;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Custom_Converter_Map {
-        field?: number;
+    export interface Checks_Map {
+        yesno: boolean;
     }
 }
 
