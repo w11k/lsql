@@ -1,4 +1,10 @@
 
+**0.33.0**
+
+- Core: Table#insert(): values for the primary columns are removed if they are `null`
+- CLI: Added support for schemas
+
+
 **0.32.10**
 
 - fixed reading of table meta datas

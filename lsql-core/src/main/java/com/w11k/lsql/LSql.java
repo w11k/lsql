@@ -6,13 +6,11 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.GenericDialect;
 import com.w11k.lsql.dialects.StatementCreator;
 import com.w11k.lsql.jdbc.ConnectionProviders;
-import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
@@ -24,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -190,27 +187,27 @@ public class LSql {
         return (PojoTable<T>) this.pojoTables.get(pojoClass);
     }
 
-    public void fetchMetaDataForAllTables() throws SQLException {
-        Connection con = ConnectionUtils.getConnection(this);
-        DatabaseMetaData md = con.getMetaData();
-
-        ResultSet tables = md.getTables(null, null, null, new String[]{"TABLE"});
-        try {
-            List<String> foundTables = Lists.newLinkedList();
-            while (tables.next()) {
-                String sqlTableName = tables.getString(3);
-                String javaTableName = identifierSqlToJava(sqlTableName);
-                foundTables.add(javaTableName);
-            }
-
-            for (String foundTable : foundTables) {
-                Table table = table(foundTable);
-                this.logger.debug("Reading table " + table.getSchemaAndTableName());
-            }
-        } catch (Exception e) {
-            this.logger.warn(e.getMessage());
-        }
-    }
+//    public void fetchMetaDataForAllTables() throws SQLException {
+//        Connection con = ConnectionUtils.getConnection(this);
+//        DatabaseMetaData md = con.getMetaData();
+//
+//        ResultSet tables = md.getTables(null, null, null, new String[]{"TABLE"});
+//        try {
+//            List<String> foundTables = Lists.newLinkedList();
+//            while (tables.next()) {
+//                String sqlTableName = tables.getString(3);
+//                String javaTableName = identifierSqlToJava(sqlTableName);
+//                foundTables.add(javaTableName);
+//            }
+//
+//            for (String foundTable : foundTables) {
+//                Table table = table(foundTable);
+//                this.logger.debug("Reading table " + table.getSchemaAndTableName());
+//            }
+//        } catch (Exception e) {
+//            this.logger.warn(e.getMessage());
+//        }
+//    }
 
 
     /**

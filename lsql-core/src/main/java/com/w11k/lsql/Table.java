@@ -148,6 +148,15 @@ public class Table {
      */
     public Optional<Object> insert(Row row) {
         try {
+            // remove the primary key column value if the value is null
+            if (this.primaryKeyColumn.isPresent()) {
+                String pkColumn = this.primaryKeyColumn.get();
+                if (row.containsKey(pkColumn) && row.get(pkColumn) == null) {
+                    row = new Row(row);
+                    row.remove(pkColumn);
+                }
+            }
+
             List<String> columns = createColumnList(row, false);
 
             PreparedStatement ps =

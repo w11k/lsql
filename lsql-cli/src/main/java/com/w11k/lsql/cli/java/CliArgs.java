@@ -15,6 +15,7 @@ public final class CliArgs {
             .put("url", "JDBC database url")
             .put("user", "JDBC database user")
             .put("password", "JDBC database password")
+            .put("schema", "comma separated list of schemas, omit to use default schema")
             .put("package", "root package for all generated classes")
             .put("sqlStatements", "root directory that contains SQL statement files")
             .put("dto", "root directory that contains Java files with embedded DTO declarations")
@@ -32,6 +33,8 @@ public final class CliArgs {
     private String user;
 
     private String password;
+
+    private String schema;
 
     private String genPackageName;
 
@@ -72,6 +75,8 @@ public final class CliArgs {
                     this.user = value;
                 } else if (key.equals("password")) {
                     this.password = value;
+                } else if (key.equals("schema")) {
+                    this.schema = value;
                 } else if (key.equals("package")) {
                     this.genPackageName = value;
                 } else if (key.equals("sqlStatements")) {
@@ -121,6 +126,10 @@ public final class CliArgs {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getSchema() {
+        return schema;
     }
 
     public String getGenPackageName() {

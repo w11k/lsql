@@ -61,6 +61,18 @@ public class TableTest extends AbstractLSqlTest {
         assertEquals(insertedRow.getString("name"), "cus1");
     }
 
+    @Test
+    public void insertRemovesNullIdValueInRow() throws SQLException {
+        createTable("CREATE TABLE table1 (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT)");
+        Table table1 = lSql.table("table1");
+
+        Row row = new Row().addKeyVals("id", null, "name", "cus1");
+        table1.insert(row);
+
+        Row insertedRow = table1.load(1).get();
+        assertEquals(insertedRow.getString("name"), "cus1");
+    }
+
     @Test(expectedExceptions = DatabaseAccessException.class)
     public void insertFailsOnWrongColumnName() throws SQLException {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT)");

@@ -48,11 +48,11 @@ public class Main {
         log("JDBC URL:", cliArgs.getUrl(), "\n");
 
         LSql lSql = new LSql(configClass, ConnectionProviders.fromInstance(connection));
-        lSql.fetchMetaDataForAllTables();
+//        lSql.fetchMetaDataForAllTables();
 
         JavaExporter javaExporter = null;
         if (cliArgs.getOutDirJava() != null) {
-            javaExporter = new JavaExporter(lSql);
+            javaExporter = new JavaExporter(lSql, cliArgs.getSchema());
             javaExporter.setPackageName(cliArgs.getGenPackageName());
             javaExporter.setOutputDir(new File(cliArgs.getOutDirJava()));
             javaExporter.setGuice(cliArgs.isDiGuice());

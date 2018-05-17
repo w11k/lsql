@@ -1,12 +1,17 @@
 package com.w11k.lsql.cli.java;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.jdbc.ConnectionUtils;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,9 +34,50 @@ public class JavaExporter {
 
     private List<DataClassMeta> generatedDataClasses = emptyList();
 
-    public JavaExporter(LSql lSql) {
+    public JavaExporter(LSql lSql, String schemas) {
         this.lSql = lSql;
+        this.fetchMetaDataForAllTables(schemas);
     }
+
+    private void fetchMetaDataForAllTables(String schemas) {
+        try {
+            Connection con = ConnectionUtils.getConnection(this.lSql);
+            DatabaseMetaData md = con.getMetaData();
+
+            List<String> foundTables = Lists.newLinkedList();
+
+            if (schemas == null) {
+                foundTables.addAll(this.fetchMetaDataForSchema(md, null));
+            } else {
+                Iterable<String> schemaList = Splitter.on(",").omitEmptyStrings().trimResults().split(schemas);
+                for (String schema : schemaList) {
+                    foundTables.addAll(this.fetchMetaDataForSchema(md, schema));
+                }
+            }
+
+            for (String foundTable : foundTables) {
+                this.lSql.table(foundTable);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<String> fetchMetaDataForSchema(DatabaseMetaData md, String schema) {
+        try {
+            ResultSet tables = md.getTables(null, schema, null, new String[]{"TABLE"});
+            List<String> foundTables = Lists.newLinkedList();
+            while (tables.next()) {
+                String sqlTableName = tables.getString(3);
+                String javaTableName = this.lSql.identifierSqlToJava(sqlTableName);
+                foundTables.add(javaTableName);
+            }
+            return foundTables;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public void setStatementFileExporters(List<StatementFileExporter> statementFileExporters) {
         this.statementFileExporters = statementFileExporters;
@@ -125,12 +171,12 @@ public class JavaExporter {
         this.packageName = packageName;
     }
 
-    public void setOutputDir(File outputDir) {
-        this.outputDir = outputDir;
-    }
-
     public File getOutputDir() {
         return outputDir;
+    }
+
+    public void setOutputDir(File outputDir) {
+        this.outputDir = outputDir;
     }
 
     public boolean isGuice() {
