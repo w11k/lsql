@@ -68,9 +68,16 @@ public class JavaExporter {
             ResultSet tables = md.getTables(null, schema, null, new String[]{"TABLE"});
             List<String> foundTables = Lists.newLinkedList();
             while (tables.next()) {
+                String sqlSchemaName = tables.getString(2);
+                String javaSchemaName = this.lSql.identifierSqlToJava(sqlSchemaName);
                 String sqlTableName = tables.getString(3);
                 String javaTableName = this.lSql.identifierSqlToJava(sqlTableName);
-                foundTables.add(javaTableName);
+
+                if (javaSchemaName != null) {
+                    foundTables.add(javaSchemaName + "." + javaTableName);
+                } else {
+                    foundTables.add(javaTableName);
+                }
             }
             return foundTables;
         } catch (Exception e) {

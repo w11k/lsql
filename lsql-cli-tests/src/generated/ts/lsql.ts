@@ -52,6 +52,20 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
     }
 }
 
+export namespace com_w11k_lsql_cli_tests_schema_schema2 {
+    export interface Table_A_Row {
+        id: number;
+        col1?: string;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_schema2 {
+    export interface Table_A_Map {
+        id: number;
+        col1?: string;
+    }
+}
+
 export namespace com_w11k_lsql_cli_tests_schema_public {
     export interface Custom_Converter_Row {
         field?: number;
