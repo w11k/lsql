@@ -75,7 +75,9 @@ public abstract class TypedTable<T extends TableRow, I> {
 
     public T updateWith(I id, Function<T, T> with) {
         Optional<T> load = this.load(id);
-        return with.apply(load.get());
+        T updated = with.apply(load.get());
+        this.update(updated);
+        return updated;
     }
 
     @SuppressWarnings("unchecked")
