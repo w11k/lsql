@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.base.Optional;
 
 import java.util.Map;
+import java.util.function.Function;
 
 public abstract class TypedTable<T extends TableRow, I> {
 
@@ -70,6 +71,11 @@ public abstract class TypedTable<T extends TableRow, I> {
     public void updateWhere(T instance, Map<String, Object> where) {
         Map<String, Object> map = instance.toInternalMap();
         this.table.updateWhere(new Row(map), new Row(where));
+    }
+
+    public T updateWith(I id, Function<T, T> with) {
+        Optional<T> load = this.load(id);
+        return with.apply(load.get());
     }
 
     @SuppressWarnings("unchecked")
