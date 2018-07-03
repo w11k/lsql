@@ -4,6 +4,8 @@ import com.w11k.lsql.cli.tests.StmtsWithCustomConverter;
 import com.w11k.lsql.cli.tests.TestCliConfig;
 import com.w11k.lsql.cli.tests.schema_public.Custom_Converter_Row;
 import com.w11k.lsql.cli.tests.schema_public.Custom_Converter_Table;
+import com.w11k.lsql.cli.tests.schema_public.Person1_Row;
+import com.w11k.lsql.cli.tests.schema_public.Person1_Table;
 import com.w11k.lsql.cli.tests.stmtswithcustomconverter.Load;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -25,5 +27,16 @@ public final class TestCliCustomConverterTest extends AbstractTestCliTest {
         Assert.assertEquals(loaded.field, new Integer(1));
     }
 
+    @Test
+    public void testQueryParameter() {
+        Person1_Table person1Table = new Person1_Table(this.lSql);
+        person1Table.insert(new Person1_Row()
+                .withId(1)
+                .withFirstName("Max"));
+
+        StmtsWithCustomConverter stmt = new StmtsWithCustomConverter(this.lSql);
+//        stmt.testQueryParamter()
+//                .withId("");
+    }
 
 }
