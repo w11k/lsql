@@ -79,23 +79,30 @@ All released files are stored in a Maven repository:
 ```{.language-xml}
 <repositories>
     <repository>
-        <id>lsql-repo</id>
-        <name>w11k Repository</name>
-        <url>http://mvn.w11k.com/releases</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+        <id>bintray-w11k-lsql</id>
+        <name>bintray</name>
+        <url>https://dl.bintray.com/w11k/lsql</url>
     </repository>
 </repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.w11k.lsql</groupId>
+        <artifactId>lsql-core</artifactId>
+        <version>...</version>
+    </dependency>
+    <dependency>
+        <groupId>com.w11k.lsql</groupId>
+        <artifactId>lsql-guice</artifactId>
+        <version>...</version>
+    </dependency>
+    <dependency>
+        <groupId>com.w11k.lsql</groupId>
+        <artifactId>lsql-cli</artifactId>
+        <version>...</version>
+    </dependency>
+</dependencies>
 ```
-
-Add the following dependency to your POM. The latest version number can always be found here:
-
-[Latest Released Version](https://raw.github.com/w11k/lsql/master/LATEST_RELEASED_VERSION)
-
-```{.language-xml}
-<dependency>
-    <groupId>com.w11k.lsql</groupId>
-    <artifactId>lsql-core</artifactId>
-    <version>{{see link above for the latest version}} </version>
-</dependency>
-```
-
-
