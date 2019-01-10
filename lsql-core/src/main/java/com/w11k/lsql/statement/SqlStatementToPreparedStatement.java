@@ -179,7 +179,7 @@ public class SqlStatementToPreparedStatement {
             // find word left from OUT_TYPE_ANNOTATION
             String alias = matcher.group(2);
             String textBeforeAlias = this.sqlString.substring(0, matcher.start(1)).trim();
-            LinkedList<String> wordsBeforeAlias = newLinkedList(on(anyOf(" ,\t")).split(textBeforeAlias));
+            LinkedList<String> wordsBeforeAlias = newLinkedList(on(anyOf(" ,\t\n")).split(textBeforeAlias));
             String wordLeft = wordsBeforeAlias.getLast();
 
             // unquote ResultSet column alias

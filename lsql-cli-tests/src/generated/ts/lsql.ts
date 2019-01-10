@@ -78,32 +78,6 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
     }
 }
 
-export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface Load_Row {
-        field?: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface Load_Map {
-        field?: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface TestQueryParamter_Row {
-        id: number;
-        firstName?: string;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
-    export interface TestQueryParamter_Map {
-        id: number;
-        first_name?: string;
-    }
-}
-
 export namespace com_w11k_lsql_cli_tests_stmts1 {
     export interface LoadAllPersonsEscaped2_Row {
         theid: number;
@@ -183,6 +157,32 @@ export namespace com_w11k_lsql_cli_tests_subdir_subsubdir_stmtscamelcase2 {
         id: number;
         first_name?: string;
         age?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
+    export interface Load_Row {
+        field?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
+    export interface Load_Map {
+        field?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
+    export interface TestQueryParamter_Row {
+        id: number;
+        firstName?: string;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_stmtswithcustomconverter {
+    export interface TestQueryParamter_Map {
+        id: number;
+        first_name?: string;
     }
 }
 
