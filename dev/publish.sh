@@ -29,7 +29,7 @@ dev/get_current_version.sh > LATEST_RELEASED_VERSION
 # Commit and push
 git add --all
 git commit -m "new release `dev/get_current_version.sh`"
-git push origin master
+git push --tags origin master
 
 # Deploy
 mvn -Dmaven.test.skip=true deploy
