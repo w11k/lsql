@@ -15,23 +15,23 @@ public class StmtsWithCustomConverter {
      * where field = &#42;&#47;: custom =&#47;&#42; 1 &#42;&#47;&#47;&#42;<br>
      * ;<br>
     */
-    public load load() {
-        return new load();
+    public loadQuery load() {
+        return new loadQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class load extends com.w11k.lsql.TypedStatementQuery<Load> implements com.w11k.lsql.TableRow, Field_Com_W11k_Lsql_Cli_Tests_Testcliconfig_Customtype {
+    public final class loadQuery extends com.w11k.lsql.TypedStatementQuery<Load> implements com.w11k.lsql.TableRow, Field_Com_W11k_Lsql_Cli_Tests_Testcliconfig_Customtype {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public load() {
+        public loadQuery() {
             super(lSql, sql_load);
             this.field = null;
         }
 
         @SuppressWarnings("NullableProblems")
-        private load(
+        private loadQuery(
                 com.w11k.lsql.cli.tests.TestCliConfig.CustomType field) {
             super(lSql, sql_load);
             this.field = field;
@@ -45,8 +45,8 @@ public class StmtsWithCustomConverter {
             return this.field;
         }
 
-        public load withField(@javax.annotation.Nullable com.w11k.lsql.cli.tests.TestCliConfig.CustomType field) {
-            return new load(field);
+        public loadQuery withField(@javax.annotation.Nullable com.w11k.lsql.cli.tests.TestCliConfig.CustomType field) {
+            return new loadQuery(field);
         }
 
         // class methods ----------
@@ -69,7 +69,7 @@ public class StmtsWithCustomConverter {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            load that = (load) o;
+            loadQuery that = (loadQuery) o;
             return     Objects.equals(field, that.field);
         }
 
@@ -80,7 +80,7 @@ public class StmtsWithCustomConverter {
 
         @Override
         public String toString() {
-            return "load{" + "field=" + field + "}";
+            return "loadQuery{" + "field=" + field + "}";
         }
 
         protected Load createTypedRow(com.w11k.lsql.Row row) {
@@ -112,23 +112,23 @@ public class StmtsWithCustomConverter {
      * person1<br>
      * WHERE id = &#42;&#47;=&#47;&#42; 1 &#42;&#47;&#47;&#42;;<br>
     */
-    public testQueryParamter testQueryParamter() {
-        return new testQueryParamter();
+    public testQueryParamterQuery testQueryParamter() {
+        return new testQueryParamterQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class testQueryParamter extends com.w11k.lsql.TypedStatementQuery<TestQueryParamter> implements com.w11k.lsql.TableRow, Id_Number {
+    public final class testQueryParamterQuery extends com.w11k.lsql.TypedStatementQuery<TestQueryParamter> implements com.w11k.lsql.TableRow, Id_Number {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public testQueryParamter() {
+        public testQueryParamterQuery() {
             super(lSql, sql_testQueryParamter);
             this.id = null;
         }
 
         @SuppressWarnings("NullableProblems")
-        private testQueryParamter(
+        private testQueryParamterQuery(
                 java.lang.Number id) {
             super(lSql, sql_testQueryParamter);
             this.id = id;
@@ -142,8 +142,8 @@ public class StmtsWithCustomConverter {
             return this.id;
         }
 
-        public testQueryParamter withId(@javax.annotation.Nullable java.lang.Number id) {
-            return new testQueryParamter(id);
+        public testQueryParamterQuery withId(@javax.annotation.Nullable java.lang.Number id) {
+            return new testQueryParamterQuery(id);
         }
 
         // class methods ----------
@@ -166,7 +166,7 @@ public class StmtsWithCustomConverter {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            testQueryParamter that = (testQueryParamter) o;
+            testQueryParamterQuery that = (testQueryParamterQuery) o;
             return     Objects.equals(id, that.id);
         }
 
@@ -177,7 +177,7 @@ public class StmtsWithCustomConverter {
 
         @Override
         public String toString() {
-            return "testQueryParamter{" + "id=" + id + "}";
+            return "testQueryParamterQuery{" + "id=" + id + "}";
         }
 
         protected TestQueryParamter createTypedRow(com.w11k.lsql.Row row) {

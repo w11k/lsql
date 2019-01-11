@@ -1,4 +1,9 @@
 
+**0.33.5**
+
+- append `Query` to generated query class names
+
+
 **0.33.0**
 
 - Core: Table#insert(): values for the primary columns are removed if they are `null`

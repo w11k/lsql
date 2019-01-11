@@ -11,6 +11,8 @@ import static com.w11k.lsql.cli.CodeGenUtils.*;
 
 public final class TypedStatementExporter {
 
+    private final String statementClassNameSuffix = "Query";
+
     private final JavaExporter javaExporter;
 
     private final TypedStatementMeta typedStatementMeta;
@@ -24,22 +26,23 @@ public final class TypedStatementExporter {
     public List<DataClassExporter> export(StringBuilder content) {
         List<DataClassExporter> dataClassExportersForQueryParams = Lists.newLinkedList();
 
-        String queryClassName = this.typedStatementMeta.getStatement().getStatementName();
+        String statementName = this.typedStatementMeta.getStatement().getStatementName();
+        String statementQueryClassName = statementName + this.statementClassNameSuffix;
 
         boolean isVoid = this.typedStatementMeta.getStatement().getTypeAnnotation().toLowerCase().equals("void");
-        String rowClassName = !isVoid ? firstCharUpperCase(queryClassName) : Void.class.getCanonicalName();
+        String rowClassName = !isVoid ? firstCharUpperCase(statementName) : Void.class.getCanonicalName();
 
         // SQL string for query
         content.append("    private final String sql_")
-                .append(queryClassName).append(" = ")
+                .append(statementName).append(" = ")
                 .append("\"").append(escapeSqlStringForJavaSourceFile(this.typedStatementMeta.getStatement().getSqlString())).append("\";\n\n");
 
-        // create query
+        // factory function for query
         content.append("    /**");
         content.append("    ").append(escapeSqlStringForJavaDoc(this.typedStatementMeta.getStatement().getSqlString()));
         content.append("    */\n");
-        content.append("    public ").append(queryClassName).append(" ").append(queryClassName).append("() {\n")
-                .append("        return ").append("new ").append(queryClassName).append("();\n")
+        content.append("    public ").append(statementQueryClassName).append(" ").append(statementName).append("() {\n")
+                .append("        return ").append("new ").append(statementQueryClassName).append("();\n")
                 .append("    }\n\n");
 
         // extends clause
@@ -54,10 +57,10 @@ public final class TypedStatementExporter {
         }
 
         // constructor body
-        String constructorBody = "super(lSql, sql_" + queryClassName + ");";
+        String constructorBody = "super(lSql, sql_" + statementName + ");";
 
         DataClassMeta dcm = new DataClassMeta(
-                queryClassName, "");
+                statementName, "");
 
         // query parameter
         for (String parameterName : this.typedStatementMeta.getParameters().keySet()) {
@@ -69,7 +72,7 @@ public final class TypedStatementExporter {
             dcm.addField(javaName, parameterName, paramType);
         }
 
-        DataClassExporter dcExporter = new DataClassExporter(this.javaExporter, dcm, "");
+        DataClassExporter dcExporter = new DataClassExporter(this.javaExporter, dcm, this.statementClassNameSuffix);
         dataClassExportersForQueryParams.add(dcExporter);
         dcExporter.setIndent(4);
         dcExporter.createClass(

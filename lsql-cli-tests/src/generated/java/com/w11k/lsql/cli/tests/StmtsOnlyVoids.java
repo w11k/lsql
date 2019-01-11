@@ -14,23 +14,23 @@ public class StmtsOnlyVoids {
      * SET yesno = &#42;&#47;=&#47;&#42; TRUE &#42;&#47;&#47;&#42;<br>
      * ;<br>
     */
-    public statementA statementA() {
-        return new statementA();
+    public statementAQuery statementA() {
+        return new statementAQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class statementA extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
+    public final class statementAQuery extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public statementA() {
+        public statementAQuery() {
             super(lSql, sql_statementA);
             this.yesno = null;
         }
 
         @SuppressWarnings("NullableProblems")
-        private statementA(
+        private statementAQuery(
                 java.lang.Boolean yesno) {
             super(lSql, sql_statementA);
             this.yesno = yesno;
@@ -44,8 +44,8 @@ public class StmtsOnlyVoids {
             return this.yesno;
         }
 
-        public statementA withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
-            return new statementA(yesno);
+        public statementAQuery withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
+            return new statementAQuery(yesno);
         }
 
         // class methods ----------
@@ -68,7 +68,7 @@ public class StmtsOnlyVoids {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            statementA that = (statementA) o;
+            statementAQuery that = (statementAQuery) o;
             return     Objects.equals(yesno, that.yesno);
         }
 
@@ -79,7 +79,7 @@ public class StmtsOnlyVoids {
 
         @Override
         public String toString() {
-            return "statementA{" + "yesno=" + yesno + "}";
+            return "statementAQuery{" + "yesno=" + yesno + "}";
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -105,23 +105,23 @@ public class StmtsOnlyVoids {
      * SET yesno = &#42;&#47;=&#47;&#42; TRUE &#42;&#47;&#47;&#42;<br>
      * ;<br>
     */
-    public statementB statementB() {
-        return new statementB();
+    public statementBQuery statementB() {
+        return new statementBQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class statementB extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
+    public final class statementBQuery extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public statementB() {
+        public statementBQuery() {
             super(lSql, sql_statementB);
             this.yesno = null;
         }
 
         @SuppressWarnings("NullableProblems")
-        private statementB(
+        private statementBQuery(
                 java.lang.Boolean yesno) {
             super(lSql, sql_statementB);
             this.yesno = yesno;
@@ -135,8 +135,8 @@ public class StmtsOnlyVoids {
             return this.yesno;
         }
 
-        public statementB withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
-            return new statementB(yesno);
+        public statementBQuery withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
+            return new statementBQuery(yesno);
         }
 
         // class methods ----------
@@ -159,7 +159,7 @@ public class StmtsOnlyVoids {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            statementB that = (statementB) o;
+            statementBQuery that = (statementBQuery) o;
             return     Objects.equals(yesno, that.yesno);
         }
 
@@ -170,7 +170,7 @@ public class StmtsOnlyVoids {
 
         @Override
         public String toString() {
-            return "statementB{" + "yesno=" + yesno + "}";
+            return "statementBQuery{" + "yesno=" + yesno + "}";
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {

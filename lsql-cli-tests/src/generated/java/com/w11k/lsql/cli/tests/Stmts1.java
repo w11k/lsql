@@ -15,17 +15,17 @@ public class Stmts1 {
      * person1.id as "theId" &#42;&#47;:int&#47;&#42;<br>
      * from person1;<br>
     */
-    public loadAllPersonsEscaped2 loadAllPersonsEscaped2() {
-        return new loadAllPersonsEscaped2();
+    public loadAllPersonsEscaped2Query loadAllPersonsEscaped2() {
+        return new loadAllPersonsEscaped2Query();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadAllPersonsEscaped2 extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsEscaped2> implements com.w11k.lsql.TableRow {
+    public final class loadAllPersonsEscaped2Query extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsEscaped2> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public loadAllPersonsEscaped2() {
+        public loadAllPersonsEscaped2Query() {
             super(lSql, sql_loadAllPersonsEscaped2);
         }
 
@@ -50,18 +50,18 @@ public class Stmts1 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            loadAllPersonsEscaped2 that = (loadAllPersonsEscaped2) o;
+            loadAllPersonsEscaped2Query that = (loadAllPersonsEscaped2Query) o;
             return true;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash("loadAllPersonsEscaped2");
+            return Objects.hash("loadAllPersonsEscaped2Query");
         }
 
         @Override
         public String toString() {
-            return "loadAllPersonsEscaped2{" + "" + "}";
+            return "loadAllPersonsEscaped2Query{" + "" + "}";
         }
 
         protected LoadAllPersonsEscaped2 createTypedRow(com.w11k.lsql.Row row) {
@@ -89,17 +89,17 @@ public class Stmts1 {
     /**    
      * select * from person1;<br>
     */
-    public loadAllPersons loadAllPersons() {
-        return new loadAllPersons();
+    public loadAllPersonsQuery loadAllPersons() {
+        return new loadAllPersonsQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadAllPersons extends com.w11k.lsql.TypedStatementQuery<LoadAllPersons> implements com.w11k.lsql.TableRow {
+    public final class loadAllPersonsQuery extends com.w11k.lsql.TypedStatementQuery<LoadAllPersons> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public loadAllPersons() {
+        public loadAllPersonsQuery() {
             super(lSql, sql_loadAllPersons);
         }
 
@@ -124,18 +124,18 @@ public class Stmts1 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            loadAllPersons that = (loadAllPersons) o;
+            loadAllPersonsQuery that = (loadAllPersonsQuery) o;
             return true;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash("loadAllPersons");
+            return Objects.hash("loadAllPersonsQuery");
         }
 
         @Override
         public String toString() {
-            return "loadAllPersons{" + "" + "}";
+            return "loadAllPersonsQuery{" + "" + "}";
         }
 
         protected LoadAllPersons createTypedRow(com.w11k.lsql.Row row) {
@@ -165,17 +165,17 @@ public class Stmts1 {
      * person1.id as theId &#42;&#47;:int&#47;&#42;<br>
      * from person1;<br>
     */
-    public loadAllPersonsEscaped1 loadAllPersonsEscaped1() {
-        return new loadAllPersonsEscaped1();
+    public loadAllPersonsEscaped1Query loadAllPersonsEscaped1() {
+        return new loadAllPersonsEscaped1Query();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadAllPersonsEscaped1 extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsEscaped1> implements com.w11k.lsql.TableRow {
+    public final class loadAllPersonsEscaped1Query extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsEscaped1> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public loadAllPersonsEscaped1() {
+        public loadAllPersonsEscaped1Query() {
             super(lSql, sql_loadAllPersonsEscaped1);
         }
 
@@ -200,18 +200,18 @@ public class Stmts1 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            loadAllPersonsEscaped1 that = (loadAllPersonsEscaped1) o;
+            loadAllPersonsEscaped1Query that = (loadAllPersonsEscaped1Query) o;
             return true;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash("loadAllPersonsEscaped1");
+            return Objects.hash("loadAllPersonsEscaped1Query");
         }
 
         @Override
         public String toString() {
-            return "loadAllPersonsEscaped1{" + "" + "}";
+            return "loadAllPersonsEscaped1Query{" + "" + "}";
         }
 
         protected LoadAllPersonsEscaped1 createTypedRow(com.w11k.lsql.Row row) {
@@ -242,17 +242,17 @@ public class Stmts1 {
      * person1.first_name as "aField" &#42;&#47;:string&#47;&#42;<br>
      * from person1;<br>
     */
-    public keepUnderscoreForCamelCase keepUnderscoreForCamelCase() {
-        return new keepUnderscoreForCamelCase();
+    public keepUnderscoreForCamelCaseQuery keepUnderscoreForCamelCase() {
+        return new keepUnderscoreForCamelCaseQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class keepUnderscoreForCamelCase extends com.w11k.lsql.TypedStatementQuery<KeepUnderscoreForCamelCase> implements com.w11k.lsql.TableRow {
+    public final class keepUnderscoreForCamelCaseQuery extends com.w11k.lsql.TypedStatementQuery<KeepUnderscoreForCamelCase> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public keepUnderscoreForCamelCase() {
+        public keepUnderscoreForCamelCaseQuery() {
             super(lSql, sql_keepUnderscoreForCamelCase);
         }
 
@@ -277,18 +277,18 @@ public class Stmts1 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            keepUnderscoreForCamelCase that = (keepUnderscoreForCamelCase) o;
+            keepUnderscoreForCamelCaseQuery that = (keepUnderscoreForCamelCaseQuery) o;
             return true;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash("keepUnderscoreForCamelCase");
+            return Objects.hash("keepUnderscoreForCamelCaseQuery");
         }
 
         @Override
         public String toString() {
-            return "keepUnderscoreForCamelCase{" + "" + "}";
+            return "keepUnderscoreForCamelCaseQuery{" + "" + "}";
         }
 
         protected KeepUnderscoreForCamelCase createTypedRow(com.w11k.lsql.Row row) {
@@ -320,23 +320,23 @@ public class Stmts1 {
      * WHERE<br>
      * person1.id = &#42;&#47;=&#47;&#42; 1 &#42;&#47;&#47;&#42;;<br>
     */
-    public queryParamsWithDot queryParamsWithDot() {
-        return new queryParamsWithDot();
+    public queryParamsWithDotQuery queryParamsWithDot() {
+        return new queryParamsWithDotQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class queryParamsWithDot extends com.w11k.lsql.TypedStatementQuery<QueryParamsWithDot> implements com.w11k.lsql.TableRow, Person1Id_Number {
+    public final class queryParamsWithDotQuery extends com.w11k.lsql.TypedStatementQuery<QueryParamsWithDot> implements com.w11k.lsql.TableRow, Person1Id_Number {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public queryParamsWithDot() {
+        public queryParamsWithDotQuery() {
             super(lSql, sql_queryParamsWithDot);
             this.person1Id = null;
         }
 
         @SuppressWarnings("NullableProblems")
-        private queryParamsWithDot(
+        private queryParamsWithDotQuery(
                 java.lang.Number person1Id) {
             super(lSql, sql_queryParamsWithDot);
             this.person1Id = person1Id;
@@ -350,8 +350,8 @@ public class Stmts1 {
             return this.person1Id;
         }
 
-        public queryParamsWithDot withPerson1Id(@javax.annotation.Nullable java.lang.Number person1Id) {
-            return new queryParamsWithDot(person1Id);
+        public queryParamsWithDotQuery withPerson1Id(@javax.annotation.Nullable java.lang.Number person1Id) {
+            return new queryParamsWithDotQuery(person1Id);
         }
 
         // class methods ----------
@@ -374,7 +374,7 @@ public class Stmts1 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            queryParamsWithDot that = (queryParamsWithDot) o;
+            queryParamsWithDotQuery that = (queryParamsWithDotQuery) o;
             return     Objects.equals(person1Id, that.person1Id);
         }
 
@@ -385,7 +385,7 @@ public class Stmts1 {
 
         @Override
         public String toString() {
-            return "queryParamsWithDot{" + "person1Id=" + person1Id + "}";
+            return "queryParamsWithDotQuery{" + "person1Id=" + person1Id + "}";
         }
 
         protected QueryParamsWithDot createTypedRow(com.w11k.lsql.Row row) {
@@ -415,23 +415,23 @@ public class Stmts1 {
      * SET yesno = &#42;&#47;=&#47;&#42; TRUE &#42;&#47;&#47;&#42;<br>
      * ;<br>
     */
-    public changeYesno changeYesno() {
-        return new changeYesno();
+    public changeYesnoQuery changeYesno() {
+        return new changeYesnoQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class changeYesno extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
+    public final class changeYesnoQuery extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, Yesno_Boolean {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public changeYesno() {
+        public changeYesnoQuery() {
             super(lSql, sql_changeYesno);
             this.yesno = null;
         }
 
         @SuppressWarnings("NullableProblems")
-        private changeYesno(
+        private changeYesnoQuery(
                 java.lang.Boolean yesno) {
             super(lSql, sql_changeYesno);
             this.yesno = yesno;
@@ -445,8 +445,8 @@ public class Stmts1 {
             return this.yesno;
         }
 
-        public changeYesno withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
-            return new changeYesno(yesno);
+        public changeYesnoQuery withYesno(@javax.annotation.Nullable java.lang.Boolean yesno) {
+            return new changeYesnoQuery(yesno);
         }
 
         // class methods ----------
@@ -469,7 +469,7 @@ public class Stmts1 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            changeYesno that = (changeYesno) o;
+            changeYesnoQuery that = (changeYesnoQuery) o;
             return     Objects.equals(yesno, that.yesno);
         }
 
@@ -480,7 +480,7 @@ public class Stmts1 {
 
         @Override
         public String toString() {
-            return "changeYesno{" + "yesno=" + yesno + "}";
+            return "changeYesnoQuery{" + "yesno=" + yesno + "}";
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {

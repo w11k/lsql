@@ -20,24 +20,24 @@ public class StmtsCamelCase2 {
      * and first_name = &#42;&#47;: string =&#47;&#42; 'name' &#42;&#47;&#47;&#42;<br>
      * ;<br>
     */
-    public loadPersonsByAgeAndFirstName loadPersonsByAgeAndFirstName() {
-        return new loadPersonsByAgeAndFirstName();
+    public loadPersonsByAgeAndFirstNameQuery loadPersonsByAgeAndFirstName() {
+        return new loadPersonsByAgeAndFirstNameQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadPersonsByAgeAndFirstName extends com.w11k.lsql.TypedStatementQuery<LoadPersonsByAgeAndFirstName> implements com.w11k.lsql.TableRow, First_Name_String, Age_Number {
+    public final class loadPersonsByAgeAndFirstNameQuery extends com.w11k.lsql.TypedStatementQuery<LoadPersonsByAgeAndFirstName> implements com.w11k.lsql.TableRow, First_Name_String, Age_Number {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public loadPersonsByAgeAndFirstName() {
+        public loadPersonsByAgeAndFirstNameQuery() {
             super(lSql, sql_loadPersonsByAgeAndFirstName);
             this.firstName = null;
             this.age = null;
         }
 
         @SuppressWarnings("NullableProblems")
-        private loadPersonsByAgeAndFirstName(
+        private loadPersonsByAgeAndFirstNameQuery(
                 java.lang.String firstName,
             java.lang.Number age) {
             super(lSql, sql_loadPersonsByAgeAndFirstName);
@@ -53,8 +53,8 @@ public class StmtsCamelCase2 {
             return this.firstName;
         }
 
-        public loadPersonsByAgeAndFirstName withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
-            return new loadPersonsByAgeAndFirstName(firstName,age);
+        public loadPersonsByAgeAndFirstNameQuery withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
+            return new loadPersonsByAgeAndFirstNameQuery(firstName,age);
         }
         @javax.annotation.Nullable public final java.lang.Number age;
 
@@ -62,8 +62,8 @@ public class StmtsCamelCase2 {
             return this.age;
         }
 
-        public loadPersonsByAgeAndFirstName withAge(@javax.annotation.Nullable java.lang.Number age) {
-            return new loadPersonsByAgeAndFirstName(firstName,age);
+        public loadPersonsByAgeAndFirstNameQuery withAge(@javax.annotation.Nullable java.lang.Number age) {
+            return new loadPersonsByAgeAndFirstNameQuery(firstName,age);
         }
 
         // class methods ----------
@@ -88,7 +88,7 @@ public class StmtsCamelCase2 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            loadPersonsByAgeAndFirstName that = (loadPersonsByAgeAndFirstName) o;
+            loadPersonsByAgeAndFirstNameQuery that = (loadPersonsByAgeAndFirstNameQuery) o;
             return     Objects.equals(firstName, that.firstName) && 
                 Objects.equals(age, that.age);
         }
@@ -100,7 +100,7 @@ public class StmtsCamelCase2 {
 
         @Override
         public String toString() {
-            return "loadPersonsByAgeAndFirstName{" + "firstName=" + firstName
+            return "loadPersonsByAgeAndFirstNameQuery{" + "firstName=" + firstName
                 + ", " + "age=" + age + "}";
         }
 
@@ -129,23 +129,23 @@ public class StmtsCamelCase2 {
     /**    
      * delete from person2 where first_name = &#42;&#47;=&#47;&#42; 'name' &#42;&#47;&#47;&#42;;<br>
     */
-    public deletePersonByFirstName deletePersonByFirstName() {
-        return new deletePersonByFirstName();
+    public deletePersonByFirstNameQuery deletePersonByFirstName() {
+        return new deletePersonByFirstNameQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class deletePersonByFirstName extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, First_Name_String {
+    public final class deletePersonByFirstNameQuery extends com.w11k.lsql.TypedStatementCommand implements com.w11k.lsql.TableRow, First_Name_String {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public deletePersonByFirstName() {
+        public deletePersonByFirstNameQuery() {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = null;
         }
 
         @SuppressWarnings("NullableProblems")
-        private deletePersonByFirstName(
+        private deletePersonByFirstNameQuery(
                 java.lang.String firstName) {
             super(lSql, sql_deletePersonByFirstName);
             this.firstName = firstName;
@@ -159,8 +159,8 @@ public class StmtsCamelCase2 {
             return this.firstName;
         }
 
-        public deletePersonByFirstName withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
-            return new deletePersonByFirstName(firstName);
+        public deletePersonByFirstNameQuery withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
+            return new deletePersonByFirstNameQuery(firstName);
         }
 
         // class methods ----------
@@ -183,7 +183,7 @@ public class StmtsCamelCase2 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            deletePersonByFirstName that = (deletePersonByFirstName) o;
+            deletePersonByFirstNameQuery that = (deletePersonByFirstNameQuery) o;
             return     Objects.equals(firstName, that.firstName);
         }
 
@@ -194,7 +194,7 @@ public class StmtsCamelCase2 {
 
         @Override
         public String toString() {
-            return "deletePersonByFirstName{" + "firstName=" + firstName + "}";
+            return "deletePersonByFirstNameQuery{" + "firstName=" + firstName + "}";
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
