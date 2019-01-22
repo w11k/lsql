@@ -582,6 +582,11 @@ public class Table {
             } else {
                 String idColumn = primaryKeys.getString(4);
                 this.primaryKeyColumn = of(lSql.identifierSqlToJava(idColumn));
+
+                // no support for compound keys yet
+                if (primaryKeys.next()) {
+                    this.primaryKeyColumn = absent();
+                }
             }
 
             // Fetch all columns

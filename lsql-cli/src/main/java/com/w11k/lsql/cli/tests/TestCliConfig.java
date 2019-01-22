@@ -52,6 +52,7 @@ public final class TestCliConfig extends Config {
         lSql.executeRawSql("create table person2 (id integer primary key, first_name text, age integer)");
         lSql.executeRawSql("create table a_table (id integer primary key)");
         lSql.executeRawSql("create table checks (yesno BOOLEAN NOT NULL);");
+        lSql.executeRawSql("create table table_with_two_keys (key1 integer, key2 integer, PRIMARY KEY (key1, key2))");
         lSql.executeRawSql("create table custom_converter (field INTEGER);");
         lSql.executeRawSql("create schema schema2;");
         lSql.executeRawSql("create table schema2.table_a (id integer primary key, col1 text)");

@@ -78,6 +78,20 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
     }
 }
 
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Table_With_Two_Keys_Row {
+        key1: number;
+        key2: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Table_With_Two_Keys_Map {
+        key1: number;
+        key2: number;
+    }
+}
+
 export namespace com_w11k_lsql_cli_tests_stmts1 {
     export interface LoadAllPersonsEscaped2_Row {
         theid: number;

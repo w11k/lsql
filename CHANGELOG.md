@@ -1,4 +1,9 @@
 
+**0.34.0**
+
+- correctly handles unsupported compound primary keys
+
+
 **0.33.5**
 
 - append `Query` to generated query class names
