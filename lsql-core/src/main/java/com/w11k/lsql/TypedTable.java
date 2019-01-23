@@ -4,20 +4,24 @@ import com.google.common.base.Optional;
 
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class TypedTable<T extends TableRow, I> {
 
-    private final Table table;
-//    private final Constructor<T> tableRowConstructor;
+    private Supplier<Table> table;
 
     public TypedTable(LSql lSql, String tableName, Class<T> tableRowClass) {
-        this.table = lSql.tableBySqlName(tableName);
+        this.setupLazyTableGetter(lSql, tableName);
+    }
 
-//        try {
-//            this.tableRowConstructor = tableRowClass.getConstructor(Map.class);
-//        } catch (NoSuchMethodException e) {
-//            throw new RuntimeException(e);
-//        }
+    private void setupLazyTableGetter(LSql lSql, String tableName) {
+        final Table[] tableInstance = new Table[1];
+        this.table = () -> {
+            if (tableInstance[0] == null) {
+                tableInstance[0] = lSql.tableBySqlName(tableName);
+            }
+            return tableInstance[0];
+        };
     }
 
     @SuppressWarnings("unchecked")
@@ -27,7 +31,7 @@ public abstract class TypedTable<T extends TableRow, I> {
         // Remove null values so that the DB can insert the default values
         map.entrySet().removeIf(entry -> entry.getValue() == null);
 
-        return (Optional<I>) this.table.insert(new Row(map));
+        return (Optional<I>) this.table.get().insert(new Row(map));
     }
 
     public T insertAndLoad(T instance) {
@@ -40,7 +44,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public Optional<T> load(I id) {
-        Optional<LinkedRow> row = this.table.load(id);
+        Optional<LinkedRow> row = this.table.get().load(id);
         if (!row.isPresent()) {
             return Optional.absent();
         }
@@ -56,21 +60,21 @@ public abstract class TypedTable<T extends TableRow, I> {
 
     public void delete(T instance) {
         Map<String, Object> map = instance.toInternalMap();
-        this.table.delete(new Row(map));
+        this.table.get().delete(new Row(map));
     }
 
     public void deleteById(I id) {
-        this.table.delete(id);
+        this.table.get().delete(id);
     }
 
     public void update(T instance) {
         Map<String, Object> map = instance.toInternalMap();
-        this.table.update(new Row(map));
+        this.table.get().update(new Row(map));
     }
 
     public void updateWhere(T instance, Map<String, Object> where) {
         Map<String, Object> map = instance.toInternalMap();
-        this.table.updateWhere(new Row(map), new Row(where));
+        this.table.get().updateWhere(new Row(map), new Row(where));
     }
 
     public T updateWith(I id, Function<T, T> with) {
@@ -83,7 +87,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     @SuppressWarnings("unchecked")
     public Optional<I> save(T instance) {
         Map<String, Object> map = instance.toInternalMap();
-        return (Optional<I>) this.table.save(new Row(map));
+        return (Optional<I>) this.table.get().save(new Row(map));
     }
 
     @SuppressWarnings("unchecked")

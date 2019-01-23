@@ -2,6 +2,7 @@
 **0.34.0**
 
 - correctly handles unsupported compound primary keys
+- lazily access lsql.table() in TypedTable
 
 
 **0.33.5**
