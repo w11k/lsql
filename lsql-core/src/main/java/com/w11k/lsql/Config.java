@@ -3,6 +3,7 @@ package com.w11k.lsql;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.GenericDialect;
+import com.w11k.lsql.dialects.IdentifierConverter;
 
 import java.util.Map;
 
@@ -12,12 +13,14 @@ public class Config {
 
     private GenericDialect dialect = new GenericDialect();
 
+    private IdentifierConverter identifierConverter = IdentifierConverter.JAVA_CAMEL_CASE_TO_SQL_LOWER_UNDERSCORE;
+
     private Integer defaultQueryTimeoutInSeconds = null;
+
+    private boolean useColumnTypeForConverterLookupInQueries = false;
 
     public Config() {
     }
-
-    private boolean useColumnTypeForConverterLookupInQueries = false;
 
     public boolean isUseColumnTypeForConverterLookupInQueries() {
         return useColumnTypeForConverterLookupInQueries;
@@ -65,6 +68,14 @@ public class Config {
 
     protected void setDefaultQueryTimeoutInSeconds(Integer defaultQueryTimeoutInSeconds) {
         this.defaultQueryTimeoutInSeconds = defaultQueryTimeoutInSeconds;
+    }
+
+    public IdentifierConverter getIdentifierConverter() {
+        return identifierConverter;
+    }
+
+    public void setIdentifierConverter(IdentifierConverter identifierConverter) {
+        this.identifierConverter = identifierConverter;
     }
 
 }

@@ -1,4 +1,13 @@
 
+**0.35.0**
+
+*breaking change:* 
+
+- All references to SQL identifiers (e.g. lsql.table("name")) must now be specified in the SQL format. The conversion only applies to `Row` keys.
+- The IdentifierConverter is now a configuration property of `Config` instead of the `Dialect` 
+- removed `Table.validate()`
+
+
 **0.34.0**
 
 - correctly handles unsupported compound primary keys

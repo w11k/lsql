@@ -2,7 +2,6 @@ package com.w11k.lsql;
 
 import com.google.common.base.Optional;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.validation.AbstractValidationError;
 
 import java.util.Map;
 
@@ -66,10 +65,10 @@ public class LinkedRow extends Row {
      */
     @Override
     public Object put(String key, Object value) {
-        Optional<? extends AbstractValidationError> validate = table.validate(key, value);
-        if (validate.isPresent()) {
-            validate.get().throwError();
-        }
+//        Optional<? extends AbstractValidationError> validate = table.validate(key, value);
+//        if (validate.isPresent()) {
+//            validate.get().throwError();
+//        }
         return super.put(key, value);
     }
 

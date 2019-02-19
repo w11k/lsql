@@ -120,7 +120,7 @@ public class StatementCreator {
 
     public String createSelectByIdStatement(Table table, Column idColumn, Collection<Column> columns) {
         String sqlTableName = table.getSqlSchemaAndTableName();
-        String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
+        String sqlColumnName = idColumn.getTable().getlSql().convertInternalSqlToExternalSql(idColumn.getJavaColumnName());
 
         String sql = "SELECT ";
         for (Column column : columns) {
@@ -138,7 +138,7 @@ public class StatementCreator {
     public PreparedStatement createDeleteByIdStatement(Table table) {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getSqlSchemaAndTableName();
-        String sqlIdName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
+        String sqlIdName = idColumn.getTable().getlSql().convertInternalSqlToExternalSql(idColumn.getJavaColumnName());
 
         String sql = "DELETE FROM ";
         sql += sqlTableName;
@@ -156,7 +156,7 @@ public class StatementCreator {
     public PreparedStatement createCountForIdStatement(Table table) throws SQLException {
         Column idColumn = table.column(table.getPrimaryKeyColumn().get());
         String sqlTableName = table.getSqlSchemaAndTableName();
-        String sqlColumnName = idColumn.getTable().getlSql().identifierJavaToSql(idColumn.getJavaColumnName());
+        String sqlColumnName = idColumn.getTable().getlSql().convertInternalSqlToExternalSql(idColumn.getJavaColumnName());
 
         String sql = "select count("
                 + getEscapedColumn(sqlColumnName)
@@ -169,12 +169,12 @@ public class StatementCreator {
 
     private String getRevisionColumnSqlIdentifier(Table table) {
         return getEscapedColumn(
-                table.getlSql().identifierJavaToSql(table.getRevisionColumn().get().getJavaColumnName()));
+                table.getlSql().convertInternalSqlToExternalSql(table.getRevisionColumn().get().getJavaColumnName()));
     }
 
     private List<String> createSqlColumnNames(final Table table, List<String> columns) {
         return columns.stream()
-                .map(input -> getEscapedColumn(table.getlSql().identifierJavaToSql(input)))
+                .map(input -> getEscapedColumn(table.getlSql().convertInternalSqlToExternalSql(input)))
                 .collect(toList());
     }
 

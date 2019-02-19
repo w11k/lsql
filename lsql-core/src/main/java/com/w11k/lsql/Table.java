@@ -12,8 +12,6 @@ import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.jdbc.ConnectionUtils;
 import com.w11k.lsql.query.RowQuery;
-import com.w11k.lsql.validation.AbstractValidationError;
-import com.w11k.lsql.validation.KeyError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,15 +30,10 @@ public class Table {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final LSql lSql;
-
-    private String sqlSchemaAndTableName;
-
-    private String schemaName;
-
-    private String tableName;
-
     private final Map<String, Column> columns = Maps.newHashMap();
-
+    private String sqlSchemaAndTableName;
+    private String schemaName;
+    private String tableName;
     private Optional<String> primaryKeyColumn = absent();
 
     private Optional<Column> revisionColumn = absent();
@@ -106,6 +99,7 @@ public class Table {
         return columns.get(columnName);
     }
 
+    @Deprecated
     public <T> PojoTable<T> withPojo(Class<T> pojoClass) {
         return new PojoTable<>(this, pojoClass);
     }
@@ -367,7 +361,7 @@ public class Table {
         PreparedStatement ps = createLoadPreparedStatement();
 
         String pkColumn = getPrimaryKeyColumn().get();
-        Column column = column(pkColumn);
+        Column column = this.column(pkColumn);
         try {
             column.getConverter().setValueInStatement(lSql, ps, 1, id);
         } catch (Exception e) {
@@ -431,27 +425,27 @@ public class Table {
      * @return A {@link java.util.Map} with potential validation errors. The keys match the column names
      * and the values are subclasses of {@link com.w11k.lsql.validation.AbstractValidationError}.
      */
-    public Map<String, AbstractValidationError> validate(Row row) {
-        Map<String, AbstractValidationError> validationErrors = Maps.newHashMap();
-        for (String key : row.keySet()) {
-            Object value = row.get(key);
-            Optional<? extends AbstractValidationError> error = validate(key, value);
-            if (error.isPresent()) {
-                validationErrors.put(key, error.get());
-            }
-        }
-        return validationErrors;
-    }
+//    public Map<String, AbstractValidationError> validate(Row row) {
+//        Map<String, AbstractValidationError> validationErrors = Maps.newHashMap();
+//        for (String key : row.keySet()) {
+//            Object value = row.get(key);
+//            Optional<? extends AbstractValidationError> error = validate(key, value);
+//            if (error.isPresent()) {
+//                validationErrors.put(key, error.get());
+//            }
+//        }
+//        return validationErrors;
+//    }
 
     /**
      * Same as {@link #validate(Row)} but limited to the passed column and value.
      */
-    public Optional<? extends AbstractValidationError> validate(String javaColumnName, Object value) {
-        if (!getColumns().containsKey(javaColumnName)) {
-            return of(new KeyError(getSqlSchemaAndTableName(), javaColumnName));
-        }
-        return column(javaColumnName).validateValue(value);
-    }
+//    public Optional<? extends AbstractValidationError> validate(String javaColumnName, Object value) {
+//        if (!getColumns().containsKey(javaColumnName)) {
+//            return of(new KeyError(getSqlSchemaAndTableName(), javaColumnName));
+//        }
+//        return column(javaColumnName).validateValue(value);
+//    }
 
     @Override
     public boolean equals(Object o) {
@@ -490,23 +484,25 @@ public class Table {
 
     private List<String> createColumnList(final Row row, final boolean filterIgnoreOnUpdateColumns) {
         List<String> columns = Lists.newLinkedList(row.keySet());
-        columns = columns.stream().filter(input -> {
-            Column column = column(input);
-            if (column == null) {
-                String message = "Column '" + input + "' does not exist in table '" + sqlSchemaAndTableName + "'. ";
-                message += "Known columns: [";
-                message += Joiner.on(",").join(Table.this.columns.keySet());
-                message += "]";
-                throw new RuntimeException(message);
-            }
+        columns = columns.stream()
+                .map(this.lSql::convertJavaIdentifierToInternalSql)
+                .filter(input -> {
+                    Column column = column(input);
+                    if (column == null) {
+                        String message = "Column '" + input + "' does not exist in table '" + sqlSchemaAndTableName + "'. ";
+                        message += "Known columns: [";
+                        message += Joiner.on(",").join(Table.this.columns.keySet());
+                        message += "]";
+                        throw new RuntimeException(message);
+                    }
 
-            if (filterIgnoreOnUpdateColumns && column.isIgnoreOnUpdate()) {
-                return false;
-            } else {
-                return !column.isIgnored();
-            }
+                    if (filterIgnoreOnUpdateColumns && column.isIgnoreOnUpdate()) {
+                        return false;
+                    } else {
+                        return !column.isIgnored();
+                    }
 
-        }).collect(Collectors.toList());
+                }).collect(Collectors.toList());
         return columns;
     }
 
@@ -581,7 +577,7 @@ public class Table {
                 this.primaryKeyColumn = Optional.absent();
             } else {
                 String idColumn = primaryKeys.getString(4);
-                this.primaryKeyColumn = of(lSql.identifierSqlToJava(idColumn));
+                this.primaryKeyColumn = of(lSql.convertExternalSqlToInternalSql(idColumn));
 
                 // no support for compound keys yet
                 if (primaryKeys.next()) {
@@ -596,11 +592,11 @@ public class Table {
             while (columnsMetaData.next()) {
                 String sqlColumnName = columnsMetaData.getString(4);
                 int columnSize = columnsMetaData.getInt(7);
-                String javaColumnName = lSql.identifierSqlToJava(sqlColumnName);
+                String javaColumnName = lSql.convertExternalSqlToInternalSql(sqlColumnName);
                 int sqlType = columnsMetaData.getInt(5);
                 boolean isNotNullable = columnsMetaData.getString(18).equalsIgnoreCase("NO");
                 Converter converter = this.lSql.getConverterForTableColumn(
-                        this.lSql.identifierSqlToJava(this.sqlSchemaAndTableName), javaColumnName, sqlType);
+                        this.lSql.convertExternalSqlToInternalSql(this.sqlSchemaAndTableName), javaColumnName, sqlType);
 
                 Column column = new Column(this, javaColumnName, sqlType, converter, columnSize);
                 column.setNullable(!isNotNullable);
@@ -625,13 +621,15 @@ public class Table {
                                                            Row values2) {
         try {
             for (int i = 0; i < columns1.size(); i++) {
+                String columnJavaIdentifier = this.lSql.convertInternalSqlToJavaIdentifier(columns1.get(i));
                 Converter converter = column(columns1.get(i)).getConverter();
-                converter.setValueInStatement(lSql, ps, i + 1, values1.get(columns1.get(i)));
+                converter.setValueInStatement(lSql, ps, i + 1, values1.get(columnJavaIdentifier));
             }
             if (columns2 != null && values2 != null) {
                 for (int i = 0; i < columns2.size(); i++) {
+                    String columnJavaIdentifier = this.lSql.convertInternalSqlToJavaIdentifier(columns2.get(i));
                     Converter converter = column(columns2.get(i)).getConverter();
-                    converter.setValueInStatement(lSql, ps, columns1.size() + i + 1, values2.get(columns2.get(i)));
+                    converter.setValueInStatement(lSql, ps, columns1.size() + i + 1, values2.get(columnJavaIdentifier));
                 }
             }
             return ps;

@@ -24,41 +24,40 @@ public class PojoQueryTest extends AbstractLSqlTest {
     }
 
 
-    @Test(
-            expectedExceptions = IllegalArgumentException.class,
-            expectedExceptionsMessageRegExp = ".*missing field.*title.*String.*"
-    )
-    public void errorMessageOnMissingField() {
-        PersonTestData.init(this.lSql, true);
-        this.lSql.executeRawQuery(
-                PersonTestData.SELECT_ALL_ORDER_BY_ID,
-                PersonMissingTitle.class
-        ).toList();
-    }
+//    @Test(
+//            expectedExceptions = IllegalArgumentException.class,
+//            expectedExceptionsMessageRegExp = ".*missing field.*title.*String.*"
+//    )
+//    public void errorMessageOnMissingField() {
+//        PersonTestData.init(this.lSql, true);
+//        this.lSql.executeRawQuery(
+//                PersonTestData.SELECT_ALL_ORDER_BY_ID,
+//                PersonMissingTitle.class
+//        ).toList();
+//    }
 
-    @Test(
-            expectedExceptions = IllegalArgumentException.class,
-            expectedExceptionsMessageRegExp = ".*title.*wrong type.*Boolean.*String.*"
-    )
-    public void errorMessageOnWrongFieldType() {
-        PersonTestData.init(this.lSql, true);
-        this.lSql.executeRawQuery(
-                PersonTestData.SELECT_ALL_ORDER_BY_ID,
-                PersonWrongTitleType.class
-        ).toList();
-    }
+//    @Test(
+//            expectedExceptions = IllegalArgumentException.class,
+//            expectedExceptionsMessageRegExp = ".*title.*wrong type.*Boolean.*String.*"
+//    )
+//    public void errorMessageOnWrongFieldType() {
+//        PersonTestData.init(this.lSql, true);
+//        this.lSql.executeRawQuery(
+//                PersonTestData.SELECT_ALL_ORDER_BY_ID,
+//                PersonWrongTitleType.class
+//        ).toList();
+//    }
 
-    @Test(
-            expectedExceptions = IllegalArgumentException.class,
-            expectedExceptionsMessageRegExp = ".*superfluous field.*oops.*"
-    )
-    public void errorMessageOnSuperfluousType() {
-        PersonTestData.init(this.lSql, true);
-        this.lSql.executeRawQuery(
-                PersonTestData.SELECT_ALL_ORDER_BY_ID,
-                PersonWithSuperfluousField.class
-        ).toList();
-    }
-
+//    @Test(
+//            expectedExceptions = IllegalArgumentException.class,
+//            expectedExceptionsMessageRegExp = ".*superfluous field.*oops.*"
+//    )
+//    public void errorMessageOnSuperfluousType() {
+//        PersonTestData.init(this.lSql, true);
+//        this.lSql.executeRawQuery(
+//                PersonTestData.SELECT_ALL_ORDER_BY_ID,
+//                PersonWithSuperfluousField.class
+//        ).toList();
+//    }
 
 }

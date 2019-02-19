@@ -7,6 +7,7 @@ import com.w11k.lsql.converter.Converter;
 import java.util.Iterator;
 import java.util.Map;
 
+@Deprecated
 public class PojoTable<T> {
 
     private final Class<T> pojoClass;
@@ -24,7 +25,7 @@ public class PojoTable<T> {
         for (String column : table.getColumns().keySet()) {
             converters.put(column, table.getColumns().get(column).getConverter());
         }
-        this.pojoMapper.checkConformity(converters);
+//        this.pojoMapper.checkConformity(converters);
     }
 
     public Optional<Object> insert(T pojo) {

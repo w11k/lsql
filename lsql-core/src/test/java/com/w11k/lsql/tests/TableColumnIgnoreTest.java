@@ -15,7 +15,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
     public void ignoreColumnOnInsert() {
         PersonTestData.init(this.lSql, false);
         Table person = this.lSql.table("person");
-        person.column("firstName").setIgnored(true);
+        person.column("first_name").setIgnored(true);
 
         person.insert(Row.fromKeyVals(
                 "id", 1,
@@ -30,7 +30,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
     public void ignoreColumnOnLoad() {
         PersonTestData.init(this.lSql, true);
         Table person = this.lSql.table("person");
-        person.column("firstName").setIgnored(true);
+        person.column("first_name").setIgnored(true);
 
         LinkedRow p1 = person.load(1).get();
         assertNull(p1.get("firstName"));
@@ -40,7 +40,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
     public void ignoreColumnOnQuery() {
         PersonTestData.init(this.lSql, true);
         Table person = this.lSql.table("person");
-        person.column("firstName").setIgnored(true);
+        person.column("first_name").setIgnored(true);
 
         Row row = lSql.createSqlStatement("select * from person").query().toList().get(0);
         assertNull(row.get("firstName"));

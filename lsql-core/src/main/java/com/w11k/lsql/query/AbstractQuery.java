@@ -144,7 +144,7 @@ public abstract class AbstractQuery<T> {
         return Subject.create(emitter -> {
             try {
                 ResultSetWithColumns resultSetWithColumns = createResultSetWithColumns();
-                checkConformity(resultSetWithColumns.getConverters());
+//                checkConformity(resultSetWithColumns.getConverters());
 
                 while (resultSetWithColumns.getResultSet().next() && !emitter.isDisposed()) {
                     emitter.onNext(resultSetWithColumns);
@@ -170,7 +170,7 @@ public abstract class AbstractQuery<T> {
             LinkedHashMap<String, Converter> converters = Maps.newLinkedHashMap();
 
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                String columnLabel = AbstractQuery.this.lSql.identifierSqlToJava(metaData.getColumnLabel(i));
+                String columnLabel = AbstractQuery.this.lSql.convertExternalSqlToInternalSql(metaData.getColumnLabel(i));
 
                 // check duplicates
                 if (!AbstractQuery.this.ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel)) {
@@ -217,10 +217,10 @@ public abstract class AbstractQuery<T> {
         }
 
         // Determine source table and column from ResultSet
-        String javaTableName = lSql.identifierSqlToJava(
+        String javaTableName = lSql.convertExternalSqlToInternalSql(
                 lSql.getSqlSchemaAndTableNameFromResultSetMetaData(metaData, position));
 
-        String javaColumnName = lSql.identifierSqlToJava(
+        String javaColumnName = lSql.convertExternalSqlToInternalSql(
                 lSql.getSqlColumnNameFromResultSetMetaData(metaData, position));
 
         if (javaTableName != null
@@ -258,7 +258,7 @@ public abstract class AbstractQuery<T> {
 
     protected abstract T createEntity();
 
-    protected abstract void checkConformity(Map<String, Converter> converters);
+//    protected abstract void checkConformity(Map<String, Converter> converters);
 
     protected abstract void setValue(T entity, String name, Object value);
 
@@ -275,7 +275,7 @@ public abstract class AbstractQuery<T> {
             try {
                 setValue(
                         entity,
-                        column.getName(),
+                        this.lSql.convertInternalSqlToJavaIdentifier(column.getName()),
                         column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
             } catch (SQLException e) {
                 throw new RuntimeException(e);

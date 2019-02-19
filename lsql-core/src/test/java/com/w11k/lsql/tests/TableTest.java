@@ -8,14 +8,10 @@ import com.w11k.lsql.exceptions.DatabaseAccessException;
 import com.w11k.lsql.exceptions.InsertException;
 import com.w11k.lsql.exceptions.UpdateException;
 import com.w11k.lsql.tests.testdata.PersonTestData;
-import com.w11k.lsql.validation.AbstractValidationError;
-import com.w11k.lsql.validation.KeyError;
-import com.w11k.lsql.validation.TypeError;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -275,21 +271,21 @@ public class TableTest extends AbstractLSqlTest {
         lSql.table("table1");
     }
 
-    @Test
-    public void validate() throws SQLException {
-        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, field1 INT, field2 INT)");
-        Table table1 = lSql.table("table1");
-
-        Row r = Row.fromKeyVals(
-                "field1", 1,
-                "field2", "2",
-                "field3", 3
-        );
-
-        Map<String, AbstractValidationError> validate = table1.validate(r);
-        assertEquals(validate.size(), 2);
-        assertEquals(validate.get("field2").getClass(), TypeError.class);
-        assertEquals(validate.get("field3").getClass(), KeyError.class);
-    }
+//    @Test
+//    public void validate() throws SQLException {
+//        createTable("CREATE TABLE table1 (id SERIAL PRIMARY KEY, field1 INT, field2 INT)");
+//        Table table1 = lSql.table("table1");
+//
+//        Row r = Row.fromKeyVals(
+//                "field1", 1,
+//                "field2", "2",
+//                "field3", 3
+//        );
+//
+//        Map<String, AbstractValidationError> validate = table1.validate(r);
+//        assertEquals(validate.size(), 2);
+//        assertEquals(validate.get("field2").getClass(), TypeError.class);
+//        assertEquals(validate.get("field3").getClass(), KeyError.class);
+//    }
 
 }

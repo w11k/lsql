@@ -125,7 +125,7 @@ public class QueryToTreeConverter {
                 lastLabel = label;
                 lastMarkerIndex = i;
             } else {
-                label = lSql.identifierSqlToJava(label);
+                label = lSql.convertExternalSqlToInternalSql(label);
                 Optional<Converter> converter = this.query.getConverterForResultSetColumn(metaData, i, label, false);
                 if (converter.isPresent()) {
                     columns.put(i, new ResultSetColumn(i, label, converter.get()));

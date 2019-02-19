@@ -59,7 +59,7 @@ public class Column {
     }
 
     public String getSqlColumnName() {
-        return this.table.getlSql().identifierJavaToSql(getJavaColumnName());
+        return this.table.getlSql().convertInternalSqlToExternalSql(getJavaColumnName());
     }
 
     public Table getTable() {

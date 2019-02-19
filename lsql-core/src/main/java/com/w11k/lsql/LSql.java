@@ -2,7 +2,6 @@ package com.w11k.lsql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -160,7 +159,7 @@ public class LSql {
      * @return the Table instance
      */
     public synchronized Table table(String javaSchemaAndTableName) {
-        return this.tableBySqlName(this.identifierJavaToSql(javaSchemaAndTableName));
+        return this.tableBySqlName(this.convertInternalSqlToExternalSql(javaSchemaAndTableName));
     }
 
     /**
@@ -286,16 +285,20 @@ public class LSql {
         };
     }
 
-    public String identifierSqlToJava(String sqlName) {
-        return this.dialect.getIdentifierConverter().sqlToJava(sqlName);
+    public String convertExternalSqlToInternalSql(String externalSql) {
+        return this.dialect.convertExternalSqlToInternalSql(externalSql);
     }
 
-    public String identifierJavaToSql(String javaName) {
-        return this.dialect.getIdentifierConverter().javaToSql(javaName);
+    public String convertInternalSqlToExternalSql(String internalSql) {
+        return this.dialect.convertInternalSqlToExternalSql(internalSql);
     }
 
-    public CaseFormat getJavaCaseFormat() {
-        return this.dialect.getIdentifierConverter().getToCaseFormat();
+    public String convertInternalSqlToJavaIdentifier(String internalSql) {
+        return this.config.getIdentifierConverter().sqlToJava(internalSql);
+    }
+
+    public String convertJavaIdentifierToInternalSql(String javaIdentifier) {
+        return this.config.getIdentifierConverter().javaToSql(javaIdentifier);
     }
 
     public Converter getConverterForSqlType(int sqlType) {
@@ -367,11 +370,4 @@ public class LSql {
                 '}';
     }
 
-//    GenericDialect getDialect() {
-//        return dialect;
-//    }
-
-//    Config getConfig() {
-//        return config;
-//    }
 }

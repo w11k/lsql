@@ -78,12 +78,12 @@ public class LinkedRowTest extends AbstractLSqlTest {
         assertFalse(table1.load(1).isPresent());
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void linkedRowPutThrowsExceptionOnTooLongString() {
-        createTable("CREATE TABLE table1 (name VARCHAR(5))");
-        LinkedRow row = lSql.table("table1").newLinkedRow();
-        row.put("name", "123456");
-    }
+//    @Test(expectedExceptions = IllegalArgumentException.class)
+//    public void linkedRowPutThrowsExceptionOnTooLongString() {
+//        createTable("CREATE TABLE table1 (name VARCHAR(5))");
+//        LinkedRow row = lSql.table("table1").newLinkedRow();
+//        row.put("name", "123456");
+//    }
 
     @Test
     public void newLinkedRowCopiesDataWithIdAndRevisionColumn() {

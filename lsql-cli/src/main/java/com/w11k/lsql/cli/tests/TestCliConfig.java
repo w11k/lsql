@@ -4,7 +4,6 @@ import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.H2Dialect;
-import com.w11k.lsql.dialects.IdentifierConverter;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -60,7 +59,7 @@ public final class TestCliConfig extends Config {
 
     public TestCliConfig() {
         setDialect(new H2Dialect());
-        getDialect().setIdentifierConverter(IdentifierConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
+//        getDialect().setIdentifierConverter(IdentifierConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
 
         getDialect().getConverterRegistry().addTypeAlias("custom", new CustomConverter());
     }

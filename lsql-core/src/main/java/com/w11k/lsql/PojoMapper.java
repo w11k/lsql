@@ -1,7 +1,6 @@
 package com.w11k.lsql;
 
 import com.google.common.collect.Maps;
-import com.w11k.lsql.converter.Converter;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -9,8 +8,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.util.Map;
 
-import static com.w11k.lsql.utils.JavaClassUtils.convertPrimitiveClassToWrapperClass;
-
+@Deprecated
 public class PojoMapper<T> {
 
     private final static Map<Class<?>, PojoMapper<?>> CACHE = Maps.newHashMap();
@@ -30,6 +28,7 @@ public class PojoMapper<T> {
     private final Constructor<T> constructor;
 
     public PojoMapper(Class<T> pojoClass) {
+
         // Find constructor
         this.constructor = getConstructor(pojoClass);
         this.pojoClass = pojoClass;
@@ -110,6 +109,7 @@ public class PojoMapper<T> {
         }
     }
 
+    /*
     public void checkConformity(Map<String, Converter> converters) {
         String logClassName = this.pojoClass.getCanonicalName();
 
@@ -147,6 +147,7 @@ public class PojoMapper<T> {
             }
         }
     }
+    */
 
     private Constructor<T> getConstructor(Class<T> pojoClass) {
         try {

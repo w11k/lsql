@@ -23,8 +23,6 @@ public class GenericDialect {
 
     private ConverterRegistry converterRegistry = new ConverterRegistry();
 
-    private IdentifierConverter identifierConverter = IdentifierConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_LOWER_UNDERSCORE;
-
     public GenericDialect() {
         // http://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html
 
@@ -113,12 +111,12 @@ public class GenericDialect {
         return statementCreator;
     }
 
-    public IdentifierConverter getIdentifierConverter() {
-        return identifierConverter;
+    public String convertExternalSqlToInternalSql(String externalSql) {
+        return externalSql.toLowerCase();
     }
 
-    public void setIdentifierConverter(IdentifierConverter identifierConverter) {
-        this.identifierConverter = identifierConverter;
+    public String convertInternalSqlToExternalSql(String internalSql) {
+        return internalSql.toUpperCase();
     }
 
     public String getSqlSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,
@@ -141,7 +139,7 @@ public class GenericDialect {
         ResultSetMetaData metaData = resultSet.getMetaData();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             String label = metaData.getColumnLabel(i);
-            if (getIdentifierConverter().sqlToJava(label).equals(pkName)) {
+            if (this.convertExternalSqlToInternalSql(label).equals(pkName)) {
                 return of(table.column(pkName).getConverter()
                         .getValueFromResultSet(getlSql(), resultSet, i));
             }

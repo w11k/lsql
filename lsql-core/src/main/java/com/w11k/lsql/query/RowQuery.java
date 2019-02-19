@@ -25,10 +25,10 @@ public class RowQuery extends AbstractQuery<Row> {
         return new Row();
     }
 
-    @Override
-    protected void checkConformity(Map<String, Converter> converters) {
+//    @Override
+//    protected void checkConformity(Map<String, Converter> converters) {
         // noop
-    }
+//    }
 
     @Override
     protected void setValue(Row entity, String name, Object value) {

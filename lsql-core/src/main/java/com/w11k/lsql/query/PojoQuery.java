@@ -31,10 +31,10 @@ public class PojoQuery<T> extends AbstractQuery<T> {
         return this.pojoMapper.newInstance();
     }
 
-    @Override
-    protected void checkConformity(Map<String, Converter> converters) {
-        this.pojoMapper.checkConformity(converters);
-    }
+//    @Override
+//    protected void checkConformity(Map<String, Converter> converters) {
+//        this.pojoMapper.checkConformity(converters);
+//    }
 
     @Override
     protected void setValue(T entity, String name, Object value) {

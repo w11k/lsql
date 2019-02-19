@@ -187,7 +187,7 @@ public class SqlStatementToPreparedStatement {
                 wordLeft = wordLeft.substring(1, wordLeft.length() - 1);
             }
 
-            String javaColumnName = this.getlSql().identifierSqlToJava(wordLeft);
+            String javaColumnName = this.getlSql().convertExternalSqlToInternalSql(wordLeft);
             Converter converter = this.getlSql().getConverterForAlias(alias);
             converters.put(javaColumnName, converter);
         }
