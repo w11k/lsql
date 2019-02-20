@@ -112,11 +112,11 @@ public class GenericDialect {
     }
 
     public String convertExternalSqlToInternalSql(String externalSql) {
-        return externalSql.toLowerCase();
+        return externalSql;
     }
 
     public String convertInternalSqlToExternalSql(String internalSql) {
-        return internalSql.toUpperCase();
+        return internalSql;
     }
 
     public String getSqlSchemaAndTableNameFromResultSetMetaData(ResultSetMetaData metaData,

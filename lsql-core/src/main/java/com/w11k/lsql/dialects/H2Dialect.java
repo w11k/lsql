@@ -28,4 +28,12 @@ public class H2Dialect extends GenericDialect {
                 .getConverter().getValueFromResultSet(getlSql(), resultSet, 1));
     }
 
+    public String convertExternalSqlToInternalSql(String externalSql) {
+        return externalSql.toLowerCase();
+    }
+
+    public String convertInternalSqlToExternalSql(String internalSql) {
+        return internalSql.toUpperCase();
+    }
+
 }
