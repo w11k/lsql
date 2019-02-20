@@ -31,13 +31,8 @@ public class PojoQuery<T> extends AbstractQuery<T> {
         return this.pojoMapper.newInstance();
     }
 
-//    @Override
-//    protected void checkConformity(Map<String, Converter> converters) {
-//        this.pojoMapper.checkConformity(converters);
-//    }
-
     @Override
-    protected void setValue(T entity, String name, Object value) {
-        this.pojoMapper.setValue(entity, name, value);
+    protected void setValue(LSql lSql, T entity, String internalSqlColumnName, Object value) {
+        this.pojoMapper.setValue(entity, lSql.convertInternalSqlToRowKey(internalSqlColumnName), value);
     }
 }

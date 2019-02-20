@@ -6,8 +6,13 @@ import com.w11k.lsql.PojoTable;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.converter.predefined.AtomicIntegerConverter;
+import com.w11k.lsql.dialects.RowKeyConverter;
 import com.w11k.lsql.tests.AbstractLSqlTest;
-import com.w11k.lsql.tests.testdata.*;
+import com.w11k.lsql.tests.testdata.Person;
+import com.w11k.lsql.tests.testdata.PersonSubclass;
+import com.w11k.lsql.tests.testdata.PersonTestData;
+import com.w11k.lsql.tests.testdata.PersonWithAtomicIntegerAge;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,6 +20,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.testng.Assert.*;
 
 public class PojoTableTest extends AbstractLSqlTest {
+
+    @BeforeMethod
+    public void setRowKeyConverter() {
+        addConfigHook(config -> {
+            config.setRowKeyConverter(RowKeyConverter.JAVA_CAMEL_CASE_TO_SQL_LOWER_UNDERSCORE);
+        });
+    }
 
     @Test
     public void insert() {
@@ -24,7 +36,7 @@ public class PojoTableTest extends AbstractLSqlTest {
         personTable.insert(p1);
         Table personRowTable = this.lSql.table("person");
         LinkedRow linkedRow = personRowTable.load(1).get();
-        assertEquals(linkedRow.getInt("id"), Integer.valueOf(1));
+        assertEquals(linkedRow.getInt("idPk"), Integer.valueOf(1));
         assertEquals(linkedRow.getString("firstName"), "Max");
     }
 
@@ -40,7 +52,7 @@ public class PojoTableTest extends AbstractLSqlTest {
 
         Table personRowTable = this.lSql.table("person");
         LinkedRow linkedRow = personRowTable.load(1).get();
-        assertEquals(linkedRow.getInt("id"), Integer.valueOf(1));
+        assertEquals(linkedRow.getInt("idPk"), Integer.valueOf(1));
         assertEquals(linkedRow.getString("firstName"), "Walter");
     }
 
@@ -77,7 +89,7 @@ public class PojoTableTest extends AbstractLSqlTest {
         PersonTestData.init(this.lSql, false);
         PojoTable<Person> personTable = this.lSql.table("person", Person.class);
         Person p1 = new Person();
-        p1.setId(1);
+        p1.setIdPk(1);
         personTable.insert(p1);
         assertEquals(p1.getTitle(), "n/a");
     }
@@ -87,7 +99,7 @@ public class PojoTableTest extends AbstractLSqlTest {
         PersonTestData.init(this.lSql, false);
         PojoTable<Person> personTable = this.lSql.table("person", Person.class);
         Person p1 = new Person();
-        p1.setId(1);
+        p1.setIdPk(1);
         personTable.insert(p1, true);
         assertNull(p1.getTitle());
     }
@@ -98,7 +110,7 @@ public class PojoTableTest extends AbstractLSqlTest {
         PojoTable<Person> personTable = this.lSql.table("person", Person.class);
 
         Person person = personTable.load(1).get();
-        assertEquals(person.getId(), 1);
+        assertEquals(person.getIdPk(), 1);
         assertEquals(person.getFirstName(), "Adam");
     }
 
@@ -161,7 +173,7 @@ public class PojoTableTest extends AbstractLSqlTest {
         PersonTestData.init(this.lSql, false);
         Table personTable = this.lSql.table("person");
         personTable.insert(Row.fromKeyVals(
-                "id", 1,
+                "idPk", 1,
                 "firstName", null,
                 "age", 10,
                 "title", "Title"

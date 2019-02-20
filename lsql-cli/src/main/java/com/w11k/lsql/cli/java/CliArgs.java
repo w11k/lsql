@@ -40,8 +40,6 @@ public final class CliArgs {
 
     private String sqlStatements;
 
-    private String dto;
-
     private boolean diGuice = false;
 
     private String outDirJava;
@@ -81,8 +79,6 @@ public final class CliArgs {
                     this.genPackageName = value;
                 } else if (key.equals("sqlStatements")) {
                     this.sqlStatements = value;
-                } else if (key.equals("dto")) {
-                    this.dto = value;
                 } else if (key.equals("outDirJava")) {
                     this.outDirJava = value;
                 } else if (key.equals("outDirTypeScript")) {
@@ -150,10 +146,6 @@ public final class CliArgs {
 
     public String getOutDirTypeScript() {
         return outDirTypeScript;
-    }
-
-    public String getDto() {
-        return dto;
     }
 
     private String getParamKey(String param) {

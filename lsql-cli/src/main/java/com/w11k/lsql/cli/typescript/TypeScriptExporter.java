@@ -59,7 +59,7 @@ public class TypeScriptExporter {
         for (DataClassMeta.DataClassFieldMeta field : dcMeta.getFields()) {
             Class<?> javaType = field.getFieldType();
             String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);
-            content.append("        ").append(field.getFieldKeyName());
+            content.append("        ").append(field.getColumnInternalSqlName());
             if (field.isNullable()) {
                 content.append("?");
             }
@@ -87,7 +87,7 @@ public class TypeScriptExporter {
     private void exportField(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
         Class<?> javaType = field.getFieldType();
         String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);
-        content.append("        ").append(field.getFieldName());
+        content.append("        ").append(field.getColumnsJavaCodeName());
         if (field.isNullable()) {
             content.append("?");
         }

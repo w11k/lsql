@@ -30,8 +30,6 @@ public class JavaExporter {
 
     private boolean guice = false;
 
-    private String dtoDeclarationSearchDir;
-
     private List<DataClassMeta> generatedDataClasses = emptyList();
 
     public JavaExporter(LSql lSql, String schemas) {
@@ -111,10 +109,15 @@ public class JavaExporter {
             DataClassMeta dcm = new DataClassMeta(className, fullPackageName);
             table.getColumns().values()
                     .forEach(c -> {
-                        String colName = c.getJavaColumnName();
+                        String colName = c.getColumnName();
                         String fieldName = getJavaCodeName(colName, false, false);
-                        dcm.addField(fieldName, colName, c.getConverter().getJavaType())
-                                .setNullable(c.isNullable());
+
+                        dcm.addField(
+                                colName,
+                                fieldName,
+                                this.lSql.convertInternalSqlToRowKey(colName),
+                                c.getConverter().getJavaType()
+                        ).setNullable(c.isNullable());
                     });
 
             this.generatedDataClasses.add(dcm);
@@ -134,14 +137,6 @@ public class JavaExporter {
             List<DataClassMeta> stmtRowDataClassMetaList = statementFileExporter.getStmtRowDataClassMetaList();
             this.generatedDataClasses.addAll(stmtRowDataClassMetaList);
             guiceModuleClasses.add(statementFileExporter.getTargetPackageName() + "." + statementFileExporter.getStmtFileClassName());
-        }
-
-        // DTOs
-        if (this.dtoDeclarationSearchDir != null) {
-            DtoDeclarationFinder dtoDeclarationFinder = new DtoDeclarationFinder(this, dtoDeclarationSearchDir);
-            dataClassExporters.addAll(dtoDeclarationFinder.getDataClassExporters());
-            dtoDeclarationFinder.getDataClassExporters()
-                    .forEach(e -> this.generatedDataClasses.add(e.getDataClassMeta()));
         }
 
         // find unique StructuralTypingFields
@@ -200,7 +195,4 @@ public class JavaExporter {
         return generatedDataClasses;
     }
 
-    public void setDtoDeclarationSearchDir(String dtoDeclarationSearchDir) {
-        this.dtoDeclarationSearchDir = dtoDeclarationSearchDir;
-    }
 }

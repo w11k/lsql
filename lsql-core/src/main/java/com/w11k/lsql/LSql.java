@@ -197,13 +197,17 @@ public class LSql {
         return (PojoTable<T>) this.pojoTables.get(pojoClass);
     }
 
+    public Statement createStatement() {
+        return this.dialect.getStatementCreator().createStatement(this);
+    }
+
     /**
      * Executes the SQL string.
      *
      * @param sql the SQL string
      */
     public void executeRawSql(String sql) {
-        Statement st = this.dialect.getStatementCreator().createStatement(this);
+        Statement st = this.createStatement();
         try {
             st.execute(sql);
         } catch (SQLException e) {
@@ -214,7 +218,7 @@ public class LSql {
     /**
      * Executes the SQL SELECT string. Useful for simple queries.
      * {@link LSqlFile}s should be used for complex queries.
-     *
+     * <p>
      * Deprecated: Use LSql#createSqlStatement() instead.
      *
      * @param sql the SQL SELECT string
@@ -237,10 +241,11 @@ public class LSql {
     /**
      * Executes the SQL SELECT string. Useful for simple queries.
      * {@link LSqlFile}s should be used for complex queries.
-     *
+     * <p>
      * Deprecated: Use LSql#createSqlStatement() instead.
-     *
+     * <p>
      * * @param sql       the SQL SELECT string
+     *
      * @param pojoClass the POJO class
      * @return the Query instance
      */
@@ -280,7 +285,12 @@ public class LSql {
         return new AbstractSqlStatement<RowQuery>(stmtToPs) {
             @Override
             protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
-                return new RowQuery(lSql, ps, outConverters);
+                return new RowQuery(lSql, ps, outConverters) {
+                    @Override
+                    protected void setValue(LSql lSql, Row entity, String internalSqlColumnName, Object value) {
+                        super.setValue(lSql, entity, convertInternalSqlToRowKey(internalSqlColumnName), value);
+                    }
+                };
             }
         };
     }
@@ -293,12 +303,12 @@ public class LSql {
         return this.dialect.convertInternalSqlToExternalSql(internalSql);
     }
 
-    public String convertInternalSqlToJavaIdentifier(String internalSql) {
-        return this.config.getIdentifierConverter().sqlToJava(internalSql);
+    public String convertInternalSqlToRowKey(String internalSql) {
+        return this.config.getRowKeyConverter().sqlToJava(internalSql);
     }
 
-    public String convertJavaIdentifierToInternalSql(String javaIdentifier) {
-        return this.config.getIdentifierConverter().javaToSql(javaIdentifier);
+    public String convertRowKeyToInternalSql(String rowKey) {
+        return this.config.getRowKeyConverter().javaToSql(rowKey);
     }
 
     public Converter getConverterForSqlType(int sqlType) {

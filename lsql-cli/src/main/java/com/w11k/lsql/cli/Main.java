@@ -56,7 +56,6 @@ public class Main {
             javaExporter.setPackageName(cliArgs.getGenPackageName());
             javaExporter.setOutputDir(new File(cliArgs.getOutDirJava()));
             javaExporter.setGuice(cliArgs.isDiGuice());
-            javaExporter.setDtoDeclarationSearchDir(cliArgs.getDto());
 
             // Java statements
             List<StatementFileExporter> statementFileExporters = createStatements(lSql, javaExporter, cliArgs);

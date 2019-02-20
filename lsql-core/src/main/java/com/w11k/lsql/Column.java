@@ -54,12 +54,12 @@ public class Column {
         this.columnSize = columnSize;
     }
 
-    public String getJavaColumnName() {
+    public String getColumnName() {
         return this.columnName;
     }
 
-    public String getSqlColumnName() {
-        return this.table.getlSql().convertInternalSqlToExternalSql(getJavaColumnName());
+    public String getExternalSqlColumnName() {
+        return this.table.getlSql().convertInternalSqlToExternalSql(getColumnName());
     }
 
     public Table getTable() {

@@ -3,13 +3,22 @@ package com.w11k.lsql.tests;
 import com.w11k.lsql.LinkedRow;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
+import com.w11k.lsql.dialects.RowKeyConverter;
 import com.w11k.lsql.tests.testdata.PersonTestData;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 public class TableColumnIgnoreTest extends AbstractLSqlTest {
+
+    @BeforeMethod
+    public void setRowKeyConverter() {
+        addConfigHook(config -> {
+            config.setRowKeyConverter(RowKeyConverter.JAVA_CAMEL_CASE_TO_SQL_LOWER_UNDERSCORE);
+        });
+    }
 
     @Test
     public void ignoreColumnOnInsert() {
@@ -18,7 +27,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
         person.column("first_name").setIgnored(true);
 
         person.insert(Row.fromKeyVals(
-                "id", 1,
+                "idPk", 1,
                 "firstName", "Adam"
         ));
 
@@ -51,7 +60,7 @@ public class TableColumnIgnoreTest extends AbstractLSqlTest {
         PersonTestData.init(this.lSql, true);
         Table person = this.lSql.table("person");
 
-        person.column("id").setIgnoreOnUpdate(true);
+        person.column("id_pk").setIgnoreOnUpdate(true);
         person.column("age").setIgnoreOnUpdate(true);
         person.column("title").setIgnoreOnUpdate(true);
 

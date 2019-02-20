@@ -21,6 +21,7 @@ public final class StatementFileExporter {
 
     private final File stmtSourceFile;
 
+    private final LSql lSql;
     private final JavaExporter javaExporter;
 
     private final String stmtFilesRootDir;
@@ -39,7 +40,7 @@ public final class StatementFileExporter {
                                  JavaExporter javaExporter,
                                  File stmtSourceFile,
                                  String stmtFilesRootDir) {
-
+        this.lSql = lSql;
         this.javaExporter = javaExporter;
         this.stmtSourceFile = stmtSourceFile;
         this.stmtFilesRootDir = stmtFilesRootDir;
@@ -82,8 +83,14 @@ public final class StatementFileExporter {
                 query.query().createResultSetWithColumns().getColumns().forEach(c -> {
                     String colName = c.getName();
                     String fieldName = getJavaCodeName(colName, false, false);
-                    dcm.addField(fieldName, colName, c.getConverter().getJavaType())
-                    .setNullable(c.isNullable());
+                    String rowKeyName = this.lSql.convertInternalSqlToRowKey(colName);
+
+                    dcm.addField(
+                            colName,
+                            fieldName,
+                            rowKeyName,
+                            c.getConverter().getJavaType()
+                    ).setNullable(c.isNullable());
                 });
                 this.stmtRowDataClassMetaList.add(dcm);
             }

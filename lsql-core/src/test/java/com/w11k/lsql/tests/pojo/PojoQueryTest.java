@@ -1,7 +1,10 @@
 package com.w11k.lsql.tests.pojo;
 
+import com.w11k.lsql.dialects.RowKeyConverter;
 import com.w11k.lsql.tests.AbstractLSqlTest;
-import com.w11k.lsql.tests.testdata.*;
+import com.w11k.lsql.tests.testdata.Person;
+import com.w11k.lsql.tests.testdata.PersonTestData;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -9,6 +12,13 @@ import java.util.List;
 import static org.testng.Assert.assertEquals;
 
 public class PojoQueryTest extends AbstractLSqlTest {
+
+    @BeforeMethod
+    public void setRowKeyConverter() {
+        addConfigHook(config -> {
+            config.setRowKeyConverter(RowKeyConverter.JAVA_CAMEL_CASE_TO_SQL_LOWER_UNDERSCORE);
+        });
+    }
 
     @Test
     public void executeRawQuery() {

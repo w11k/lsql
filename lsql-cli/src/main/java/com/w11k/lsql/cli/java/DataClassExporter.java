@@ -33,7 +33,7 @@ public class DataClassExporter {
 
         this.structuralTypingFields = createStructuralTypingFieldList();
         this.constructorCallArgs = Joiner.on(",").join(dataClassMeta.getFields().stream()
-                .map(DataClassMeta.DataClassFieldMeta::getFieldName)
+                .map(DataClassMeta.DataClassFieldMeta::getColumnsJavaCodeName)
                 .collect(toList()));
     }
 
@@ -44,7 +44,7 @@ public class DataClassExporter {
     private List<StructuralTypingField> createStructuralTypingFieldList() {
         List<StructuralTypingField> list = Lists.newLinkedList();
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
-            list.add(new StructuralTypingField(field.getFieldName(), field.getFieldType()));
+            list.add(new StructuralTypingField(field.getColumnsJavaCodeName(), field.getFieldType()));
         }
         return list;
     }
@@ -137,7 +137,7 @@ public class DataClassExporter {
 
         // toInternalMap
         contentToInternalMap(content);
-        contentToMap(content);
+        contentToRow(content);
 
         content.append(indentString()).append("    // Object methods ----------\n\n");
         contentEquals(content);
@@ -164,7 +164,7 @@ public class DataClassExporter {
             content.append(indentString()).append("        return ");
 
             List<String> fieldEquals = this.dataClassMeta.getFields().stream()
-                    .map(f -> "    Objects.equals(" + f.getFieldName() + ", that." + f.getFieldName() + ")")
+                    .map(f -> "    Objects.equals(" + f.getColumnsJavaCodeName() + ", that." + f.getColumnsJavaCodeName() + ")")
                     .collect(toList());
 
             content.append(Joiner.on(" && \n" + indentString() + "        ").join(fieldEquals));
@@ -183,7 +183,7 @@ public class DataClassExporter {
             content.append("\"").append(this.getClassName()).append("\"");
         } else {
             List<String> fieldNames = this.dataClassMeta.getFields().stream()
-                    .map(DataClassMeta.DataClassFieldMeta::getFieldName)
+                    .map(DataClassMeta.DataClassFieldMeta::getColumnsJavaCodeName)
                     .collect(toList());
 
             content.append(Joiner.on(", ").join(fieldNames));
@@ -201,7 +201,7 @@ public class DataClassExporter {
             content.append("\"\"");
         } else {
             List<String> fieldNames = this.dataClassMeta.getFields().stream()
-                    .map(f -> "\"" + f.getFieldName() + "=\" + " + f.getFieldName())
+                    .map(f -> "\"" + f.getColumnsJavaCodeName() + "=\" + " + f.getColumnsJavaCodeName())
                     .collect(toList());
 
             content.append(Joiner.on("\n" + this.indentString() + "            + \", \" + ").join(fieldNames));
@@ -216,20 +216,20 @@ public class DataClassExporter {
 
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
-                    .append("map.put(\"").append(field.getFieldKeyName()).append("\", this.").append(field.getFieldName()).append(");\n");
+                    .append("map.put(\"").append(field.getColumnInternalSqlName()).append("\", this.").append(field.getColumnsJavaCodeName()).append(");\n");
         }
 
         content.append(indentString()).append("        return map;\n");
         content.append(indentString()).append("    }\n\n");
     }
 
-    private void contentToMap(StringBuilder content) {
-        content.append(indentString()).append("    public java.util.Map<String, Object> toMap() {\n");
+    private void contentToRow(StringBuilder content) {
+        content.append(indentString()).append("    public java.util.Map<String, Object> toRow() {\n");
         content.append(indentString()).append("        java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
 
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
-                    .append("map.put(\"").append(field.getFieldName()).append("\", this.").append(field.getFieldName()).append(");\n");
+                    .append("map.put(\"").append(field.getColumnsJavaCodeName()).append("\", this.").append(field.getColumnRowKeyName()).append(");\n");
         }
 
         content.append(indentString()).append("        return map;\n");
@@ -310,23 +310,23 @@ public class DataClassExporter {
         content.append(indentString()).append("        ")
                 .append("return new ").append(this.getClassName()).append("(");
         content.append(Joiner.on(", ").join(dataClassMeta.getFields().stream()
-                .map(f -> "(" + f.getFieldType().getCanonicalName() + ") internalMap.get(\"" + f.getFieldKeyName() + "\")")
+                .map(f -> "(" + f.getFieldType().getCanonicalName() + ") internalMap.get(\"" + f.getColumnInternalSqlName() + "\")")
                 .collect(toList())));
         content.append(");\n");
         content.append(indentString()).append("    }\n\n");
 
-        // fromMap
+        // fromRow
         this.addSuppressWarningsUnused(4, content);
         content.append(indentString())
                 .append("    public static ")
                 .append(this.getClassName())
-                .append(" fromMap(java.util.Map<String, Object> map) {\n");
+                .append(" fromRow(java.util.Map<String, Object> map) {\n");
 
         // ... assign member
         content.append(indentString()).append("        ")
                 .append("return new ").append(this.getClassName()).append("(");
         content.append(Joiner.on(", ").join(dataClassMeta.getFields().stream()
-                .map(f -> "(" + f.getFieldType().getCanonicalName() + ") map.get(\"" + f.getFieldName() + "\")")
+                .map(f -> "(" + f.getFieldType().getCanonicalName() + ") map.get(\"" + f.getColumnRowKeyName() + "\")")
                 .collect(toList())));
         content.append(");\n");
         content.append(indentString()).append("    }\n\n");
@@ -352,7 +352,7 @@ public class DataClassExporter {
         }
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
-                    .append("this.").append(field.getFieldName())
+                    .append("this.").append(field.getColumnsJavaCodeName())
                     .append(" = null;\n");
         }
         content.append(indentString()).append("    }\n\n");
@@ -365,7 +365,7 @@ public class DataClassExporter {
                     "            "
                             + field.getFieldType().getCanonicalName()
                             + " "
-                            + field.getFieldName())
+                            + field.getColumnsJavaCodeName())
                     .collect(toList()));
             content.append(indentString()).append(arguments);
             content.append(") {\n");
@@ -376,9 +376,9 @@ public class DataClassExporter {
             }
             for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
                 content.append(indentString()).append("        ")
-                        .append("this.").append(field.getFieldName())
+                        .append("this.").append(field.getColumnsJavaCodeName())
                         .append(" = ")
-                        .append(field.getFieldName())
+                        .append(field.getColumnsJavaCodeName())
                         .append(";\n");
             }
 
@@ -387,20 +387,20 @@ public class DataClassExporter {
     }
 
     private void contentStaticFieldNames(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
-        String staticName = field.getFieldKeyName();
+        String staticName = field.getColumnInternalSqlName();
 
         this.addSuppressWarningsUnused(4, content);
         content.append(indentString()).append("    public static final String INTERNAL_FIELD_").append(staticName.toUpperCase())
                 .append(" = ")
                 .append("\"")
-                .append(field.getFieldKeyName())
+                .append(field.getColumnInternalSqlName())
                 .append("\";\n\n");
 
         this.addSuppressWarningsUnused(4, content);
         content.append(indentString()).append("    public static final String FIELD_").append(staticName.toUpperCase())
                 .append(" = ")
                 .append("\"")
-                .append(field.getFieldName())
+                .append(field.getColumnsJavaCodeName())
                 .append("\";\n\n");
     }
 
@@ -413,7 +413,7 @@ public class DataClassExporter {
 
     private void contentField(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
         content.append(indentString()).append("    ").append(this.getNullableOrNonnullAnnotation(field)).append("public final ");
-        content.append(field.getFieldType().getCanonicalName()).append(" ").append(field.getFieldName());
+        content.append(field.getFieldType().getCanonicalName()).append(" ").append(field.getColumnsJavaCodeName());
         content.append(";\n");
     }
 
@@ -424,16 +424,16 @@ public class DataClassExporter {
         content.append(" ");
         boolean isBool = Boolean.class.isAssignableFrom(field.getFieldType());
         String prefix = isBool ? "is" : "get";
-        content.append(prefix).append(firstCharUpperCase(field.getFieldName())).append("() {\n");
-        content.append(indentString()).append("        return this.").append(field.getFieldName()).append(";\n");
+        content.append(prefix).append(firstCharUpperCase(field.getColumnsJavaCodeName())).append("() {\n");
+        content.append(indentString()).append("        return this.").append(field.getColumnsJavaCodeName()).append(";\n");
         content.append(indentString()).append("    }\n\n");
 
         // Setter
         content.append(indentString()).append("    public ").append(this.getClassName()).append(" ");
-        content.append("with").append(firstCharUpperCase(field.getFieldName())).append("(");
+        content.append("with").append(firstCharUpperCase(field.getColumnsJavaCodeName())).append("(");
         content.append(this.getNullableOrNonnullAnnotation(field));
         content.append(field.getFieldType().getCanonicalName());
-        content.append(" ").append(field.getFieldName());
+        content.append(" ").append(field.getColumnsJavaCodeName());
         content.append(") {\n");
 
         // setter body

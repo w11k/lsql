@@ -2,7 +2,7 @@ package com.w11k.lsql.tests.testdata;
 
 public class Person {
 
-    private int id;
+    private int idPk;
 
     private String firstName;
 
@@ -13,18 +13,18 @@ public class Person {
     public Person() {
     }
 
-    public Person(int id, String firstName, int age) {
-        this.id = id;
+    public Person(int idPk, String firstName, int age) {
+        this.idPk = idPk;
         this.firstName = firstName;
         this.age = age;
     }
 
-    public int getId() {
-        return this.id;
+    public int getIdPk() {
+        return this.idPk;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdPk(int idPk) {
+        this.idPk = idPk;
     }
 
     public String getFirstName() {
@@ -58,7 +58,7 @@ public class Person {
 
         Person person = (Person) o;
 
-        return this.id == person.id && this.age == person.age
+        return this.idPk == person.idPk && this.age == person.age
                 && (this.firstName != null ? this.firstName.equals(person.firstName) : person.firstName == null
                 && (this.title != null ? this.title.equals(person.title) : person.title == null));
 
@@ -66,7 +66,7 @@ public class Person {
 
     @Override
     public int hashCode() {
-        int result = this.id;
+        int result = this.idPk;
         result = 31 * result + (this.firstName != null ? this.firstName.hashCode() : 0);
         result = 31 * result + this.age;
         result = 31 * result + (this.title != null ? this.title.hashCode() : 0);
@@ -76,7 +76,7 @@ public class Person {
     @Override
     public String toString() {
         return "Person{" +
-                "id=" + this.id +
+                "id=" + this.idPk +
                 ", firstName='" + this.firstName + '\'' +
                 ", age=" + this.age +
                 '}';

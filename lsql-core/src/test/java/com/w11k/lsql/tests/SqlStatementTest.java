@@ -5,12 +5,14 @@ import com.google.common.collect.Lists;
 import com.w11k.lsql.*;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.PostgresDialect;
+import com.w11k.lsql.dialects.RowKeyConverter;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.query.RowQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 import org.testng.Assert;
 import org.testng.SkipException;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.annotation.Nullable;
@@ -24,6 +26,13 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class SqlStatementTest extends AbstractLSqlTest {
+
+    @BeforeMethod
+    public void setRowKeyConverter() {
+        addConfigHook(config -> {
+            config.setRowKeyConverter(RowKeyConverter.JAVA_CAMEL_CASE_TO_SQL_LOWER_UNDERSCORE);
+        });
+    }
 
     @Test
     public void statementNoParameter() {

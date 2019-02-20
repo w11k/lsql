@@ -44,14 +44,15 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public Optional<T> load(I id) {
-        Optional<LinkedRow> row = this.table.get().load(id);
-        if (!row.isPresent()) {
+        Optional<LinkedRow> internalRow = this.table.get().load(id);
+
+        if (!internalRow.isPresent()) {
             return Optional.absent();
         }
 
         T tableRow;
         try {
-            tableRow = this.createFromInternalMap(row.get());
+            tableRow = this.createFromInternalMap(internalRow.get());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

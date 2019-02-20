@@ -4,14 +4,12 @@ import com.google.common.base.Optional;
 import com.google.common.reflect.Invokable;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.Table;
-import com.w11k.lsql.cli.tests.DummyDto;
 import com.w11k.lsql.cli.tests.Stmts1;
 import com.w11k.lsql.cli.tests.schema_public.Person1_Row;
 import com.w11k.lsql.cli.tests.schema_public.Person1_Table;
 import com.w11k.lsql.cli.tests.schema_public.Person2_Row;
 import com.w11k.lsql.cli.tests.schema_public.Person2_Table;
 import com.w11k.lsql.cli.tests.stmts1.QueryParamsWithDot;
-import com.w11k.lsql.cli.tests.sub_for_dto.SubDummyDto;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.StmtsCamelCase2;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
 import org.testng.Assert;
@@ -22,6 +20,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.Integer.valueOf;
 import static org.testng.Assert.*;
 
 public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
@@ -135,7 +134,7 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
         Person1_Row person1Row = new Person1_Row()
                 .withFirstName("Max");
 
-        Map<String, Object> map = person1Row.toMap();
+        Map<String, Object> map = person1Row.toRow();
         assertTrue(map.containsKey("firstName"));
         assertTrue(map.containsKey(Person1_Row.FIELD_FIRST_NAME));
     }
@@ -153,14 +152,14 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
     public void insert() {
         Person1_Table person1Table = new Person1_Table(lSql);
         Optional<Integer> pk = person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
-        assertEquals(pk.get(), new Integer(1));
+        assertEquals(pk.get(), valueOf(1));
     }
 
     @Test
     public void insertAndLoad() {
         Person1_Table person1Table = new Person1_Table(lSql);
         Person1_Row p1 = person1Table.insertAndLoad(new Person1_Row().withId(1).withFirstName("a"));
-        assertEquals(p1.getId(), new Integer(1));
+        assertEquals(p1.getId(), valueOf(1));
         assertEquals(p1.getFirstName(), "a");
     }
 
@@ -281,12 +280,4 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
         assertFalse(row.isPresent());
     }
 
-    @Test
-    public void dto() {
-        SubDummyDto dto = new DummyDto()
-                .withFieldA("a")
-                .as(SubDummyDto.class);
-
-        assertEquals(dto.fieldA, "a");
-    }
 }

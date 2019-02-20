@@ -24,8 +24,8 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersons fromMap(java.util.Map<String, Object> map) {
-        return new LoadAllPersons((java.lang.Integer) map.get("id"), (java.lang.String) map.get("firstName"));
+    public static LoadAllPersons fromRow(java.util.Map<String, Object> map) {
+        return new LoadAllPersons((java.lang.Integer) map.get("id"), (java.lang.String) map.get("first_name"));
     }
 
     // constructors ----------
@@ -106,10 +106,10 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         return map;
     }
 
-    public java.util.Map<String, Object> toMap() {
+    public java.util.Map<String, Object> toRow() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
-        map.put("firstName", this.firstName);
+        map.put("firstName", this.first_name);
         return map;
     }
 

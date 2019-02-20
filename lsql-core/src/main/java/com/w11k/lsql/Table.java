@@ -105,7 +105,7 @@ public class Table {
     }
 
     /**
-     * Convenience method. Same as {@code enableRevisionSupport(revision).}
+     * Convenience method. Same as {@code enableRevisionSupport("revision").}
      */
     public void enableRevisionSupport() {
         enableRevisionSupport("revision");
@@ -145,9 +145,10 @@ public class Table {
             // remove the primary key column value if the value is null
             if (this.primaryKeyColumn.isPresent()) {
                 String pkColumn = this.primaryKeyColumn.get();
-                if (row.containsKey(pkColumn) && row.get(pkColumn) == null) {
+                String pkRowKey = rowKeyJavaToSql(pkColumn);
+                if (row.containsKey(pkRowKey) && row.get(pkRowKey) == null) {
                     row = new Row(row);
-                    row.remove(pkColumn);
+                    row.remove(pkRowKey);
                 }
             }
 
@@ -164,18 +165,18 @@ public class Table {
             }
             if (primaryKeyColumn.isPresent()) {
                 Object id = null;
-                if (!row.containsKey(primaryKeyColumn.get())) {
+                if (!row.containsKey(rowKeySqlToJava(primaryKeyColumn.get()))) {
                     // check for generated keys
                     ResultSet resultSet = ps.getGeneratedKeys();
                     if (resultSet.next()) {
                         Optional<Object> generated = lSql.extractGeneratedPk(this, resultSet);
                         if (generated.isPresent()) {
                             id = generated.get();
-                            row.put(primaryKeyColumn.get(), id);
+                            row.put(rowKeySqlToJava(primaryKeyColumn.get()), id);
                         }
                     }
                 } else {
-                    id = row.get(primaryKeyColumn.get());
+                    id = row.get(rowKeySqlToJava(primaryKeyColumn.get()));
                 }
 
                 // Set new revision
@@ -209,13 +210,14 @@ public class Table {
             throw new UpdateException("Can not update row without a primary key column.");
         }
 
-        if (!row.containsKey(primaryKeyColumn.get())) {
+        String rowKeyPk = rowKeySqlToJava(primaryKeyColumn.get());
+
+        if (!row.containsKey(rowKeyPk)) {
             throw new UpdateException("Can not update row because the primary key column " +
-                    "'" + primaryKeyColumn.get() + "' is not present.");
+                    "'" + rowKeyPk + "' is not present.");
         }
 
-        String pkName = primaryKeyColumn.get();
-        Row whereIdVal = Row.fromKeyVals(pkName, row.get(pkName));
+        Row whereIdVal = Row.fromKeyVals(rowKeyPk, row.get(rowKeyPk));
         updateWhere(row, whereIdVal);
     }
 
@@ -228,8 +230,8 @@ public class Table {
             List<String> whereColumns = createColumnList(where, false);
 
             if (revisionColumn.isPresent()) {
-                valueColumns.remove(getRevisionColumn().get().getJavaColumnName());
-                whereColumns.remove(getRevisionColumn().get().getJavaColumnName());
+                valueColumns.remove(rowKeySqlToJava(getRevisionColumn().get().getColumnName()));
+                whereColumns.remove(rowKeySqlToJava(getRevisionColumn().get().getColumnName()));
             }
 
             final int placeholderCount = valueColumns.size() + whereColumns.size();
@@ -246,16 +248,16 @@ public class Table {
             // Set Revision
             if (revisionColumn.isPresent()) {
                 Column col = revisionColumn.get();
-                Object revision = values.get(col.getJavaColumnName());
+                Object revision = values.get(rowKeySqlToJava(col.getColumnName()));
                 col.getConverter().setValueInStatement(lSql, ps, placeholderCount + 1, revision);
             }
 
             executeUpdate(ps);
 
             // Set new revision
-            if (getPrimaryKeyColumn().isPresent() && values.containsKey(getPrimaryKeyColumn().get())) {
+            if (getPrimaryKeyColumn().isPresent() && values.containsKey(rowKeySqlToJava(getPrimaryKeyColumn().get()))) {
                 String pkColumn = getPrimaryKeyColumn().get();
-                Object id = values.get(pkColumn);
+                Object id = values.get(rowKeySqlToJava(pkColumn));
                 applyNewRevision(values, id);
             }
         } catch (Exception e) {
@@ -274,15 +276,17 @@ public class Table {
         if (!primaryKeyColumn.isPresent()) {
             throw new DatabaseAccessException("save() requires a primary key column.");
         }
-        if (!row.containsKey(getPrimaryKeyColumn().get())) {
+
+        String rowKeyPrimaryKey = rowKeySqlToJava(primaryKeyColumn.get());
+
+        if (!row.containsKey(rowKeyPrimaryKey)) {
             // Insert
             return insert(row);
         } else {
             // Check if insert or update
-            Object id = row.get(primaryKeyColumn.get());
+            Object id = row.get(rowKeyPrimaryKey);
             try {
-                PreparedStatement ps = lSql.getStatementCreator()
-                        .createCountForIdStatement(this);
+                PreparedStatement ps = lSql.getStatementCreator().createCountForIdStatement(this);
                 Column column = column(getPrimaryKeyColumn().get());
                 column.getConverter().setValueInStatement(lSql, ps, 1, id);
                 ps.setObject(1, id);
@@ -312,7 +316,7 @@ public class Table {
      */
     public void delete(Object id) {
         Row row = new Row();
-        row.put(primaryKeyColumn.get(), id);
+        row.put(rowKeySqlToJava(primaryKeyColumn.get()), id);
         delete(row);
     }
 
@@ -331,11 +335,11 @@ public class Table {
         PreparedStatement ps = lSql.getStatementCreator().createDeleteByIdStatement(this);
         try {
             Column column = column(primaryKeyColumn.get());
-            Object id = row.get(primaryKeyColumn.get());
+            Object id = row.get(rowKeySqlToJava(primaryKeyColumn.get()));
             column.getConverter().setValueInStatement(lSql, ps, 1, id);
             if (revisionColumn.isPresent()) {
                 Column revCol = revisionColumn.get();
-                Object revVal = row.get(revCol.getJavaColumnName());
+                Object revVal = row.get(rowKeySqlToJava(revCol.getColumnName()));
                 if (revVal == null) {
                     throw new IllegalStateException("Row must contain a revision.");
                 }
@@ -367,7 +371,12 @@ public class Table {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        RowQuery query = new RowQuery(lSql, ps, null);
+        RowQuery query = new RowQuery(lSql, ps, null) {
+            @Override
+            protected void setValue(LSql lSql, Row entity, String internalSqlColumnName, Object value) {
+                entity.put(rowKeySqlToJava(internalSqlColumnName), value);
+            }
+        };
         for (Map.Entry<String, Column> columnInTable : this.columns.entrySet()) {
             Column value = columnInTable.getValue();
             if (value.isIgnored()) {
@@ -381,6 +390,14 @@ public class Table {
         } else {
             return absent();
         }
+    }
+
+    protected String rowKeySqlToJava(String internalSql) {
+        return this.lSql.convertInternalSqlToRowKey(internalSql);
+    }
+
+    protected String rowKeyJavaToSql(String javaIdentifier) {
+        return this.lSql.convertRowKeyToInternalSql(javaIdentifier);
     }
 
     /**
@@ -446,7 +463,6 @@ public class Table {
 //        }
 //        return column(javaColumnName).validateValue(value);
 //    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -485,7 +501,7 @@ public class Table {
     private List<String> createColumnList(final Row row, final boolean filterIgnoreOnUpdateColumns) {
         List<String> columns = Lists.newLinkedList(row.keySet());
         columns = columns.stream()
-                .map(this.lSql::convertJavaIdentifierToInternalSql)
+                .map(this::rowKeyJavaToSql)
                 .filter(input -> {
                     Column column = column(input);
                     if (column == null) {
@@ -518,7 +534,7 @@ public class Table {
     private void applyNewRevision(Row row, Object id) throws SQLException {
         if (revisionColumn.isPresent()) {
             Object revision = queryRevision(id);
-            row.put(revisionColumn.get().getJavaColumnName(), revision);
+            row.put(revisionColumn.get().getColumnName(), revision);
         }
     }
 
@@ -621,15 +637,13 @@ public class Table {
                                                            Row values2) {
         try {
             for (int i = 0; i < columns1.size(); i++) {
-                String columnJavaIdentifier = this.lSql.convertInternalSqlToJavaIdentifier(columns1.get(i));
                 Converter converter = column(columns1.get(i)).getConverter();
-                converter.setValueInStatement(lSql, ps, i + 1, values1.get(columnJavaIdentifier));
+                converter.setValueInStatement(lSql, ps, i + 1, values1.get(rowKeySqlToJava(columns1.get(i))));
             }
             if (columns2 != null && values2 != null) {
                 for (int i = 0; i < columns2.size(); i++) {
-                    String columnJavaIdentifier = this.lSql.convertInternalSqlToJavaIdentifier(columns2.get(i));
                     Converter converter = column(columns2.get(i)).getConverter();
-                    converter.setValueInStatement(lSql, ps, columns1.size() + i + 1, values2.get(columnJavaIdentifier));
+                    converter.setValueInStatement(lSql, ps, columns1.size() + i + 1, values2.get(rowKeySqlToJava(columns2.get(i))));
                 }
             }
             return ps;

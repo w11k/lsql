@@ -17,8 +17,12 @@ public final class DataClassMeta {
         this.packageName = packageName;
     }
 
-    public DataClassFieldMeta addField(String fieldName, String fieldKeyInMap, Class<?> fieldType) {
-        DataClassFieldMeta field = new DataClassFieldMeta(fieldName, fieldKeyInMap, fieldType);
+    public DataClassFieldMeta addField(String columnInternalSqlName,
+                                       String columnsJavaCodeName,
+                                       String columnRowKeyName,
+                                       Class<?> fieldType) {
+
+        DataClassFieldMeta field = new DataClassFieldMeta(columnInternalSqlName, columnsJavaCodeName, columnRowKeyName, fieldType);
         this.fields.add(field);
         return field;
     }
@@ -37,30 +41,38 @@ public final class DataClassMeta {
 
     public static class DataClassFieldMeta {
 
-        private final String fieldName;
-
-        private final String fieldKeyName;
-
+        private final String columnInternalSqlName;
+        private final String columnsJavaCodeName;
+        private final String columnRowKeyName;
         private final Class<?> fieldType;
 
         private boolean nullable = true;
 
-        public DataClassFieldMeta(String fieldName, String fieldKeyName, Class<?> fieldType) {
-            this.fieldName = fieldName;
-            this.fieldKeyName = fieldKeyName;
+        public DataClassFieldMeta(String columnInternalSqlName,
+                                  String columnsJavaCodeName,
+                                  String columnRowKeyName,
+                                  Class<?> fieldType) {
+
+            this.columnInternalSqlName = columnInternalSqlName;
+            this.columnsJavaCodeName = columnsJavaCodeName;
+            this.columnRowKeyName = columnRowKeyName;
             this.fieldType = fieldType;
         }
 
-        public String getFieldName() {
-            return fieldName;
+        public String getColumnsJavaCodeName() {
+            return columnsJavaCodeName;
         }
 
         public Class<?> getFieldType() {
             return fieldType;
         }
 
-        public String getFieldKeyName() {
-            return fieldKeyName;
+        public String getColumnInternalSqlName() {
+            return columnInternalSqlName;
+        }
+
+        public String getColumnRowKeyName() {
+            return columnRowKeyName;
         }
 
         public boolean isNullable() {

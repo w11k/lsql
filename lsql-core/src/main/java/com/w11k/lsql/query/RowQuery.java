@@ -25,15 +25,9 @@ public class RowQuery extends AbstractQuery<Row> {
         return new Row();
     }
 
-//    @Override
-//    protected void checkConformity(Map<String, Converter> converters) {
-        // noop
-//    }
-
     @Override
-    protected void setValue(Row entity, String name, Object value) {
-        entity.put(name, value);
+    protected void setValue(LSql lSql, Row entity, String internalSqlColumnName, Object value) {
+        entity.put(internalSqlColumnName, value);
     }
-
 
 }

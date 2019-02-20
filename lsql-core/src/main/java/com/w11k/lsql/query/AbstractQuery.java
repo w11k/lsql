@@ -256,11 +256,8 @@ public abstract class AbstractQuery<T> {
         }
     }
 
-    protected abstract T createEntity();
-
 //    protected abstract void checkConformity(Map<String, Converter> converters);
 
-    protected abstract void setValue(T entity, String name, Object value);
 
     private Converter getConverterByColumnType(ResultSetMetaData metaData, int position) throws SQLException {
         int columnSqlType = metaData.getColumnType(position);
@@ -274,8 +271,9 @@ public abstract class AbstractQuery<T> {
         for (ResultSetColumn column : columnList) {
             try {
                 setValue(
+                        this.lSql,
                         entity,
-                        this.lSql.convertInternalSqlToJavaIdentifier(column.getName()),
+                        column.getName(),
                         column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -283,4 +281,9 @@ public abstract class AbstractQuery<T> {
         }
         return entity;
     }
+
+    protected abstract T createEntity();
+
+    protected abstract void setValue(LSql lSql, T entity, String internalSqlColumnName, Object value);
+
 }

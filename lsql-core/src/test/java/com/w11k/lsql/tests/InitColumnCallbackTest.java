@@ -15,9 +15,9 @@ public class InitColumnCallbackTest extends AbstractLSqlTest {
         lSql.setInitColumnCallback(new InitColumnCallback() {
             @Override
             public void onNewColumn(Column column) {
-                if (column.getJavaColumnName().equals("c1")) {
+                if (column.getColumnName().equals("c1")) {
                     called[0] = true;
-                } else if (column.getJavaColumnName().equals("c2")) {
+                } else if (column.getColumnName().equals("c2")) {
                     called[1] = true;
                 }
             }

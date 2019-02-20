@@ -35,7 +35,7 @@ public class LinkedRow extends Row {
      * @return the revision value
      */
     public Object getRevision() {
-        return get(table.getRevisionColumn().get().getJavaColumnName());
+        return get(table.getRevisionColumn().get().getColumnName());
     }
 
     /**
@@ -44,7 +44,7 @@ public class LinkedRow extends Row {
      * @param revision Revision to use for DML statements.
      */
     public void setRevision(Object revision) {
-        put(table.getRevisionColumn().get().getJavaColumnName(), revision);
+        put(table.getRevisionColumn().get().getColumnName(), revision);
     }
 
     /**
@@ -53,7 +53,7 @@ public class LinkedRow extends Row {
     public void removeIdAndRevision() {
         remove(table.getPrimaryKeyColumn().get());
         if (table.getRevisionColumn().isPresent()) {
-            remove(table.getRevisionColumn().get().getJavaColumnName());
+            remove(table.getRevisionColumn().get().getColumnName());
         }
     }
 

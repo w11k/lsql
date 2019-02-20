@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PersonWithAtomicIntegerAge {
 
-    private int id;
+    private int idPk;
 
     private String firstName;
 
@@ -15,18 +15,18 @@ public class PersonWithAtomicIntegerAge {
     public PersonWithAtomicIntegerAge() {
     }
 
-    public PersonWithAtomicIntegerAge(int id, String firstName, AtomicInteger age) {
-        this.id = id;
+    public PersonWithAtomicIntegerAge(int idPk, String firstName, AtomicInteger age) {
+        this.idPk = idPk;
         this.firstName = firstName;
         this.age = age;
     }
 
-    public int getId() {
-        return this.id;
+    public int getIdPk() {
+        return this.idPk;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdPk(int idPk) {
+        this.idPk = idPk;
     }
 
     public String getFirstName() {
@@ -60,7 +60,7 @@ public class PersonWithAtomicIntegerAge {
 
         PersonWithAtomicIntegerAge that = (PersonWithAtomicIntegerAge) o;
 
-        return this.id == that.id
+        return this.idPk == that.idPk
                 && (this.firstName != null ? this.firstName.equals(that.firstName) : that.firstName == null
                 && (this.age != null ? this.age.equals(that.age) : that.age == null));
 
@@ -68,7 +68,7 @@ public class PersonWithAtomicIntegerAge {
 
     @Override
     public int hashCode() {
-        int result = this.id;
+        int result = this.idPk;
         result = 31 * result + (this.firstName != null ? this.firstName.hashCode() : 0);
         result = 31 * result + (this.age != null ? this.age.hashCode() : 0);
         return result;
@@ -77,7 +77,7 @@ public class PersonWithAtomicIntegerAge {
     @Override
     public String toString() {
         return "PersonWithAtomicIntegerAge{" +
-                "id=" + this.id +
+                "id=" + this.idPk +
                 ", firstName='" + this.firstName + '\'' +
                 ", age=" + this.age +
                 '}';
