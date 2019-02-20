@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
-import com.w11k.lsql.query.RowQuery;
+import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 
@@ -24,7 +24,7 @@ public final class TypedStatementMeta {
     private Map<String, Class<?>> parameters = Maps.newHashMap();
 
     public TypedStatementMeta(LSql lSql,
-                              AbstractSqlStatement<RowQuery> query,
+                              AbstractSqlStatement<PlainQuery> query,
                               SqlStatementToPreparedStatement statement,
                               @Nullable String sourceFileName) {
 

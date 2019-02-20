@@ -8,9 +8,9 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
 
-public class RowQuery extends AbstractQuery<Row> {
+public class PlainQuery extends AbstractQuery<Row> {
 
-    public RowQuery(LSql lSql, PreparedStatement preparedStatement, Map<String, Converter> outConverters) {
+    public PlainQuery(LSql lSql, PreparedStatement preparedStatement, Map<String, Converter> outConverters) {
         super(lSql, preparedStatement, outConverters);
     }
 

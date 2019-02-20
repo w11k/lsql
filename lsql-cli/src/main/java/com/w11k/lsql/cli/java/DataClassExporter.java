@@ -33,7 +33,7 @@ public class DataClassExporter {
 
         this.structuralTypingFields = createStructuralTypingFieldList();
         this.constructorCallArgs = Joiner.on(",").join(dataClassMeta.getFields().stream()
-                .map(DataClassMeta.DataClassFieldMeta::getColumnsJavaCodeName)
+                .map(DataClassMeta.DataClassFieldMeta::getColumnJavaCodeName)
                 .collect(toList()));
     }
 
@@ -44,7 +44,7 @@ public class DataClassExporter {
     private List<StructuralTypingField> createStructuralTypingFieldList() {
         List<StructuralTypingField> list = Lists.newLinkedList();
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
-            list.add(new StructuralTypingField(field.getColumnsJavaCodeName(), field.getFieldType()));
+            list.add(new StructuralTypingField(field.getColumnJavaCodeName(), field.getFieldType()));
         }
         return list;
     }
@@ -164,7 +164,7 @@ public class DataClassExporter {
             content.append(indentString()).append("        return ");
 
             List<String> fieldEquals = this.dataClassMeta.getFields().stream()
-                    .map(f -> "    Objects.equals(" + f.getColumnsJavaCodeName() + ", that." + f.getColumnsJavaCodeName() + ")")
+                    .map(f -> "    Objects.equals(" + f.getColumnJavaCodeName() + ", that." + f.getColumnJavaCodeName() + ")")
                     .collect(toList());
 
             content.append(Joiner.on(" && \n" + indentString() + "        ").join(fieldEquals));
@@ -183,7 +183,7 @@ public class DataClassExporter {
             content.append("\"").append(this.getClassName()).append("\"");
         } else {
             List<String> fieldNames = this.dataClassMeta.getFields().stream()
-                    .map(DataClassMeta.DataClassFieldMeta::getColumnsJavaCodeName)
+                    .map(DataClassMeta.DataClassFieldMeta::getColumnJavaCodeName)
                     .collect(toList());
 
             content.append(Joiner.on(", ").join(fieldNames));
@@ -201,7 +201,7 @@ public class DataClassExporter {
             content.append("\"\"");
         } else {
             List<String> fieldNames = this.dataClassMeta.getFields().stream()
-                    .map(f -> "\"" + f.getColumnsJavaCodeName() + "=\" + " + f.getColumnsJavaCodeName())
+                    .map(f -> "\"" + f.getColumnJavaCodeName() + "=\" + " + f.getColumnJavaCodeName())
                     .collect(toList());
 
             content.append(Joiner.on("\n" + this.indentString() + "            + \", \" + ").join(fieldNames));
@@ -216,7 +216,7 @@ public class DataClassExporter {
 
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
-                    .append("map.put(\"").append(field.getColumnInternalSqlName()).append("\", this.").append(field.getColumnsJavaCodeName()).append(");\n");
+                    .append("map.put(\"").append(field.getColumnInternalSqlName()).append("\", this.").append(field.getColumnJavaCodeName()).append(");\n");
         }
 
         content.append(indentString()).append("        return map;\n");
@@ -229,7 +229,7 @@ public class DataClassExporter {
 
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
-                    .append("map.put(\"").append(field.getColumnsJavaCodeName()).append("\", this.").append(field.getColumnRowKeyName()).append(");\n");
+                    .append("map.put(\"").append(field.getColumnRowKeyName()).append("\", this.").append(field.getColumnJavaCodeName()).append(");\n");
         }
 
         content.append(indentString()).append("        return map;\n");
@@ -352,7 +352,7 @@ public class DataClassExporter {
         }
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
             content.append(indentString()).append("        ")
-                    .append("this.").append(field.getColumnsJavaCodeName())
+                    .append("this.").append(field.getColumnJavaCodeName())
                     .append(" = null;\n");
         }
         content.append(indentString()).append("    }\n\n");
@@ -365,7 +365,7 @@ public class DataClassExporter {
                     "            "
                             + field.getFieldType().getCanonicalName()
                             + " "
-                            + field.getColumnsJavaCodeName())
+                            + field.getColumnJavaCodeName())
                     .collect(toList()));
             content.append(indentString()).append(arguments);
             content.append(") {\n");
@@ -376,9 +376,9 @@ public class DataClassExporter {
             }
             for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
                 content.append(indentString()).append("        ")
-                        .append("this.").append(field.getColumnsJavaCodeName())
+                        .append("this.").append(field.getColumnJavaCodeName())
                         .append(" = ")
-                        .append(field.getColumnsJavaCodeName())
+                        .append(field.getColumnJavaCodeName())
                         .append(";\n");
             }
 
@@ -400,7 +400,7 @@ public class DataClassExporter {
         content.append(indentString()).append("    public static final String FIELD_").append(staticName.toUpperCase())
                 .append(" = ")
                 .append("\"")
-                .append(field.getColumnsJavaCodeName())
+                .append(field.getColumnRowKeyName())
                 .append("\";\n\n");
     }
 
@@ -413,7 +413,7 @@ public class DataClassExporter {
 
     private void contentField(StringBuilder content, DataClassMeta.DataClassFieldMeta field) {
         content.append(indentString()).append("    ").append(this.getNullableOrNonnullAnnotation(field)).append("public final ");
-        content.append(field.getFieldType().getCanonicalName()).append(" ").append(field.getColumnsJavaCodeName());
+        content.append(field.getFieldType().getCanonicalName()).append(" ").append(field.getColumnJavaCodeName());
         content.append(";\n");
     }
 
@@ -424,16 +424,16 @@ public class DataClassExporter {
         content.append(" ");
         boolean isBool = Boolean.class.isAssignableFrom(field.getFieldType());
         String prefix = isBool ? "is" : "get";
-        content.append(prefix).append(firstCharUpperCase(field.getColumnsJavaCodeName())).append("() {\n");
-        content.append(indentString()).append("        return this.").append(field.getColumnsJavaCodeName()).append(";\n");
+        content.append(prefix).append(firstCharUpperCase(field.getColumnJavaCodeName())).append("() {\n");
+        content.append(indentString()).append("        return this.").append(field.getColumnJavaCodeName()).append(";\n");
         content.append(indentString()).append("    }\n\n");
 
         // Setter
         content.append(indentString()).append("    public ").append(this.getClassName()).append(" ");
-        content.append("with").append(firstCharUpperCase(field.getColumnsJavaCodeName())).append("(");
+        content.append("with").append(firstCharUpperCase(field.getColumnJavaCodeName())).append("(");
         content.append(this.getNullableOrNonnullAnnotation(field));
         content.append(field.getFieldType().getCanonicalName());
-        content.append(" ").append(field.getColumnsJavaCodeName());
+        content.append(" ").append(field.getColumnJavaCodeName());
         content.append(") {\n");
 
         // setter body

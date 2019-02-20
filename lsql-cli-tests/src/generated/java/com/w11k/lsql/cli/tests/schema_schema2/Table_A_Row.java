@@ -1,47 +1,47 @@
-package com.w11k.lsql.cli.tests.stmts1;
+package com.w11k.lsql.cli.tests.schema_schema2;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
 @SuppressWarnings({"Duplicates", "WeakerAccess"})
-public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String {
+public final class Table_A_Row implements com.w11k.lsql.TableRow, Id_Integer, Col1String {
 
     // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
             Id_Integer
-            & First_Name_String> LoadAllPersons from(T source) {
-        Object target = new LoadAllPersons();
+            & Col1String> Table_A_Row from(T source) {
+        Object target = new Table_A_Row();
         target = ((Id_Integer) target).withId(source.getId());
-        target = ((First_Name_String) target).withFirstName(source.getFirstName());
-        return (LoadAllPersons) target;
+        target = ((Col1String) target).withCol1(source.getCol1());
+        return (Table_A_Row) target;
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersons fromInternalMap(java.util.Map<String, Object> internalMap) {
-        return new LoadAllPersons((java.lang.Integer) internalMap.get("id"), (java.lang.String) internalMap.get("first_name"));
+    public static Table_A_Row fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new Table_A_Row((java.lang.Integer) internalMap.get("id"), (java.lang.String) internalMap.get("col1"));
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersons fromRow(java.util.Map<String, Object> map) {
-        return new LoadAllPersons((java.lang.Integer) map.get("id"), (java.lang.String) map.get("firstName"));
+    public static Table_A_Row fromRow(java.util.Map<String, Object> map) {
+        return new Table_A_Row((java.lang.Integer) map.get("id"), (java.lang.String) map.get("col1"));
     }
 
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
-    public LoadAllPersons() {
+    public Table_A_Row() {
         this.id = null;
-        this.firstName = null;
+        this.col1 = null;
     }
 
     @SuppressWarnings("NullableProblems")
-    private LoadAllPersons(
+    private Table_A_Row(
             java.lang.Integer id,
-            java.lang.String firstName) {
+            java.lang.String col1) {
         this.id = id;
-        this.firstName = firstName;
+        this.col1 = col1;
     }
 
     // fields ----------
@@ -58,23 +58,23 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         return this.id;
     }
 
-    public LoadAllPersons withId(@javax.annotation.Nonnull java.lang.Integer id) {
-        return new LoadAllPersons(id,firstName);
+    public Table_A_Row withId(@javax.annotation.Nonnull java.lang.Integer id) {
+        return new Table_A_Row(id,col1);
     }
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_FIRST_NAME = "first_name";
+    public static final String INTERNAL_FIELD_COL1 = "col1";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_FIRST_NAME = "firstName";
+    public static final String FIELD_COL1 = "col1";
 
-    @javax.annotation.Nullable public final java.lang.String firstName;
+    @javax.annotation.Nullable public final java.lang.String col1;
 
-    @javax.annotation.Nullable public java.lang.String getFirstName() {
-        return this.firstName;
+    @javax.annotation.Nullable public java.lang.String getCol1() {
+        return this.col1;
     }
 
-    public LoadAllPersons withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
-        return new LoadAllPersons(id,firstName);
+    public Table_A_Row withCol1(@javax.annotation.Nullable java.lang.String col1) {
+        return new Table_A_Row(id,col1);
     }
 
     // class methods ----------
@@ -82,17 +82,17 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     @SuppressWarnings("unchecked")
     public <T extends 
             Id_Integer
-            & First_Name_String> T as(T targetStart) {
+            & Col1String> T as(T targetStart) {
         Object target = targetStart;
         target = ((Id_Integer) target).withId(this.getId());
-        target = ((First_Name_String) target).withFirstName(this.getFirstName());
+        target = ((Col1String) target).withCol1(this.getCol1());
         return (T) target;
     }
 
     @SuppressWarnings("unchecked")
     public <T extends 
             Id_Integer
-            & First_Name_String> T as(Class<? extends T> targetClass) {
+            & Col1String> T as(Class<? extends T> targetClass) {
         try {
             Object target = targetClass.newInstance();
             return this.as((T) target);
@@ -102,14 +102,14 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     public java.util.Map<String, Object> toInternalMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
-        map.put("first_name", this.firstName);
+        map.put("col1", this.col1);
         return map;
     }
 
     public java.util.Map<String, Object> toRow() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
-        map.put("firstName", this.firstName);
+        map.put("col1", this.col1);
         return map;
     }
 
@@ -119,20 +119,20 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LoadAllPersons that = (LoadAllPersons) o;
+        Table_A_Row that = (Table_A_Row) o;
         return     Objects.equals(id, that.id) && 
-            Objects.equals(firstName, that.firstName);
+            Objects.equals(col1, that.col1);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName);
+        return Objects.hash(id, col1);
     }
 
     @Override
     public String toString() {
-        return "LoadAllPersons{" + "id=" + id
-            + ", " + "firstName=" + firstName + "}";
+        return "Table_A_Row{" + "id=" + id
+            + ", " + "col1=" + col1 + "}";
     }
 
 }

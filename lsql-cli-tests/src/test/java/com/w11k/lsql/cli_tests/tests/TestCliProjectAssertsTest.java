@@ -12,6 +12,7 @@ import com.w11k.lsql.cli.tests.schema_public.Person2_Table;
 import com.w11k.lsql.cli.tests.stmts1.QueryParamsWithDot;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.StmtsCamelCase2;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
+import com.w11k.lsql.utils.JdbcTestUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -30,8 +31,8 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
         // insert with static util fields
         Table table = this.lSql.table(Person1_Table.NAME);
         Row person1Row = Row.fromKeyVals(
-                Person1_Row.INTERNAL_FIELD_ID, 1,
-                Person1_Row.INTERNAL_FIELD_FIRST_NAME, "a"
+                Person1_Row.FIELD_ID, 1,
+                Person1_Row.FIELD_FIRST_NAME, "a"
         );
         table.insert(person1Row);
 
@@ -130,12 +131,11 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
     }
 
     @Test
-    public void toMap() {
+    public void toRow() {
         Person1_Row person1Row = new Person1_Row()
                 .withFirstName("Max");
 
         Map<String, Object> map = person1Row.toRow();
-        assertTrue(map.containsKey("firstName"));
         assertTrue(map.containsKey(Person1_Row.FIELD_FIRST_NAME));
     }
 
@@ -149,10 +149,19 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
     }
 
     @Test
-    public void insert() {
+    public void insert() throws Exception {
         Person1_Table person1Table = new Person1_Table(lSql);
         Optional<Integer> pk = person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
         assertEquals(pk.get(), valueOf(1));
+
+        JdbcTestUtils.queryForEach(
+                lSql.getConnectionProvider().call(),
+                "select * from person1;",
+                rs -> {
+                    assertEquals(rs.getInt("id"), 1);
+                    assertEquals(rs.getString("first_name"), "a");
+                    return false;
+                });
     }
 
     @Test
@@ -200,10 +209,8 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
         Person1_Table person1Table = new Person1_Table(lSql);
         Person1_Row p1 = new Person1_Row().withId(1).withFirstName("a");
         person1Table.insert(p1);
-
         person1Table.update(p1.withFirstName("b"));
         p1 = person1Table.load(1).get();
-
         assertEquals(p1.getFirstName(), "b");
     }
 

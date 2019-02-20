@@ -2,7 +2,7 @@ package com.w11k.lsql.tests;
 
 import com.w11k.lsql.ResultSetWithColumns;
 import com.w11k.lsql.Row;
-import com.w11k.lsql.query.RowQuery;
+import com.w11k.lsql.query.PlainQuery;
 import io.reactivex.Observable;
 import org.testng.annotations.Test;
 
@@ -11,13 +11,13 @@ import java.util.List;
 
 import static org.testng.Assert.*;
 
-public class RowQueryTest extends AbstractLSqlTest {
+public class PlainQueryTest extends AbstractLSqlTest {
 
     @Test
     public void query() {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        RowQuery rows = lSql.executeRawQuery("SELECT * FROM table1");
+        PlainQuery rows = lSql.executeRawQuery("SELECT * FROM table1");
         assertNotNull(rows);
     }
 
@@ -76,7 +76,7 @@ public class RowQueryTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table2 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table2 (name, age) VALUES ('cus2', 30)");
-        RowQuery query = lSql.executeRawQuery("SELECT *, count(*) AS c FROM table1, table2");
+        PlainQuery query = lSql.executeRawQuery("SELECT *, count(*) AS c FROM table1, table2");
         query.toList();
     }
 
@@ -108,7 +108,7 @@ public class RowQueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 10)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus2', 20)");
 
-        final RowQuery query = lSql.executeRawQuery("SELECT * FROM table1");
+        final PlainQuery query = lSql.executeRawQuery("SELECT * FROM table1");
         Observable<ResultSetWithColumns> rx = query.rxResultSet();
         List<Row> result = rx.filter(resultSetWithColumns -> {
             try {
@@ -133,7 +133,7 @@ public class RowQueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 10)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus2', 20)");
 
-        RowQuery query = lSql.executeRawQuery("SELECT * FROM table1");
+        PlainQuery query = lSql.executeRawQuery("SELECT * FROM table1");
         query.rx()
                 .filter((Row row) -> row.getInt("age") < 100)
                 .subscribe(row -> System.out.println("row = " + row));

@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.CodeGenUtils;
-import com.w11k.lsql.query.RowQuery;
+import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
@@ -55,7 +55,7 @@ public final class StatementFileExporter {
         // process statements
         boolean containsOnlyVoidStatements = true;
         for (String stmtName : statements.keySet()) {
-            AbstractSqlStatement<RowQuery> query = lSqlFile.statement(stmtName);
+            AbstractSqlStatement<PlainQuery> query = lSqlFile.statement(stmtName);
             SqlStatementToPreparedStatement stmt = lSqlFile.getSqlStatementToPreparedStatement(stmtName);
 
             if (stmt.getTypeAnnotation().toLowerCase().equals("nogen")) {

@@ -11,7 +11,7 @@ import com.w11k.lsql.dialects.GenericDialect;
 import com.w11k.lsql.dialects.StatementCreator;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.query.PojoQuery;
-import com.w11k.lsql.query.RowQuery;
+import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
@@ -225,11 +225,11 @@ public class LSql {
      * @return the Query instance
      */
     @Deprecated
-    public RowQuery executeRawQuery(String sql) {
+    public PlainQuery executeRawQuery(String sql) {
         SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "LSql", "executeRawQuery", "", sql);
 
         try {
-            return new RowQuery(
+            return new PlainQuery(
                     this,
                     st.createPreparedStatement(Collections.emptyMap(), null),
                     st.getOutConverters());
@@ -269,7 +269,7 @@ public class LSql {
      *
      * @param sqlString the SQL SELECT string
      */
-    public AbstractSqlStatement<RowQuery> createSqlStatement(String sqlString) {
+    public AbstractSqlStatement<PlainQuery> createSqlStatement(String sqlString) {
         return this.createSqlStatement(sqlString, "LSql", "createSqlStatement");
     }
 
@@ -278,14 +278,14 @@ public class LSql {
      *
      * @param sqlString the SQL SELECT string
      */
-    public AbstractSqlStatement<RowQuery> createSqlStatement(String sqlString, String sourceName, String stmtName) {
+    public AbstractSqlStatement<PlainQuery> createSqlStatement(String sqlString, String sourceName, String stmtName) {
         final SqlStatementToPreparedStatement stmtToPs =
                 new SqlStatementToPreparedStatement(this, sourceName, stmtName, "", sqlString);
 
-        return new AbstractSqlStatement<RowQuery>(stmtToPs) {
+        return new AbstractSqlStatement<PlainQuery>(stmtToPs) {
             @Override
-            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
-                return new RowQuery(lSql, ps, outConverters) {
+            protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new PlainQuery(lSql, ps, outConverters) {
                     @Override
                     protected void setValue(LSql lSql, Row entity, String internalSqlColumnName, Object value) {
                         super.setValue(lSql, entity, convertInternalSqlToRowKey(internalSqlColumnName), value);

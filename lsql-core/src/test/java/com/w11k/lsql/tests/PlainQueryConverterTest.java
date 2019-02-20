@@ -3,7 +3,7 @@ package com.w11k.lsql.tests;
 import com.w11k.lsql.Row;
 import com.w11k.lsql.converter.predefined.JavaBoolToSqlStringConverter;
 import com.w11k.lsql.converter.types.IntConverter;
-import com.w11k.lsql.query.RowQuery;
+import com.w11k.lsql.query.PlainQuery;
 import org.testng.annotations.Test;
 
 import java.sql.Types;
@@ -11,7 +11,7 @@ import java.sql.Types;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class RowQueryConverterTest extends AbstractLSqlTest {
+public class PlainQueryConverterTest extends AbstractLSqlTest {
 
     @Test
     public void normalColumn() {
@@ -33,7 +33,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
                 c.setConverter("table1", "field", new JavaBoolToSqlStringConverter("ja", "nein")));
 
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 'ja')");
-        RowQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
+        PlainQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
 
         // Set converter for aliased column
         query.addConverter("aaa", converter);
@@ -47,7 +47,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field INT)");
 
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 2)");
-        RowQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
+        PlainQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
 
         // Set converter for aliased column
         query.addConverter("aaa", null);
@@ -60,7 +60,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
     public void failOnMissingConverter() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field INT)");
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 2)");
-        RowQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
+        PlainQuery query = lSql.executeRawQuery("SELECT id, field as aaa FROM table1");
         query.first().get();
     }
 
@@ -91,7 +91,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 20)");
-        RowQuery query = lSql.executeRawQuery("SELECT count(*) AS c FROM table1");
+        PlainQuery query = lSql.executeRawQuery("SELECT count(*) AS c FROM table1");
         query.addConverter("c", new IntConverter(Types.INTEGER));
         Row row = query.first().get();
         assertEquals(row.getInt("c"), (Integer) 2);
@@ -101,7 +101,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
     public void canUseCalculatedColumnsTogetherWithNormalColumnsOneTable() {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, name TEXT, age INT)");
         lSql.executeRawSql("INSERT INTO table1 (id, name, age) VALUES (1, 'cus1', 20)");
-        RowQuery query = lSql.executeRawQuery("SELECT id, name, age, count(*) AS c FROM table1 GROUP BY id;");
+        PlainQuery query = lSql.executeRawQuery("SELECT id, name, age, count(*) AS c FROM table1 GROUP BY id;");
         query.addConverter("c", new IntConverter(Types.INTEGER));
         Row row = query.first().get();
         assertEquals(row.getString("name"), "cus1");
@@ -114,7 +114,7 @@ public class RowQueryConverterTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY , field INT)");
 
         lSql.executeRawSql("INSERT INTO table1 (id, field) VALUES (1, 2)");
-        RowQuery query = lSql.executeRawQuery("SELECT id, field FROM table1");
+        PlainQuery query = lSql.executeRawQuery("SELECT id, field FROM table1");
 
         query.addConverter("aaa", null);
 

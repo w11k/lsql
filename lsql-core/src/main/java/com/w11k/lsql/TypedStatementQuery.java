@@ -1,9 +1,14 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.converter.Converter;
+import com.w11k.lsql.query.PlainQuery;
+import com.w11k.lsql.statement.AbstractSqlStatement;
+import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +26,22 @@ public abstract class TypedStatementQuery<T> {
     }
 
     public Observable<T> rx() {
-        return this.lSql.createSqlStatement(this.sqlStatement, this.getStatementFileName(), this.getStatementName())
+        final SqlStatementToPreparedStatement stmtToPs =
+                new SqlStatementToPreparedStatement(
+                        this.lSql,
+                        this.getStatementFileName(),
+                        this.getStatementName(),
+                        "",
+                        this.sqlStatement);
+
+        AbstractSqlStatement<PlainQuery> sqlStatement = new AbstractSqlStatement<PlainQuery>(stmtToPs) {
+            @Override
+            protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new PlainQuery(lSql, ps, outConverters);
+            }
+        };
+
+        return sqlStatement
                 .query(this.getQueryParameters())
                 .rx()
                 .map(this::createTypedRow);

@@ -8,7 +8,7 @@
     <parameter name="jdbcPassword" value="lsqltestspass"/>
 
     <classes>
-      <class name="com.w11k.lsql.tests.RowQueryConverterTest">
+      <class name="com.w11k.lsql.tests.PlainQueryConverterTest">
         <methods>
           <include name="failOnUnusedConverter" />
         </methods>

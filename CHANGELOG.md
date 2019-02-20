@@ -4,7 +4,7 @@
 *breaking change:* 
 
 - All references to SQL identifiers (e.g. lsql.table("name")) must now be specified in the SQL format. The conversion only applies to `Row` keys.
-- The IdentifierConverter is now a configuration property of `Config` instead of the `Dialect` 
+- The IdentifierConverter is now a configuration property of `Config` instead of the `Dialect` and is called `RowKeyConverter`
 - removed `Table.validate()`
 
 

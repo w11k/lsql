@@ -7,7 +7,7 @@ import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.query.PojoQuery;
-import com.w11k.lsql.query.RowQuery;
+import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
 import org.slf4j.Logger;
@@ -54,12 +54,12 @@ public class LSqlFile {
         return copyOf(statements);
     }
 
-    public AbstractSqlStatement<RowQuery> statement(String name) {
+    public AbstractSqlStatement<PlainQuery> statement(String name) {
         final SqlStatementToPreparedStatement stmtToPs = getStatement(name);
-        return new AbstractSqlStatement<RowQuery>(stmtToPs) {
+        return new AbstractSqlStatement<PlainQuery>(stmtToPs) {
             @Override
-            protected RowQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
-                return new RowQuery(LSqlFile.this.lSql, ps, outConverters);
+            protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new PlainQuery(LSqlFile.this.lSql, ps, outConverters);
             }
         };
     }

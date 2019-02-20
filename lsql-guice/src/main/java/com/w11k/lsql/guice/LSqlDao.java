@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Table;
 import com.w11k.lsql.query.PojoQuery;
-import com.w11k.lsql.query.RowQuery;
+import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
 import com.w11k.lsql.statement.AbstractSqlStatement;
 
@@ -34,7 +34,7 @@ public class LSqlDao {
         this.lSqlFile = lSqlFile;
     }
 
-    public AbstractSqlStatement<RowQuery> statement(String name) {
+    public AbstractSqlStatement<PlainQuery> statement(String name) {
         return getlSqlFile().statement(name);
     }
 

@@ -59,7 +59,7 @@ public final class DataClassMeta {
             this.fieldType = fieldType;
         }
 
-        public String getColumnsJavaCodeName() {
+        public String getColumnJavaCodeName() {
             return columnsJavaCodeName;
         }
 

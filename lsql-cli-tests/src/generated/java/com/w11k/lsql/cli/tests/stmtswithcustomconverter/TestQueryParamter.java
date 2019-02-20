@@ -1,43 +1,43 @@
-package com.w11k.lsql.cli.tests.stmts1;
+package com.w11k.lsql.cli.tests.stmtswithcustomconverter;
 
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
 @SuppressWarnings({"Duplicates", "WeakerAccess"})
-public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String {
+public final class TestQueryParamter implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String {
 
     // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
             Id_Integer
-            & First_Name_String> LoadAllPersons from(T source) {
-        Object target = new LoadAllPersons();
+            & First_Name_String> TestQueryParamter from(T source) {
+        Object target = new TestQueryParamter();
         target = ((Id_Integer) target).withId(source.getId());
         target = ((First_Name_String) target).withFirstName(source.getFirstName());
-        return (LoadAllPersons) target;
+        return (TestQueryParamter) target;
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersons fromInternalMap(java.util.Map<String, Object> internalMap) {
-        return new LoadAllPersons((java.lang.Integer) internalMap.get("id"), (java.lang.String) internalMap.get("first_name"));
+    public static TestQueryParamter fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new TestQueryParamter((java.lang.Integer) internalMap.get("id"), (java.lang.String) internalMap.get("first_name"));
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersons fromRow(java.util.Map<String, Object> map) {
-        return new LoadAllPersons((java.lang.Integer) map.get("id"), (java.lang.String) map.get("firstName"));
+    public static TestQueryParamter fromRow(java.util.Map<String, Object> map) {
+        return new TestQueryParamter((java.lang.Integer) map.get("id"), (java.lang.String) map.get("firstName"));
     }
 
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
-    public LoadAllPersons() {
+    public TestQueryParamter() {
         this.id = null;
         this.firstName = null;
     }
 
     @SuppressWarnings("NullableProblems")
-    private LoadAllPersons(
+    private TestQueryParamter(
             java.lang.Integer id,
             java.lang.String firstName) {
         this.id = id;
@@ -58,8 +58,8 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         return this.id;
     }
 
-    public LoadAllPersons withId(@javax.annotation.Nonnull java.lang.Integer id) {
-        return new LoadAllPersons(id,firstName);
+    public TestQueryParamter withId(@javax.annotation.Nonnull java.lang.Integer id) {
+        return new TestQueryParamter(id,firstName);
     }
     @SuppressWarnings("unused")
     public static final String INTERNAL_FIELD_FIRST_NAME = "first_name";
@@ -73,8 +73,8 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         return this.firstName;
     }
 
-    public LoadAllPersons withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
-        return new LoadAllPersons(id,firstName);
+    public TestQueryParamter withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
+        return new TestQueryParamter(id,firstName);
     }
 
     // class methods ----------
@@ -119,7 +119,7 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LoadAllPersons that = (LoadAllPersons) o;
+        TestQueryParamter that = (TestQueryParamter) o;
         return     Objects.equals(id, that.id) && 
             Objects.equals(firstName, that.firstName);
     }
@@ -131,7 +131,7 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
 
     @Override
     public String toString() {
-        return "LoadAllPersons{" + "id=" + id
+        return "TestQueryParamter{" + "id=" + id
             + ", " + "firstName=" + firstName + "}";
     }
 

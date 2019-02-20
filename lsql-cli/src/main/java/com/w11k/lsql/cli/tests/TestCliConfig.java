@@ -4,6 +4,7 @@ import com.w11k.lsql.Config;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.dialects.H2Dialect;
+import com.w11k.lsql.dialects.RowKeyConverter;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -49,7 +50,7 @@ public final class TestCliConfig extends Config {
     public static void createTables(LSql lSql) {
         lSql.executeRawSql("create table person1 (id integer primary key, first_name text)");
         lSql.executeRawSql("create table person2 (id integer primary key, first_name text, age integer)");
-        lSql.executeRawSql("create table a_table (id integer primary key)");
+        lSql.executeRawSql("create table a_table (id_pk integer primary key)");
         lSql.executeRawSql("create table checks (yesno BOOLEAN NOT NULL);");
         lSql.executeRawSql("create table table_with_two_keys (key1 integer, key2 integer, PRIMARY KEY (key1, key2))");
         lSql.executeRawSql("create table custom_converter (field INTEGER);");
@@ -59,8 +60,8 @@ public final class TestCliConfig extends Config {
 
     public TestCliConfig() {
         setDialect(new H2Dialect());
-//        getDialect().setIdentifierConverter(IdentifierConverter.JAVA_LOWER_UNDERSCORE_TO_SQL_UPPER_UNDERSCORE);
-
+        setRowKeyConverter(RowKeyConverter.JAVA_CAMEL_CASE_TO_SQL_LOWER_UNDERSCORE);
+//        setRowKeyConverter(RowKeyConverter.NOOP);
         getDialect().getConverterRegistry().addTypeAlias("custom", new CustomConverter());
     }
 
