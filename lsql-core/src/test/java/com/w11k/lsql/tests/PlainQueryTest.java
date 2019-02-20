@@ -37,10 +37,7 @@ public class PlainQueryTest extends AbstractLSqlTest {
         lSql.executeRawSql("INSERT INTO table1 (name, age) VALUES ('cus1', 30)");
         Observable<Row> rx = lSql.executeRawQuery("SELECT * FROM table1").rx();
 
-        List<Integer> ages = rx.map(row -> {
-            System.out.println("MAPPPP");
-            return row.getInt("age");
-        }).toList().blockingGet();
+        List<Integer> ages = rx.map(row -> row.getInt("age")).toList().blockingGet();
 
         assertTrue(ages.contains(20));
         assertTrue(ages.contains(30));
@@ -136,7 +133,7 @@ public class PlainQueryTest extends AbstractLSqlTest {
         PlainQuery query = lSql.executeRawQuery("SELECT * FROM table1");
         query.rx()
                 .filter((Row row) -> row.getInt("age") < 100)
-                .subscribe(row -> System.out.println("row = " + row));
+                .subscribe();
     }
 
 }

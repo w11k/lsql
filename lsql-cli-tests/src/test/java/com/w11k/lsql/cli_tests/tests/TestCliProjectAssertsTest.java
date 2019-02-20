@@ -12,8 +12,6 @@ import com.w11k.lsql.cli.tests.schema_public.Person2_Table;
 import com.w11k.lsql.cli.tests.stmts1.QueryParamsWithDot;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.StmtsCamelCase2;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
-import com.w11k.lsql.utils.JdbcTestUtils;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.annotation.Nonnull;
@@ -21,7 +19,6 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Integer.valueOf;
 import static org.testng.Assert.*;
 
 public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
@@ -146,72 +143,6 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
 
         Invokable<?, Object> withFirstName = Invokable.from(Person2_Row.class.getMethod("withFirstName", String.class));
         assertTrue(withFirstName.getParameters().get(0).isAnnotationPresent(Nullable.class));
-    }
-
-    @Test
-    public void insert() throws Exception {
-        Person1_Table person1Table = new Person1_Table(lSql);
-        Optional<Integer> pk = person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
-        assertEquals(pk.get(), valueOf(1));
-
-        JdbcTestUtils.queryForEach(
-                lSql.getConnectionProvider().call(),
-                "select * from person1;",
-                rs -> {
-                    assertEquals(rs.getInt("id"), 1);
-                    assertEquals(rs.getString("first_name"), "a");
-                    return false;
-                });
-    }
-
-    @Test
-    public void insertAndLoad() {
-        Person1_Table person1Table = new Person1_Table(lSql);
-        Person1_Row p1 = person1Table.insertAndLoad(new Person1_Row().withId(1).withFirstName("a"));
-        assertEquals(p1.getId(), valueOf(1));
-        assertEquals(p1.getFirstName(), "a");
-    }
-
-    @Test
-    public void load() {
-        Person1_Table person1Table = new Person1_Table(lSql);
-        person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
-
-        Optional<Person1_Row> person1RowOptional = person1Table.load(1);
-        Assert.assertTrue(person1RowOptional.isPresent());
-        Person1_Row person1Row = person1RowOptional.get();
-        assertEquals(person1Row.getId(), new Integer(1));
-        assertEquals(person1Row.getFirstName(), "a");
-    }
-
-    @Test
-    public void delete() {
-        Person1_Table person1Table = new Person1_Table(lSql);
-        person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
-        person1Table.delete(new Person1_Row().withId(1));
-
-        Optional<Person1_Row> person1RowOptional = person1Table.load(1);
-        Assert.assertFalse(person1RowOptional.isPresent());
-    }
-
-    @Test
-    public void deleteById() {
-        Person1_Table person1Table = new Person1_Table(lSql);
-        person1Table.insert(new Person1_Row().withId(1).withFirstName("a"));
-        person1Table.deleteById(1);
-
-        Optional<Person1_Row> person1RowOptional = person1Table.load(1);
-        Assert.assertFalse(person1RowOptional.isPresent());
-    }
-
-    @Test
-    public void update() {
-        Person1_Table person1Table = new Person1_Table(lSql);
-        Person1_Row p1 = new Person1_Row().withId(1).withFirstName("a");
-        person1Table.insert(p1);
-        person1Table.update(p1.withFirstName("b"));
-        p1 = person1Table.load(1).get();
-        assertEquals(p1.getFirstName(), "b");
     }
 
     @Test

@@ -553,7 +553,7 @@ public class Table {
         int rowsAffected = ps.executeUpdate();
         if (rowsAffected != 1) {
             throw new UpdateException(rowsAffected +
-                    " toList were affected by update operation (expected 1). " +
+                    " rows were affected by update operation (expected 1). " +
                     "Either the ID or the revision (if enabled) is wrong.");
         }
     }

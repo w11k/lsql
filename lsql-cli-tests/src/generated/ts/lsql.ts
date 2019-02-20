@@ -27,6 +27,22 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Crud_Row {
+        fieldA?: number;
+        fieldB?: string;
+        id: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Crud_Map {
+        field_a?: number;
+        field_b?: string;
+        id: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
     export interface A_Table_Row {
         idPk: number;
     }

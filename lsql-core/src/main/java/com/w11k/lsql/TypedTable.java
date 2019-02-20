@@ -1,6 +1,7 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
+import com.w11k.lsql.exceptions.DatabaseAccessException;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -98,7 +99,17 @@ public abstract class TypedTable<T extends TableRow, I> {
 
     @SuppressWarnings("unchecked")
     public Optional<I> save(T instance) {
+        Optional<String> primaryKeyColumn = this.table.get().getPrimaryKeyColumn();
+        if (!primaryKeyColumn.isPresent()) {
+            throw new DatabaseAccessException("save() requires a primary key column.");
+        }
+
         Map<String, Object> map = instance.toInternalMap();
+        Object pkValue = map.get(primaryKeyColumn.get());
+        if (pkValue == null) {
+            map.remove(primaryKeyColumn.get());
+        }
+
         return (Optional<I>) this.table.get().save(new Row(map), ROW_KEY_HANDLER);
     }
 

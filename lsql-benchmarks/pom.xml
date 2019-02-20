@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.w11k.lsql</groupId>
+        <artifactId>lsql-parent</artifactId>
+        <version>0.35.0</version>
+    </parent>
+
+    <artifactId>lsql-benchmarks</artifactId>
+
+    <properties>
+        <db.url>jdbc:postgresql://localhost:33333/lsql_benchmark</db.url>
+        <db.user>lsql_benchmark</db.user>
+        <db.pass>lsql_benchmark</db.pass>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/generated/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>5.2.4</version>
+                <configuration>
+                    <url>${db.url}</url>
+                    <user>${db.user}</user>
+                    <password>${db.pass}</password>
+                </configuration>
+                <executions>
+                    <execution>
+
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.w11k.lsql.cli.Main</mainClass>
+                    <arguments>
+                        <argument>config:com.w11k.lsql_benchmark.LSqlConfig</argument>
+                        <argument>url:${db.url}</argument>
+                        <argument>user:${db.user}</argument>
+                        <argument>password:${db.pass}</argument>
+                        <argument>package:com.w11k.lsql_benchmark.db</argument>
+                        <argument>sqlStatements:src/main/java/com/w11k/lsql_benchmark</argument>
+                        <argument>outDirJava:src/generated/java</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.2</version>
+                <configuration>
+                    <useFile>false</useFile>
+                    <systemProperties>
+                        <property>
+                            <name>db.url</name>
+                            <value>${db.url}</value>
+                        </property>
+                        <property>
+                            <name>db.user</name>
+                            <value>${db.user}</value>
+                        </property>
+                        <property>
+                            <name>db.pass</name>
+                            <value>${db.pass}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <version>${project.parent.version}</version>
+            <artifactId>lsql-cli</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.flyway</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>
+
