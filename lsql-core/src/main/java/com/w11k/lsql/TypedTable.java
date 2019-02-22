@@ -9,17 +9,6 @@ import java.util.function.Supplier;
 
 public abstract class TypedTable<T extends TableRow, I> {
 
-    private static Table.RowKeyHandler ROW_KEY_HANDLER = new Table.RowKeyHandler() {
-        @Override
-        public String sqlToJava(String internalSql) {
-            return internalSql;
-        }
-
-        @Override
-        public String javaToSql(String javaIdentifier) {
-            return javaIdentifier;
-        }
-    };
     private Supplier<Table> table;
 
     public TypedTable(LSql lSql, String tableName, Class<T> tableRowClass) {
@@ -43,7 +32,7 @@ public abstract class TypedTable<T extends TableRow, I> {
         // Remove null values so that the DB can insert the default values
         map.entrySet().removeIf(entry -> entry.getValue() == null);
 
-        return (Optional<I>) this.table.get().insert(new Row(map), ROW_KEY_HANDLER);
+        return (Optional<I>) this.table.get().insert(new Row(map), RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
     }
 
     public T insertAndLoad(T instance) {
@@ -56,7 +45,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public Optional<T> load(I id) {
-        Optional<LinkedRow> internalRow = this.table.get().load(id, ROW_KEY_HANDLER);
+        Optional<? extends Row> internalRow = this.table.get().load(id, RowDeserializer.INSTANCE_BYPASS);
 
         if (!internalRow.isPresent()) {
             return Optional.absent();
@@ -73,21 +62,21 @@ public abstract class TypedTable<T extends TableRow, I> {
 
     public void delete(T instance) {
         Map<String, Object> map = instance.toInternalMap();
-        this.table.get().delete(new Row(map), ROW_KEY_HANDLER);
+        this.table.get().delete(new Row(map), RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
     }
 
     public void deleteById(I id) {
-        this.table.get().delete(id, ROW_KEY_HANDLER);
+        this.table.get().delete(id, RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
     }
 
     public void update(T instance) {
         Map<String, Object> map = instance.toInternalMap();
-        this.table.get().update(new Row(map), ROW_KEY_HANDLER);
+        this.table.get().update(new Row(map), RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
     }
 
     public void updateWhere(T instance, Map<String, Object> where) {
         Map<String, Object> map = instance.toInternalMap();
-        this.table.get().updateWhere(new Row(map), new Row(where), ROW_KEY_HANDLER);
+        this.table.get().updateWhere(new Row(map), new Row(where), RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
     }
 
     public T updateWith(I id, Function<T, T> with) {
@@ -110,7 +99,7 @@ public abstract class TypedTable<T extends TableRow, I> {
             map.remove(primaryKeyColumn.get());
         }
 
-        return (Optional<I>) this.table.get().save(new Row(map), ROW_KEY_HANDLER);
+        return (Optional<I>) this.table.get().save(new Row(map), RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
     }
 
     @SuppressWarnings("unchecked")

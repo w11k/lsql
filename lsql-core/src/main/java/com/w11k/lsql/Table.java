@@ -36,16 +36,6 @@ public class Table {
     private Optional<String> primaryKeyColumn = absent();
     private Optional<Column> revisionColumn = absent();
 
-    private RowKeyHandler DEFAULT_ROW_KEY_HANDLER = new RowKeyHandler() {
-        public String sqlToJava(String internalSql) {
-            return lSql.convertInternalSqlToRowKey(internalSql);
-        }
-
-        public String javaToSql(String javaIdentifier) {
-            return lSql.convertRowKeyToInternalSql(javaIdentifier);
-        }
-    };
-
     Table(LSql lSql, String sqlSchemaAndTableName) {
         this.lSql = lSql;
         this.sqlSchemaAndTableName = sqlSchemaAndTableName;
@@ -149,27 +139,27 @@ public class Table {
      * @throws InsertException
      */
     public Optional<Object> insert(Row row) {
-        return this.insert(row, DEFAULT_ROW_KEY_HANDLER);
+        return this.insert(row, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    Optional<Object> insert(Row row, RowKeyHandler rowKeyHandler) {
+    Optional<Object> insert(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         try {
             // remove the primary key column value if the value is null
             if (this.primaryKeyColumn.isPresent()) {
                 String pkColumn = this.primaryKeyColumn.get();
-                String pkRowKey = rowKeyHandler.sqlToJava(pkColumn);
+                String pkRowKey = rowDeserializer.getDeserializedFieldName(lSql, pkColumn);
                 if (row.containsKey(pkRowKey) && row.get(pkRowKey) == null) {
                     row = new Row(row);
                     row.remove(pkRowKey);
                 }
             }
 
-            List<String> columns = createColumnList(row, false, rowKeyHandler);
+            List<String> columns = createColumnList(row, false, rowSerializer);
 
             PreparedStatement ps =
                     lSql.getStatementCreator().createInsertStatement(this, columns);
 
-            setValuesInPreparedStatement(rowKeyHandler, ps, columns, row, null, null);
+            setValuesInPreparedStatement(rowDeserializer, ps, columns, row, null, null);
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
@@ -177,18 +167,18 @@ public class Table {
             }
             if (primaryKeyColumn.isPresent()) {
                 Object id = null;
-                if (!row.containsKey(rowKeyHandler.sqlToJava(primaryKeyColumn.get()))) {
+                if (!row.containsKey(rowDeserializer.getDeserializedFieldName(lSql, primaryKeyColumn.get()))) {
                     // check for generated keys
                     ResultSet resultSet = ps.getGeneratedKeys();
                     if (resultSet.next()) {
                         Optional<Object> generated = lSql.extractGeneratedPk(this, resultSet);
                         if (generated.isPresent()) {
                             id = generated.get();
-                            row.put(rowKeyHandler.sqlToJava(primaryKeyColumn.get()), id);
+                            row.put(rowDeserializer.getDeserializedFieldName(lSql, primaryKeyColumn.get()), id);
                         }
                     }
                 } else {
-                    id = row.get(rowKeyHandler.sqlToJava(primaryKeyColumn.get()));
+                    id = row.get(rowDeserializer.getDeserializedFieldName(lSql, primaryKeyColumn.get()));
                 }
 
                 // Set new revision
@@ -216,17 +206,17 @@ public class Table {
      * @throws UpdateException
      */
     public void update(Row row) {
-        this.update(row, DEFAULT_ROW_KEY_HANDLER);
+        this.update(row, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    void update(Row row, RowKeyHandler rowKeyHandler) {
+    void update(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
 
         if (!primaryKeyColumn.isPresent()) {
             throw new UpdateException("Can not update row without a primary key column.");
         }
 
-        String rowKeyPk = rowKeyHandler.sqlToJava(primaryKeyColumn.get());
+        String rowKeyPk = rowDeserializer.getDeserializedFieldName(lSql, primaryKeyColumn.get());
 
         if (!row.containsKey(rowKeyPk)) {
             throw new UpdateException("Can not update row because the primary key column " +
@@ -234,24 +224,24 @@ public class Table {
         }
 
         Row whereIdVal = Row.fromKeyVals(rowKeyPk, row.get(rowKeyPk));
-        updateWhere(row, whereIdVal, rowKeyHandler);
+        updateWhere(row, whereIdVal, rowSerializer, rowDeserializer);
     }
 
     public void updateWhere(Row values, Row where) {
-        this.updateWhere(values, where, DEFAULT_ROW_KEY_HANDLER);
+        this.updateWhere(values, where, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    void updateWhere(Row values, Row where, RowKeyHandler rowKeyHandler) {
+    void updateWhere(Row values, Row where, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         if (where.size() == 0) {
             throw new UpdateException("Can not update row without where values.");
         }
         try {
-            List<String> valueColumns = createColumnList(values, true, rowKeyHandler);
-            List<String> whereColumns = createColumnList(where, false, rowKeyHandler);
+            List<String> valueColumns = createColumnList(values, true, rowSerializer);
+            List<String> whereColumns = createColumnList(where, false, rowSerializer);
 
             if (revisionColumn.isPresent()) {
-                valueColumns.remove(rowKeyHandler.sqlToJava(getRevisionColumn().get().getColumnName()));
-                whereColumns.remove(rowKeyHandler.sqlToJava(getRevisionColumn().get().getColumnName()));
+                valueColumns.remove(rowSerializer.getSerializedFieldName(lSql, getRevisionColumn().get().getColumnName()));
+                whereColumns.remove(rowSerializer.getSerializedFieldName(lSql, getRevisionColumn().get().getColumnName()));
             }
 
             final int placeholderCount = valueColumns.size() + whereColumns.size();
@@ -263,21 +253,21 @@ public class Table {
             PreparedStatement ps = lSql.getStatementCreator()
                     .createUpdateStatement(this, valueColumns, whereColumns);
 
-            setValuesInPreparedStatement(rowKeyHandler, ps, valueColumns, values, whereColumns, where);
+            setValuesInPreparedStatement(rowDeserializer, ps, valueColumns, values, whereColumns, where);
 
             // Set Revision
             if (revisionColumn.isPresent()) {
                 Column col = revisionColumn.get();
-                Object revision = values.get(rowKeyHandler.sqlToJava(col.getColumnName()));
+                Object revision = values.get(rowSerializer.getSerializedFieldName(lSql, col.getColumnName()));
                 col.getConverter().setValueInStatement(lSql, ps, placeholderCount + 1, revision);
             }
 
             executeUpdate(ps);
 
             // Set new revision
-            if (getPrimaryKeyColumn().isPresent() && values.containsKey(rowKeyHandler.sqlToJava(getPrimaryKeyColumn().get()))) {
+            if (getPrimaryKeyColumn().isPresent() && values.containsKey(rowSerializer.getSerializedFieldName(lSql, getPrimaryKeyColumn().get()))) {
                 String pkColumn = getPrimaryKeyColumn().get();
-                Object id = values.get(rowKeyHandler.sqlToJava(pkColumn));
+                Object id = values.get(rowSerializer.getSerializedFieldName(lSql, pkColumn));
                 applyNewRevision(values, id);
             }
         } catch (Exception e) {
@@ -293,15 +283,15 @@ public class Table {
      * is, {@link #update(Row)} will be called, {@link #insert(Row)} otherwise.
      */
     public Optional<?> save(Row row) {
-        return this.save(row, DEFAULT_ROW_KEY_HANDLER);
+        return this.save(row, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    Optional<?> save(Row row, RowKeyHandler rowKeyHandler) {
+    Optional<?> save(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         if (!primaryKeyColumn.isPresent()) {
             throw new DatabaseAccessException("save() requires a primary key column.");
         }
 
-        String rowKeyPrimaryKey = rowKeyHandler.sqlToJava(primaryKeyColumn.get());
+        String rowKeyPrimaryKey = rowDeserializer.getDeserializedFieldName(lSql, primaryKeyColumn.get());
 
         if (!row.containsKey(rowKeyPrimaryKey)) {
             // Insert
@@ -318,9 +308,9 @@ public class Table {
                 rs.next();
                 int count = rs.getInt(1);
                 if (count == 0) {
-                    insert(row);
+                    insert(row, rowSerializer, rowDeserializer);
                 } else {
-                    update(row);
+                    update(row, rowSerializer, rowDeserializer);
                 }
             } catch (DatabaseAccessException dae) {
                 throw dae;
@@ -339,12 +329,12 @@ public class Table {
      * @param id delete the row with this primary key value
      */
     public void delete(Object id) {
-        this.delete(id, DEFAULT_ROW_KEY_HANDLER);
+        this.delete(id, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    void delete(Object id, RowKeyHandler rowKeyHandler) {
+    void delete(Object id, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         Row row = new Row();
-        row.put(rowKeyHandler.sqlToJava(primaryKeyColumn.get()), id);
+        row.put(rowDeserializer.getDeserializedFieldName(lSql, primaryKeyColumn.get()), id);
         delete(row);
     }
 
@@ -355,10 +345,10 @@ public class Table {
      * @throws com.w11k.lsql.exceptions.DeleteException
      */
     public void delete(Row row) {
-        this.delete(row, DEFAULT_ROW_KEY_HANDLER);
+        this.delete(row, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    void delete(Row row, RowKeyHandler rowKeyHandler) {
+    void delete(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
         if (!primaryKeyColumn.isPresent()) {
             throw new IllegalArgumentException("Can not delete row, table has no primary column");
@@ -367,11 +357,11 @@ public class Table {
         PreparedStatement ps = lSql.getStatementCreator().createDeleteByIdStatement(this);
         try {
             Column column = column(primaryKeyColumn.get());
-            Object id = row.get(rowKeyHandler.sqlToJava(primaryKeyColumn.get()));
+            Object id = row.get(rowDeserializer.getDeserializedFieldName(lSql, primaryKeyColumn.get()));
             column.getConverter().setValueInStatement(lSql, ps, 1, id);
             if (revisionColumn.isPresent()) {
                 Column revCol = revisionColumn.get();
-                Object revVal = row.get(rowKeyHandler.sqlToJava(revCol.getColumnName()));
+                Object revVal = row.get(rowDeserializer.getDeserializedFieldName(lSql, revCol.getColumnName()));
                 if (revVal == null) {
                     throw new IllegalStateException("Row must contain a revision.");
                 }
@@ -391,10 +381,10 @@ public class Table {
      * values matches a row in the database. {@link com.google.common.base.Absent} otherwise.
      */
     public Optional<LinkedRow> load(Object id) {
-        return this.load(id, DEFAULT_ROW_KEY_HANDLER);
+        return this.load(id, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    Optional<LinkedRow> load(Object id, RowKeyHandler rowKeyHandler) {
+    Optional<LinkedRow> load(Object id, RowDeserializer<Row> rowDeserializer) {
         if (!this.primaryKeyColumn.isPresent()) {
             throw new IllegalArgumentException("Can not load by ID, table has no primary column");
         }
@@ -409,8 +399,8 @@ public class Table {
         }
         PlainQuery query = new PlainQuery(lSql, ps, null) {
             @Override
-            protected void setValue(LSql lSql, Row entity, String internalSqlColumnName, Object value) {
-                entity.put(rowKeyHandler.sqlToJava(internalSqlColumnName), value);
+            protected RowDeserializer<Row> getRowDeserializer() {
+                return rowDeserializer;
             }
         };
         for (Map.Entry<String, Column> columnInTable : this.columns.entrySet()) {
@@ -525,10 +515,10 @@ public class Table {
         return lSql.getStatementCreator().createPreparedStatement(lSql, psString, false);
     }
 
-    private List<String> createColumnList(final Row row, final boolean filterIgnoreOnUpdateColumns, RowKeyHandler rowKeyHandler) {
+    private List<String> createColumnList(final Row row, final boolean filterIgnoreOnUpdateColumns, RowSerializer<Row> rowSerializer) {
         List<String> columns = Lists.newLinkedList(row.keySet());
         columns = columns.stream()
-                .map(rowKeyHandler::javaToSql)
+                .map(c -> rowSerializer.getSerializedFieldName(lSql, c))
                 .filter(input -> {
                     Column column = column(input);
                     if (column == null) {
@@ -657,33 +647,27 @@ public class Table {
         }
     }
 
-    private PreparedStatement setValuesInPreparedStatement(RowKeyHandler rowKeyHandler,
-                                                           PreparedStatement ps,
-                                                           List<String> columns1,
-                                                           Row values1,
-                                                           List<String> columns2,
-                                                           Row values2) {
+    private void setValuesInPreparedStatement(RowDeserializer<Row> rowDeserializer,
+                                              PreparedStatement ps,
+                                              List<String> columns1,
+                                              Row values1,
+                                              List<String> columns2,
+                                              Row values2) {
         try {
             for (int i = 0; i < columns1.size(); i++) {
                 Converter converter = column(columns1.get(i)).getConverter();
-                converter.setValueInStatement(lSql, ps, i + 1, values1.get(rowKeyHandler.sqlToJava(columns1.get(i))));
+                converter.setValueInStatement(lSql,
+                        ps, i + 1, values1.get(rowDeserializer.getDeserializedFieldName(lSql, columns1.get(i))));
             }
             if (columns2 != null && values2 != null) {
                 for (int i = 0; i < columns2.size(); i++) {
                     Converter converter = column(columns2.get(i)).getConverter();
-                    converter.setValueInStatement(lSql, ps, columns1.size() + i + 1, values2.get(rowKeyHandler.sqlToJava(columns2.get(i))));
+                    converter.setValueInStatement(lSql, ps, columns1.size() + i + 1, values2.get(rowDeserializer.getDeserializedFieldName(lSql, columns2.get(i))));
                 }
             }
-            return ps;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static interface RowKeyHandler {
-        String sqlToJava(String internalSql);
-
-        String javaToSql(String javaIdentifier);
     }
 
 }

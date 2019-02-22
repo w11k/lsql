@@ -4,10 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.w11k.lsql.Column;
-import com.w11k.lsql.LSql;
-import com.w11k.lsql.ResultSetColumn;
-import com.w11k.lsql.ResultSetWithColumns;
+import com.w11k.lsql.*;
 import com.w11k.lsql.converter.Converter;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
@@ -256,9 +253,6 @@ public abstract class AbstractQuery<T> {
         }
     }
 
-//    protected abstract void checkConformity(Map<String, Converter> converters);
-
-
     private Converter getConverterByColumnType(ResultSetMetaData metaData, int position) throws SQLException {
         int columnSqlType = metaData.getColumnType(position);
         return lSql.getConverterForSqlType(columnSqlType);
@@ -267,23 +261,19 @@ public abstract class AbstractQuery<T> {
     private T extractEntity(ResultSetWithColumns resultSetWithColumns) {
         ResultSet resultSet = resultSetWithColumns.getResultSet();
         Collection<ResultSetColumn> columnList = resultSetWithColumns.getColumnsByLabel().values();
-        T entity = createEntity();
-        for (ResultSetColumn column : columnList) {
-            try {
-                setValue(
-                        this.lSql,
-                        entity,
-                        column.getName(),
-                        column.getConverter().getValueFromResultSet(lSql, resultSet, column.getPosition()));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+        RowDeserializer<T> rowDeserializer = this.getRowDeserializer();
+        try {
+            T entity = rowDeserializer.createRow();
+            for (ResultSetColumn column : columnList) {
+                rowDeserializer.deserializeField(
+                        this.lSql, entity, column.getConverter(), column.getName(), resultSet, column.getPosition());
             }
+            return entity;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return entity;
     }
 
-    protected abstract T createEntity();
-
-    protected abstract void setValue(LSql lSql, T entity, String internalSqlColumnName, Object value);
+    protected abstract RowDeserializer<T> getRowDeserializer();
 
 }

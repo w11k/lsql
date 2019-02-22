@@ -287,8 +287,8 @@ public class LSql {
             protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
                 return new PlainQuery(lSql, ps, outConverters) {
                     @Override
-                    protected void setValue(LSql lSql, Row entity, String internalSqlColumnName, Object value) {
-                        super.setValue(lSql, entity, convertInternalSqlToRowKey(internalSqlColumnName), value);
+                    protected RowDeserializer<Row> getRowDeserializer() {
+                        return RowDeserializer.INSTANCE_SPECIAL_ROWKEY;
                     }
                 };
             }

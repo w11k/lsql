@@ -34,7 +34,7 @@ public class RowKeyConverterTest extends AbstractLSqlTest {
         createTable("CREATE TABLE table1 (id INT PRIMARY KEY, ccc_ddd INT NULL)");
         Table table1 = lSql.table("table1");
         table1.insert(fromKeyVals("id", 1, "cccDdd", 2));
-        assertEquals(table1.load(1).get().getInt("cccDdd"), new Integer(2));
+        assertEquals(table1.load(1).get().getInt("cccDdd"), Integer.valueOf(2));
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.w11k.lsql.query;
 
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.Row;
+import com.w11k.lsql.RowDeserializer;
 import com.w11k.lsql.converter.Converter;
 
 import java.sql.PreparedStatement;
@@ -21,13 +22,8 @@ public class PlainQuery extends AbstractQuery<Row> {
     }
 
     @Override
-    protected Row createEntity() {
-        return new Row();
-    }
-
-    @Override
-    protected void setValue(LSql lSql, Row entity, String internalSqlColumnName, Object value) {
-        entity.put(internalSqlColumnName, value);
+    protected RowDeserializer<Row> getRowDeserializer() {
+        return RowDeserializer.INSTANCE_BYPASS;
     }
 
 }
