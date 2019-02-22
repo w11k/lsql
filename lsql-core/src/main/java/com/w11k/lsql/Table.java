@@ -142,7 +142,7 @@ public class Table {
         return this.insert(row, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    Optional<Object> insert(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
+    public Optional<Object> insert(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         try {
             // remove the primary key column value if the value is null
             if (this.primaryKeyColumn.isPresent()) {
@@ -209,7 +209,7 @@ public class Table {
         this.update(row, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    void update(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
+    public void update(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
 
         if (!primaryKeyColumn.isPresent()) {
@@ -231,7 +231,7 @@ public class Table {
         this.updateWhere(values, where, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    void updateWhere(Row values, Row where, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
+    public void updateWhere(Row values, Row where, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         if (where.size() == 0) {
             throw new UpdateException("Can not update row without where values.");
         }
@@ -286,7 +286,7 @@ public class Table {
         return this.save(row, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    Optional<?> save(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
+    public Optional<?> save(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
         if (!primaryKeyColumn.isPresent()) {
             throw new DatabaseAccessException("save() requires a primary key column.");
         }
@@ -329,10 +329,10 @@ public class Table {
      * @param id delete the row with this primary key value
      */
     public void delete(Object id) {
-        this.delete(id, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
+        this.delete(id, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    void delete(Object id, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
+    public void delete(Object id, RowDeserializer<Row> rowDeserializer) {
         Row row = new Row();
         row.put(rowDeserializer.getDeserializedFieldName(lSql, primaryKeyColumn.get()), id);
         delete(row);
@@ -345,10 +345,10 @@ public class Table {
      * @throws com.w11k.lsql.exceptions.DeleteException
      */
     public void delete(Row row) {
-        this.delete(row, RowSerializer.INSTANCE_SPECIAL_ROWKEY, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
+        this.delete(row, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    void delete(Row row, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
+    public void delete(Row row, RowDeserializer<Row> rowDeserializer) {
         Optional<String> primaryKeyColumn = getPrimaryKeyColumn();
         if (!primaryKeyColumn.isPresent()) {
             throw new IllegalArgumentException("Can not delete row, table has no primary column");
@@ -384,7 +384,7 @@ public class Table {
         return this.load(id, RowDeserializer.INSTANCE_SPECIAL_ROWKEY);
     }
 
-    Optional<LinkedRow> load(Object id, RowDeserializer<Row> rowDeserializer) {
+    public Optional<LinkedRow> load(Object id, RowDeserializer<Row> rowDeserializer) {
         if (!this.primaryKeyColumn.isPresent()) {
             throw new IllegalArgumentException("Can not load by ID, table has no primary column");
         }
