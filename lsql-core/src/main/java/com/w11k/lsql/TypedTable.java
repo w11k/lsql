@@ -26,7 +26,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public Optional<I> insert(T instance) {
-        return this.insert(instance, RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
+        return this.insert(instance, RowSerializer.INSTANCE_DIRECT, RowDeserializer.INSTANCE_DIRECT);
     }
 
     @SuppressWarnings("unchecked")
@@ -40,7 +40,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public T insertAndLoad(T instance) {
-        return this.insertAndLoad(instance, RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
+        return this.insertAndLoad(instance, RowSerializer.INSTANCE_DIRECT, RowDeserializer.INSTANCE_DIRECT);
     }
 
     public T insertAndLoad(T instance, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
@@ -53,7 +53,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public Optional<T> load(I id) {
-        return this.load(id, RowDeserializer.INSTANCE_BYPASS);
+        return this.load(id, RowDeserializer.INSTANCE_DIRECT);
     }
 
     public Optional<T> load(I id, RowDeserializer<Row> rowDeserializer) {
@@ -73,7 +73,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public void delete(T instance) {
-        this.delete(instance, RowDeserializer.INSTANCE_BYPASS);
+        this.delete(instance, RowDeserializer.INSTANCE_DIRECT);
     }
 
     public void delete(T instance, RowDeserializer<Row> rowDeserializer) {
@@ -82,7 +82,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public void deleteById(I id) {
-        this.deleteById(id, RowDeserializer.INSTANCE_BYPASS);
+        this.deleteById(id, RowDeserializer.INSTANCE_DIRECT);
     }
 
     public void deleteById(I id, RowDeserializer<Row> rowDeserializer) {
@@ -90,7 +90,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public void update(T instance) {
-        this.update(instance, RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
+        this.update(instance, RowSerializer.INSTANCE_DIRECT, RowDeserializer.INSTANCE_DIRECT);
     }
 
     public void update(T instance, RowSerializer<Row> rowSerializer, RowDeserializer<Row> rowDeserializer) {
@@ -99,7 +99,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public void updateWhere(T instance, Map<String, Object> where) {
-        this.updateWhere(instance, where, RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
+        this.updateWhere(instance, where, RowSerializer.INSTANCE_DIRECT, RowDeserializer.INSTANCE_DIRECT);
     }
 
     public void updateWhere(
@@ -117,7 +117,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public Optional<I> save(T instance) {
-        return this.save(instance, RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
+        return this.save(instance, RowSerializer.INSTANCE_DIRECT, RowDeserializer.INSTANCE_DIRECT);
     }
 
     @SuppressWarnings("unchecked")
@@ -137,7 +137,7 @@ public abstract class TypedTable<T extends TableRow, I> {
     }
 
     public T saveAndLoad(T instance) {
-        return this.saveAndLoad(instance, RowSerializer.INSTANCE_BYPASS, RowDeserializer.INSTANCE_BYPASS);
+        return this.saveAndLoad(instance, RowSerializer.INSTANCE_DIRECT, RowDeserializer.INSTANCE_DIRECT);
     }
 
     @SuppressWarnings("unchecked")

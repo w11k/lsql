@@ -159,7 +159,7 @@ public class Table {
             PreparedStatement ps =
                     lSql.getStatementCreator().createInsertStatement(this, columns);
 
-            setValuesInPreparedStatement(rowDeserializer, ps, columns, row, null, null);
+            setValuesInPreparedStatement(rowSerializer, rowDeserializer, ps, columns, row, null, null);
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
@@ -253,7 +253,7 @@ public class Table {
             PreparedStatement ps = lSql.getStatementCreator()
                     .createUpdateStatement(this, valueColumns, whereColumns);
 
-            setValuesInPreparedStatement(rowDeserializer, ps, valueColumns, values, whereColumns, where);
+            setValuesInPreparedStatement(rowSerializer, rowDeserializer, ps, valueColumns, values, whereColumns, where);
 
             // Set Revision
             if (revisionColumn.isPresent()) {
@@ -647,7 +647,8 @@ public class Table {
         }
     }
 
-    private void setValuesInPreparedStatement(RowDeserializer<Row> rowDeserializer,
+    private void setValuesInPreparedStatement(RowSerializer<Row> rowSerializer,
+                                              RowDeserializer<Row> rowDeserializer,
                                               PreparedStatement ps,
                                               List<String> columns1,
                                               Row values1,
@@ -656,16 +657,19 @@ public class Table {
         try {
             for (int i = 0; i < columns1.size(); i++) {
                 Converter converter = column(columns1.get(i)).getConverter();
-                converter.setValueInStatement(lSql,
-                        ps, i + 1, values1.get(rowDeserializer.getDeserializedFieldName(lSql, columns1.get(i))));
+                String fieldName = rowDeserializer.getDeserializedFieldName(lSql, columns1.get(i));
+                rowSerializer.serializeField(lSql, values1, converter, fieldName, ps, i + 1);
+
             }
             if (columns2 != null && values2 != null) {
                 for (int i = 0; i < columns2.size(); i++) {
                     Converter converter = column(columns2.get(i)).getConverter();
-                    converter.setValueInStatement(lSql, ps, columns1.size() + i + 1, values2.get(rowDeserializer.getDeserializedFieldName(lSql, columns2.get(i))));
+                    String fieldName = rowDeserializer.getDeserializedFieldName(lSql, columns2.get(i));
+                    rowSerializer.serializeField(
+                            lSql, values2, converter, fieldName, ps, columns1.size() + i + 1);
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

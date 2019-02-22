@@ -55,6 +55,7 @@ public final class TestCliConfig extends Config {
         lSql.executeRawSql("create table checks (yesno BOOLEAN NOT NULL);");
         lSql.executeRawSql("create table table_with_two_keys (key1 integer, key2 integer, PRIMARY KEY (key1, key2))");
         lSql.executeRawSql("create table custom_converter (field INTEGER);");
+        lSql.executeRawSql("create table custom_deserializer (id integer primary key, data longvarbinary);");
         lSql.executeRawSql("create schema schema2;");
         lSql.executeRawSql("create table schema2.table_a (id integer primary key, col1 text)");
     }

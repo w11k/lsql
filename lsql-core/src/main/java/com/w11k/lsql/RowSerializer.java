@@ -6,20 +6,7 @@ import java.sql.PreparedStatement;
 
 public interface RowSerializer<T> {
 
-    RowSerializer<Row> INSTANCE_BYPASS = new RowSerializer<Row>() {
-        @Override
-        public String getSerializedFieldName(LSql lSql, String fieldName) {
-            return fieldName;
-        }
-
-        @Override
-        public void serializeField(
-                LSql lSql, Row row, Converter converter, String fieldName, PreparedStatement preparedStatement, int parameterIndex)
-                throws Exception {
-
-            converter.setValueInStatement(lSql, preparedStatement, parameterIndex, row.get(fieldName));
-        }
-    };
+    RowSerializer<Row> INSTANCE_DIRECT = new DirectRowSerializer();
 
     RowSerializer<Row> INSTANCE_SPECIAL_ROWKEY = new RowSerializer<Row>() {
         @Override
@@ -32,8 +19,7 @@ public interface RowSerializer<T> {
                 LSql lSql, Row row, Converter converter, String fieldName, PreparedStatement preparedStatement, int parameterIndex)
                 throws Exception {
 
-            Object value = row.get(this.getSerializedFieldName(lSql, fieldName));
-            converter.setValueInStatement(lSql, preparedStatement, parameterIndex, value);
+            converter.setValueInStatement(lSql, preparedStatement, parameterIndex, row.get(fieldName));
         }
     };
 
@@ -45,5 +31,20 @@ public interface RowSerializer<T> {
                         String fieldName,
                         PreparedStatement preparedStatement,
                         int parameterIndex) throws Exception;
+
+    class DirectRowSerializer implements RowSerializer<Row> {
+        @Override
+        public String getSerializedFieldName(LSql lSql, String fieldName) {
+            return fieldName;
+        }
+
+        @Override
+        public void serializeField(
+                LSql lSql, Row row, Converter converter, String fieldName, PreparedStatement preparedStatement, int parameterIndex)
+                throws Exception {
+
+            converter.setValueInStatement(lSql, preparedStatement, parameterIndex, row.get(fieldName));
+        }
+    }
 
 }

@@ -11,6 +11,20 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Custom_Deserializer_Row {
+        data?: any;
+        id: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Custom_Deserializer_Map {
+        data?: any;
+        id: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
     export interface Person2_Row {
         id: number;
         firstName?: string;
