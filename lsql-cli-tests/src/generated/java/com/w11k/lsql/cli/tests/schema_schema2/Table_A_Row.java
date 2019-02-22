@@ -47,10 +47,10 @@ public final class Table_A_Row implements com.w11k.lsql.TableRow, Id_Integer, Co
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_ID = "id";
+    public static final String FIELD_ID = "id";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String ROW_KEY_ID = "id";
 
     @javax.annotation.Nonnull public final java.lang.Integer id;
 
@@ -62,10 +62,10 @@ public final class Table_A_Row implements com.w11k.lsql.TableRow, Id_Integer, Co
         return new Table_A_Row(id,col1);
     }
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_COL1 = "col1";
+    public static final String FIELD_COL1 = "col1";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_COL1 = "col1";
+    public static final String ROW_KEY_COL1 = "col1";
 
     @javax.annotation.Nullable public final java.lang.String col1;
 

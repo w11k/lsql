@@ -42,10 +42,10 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_YESNO = "yesno";
+    public static final String FIELD_YESNO = "yesno";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_YESNO = "yesno";
+    public static final String ROW_KEY_YESNO = "yesno";
 
     @javax.annotation.Nonnull public final java.lang.Boolean yesno;
 

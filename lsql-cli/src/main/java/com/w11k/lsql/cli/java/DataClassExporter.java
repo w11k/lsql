@@ -390,14 +390,14 @@ public class DataClassExporter {
         String staticName = field.getColumnInternalSqlName();
 
         this.addSuppressWarningsUnused(4, content);
-        content.append(indentString()).append("    public static final String INTERNAL_FIELD_").append(staticName.toUpperCase())
+        content.append(indentString()).append("    public static final String FIELD_").append(staticName.toUpperCase())
                 .append(" = ")
                 .append("\"")
                 .append(field.getColumnInternalSqlName())
                 .append("\";\n\n");
 
         this.addSuppressWarningsUnused(4, content);
-        content.append(indentString()).append("    public static final String FIELD_").append(staticName.toUpperCase())
+        content.append(indentString()).append("    public static final String ROW_KEY_").append(staticName.toUpperCase())
                 .append(" = ")
                 .append("\"")
                 .append(field.getColumnRowKeyName())

@@ -47,10 +47,10 @@ public final class Table_With_Two_Keys_Row implements com.w11k.lsql.TableRow, Ke
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_KEY1 = "key1";
+    public static final String FIELD_KEY1 = "key1";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_KEY1 = "key1";
+    public static final String ROW_KEY_KEY1 = "key1";
 
     @javax.annotation.Nonnull public final java.lang.Integer key1;
 
@@ -62,10 +62,10 @@ public final class Table_With_Two_Keys_Row implements com.w11k.lsql.TableRow, Ke
         return new Table_With_Two_Keys_Row(key1,key2);
     }
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_KEY2 = "key2";
+    public static final String FIELD_KEY2 = "key2";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_KEY2 = "key2";
+    public static final String ROW_KEY_KEY2 = "key2";
 
     @javax.annotation.Nonnull public final java.lang.Integer key2;
 

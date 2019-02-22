@@ -42,10 +42,10 @@ public final class LoadAllPersonsEscaped1 implements com.w11k.lsql.TableRow, The
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_THEID = "theid";
+    public static final String FIELD_THEID = "theid";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_THEID = "theid";
+    public static final String ROW_KEY_THEID = "theid";
 
     @javax.annotation.Nonnull public final java.lang.Integer theid;
 

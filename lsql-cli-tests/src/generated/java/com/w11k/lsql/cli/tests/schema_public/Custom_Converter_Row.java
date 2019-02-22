@@ -42,10 +42,10 @@ public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_FIELD = "field";
+    public static final String FIELD_FIELD = "field";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_FIELD = "field";
+    public static final String ROW_KEY_FIELD = "field";
 
     @javax.annotation.Nullable public final java.lang.Integer field;
 

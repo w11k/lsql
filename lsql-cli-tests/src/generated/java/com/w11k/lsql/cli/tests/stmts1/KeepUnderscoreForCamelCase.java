@@ -47,10 +47,10 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_A_FIELD = "a_field";
+    public static final String FIELD_A_FIELD = "a_field";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_A_FIELD = "aField";
+    public static final String ROW_KEY_A_FIELD = "aField";
 
     @javax.annotation.Nonnull public final java.lang.Integer aField;
 
@@ -62,10 +62,10 @@ public final class KeepUnderscoreForCamelCase implements com.w11k.lsql.TableRow,
         return new KeepUnderscoreForCamelCase(aField,afield);
     }
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_AFIELD = "afield";
+    public static final String FIELD_AFIELD = "afield";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_AFIELD = "afield";
+    public static final String ROW_KEY_AFIELD = "afield";
 
     @javax.annotation.Nullable public final java.lang.String afield;
 

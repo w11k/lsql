@@ -52,10 +52,10 @@ public final class Crud_Row implements com.w11k.lsql.TableRow, Field_AInteger, F
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_FIELD_A = "field_a";
+    public static final String FIELD_FIELD_A = "field_a";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_FIELD_A = "fieldA";
+    public static final String ROW_KEY_FIELD_A = "fieldA";
 
     @javax.annotation.Nullable public final java.lang.Integer fieldA;
 
@@ -67,10 +67,10 @@ public final class Crud_Row implements com.w11k.lsql.TableRow, Field_AInteger, F
         return new Crud_Row(fieldA,fieldB,id);
     }
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_FIELD_B = "field_b";
+    public static final String FIELD_FIELD_B = "field_b";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_FIELD_B = "fieldB";
+    public static final String ROW_KEY_FIELD_B = "fieldB";
 
     @javax.annotation.Nullable public final java.lang.String fieldB;
 
@@ -82,10 +82,10 @@ public final class Crud_Row implements com.w11k.lsql.TableRow, Field_AInteger, F
         return new Crud_Row(fieldA,fieldB,id);
     }
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_ID = "id";
+    public static final String FIELD_ID = "id";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String ROW_KEY_ID = "id";
 
     @javax.annotation.Nonnull public final java.lang.Integer id;
 

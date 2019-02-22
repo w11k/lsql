@@ -52,10 +52,10 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_ID = "id";
+    public static final String FIELD_ID = "id";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String ROW_KEY_ID = "id";
 
     @javax.annotation.Nonnull public final java.lang.Integer id;
 
@@ -67,10 +67,10 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_FIRST_NAME = "first_name";
+    public static final String FIELD_FIRST_NAME = "first_name";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_FIRST_NAME = "firstName";
+    public static final String ROW_KEY_FIRST_NAME = "firstName";
 
     @javax.annotation.Nullable public final java.lang.String firstName;
 
@@ -82,10 +82,10 @@ public final class LoadPersonsByAgeAndFirstName implements com.w11k.lsql.TableRo
         return new LoadPersonsByAgeAndFirstName(id,firstName,age);
     }
     @SuppressWarnings("unused")
-    public static final String INTERNAL_FIELD_AGE = "age";
+    public static final String FIELD_AGE = "age";
 
     @SuppressWarnings("unused")
-    public static final String FIELD_AGE = "age";
+    public static final String ROW_KEY_AGE = "age";
 
     @javax.annotation.Nullable public final java.lang.Integer age;
 

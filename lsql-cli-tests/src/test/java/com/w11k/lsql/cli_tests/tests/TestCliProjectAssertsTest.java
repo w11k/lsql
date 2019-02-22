@@ -28,15 +28,15 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
         // insert with static util fields
         Table table = this.lSql.table(Person1_Table.NAME);
         Row person1Row = Row.fromKeyVals(
-                Person1_Row.FIELD_ID, 1,
-                Person1_Row.FIELD_FIRST_NAME, "a"
+                Person1_Row.ROW_KEY_ID, 1,
+                Person1_Row.ROW_KEY_FIRST_NAME, "a"
         );
         table.insert(person1Row);
 
         // valid
         Person1_Table Person1_Table = new Person1_Table(this.lSql);
         Person1_Row loaded = Person1_Table.load(1).get();
-        assertEquals(loaded.getId(), new Integer(1));
+        assertEquals(loaded.getId(), Integer.valueOf(1));
         assertEquals(loaded.getFirstName(), "a");
     }
 
@@ -124,7 +124,7 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
         Map<String, Object> map = person1Row.toInternalMap();
 
         assertTrue(map.containsKey("first_name"));
-        assertTrue(map.containsKey(Person1_Row.INTERNAL_FIELD_FIRST_NAME));
+        assertTrue(map.containsKey(Person1_Row.FIELD_FIRST_NAME));
     }
 
     @Test
@@ -133,7 +133,7 @@ public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
                 .withFirstName("Max");
 
         Map<String, Object> map = person1Row.toRow();
-        assertTrue(map.containsKey(Person1_Row.FIELD_FIRST_NAME));
+        assertTrue(map.containsKey(Person1_Row.ROW_KEY_FIRST_NAME));
     }
 
     @Test
