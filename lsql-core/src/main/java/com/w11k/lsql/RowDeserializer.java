@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 
 public interface RowDeserializer<T> {
 
-    RowDeserializer<Row> INSTANCE_DIRECT = new DirectRowDeserializer();
+    RowDeserializer<Row> INSTANCE = new Deserializer();
 
     RowDeserializer<Row> INSTANCE_SPECIAL_ROWKEY = new RowDeserializer<Row>() {
         @Override
@@ -34,7 +34,7 @@ public interface RowDeserializer<T> {
 
     void deserializeField(LSql lSql, T row, Converter converter, String internalSqlColumnName, ResultSet resultSet, int resultSetColumnPosition) throws Exception;
 
-    class DirectRowDeserializer implements RowDeserializer<Row> {
+    class Deserializer implements RowDeserializer<Row> {
         @Override
         public Row createRow() {
             return new Row();

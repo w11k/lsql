@@ -23,7 +23,7 @@ public class PlainQuery extends AbstractQuery<Row> {
 
     @Override
     protected RowDeserializer<Row> getRowDeserializer() {
-        return RowDeserializer.INSTANCE_DIRECT;
+        return RowDeserializer.INSTANCE;
     }
 
 }

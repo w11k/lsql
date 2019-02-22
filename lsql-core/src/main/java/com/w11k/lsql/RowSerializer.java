@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 
 public interface RowSerializer<T> {
 
-    RowSerializer<Row> INSTANCE_DIRECT = new DirectRowSerializer();
+    RowSerializer<Row> INSTANCE = new Serializer();
 
     RowSerializer<Row> INSTANCE_SPECIAL_ROWKEY = new RowSerializer<Row>() {
         @Override
@@ -32,7 +32,7 @@ public interface RowSerializer<T> {
                         PreparedStatement preparedStatement,
                         int parameterIndex) throws Exception;
 
-    class DirectRowSerializer implements RowSerializer<Row> {
+    class Serializer implements RowSerializer<Row> {
         @Override
         public String getSerializedFieldName(LSql lSql, String fieldName) {
             return fieldName;

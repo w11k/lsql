@@ -23,7 +23,7 @@ public final class CustomDeserializerTest extends AbstractTestCliTest {
         table.insert(new Custom_Deserializer_Row().withId(1).withData(new Blob("abc".getBytes())));
 
         List<byte[]> result = new LinkedList<>();
-        Custom_Deserializer_Row row = table.load(1, new RowDeserializer.DirectRowDeserializer() {
+        Custom_Deserializer_Row row = table.load(1, new RowDeserializer.Deserializer() {
             @Override
             public void deserializeField(LSql lSql,
                                          Row row,
