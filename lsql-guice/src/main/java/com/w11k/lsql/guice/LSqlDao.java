@@ -6,7 +6,7 @@ import com.w11k.lsql.Table;
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
-import com.w11k.lsql.statement.AbstractSqlStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
 
 public class LSqlDao {
 
@@ -34,12 +34,12 @@ public class LSqlDao {
         this.lSqlFile = lSqlFile;
     }
 
-    public AbstractSqlStatement<PlainQuery> statement(String name) {
+    public AnnotatedSqlStatementToQuery<PlainQuery> statement(String name) {
         return getlSqlFile().statement(name);
     }
 
     @Deprecated
-    public <T> AbstractSqlStatement<PojoQuery<T>> statement(String name, Class<T> pojoClass) {
+    public <T> AnnotatedSqlStatementToQuery<PojoQuery<T>> statement(String name, Class<T> pojoClass) {
         return getlSqlFile().statement(name, pojoClass);
     }
 

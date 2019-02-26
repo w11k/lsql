@@ -7,8 +7,8 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.CodeGenUtils;
 import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
-import com.w11k.lsql.statement.AbstractSqlStatement;
-import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
+import com.w11k.lsql.statement.AnnotatedSqlStatement;
 
 import java.io.File;
 import java.util.List;
@@ -50,13 +50,13 @@ public final class StatementFileExporter {
 
         // read statements in file
         LSqlFile lSqlFile = new LSqlFile(lSql, stmtSourceFile.getAbsolutePath(), stmtSourceFile.getAbsolutePath());
-        ImmutableMap<String, SqlStatementToPreparedStatement> statements = lSqlFile.getStatements();
+        ImmutableMap<String, AnnotatedSqlStatement> statements = lSqlFile.getStatements();
 
         // process statements
         boolean containsOnlyVoidStatements = true;
         for (String stmtName : statements.keySet()) {
-            AbstractSqlStatement<PlainQuery> query = lSqlFile.statement(stmtName);
-            SqlStatementToPreparedStatement stmt = lSqlFile.getSqlStatementToPreparedStatement(stmtName);
+            AnnotatedSqlStatementToQuery<PlainQuery> query = lSqlFile.statement(stmtName);
+            AnnotatedSqlStatement stmt = lSqlFile.getSqlStatementToPreparedStatement(stmtName);
 
             if (stmt.getTypeAnnotation().toLowerCase().equals("nogen")) {
                 continue;

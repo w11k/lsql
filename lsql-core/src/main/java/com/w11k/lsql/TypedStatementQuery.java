@@ -3,8 +3,8 @@ package com.w11k.lsql;
 import com.google.common.base.Optional;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.query.PlainQuery;
-import com.w11k.lsql.statement.AbstractSqlStatement;
-import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
+import com.w11k.lsql.statement.AnnotatedSqlStatement;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
@@ -26,15 +26,15 @@ public abstract class TypedStatementQuery<T> {
     }
 
     public Observable<T> rx() {
-        final SqlStatementToPreparedStatement stmtToPs =
-                new SqlStatementToPreparedStatement(
+        final AnnotatedSqlStatement stmtToPs =
+                new AnnotatedSqlStatement(
                         this.lSql,
                         this.getStatementFileName(),
                         this.getStatementName(),
                         "",
                         this.sqlStatement);
 
-        AbstractSqlStatement<PlainQuery> sqlStatement = new AbstractSqlStatement<PlainQuery>(stmtToPs) {
+        AnnotatedSqlStatementToQuery<PlainQuery> sqlStatement = new AnnotatedSqlStatementToQuery<PlainQuery>(stmtToPs) {
             @Override
             protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
                 return new PlainQuery(lSql, ps, outConverters);
@@ -64,15 +64,15 @@ public abstract class TypedStatementQuery<T> {
         }
     }
 
-    public <R> Optional<R> first(final Function<T, R> mapper) {
-        return this.first().transform(t -> {
-            try {
-                return mapper.apply(t);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
+//    public <R> Optional<R> first(final Function<T, R> mapper) {
+//        return this.first().transform(t -> {
+//            try {
+//                return mapper.apply(t);
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
+//    }
 
     public abstract String getStatementFileName();
 

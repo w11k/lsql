@@ -8,8 +8,8 @@ import com.w11k.lsql.dialects.PostgresDialect;
 import com.w11k.lsql.dialects.RowKeyConverter;
 import com.w11k.lsql.exceptions.QueryException;
 import com.w11k.lsql.query.PlainQuery;
-import com.w11k.lsql.statement.AbstractSqlStatement;
-import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
+import com.w11k.lsql.statement.AnnotatedSqlStatement;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
@@ -213,7 +213,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementThreeParametersMultipleOccurences() {
         setup();
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement("SELECT * FROM person WHERE " +
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement("SELECT * FROM person WHERE " +
                 "id > /*val=*/ 99999 /**/" +
                 "AND age > /*val=*/ 99999 /**/" +
                 "AND fullname= /*=*/ 'c' /**/" +
@@ -230,7 +230,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         lSql.executeRawSql("delete from person;");
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "insert into person (id, age) \n" +
                         "values ( /*id=*/ 100 /**/,/*age=*/ 100 /**/);"
         );
@@ -245,13 +245,13 @@ public class SqlStatementTest extends AbstractLSqlTest {
     @Test
     public void statementQueryParameter() {
         setup();
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement("SELECT * FROM \n" +
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement("SELECT * FROM \n" +
                 "person \n" +
                 "WHERE \n" +
                 "id = /*=*/ 99999 /**/\n" +
                 "and age = /*: age =*/ 11 /**/\n;");
 
-        ImmutableMap<String, List<SqlStatementToPreparedStatement.Parameter>> params = statement.getParameters();
+        ImmutableMap<String, List<AnnotatedSqlStatement.Parameter>> params = statement.getParameters();
         assertEquals(params.get("id").get(0).getName(), "id");
         assertEquals(params.get("age").get(0).getName(), "age");
 
@@ -263,7 +263,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void nullValueAsQueryParameter() {
         createTable();
         insert(0, 50, null);
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "SELECT * FROM person WHERE fullname IS /*: string =*/ NULL /**/;");
 
         List<Row> rows = statement.query("fullname", null).toList();
@@ -274,7 +274,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void nullValueAsNamedQueryParameter() {
         createTable();
         insert(0, 50, null);
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "SELECT * FROM person WHERE fullname IS /*aaa: string =*/ NULL /**/;");
 
         List<Row> rows = statement.query("aaa", null).toList();
@@ -286,7 +286,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         List<Row> rows;
 
-        AbstractSqlStatement<PlainQuery> statement = this.lSql.createSqlStatement("select * from person where " +
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = this.lSql.createSqlStatement("select * from person where " +
                 "age in (/*ages=*/ 11, 12, 13 /**/) " +
                 "and 1 = /*param=*/ 1 /**/;");
 
@@ -341,7 +341,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         List<Row> rows;
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement("select * from person where" +
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement("select * from person where" +
                 " age in (/*ages=*/ 11, 12, 13 /**/) " +
                 "and 1 = /*param=*/ 1 /**/;");
 
@@ -365,7 +365,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void listLiteralQueryParameterWithPlaceholderStrings() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement("select * from person where" +
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement("select * from person where" +
                 " fullname in (/*fullnames=*/ 'a', 'b', 'c' /**/) ;");
 
         List<Row> rows = statement.query("fullnames", ListLiteralQueryParameter.of("a", "x")).toList();
@@ -382,7 +382,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
         List<Row> rows;
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement("select * from person where" +
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement("select * from person where" +
                 " age in (/*ages=*/ 11, 12, 13 /**/) " +
                 "and 1 = /*param=*/ 1 /**/;");
 
@@ -398,7 +398,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void resultSetTypeAnnotations() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select count(id) as count_id /*:string*/, max(age) as max_age /*:long*/ from person;");
         PlainQuery query = statement.query();
         List<Row> rows = query.toList();
@@ -412,7 +412,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void resultSetTypeAnnotationsWithQuotedIdentifier() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select count(id) as \"count_id\" /*:string*/, max(age) as \"max_age\" /*:long*/ from person;");
         PlainQuery query = statement.query();
         List<Row> rows = query.toList();
@@ -426,7 +426,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void explicitParameterConverter() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select * from person where id = /*=*/ 1 /**/;")
                 .setParameterConverter("id", new Converter(String.class, Types.INTEGER) {
                     @Override
@@ -449,10 +449,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations1() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /*:int=*/ 18 /**/;");
 
-        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("age").get(0);
+        AnnotatedSqlStatement.Parameter param = statement.getParameters().get("age").get(0);
         Assert.assertEquals(param.getJavaTypeAlias(), "int");
     }
 
@@ -460,10 +460,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations2() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /* :  int  =*/ 18 /**/;");
 
-        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("age").get(0);
+        AnnotatedSqlStatement.Parameter param = statement.getParameters().get("age").get(0);
         Assert.assertEquals(param.getJavaTypeAlias(), "int");
     }
 
@@ -471,10 +471,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations3() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /*p1:int=*/ 18 /**/;");
 
-        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
+        AnnotatedSqlStatement.Parameter param = statement.getParameters().get("p1").get(0);
         Assert.assertEquals(param.getJavaTypeAlias(), "int");
     }
 
@@ -482,10 +482,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations4() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /* p1 : int =*/ 18 /**/;");
 
-        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
+        AnnotatedSqlStatement.Parameter param = statement.getParameters().get("p1").get(0);
         Assert.assertEquals(param.getJavaTypeAlias(), "int");
     }
 
@@ -493,10 +493,10 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotations5() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /*p1: int =*/ 18 /**/;");
 
-        SqlStatementToPreparedStatement.Parameter param = statement.getParameters().get("p1").get(0);
+        AnnotatedSqlStatement.Parameter param = statement.getParameters().get("p1").get(0);
         Assert.assertEquals(param.getJavaTypeAlias(), "int");
     }
 
@@ -504,7 +504,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
     public void queryParameterTypeAnnotationsAreCheckedAtQueryTime() {
         setup();
 
-        AbstractSqlStatement<PlainQuery> statement = lSql.createSqlStatement(
+        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
                 "select * from person where age > /*:int =*/ 18 /**/;");
 
         statement.query("age", "3").toList();

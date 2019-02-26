@@ -13,8 +13,8 @@ import com.w11k.lsql.jdbc.ConnectionProviders;
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.sqlfile.LSqlFile;
-import com.w11k.lsql.statement.AbstractSqlStatement;
-import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
+import com.w11k.lsql.statement.AnnotatedSqlStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,7 +226,7 @@ public class LSql {
      */
     @Deprecated
     public PlainQuery executeRawQuery(String sql) {
-        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "LSql", "executeRawQuery", "", sql);
+        AnnotatedSqlStatement st = new AnnotatedSqlStatement(this, "LSql", "executeRawQuery", "", sql);
 
         try {
             return new PlainQuery(
@@ -251,7 +251,7 @@ public class LSql {
      */
     @Deprecated
     public <T> PojoQuery<T> executeRawQuery(String sql, Class<T> pojoClass) {
-        SqlStatementToPreparedStatement st = new SqlStatementToPreparedStatement(this, "LSql", "executeRawQuery", "", sql);
+        AnnotatedSqlStatement st = new AnnotatedSqlStatement(this, "LSql", "executeRawQuery", "", sql);
 
         try {
             return new PojoQuery<>(
@@ -269,7 +269,7 @@ public class LSql {
      *
      * @param sqlString the SQL SELECT string
      */
-    public AbstractSqlStatement<PlainQuery> createSqlStatement(String sqlString) {
+    public AnnotatedSqlStatementToQuery<PlainQuery> createSqlStatement(String sqlString) {
         return this.createSqlStatement(sqlString, "LSql", "createSqlStatement");
     }
 
@@ -278,11 +278,11 @@ public class LSql {
      *
      * @param sqlString the SQL SELECT string
      */
-    public AbstractSqlStatement<PlainQuery> createSqlStatement(String sqlString, String sourceName, String stmtName) {
-        final SqlStatementToPreparedStatement stmtToPs =
-                new SqlStatementToPreparedStatement(this, sourceName, stmtName, "", sqlString);
+    public AnnotatedSqlStatementToQuery<PlainQuery> createSqlStatement(String sqlString, String sourceName, String stmtName) {
+        final AnnotatedSqlStatement stmtToPs =
+                new AnnotatedSqlStatement(this, sourceName, stmtName, "", sqlString);
 
-        return new AbstractSqlStatement<PlainQuery>(stmtToPs) {
+        return new AnnotatedSqlStatementToQuery<PlainQuery>(stmtToPs) {
             @Override
             protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
                 return new PlainQuery(lSql, ps, outConverters) {

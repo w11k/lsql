@@ -6,8 +6,8 @@ import com.google.common.collect.Maps;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.query.PlainQuery;
-import com.w11k.lsql.statement.AbstractSqlStatement;
-import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
+import com.w11k.lsql.statement.AnnotatedSqlStatement;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -17,27 +17,27 @@ public final class TypedStatementMeta {
 
     private final LSql lSql;
 
-    private final SqlStatementToPreparedStatement statement;
+    private final AnnotatedSqlStatement statement;
     @Nullable
     private final String sourceFileName;
 
     private Map<String, Class<?>> parameters = Maps.newHashMap();
 
     public TypedStatementMeta(LSql lSql,
-                              AbstractSqlStatement<PlainQuery> query,
-                              SqlStatementToPreparedStatement statement,
+                              AnnotatedSqlStatementToQuery<PlainQuery> query,
+                              AnnotatedSqlStatement statement,
                               @Nullable String sourceFileName) {
 
         this.lSql = lSql;
         this.statement = statement;
         this.sourceFileName = sourceFileName;
 
-        ImmutableMap<String, List<SqlStatementToPreparedStatement.Parameter>> queryParameters =
+        ImmutableMap<String, List<AnnotatedSqlStatement.Parameter>> queryParameters =
                 query.getParameters();
 
         for (String key : queryParameters.keySet()) {
-            List<SqlStatementToPreparedStatement.Parameter> allParamOccurences = queryParameters.get(key);
-            SqlStatementToPreparedStatement.Parameter p = allParamOccurences.get(0);
+            List<AnnotatedSqlStatement.Parameter> allParamOccurences = queryParameters.get(key);
+            AnnotatedSqlStatement.Parameter p = allParamOccurences.get(0);
 
             Class<?> paramType;
             if (Strings.isNullOrEmpty(p.getJavaTypeAlias())) {
@@ -56,7 +56,7 @@ public final class TypedStatementMeta {
         return lSql;
     }
 
-    public SqlStatementToPreparedStatement getStatement() {
+    public AnnotatedSqlStatement getStatement() {
         return statement;
     }
 

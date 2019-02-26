@@ -25,7 +25,7 @@ import static com.google.common.base.CharMatcher.anyOf;
 import static com.google.common.base.Splitter.on;
 import static com.google.common.collect.Lists.newLinkedList;
 
-public class SqlStatementToPreparedStatement {
+public class AnnotatedSqlStatement {
 
     // ..... /*name: type =*/ 123 /**/
     private static final Pattern QUERY_ARG_START = Pattern.compile(
@@ -54,7 +54,7 @@ public class SqlStatementToPreparedStatement {
 
     private final Map<String, Converter> outConverters;
 
-    public SqlStatementToPreparedStatement(LSql lSql, String statementSourceName, String statementName, String typeAnnotation, String sqlString) {
+    public AnnotatedSqlStatement(LSql lSql, String statementSourceName, String statementName, String typeAnnotation, String sqlString) {
         this.lSql = lSql;
         this.statementSourceName = statementSourceName;
         this.statementName = statementName.trim();

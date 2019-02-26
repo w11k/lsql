@@ -156,7 +156,7 @@ public abstract class AbstractQuery<T> {
 
     public ResultSetWithColumns createResultSetWithColumns() {
         try {
-            ResultSet resultSet = AbstractQuery.this.preparedStatement.executeQuery();
+            ResultSet resultSet = this.preparedStatement.executeQuery();
             ResultSetMetaData metaData = resultSet.getMetaData();
 
             // used to find duplicates

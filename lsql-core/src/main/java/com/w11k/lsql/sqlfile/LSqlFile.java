@@ -8,8 +8,8 @@ import com.w11k.lsql.LSql;
 import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.query.PlainQuery;
-import com.w11k.lsql.statement.AbstractSqlStatement;
-import com.w11k.lsql.statement.SqlStatementToPreparedStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
+import com.w11k.lsql.statement.AnnotatedSqlStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class LSqlFile {
 
     private final String path;
 
-    private final Map<String, SqlStatementToPreparedStatement> statements = Maps.newHashMap();
+    private final Map<String, AnnotatedSqlStatement> statements = Maps.newHashMap();
 
     public LSqlFile(LSql lSql, String fileNameForDescription, String path) {
         this.lSql = lSql;
@@ -50,13 +50,13 @@ public class LSqlFile {
 
     // ----- public -----
 
-    public ImmutableMap<String, SqlStatementToPreparedStatement> getStatements() {
+    public ImmutableMap<String, AnnotatedSqlStatement> getStatements() {
         return copyOf(statements);
     }
 
-    public AbstractSqlStatement<PlainQuery> statement(String name) {
-        final SqlStatementToPreparedStatement stmtToPs = getStatement(name);
-        return new AbstractSqlStatement<PlainQuery>(stmtToPs) {
+    public AnnotatedSqlStatementToQuery<PlainQuery> statement(String name) {
+        final AnnotatedSqlStatement stmtToPs = getStatement(name);
+        return new AnnotatedSqlStatementToQuery<PlainQuery>(stmtToPs) {
             @Override
             protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
                 return new PlainQuery(LSqlFile.this.lSql, ps, outConverters);
@@ -65,9 +65,9 @@ public class LSqlFile {
     }
 
     @Deprecated
-    public <T> AbstractSqlStatement<PojoQuery<T>> statement(String name, final Class<T> pojoClass) {
-        final SqlStatementToPreparedStatement stmtToPs = getStatement(name);
-        return new AbstractSqlStatement<PojoQuery<T>>(stmtToPs) {
+    public <T> AnnotatedSqlStatementToQuery<PojoQuery<T>> statement(String name, final Class<T> pojoClass) {
+        final AnnotatedSqlStatement stmtToPs = getStatement(name);
+        return new AnnotatedSqlStatementToQuery<PojoQuery<T>>(stmtToPs) {
             @Override
             protected PojoQuery<T> createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
                 return new PojoQuery<>(LSqlFile.this.lSql, ps, pojoClass, outConverters);
@@ -75,11 +75,11 @@ public class LSqlFile {
         };
     }
 
-    public SqlStatementToPreparedStatement getSqlStatementToPreparedStatement(String name) {
+    public AnnotatedSqlStatement getSqlStatementToPreparedStatement(String name) {
         return this.getStatement(name);
     }
 
-    private SqlStatementToPreparedStatement getStatement(String name) {
+    private AnnotatedSqlStatement getStatement(String name) {
         if (!this.statements.containsKey(name)) {
             throw new IllegalArgumentException("No statement with name '" + name +
                     "' found in file '" + this.path + "'.");
@@ -135,7 +135,7 @@ public class LSqlFile {
 
                 if (!this.areAllLinesCommented(sub)) {
                     logger.debug("Found SQL statement '{}'", stmtName);
-                    SqlStatementToPreparedStatement stmt = new SqlStatementToPreparedStatement(
+                    AnnotatedSqlStatement stmt = new AnnotatedSqlStatement(
                             lSql, fileNameForDescription, stmtName, typeAnnotation, sub);
                     statements.put(stmtName, stmt);
                 }
