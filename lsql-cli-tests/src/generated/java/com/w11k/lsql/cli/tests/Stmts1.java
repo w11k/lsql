@@ -4,83 +4,8 @@ import com.w11k.lsql.cli.tests.structural_fields.*;
 import com.w11k.lsql.cli.tests.stmts1.*;
 import java.util.*;
 
+@javax.inject.Singleton
 public class Stmts1 {
-
-    // Statement: loadAllPersonsEscaped2 ----------------------------
-
-    private final String sql_loadAllPersonsEscaped2 = "select \n person1.id as \"theId\" /*:int*/ \n from person1;";
-
-    /**    
-     * select<br>
-     * person1.id as "theId" &#42;&#47;:int&#47;&#42;<br>
-     * from person1;<br>
-    */
-    public loadAllPersonsEscaped2Query loadAllPersonsEscaped2() {
-        return new loadAllPersonsEscaped2Query();
-    }
-
-    @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadAllPersonsEscaped2Query extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsEscaped2> implements com.w11k.lsql.TableRow {
-
-        // constructors ----------
-
-        @SuppressWarnings("ConstantConditions")
-        public loadAllPersonsEscaped2Query() {
-            super(lSql, sql_loadAllPersonsEscaped2);
-        }
-
-        // fields ----------
-
-
-        // class methods ----------
-
-        public java.util.Map<String, Object> toInternalMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<>();
-            return map;
-        }
-
-        public java.util.Map<String, Object> toRow() {
-            java.util.Map<String, Object> map = new java.util.HashMap<>();
-            return map;
-        }
-
-        // Object methods ----------
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            loadAllPersonsEscaped2Query that = (loadAllPersonsEscaped2Query) o;
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash("loadAllPersonsEscaped2Query");
-        }
-
-        @Override
-        public String toString() {
-            return "loadAllPersonsEscaped2Query{" + "" + "}";
-        }
-
-        protected LoadAllPersonsEscaped2 createTypedRow(com.w11k.lsql.Row row) {
-            return LoadAllPersonsEscaped2.fromInternalMap(row);
-        }
-
-        protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toInternalMap();
-        }
-
-        public String getStatementFileName() {
-            return "Stmts1.sql";
-        }
-
-        public String getStatementName() {
-            return "loadAllPersonsEscaped2";
-        }
-
-    }
 
     // Statement: loadAllPersons ----------------------------
 
@@ -156,27 +81,27 @@ public class Stmts1 {
 
     }
 
-    // Statement: loadAllPersonsEscaped1 ----------------------------
+    // Statement: loadAllPersonsColumnAlias ----------------------------
 
-    private final String sql_loadAllPersonsEscaped1 = "select \n person1.id as theId /*:int*/ \n from person1;";
+    private final String sql_loadAllPersonsColumnAlias = "select \n person1.id as \"pid: int\" \n from person1;";
 
     /**    
      * select<br>
-     * person1.id as theId &#42;&#47;:int&#47;&#42;<br>
+     * person1.id as "pid: int"<br>
      * from person1;<br>
     */
-    public loadAllPersonsEscaped1Query loadAllPersonsEscaped1() {
-        return new loadAllPersonsEscaped1Query();
+    public loadAllPersonsColumnAliasQuery loadAllPersonsColumnAlias() {
+        return new loadAllPersonsColumnAliasQuery();
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadAllPersonsEscaped1Query extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsEscaped1> implements com.w11k.lsql.TableRow {
+    public final class loadAllPersonsColumnAliasQuery extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsColumnAlias> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
         @SuppressWarnings("ConstantConditions")
-        public loadAllPersonsEscaped1Query() {
-            super(lSql, sql_loadAllPersonsEscaped1);
+        public loadAllPersonsColumnAliasQuery() {
+            super(lSql, sql_loadAllPersonsColumnAlias);
         }
 
         // fields ----------
@@ -200,22 +125,22 @@ public class Stmts1 {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            loadAllPersonsEscaped1Query that = (loadAllPersonsEscaped1Query) o;
+            loadAllPersonsColumnAliasQuery that = (loadAllPersonsColumnAliasQuery) o;
             return true;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash("loadAllPersonsEscaped1Query");
+            return Objects.hash("loadAllPersonsColumnAliasQuery");
         }
 
         @Override
         public String toString() {
-            return "loadAllPersonsEscaped1Query{" + "" + "}";
+            return "loadAllPersonsColumnAliasQuery{" + "" + "}";
         }
 
-        protected LoadAllPersonsEscaped1 createTypedRow(com.w11k.lsql.Row row) {
-            return LoadAllPersonsEscaped1.fromInternalMap(row);
+        protected LoadAllPersonsColumnAlias createTypedRow(com.w11k.lsql.Row row) {
+            return LoadAllPersonsColumnAlias.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -227,84 +152,7 @@ public class Stmts1 {
         }
 
         public String getStatementName() {
-            return "loadAllPersonsEscaped1";
-        }
-
-    }
-
-    // Statement: keepUnderscoreForCamelCase ----------------------------
-
-    private final String sql_keepUnderscoreForCamelCase = "select \n person1.id as \"a_field\" /*:int*/, \n person1.first_name as \"aField\" /*:string*/ \n from person1;";
-
-    /**    
-     * select<br>
-     * person1.id as "a_field" &#42;&#47;:int&#47;&#42;,<br>
-     * person1.first_name as "aField" &#42;&#47;:string&#47;&#42;<br>
-     * from person1;<br>
-    */
-    public keepUnderscoreForCamelCaseQuery keepUnderscoreForCamelCase() {
-        return new keepUnderscoreForCamelCaseQuery();
-    }
-
-    @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class keepUnderscoreForCamelCaseQuery extends com.w11k.lsql.TypedStatementQuery<KeepUnderscoreForCamelCase> implements com.w11k.lsql.TableRow {
-
-        // constructors ----------
-
-        @SuppressWarnings("ConstantConditions")
-        public keepUnderscoreForCamelCaseQuery() {
-            super(lSql, sql_keepUnderscoreForCamelCase);
-        }
-
-        // fields ----------
-
-
-        // class methods ----------
-
-        public java.util.Map<String, Object> toInternalMap() {
-            java.util.Map<String, Object> map = new java.util.HashMap<>();
-            return map;
-        }
-
-        public java.util.Map<String, Object> toRow() {
-            java.util.Map<String, Object> map = new java.util.HashMap<>();
-            return map;
-        }
-
-        // Object methods ----------
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            keepUnderscoreForCamelCaseQuery that = (keepUnderscoreForCamelCaseQuery) o;
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash("keepUnderscoreForCamelCaseQuery");
-        }
-
-        @Override
-        public String toString() {
-            return "keepUnderscoreForCamelCaseQuery{" + "" + "}";
-        }
-
-        protected KeepUnderscoreForCamelCase createTypedRow(com.w11k.lsql.Row row) {
-            return KeepUnderscoreForCamelCase.fromInternalMap(row);
-        }
-
-        protected java.util.Map<String, Object>  getQueryParameters() {
-            return this.toInternalMap();
-        }
-
-        public String getStatementFileName() {
-            return "Stmts1.sql";
-        }
-
-        public String getStatementName() {
-            return "keepUnderscoreForCamelCase";
+            return "loadAllPersonsColumnAlias";
         }
 
     }
@@ -499,7 +347,7 @@ public class Stmts1 {
 
     private final com.w11k.lsql.LSql lSql;
 
-    @com.google.inject.Inject
+    @javax.inject.Inject
     public Stmts1(com.w11k.lsql.LSql lSql) {
         this.lSql = lSql;
     }

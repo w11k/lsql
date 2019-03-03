@@ -48,10 +48,15 @@ public final class TestCliConfig extends Config {
     }
 
     public static void createTables(LSql lSql) {
+        lSql.executeRawSql("create table api1 (id integer primary key, first_name text)");
+        lSql.executeRawSql("create table api2 (id integer primary key, first_name text, age integer)");
+
+        lSql.executeRawSql("create table crud (id serial primary key, field_a int, field_b text)");
         lSql.executeRawSql("create table person1 (id integer primary key, first_name text)");
         lSql.executeRawSql("create table person2 (id integer primary key, first_name text, age integer)");
+        lSql.executeRawSql("create table case_conversions1 (id integer primary key, aaa_bbb int, aaaBbb int)");
+        lSql.executeRawSql("create table case_conversions2 (id integer primary key, col1 int)");
         lSql.executeRawSql("create table a_table (id_pk integer primary key)");
-        lSql.executeRawSql("create table crud (id serial primary key, field_a int, field_b text)");
         lSql.executeRawSql("create table checks (yesno BOOLEAN NOT NULL);");
         lSql.executeRawSql("create table table_with_two_keys (key1 integer, key2 integer, PRIMARY KEY (key1, key2))");
         lSql.executeRawSql("create table custom_converter (field INTEGER);");

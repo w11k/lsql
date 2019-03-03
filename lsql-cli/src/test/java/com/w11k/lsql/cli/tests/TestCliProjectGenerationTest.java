@@ -54,7 +54,7 @@ public final class TestCliProjectGenerationTest {
                 "sqlStatements:" + pathRelativeToProjectRoot("pom.xml", "./src/test/java/com/w11k/lsql/cli/tests"),
                 "dto:" + pathRelativeToProjectRoot("pom.xml", "./src/test/java/com/w11k/lsql/cli/tests"),
                 "package:" + TestCliConfig.class.getPackage().getName(),
-                "di:guice",
+                "di:java",
                 "outDirJava:" + genJavaDir.getAbsolutePath(),
                 "outDirTypeScript:" + genTSDir.getAbsolutePath()
         };

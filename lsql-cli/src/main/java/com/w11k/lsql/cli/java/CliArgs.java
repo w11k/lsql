@@ -23,27 +23,16 @@ public final class CliArgs {
             .put("outDirTypeScript", "output directory for the generated TypeScript file domain.d.ts")
             .put("di", "Specify in which DI container the generated classes are used. Valid values: guice, java")
             .build();
-
     public static Set<String> VALID_ARG_NAMES = VALID_ARGS.keySet();
-
     private String configClassName;
-
     private String url;
-
     private String user;
-
     private String password;
-
     private String schema;
-
     private String genPackageName;
-
     private String sqlStatements;
-
-    private boolean diGuice = false;
-
+    private DependencyInjection dependencyInjection = DependencyInjection.JAVA;
     private String outDirJava;
-
     private String outDirTypeScript;
 
     public CliArgs(String[] args) {
@@ -85,7 +74,9 @@ public final class CliArgs {
                     this.outDirTypeScript = value;
                 } else if (key.equals("di")) {
                     if (value.equalsIgnoreCase("guice")) {
-                        this.diGuice = true;
+                        this.dependencyInjection = DependencyInjection.GUICE;
+                    } else if (value.equalsIgnoreCase("java")) {
+                        this.dependencyInjection = DependencyInjection.JAVA;
                     }
                 }
             }
@@ -136,8 +127,8 @@ public final class CliArgs {
         return sqlStatements;
     }
 
-    public boolean isDiGuice() {
-        return diGuice;
+    public DependencyInjection getDependencyInjection() {
+        return dependencyInjection;
     }
 
     public String getOutDirJava() {
@@ -154,5 +145,9 @@ public final class CliArgs {
 
     private String getParamValue(String param) {
         return param.substring(param.indexOf(":") + 1).trim();
+    }
+
+    public enum DependencyInjection {
+        JAVA, GUICE
     }
 }

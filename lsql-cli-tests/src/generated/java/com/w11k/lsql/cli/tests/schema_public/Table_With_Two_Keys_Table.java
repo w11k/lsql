@@ -1,8 +1,9 @@
 package com.w11k.lsql.cli.tests.schema_public;
 
+@javax.inject.Singleton
 public class Table_With_Two_Keys_Table extends com.w11k.lsql.TypedTable<Table_With_Two_Keys_Row, com.w11k.lsql.NoPrimaryKeyColumn>  {
 
-    @com.google.inject.Inject
+    @javax.inject.Inject
     public Table_With_Two_Keys_Table(com.w11k.lsql.LSql lSql) {
         super(lSql, "TABLE_WITH_TWO_KEYS", Table_With_Two_Keys_Row.class);
     }

@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static org.testng.Assert.*;
 
-public final class TestCliProjectAssertsTest extends AbstractTestCliTest {
+public final class Stmt1Test extends AbstractTestCliTest {
 
     @Test
     public void useStaticUtilFields() {

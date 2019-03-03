@@ -55,7 +55,7 @@ public class Main {
             javaExporter = new JavaExporter(lSql, cliArgs.getSchema());
             javaExporter.setPackageName(cliArgs.getGenPackageName());
             javaExporter.setOutputDir(new File(cliArgs.getOutDirJava()));
-            javaExporter.setGuice(cliArgs.isDiGuice());
+            javaExporter.setDependencyInjection(cliArgs.getDependencyInjection());
 
             // Java statements
             List<StatementFileExporter> statementFileExporters = createStatements(lSql, javaExporter, cliArgs);

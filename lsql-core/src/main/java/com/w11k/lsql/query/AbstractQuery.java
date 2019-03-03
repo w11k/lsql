@@ -33,13 +33,13 @@ public abstract class AbstractQuery<T> {
 
     private boolean ignoreDuplicateColumns = false;
 
-    public AbstractQuery(LSql lSql, PreparedStatement preparedStatement, Map<String, Converter> outConverters) {
+    public AbstractQuery(LSql lSql, PreparedStatement preparedStatement/*, Map<String, Converter> outConverters*/) {
         this.lSql = lSql;
         this.preparedStatement = preparedStatement;
 
-        if (outConverters != null) {
-            this.setConverters(outConverters);
-        }
+//        if (outConverters != null) {
+//            this.setConverters(outConverters);
+//        }
 
         Integer defaultQueryTimeoutInSeconds = lSql.getConfig().getDefaultQueryTimeoutInSeconds();
         if (defaultQueryTimeoutInSeconds != null) {
@@ -167,21 +167,41 @@ public abstract class AbstractQuery<T> {
             LinkedHashMap<String, Converter> converters = Maps.newLinkedHashMap();
 
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                String columnLabel = AbstractQuery.this.lSql.convertExternalSqlToInternalSql(metaData.getColumnLabel(i));
+                Converter converter = null;
+                String columnLabel;
+                String resultSetColumnName = metaData.getColumnLabel(i);
+
+                // f as "f: type"
+                int idxOfColon = resultSetColumnName.indexOf(':');
+                if (idxOfColon == -1) {
+                    columnLabel = AbstractQuery.this.lSql.convertExternalSqlToInternalSql(resultSetColumnName);
+                } else {
+                    columnLabel = resultSetColumnName.substring(0, idxOfColon).trim();
+                    String typeAnnotation = resultSetColumnName.substring(idxOfColon + 1).trim();
+                    if (typeAnnotation.length() > 0) {
+                        converter = this.lSql.getConverterForAlias(typeAnnotation);
+                    }
+                }
 
                 // check duplicates
-                if (!AbstractQuery.this.ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel)) {
-                    throw new IllegalStateException("Duplicate column '" + columnLabel + "' in query.");
+                if (!this.ignoreDuplicateColumns && processedColumnLabels.contains(columnLabel.toLowerCase())) {
+                    throw new IllegalStateException("Duplicate column '" + columnLabel + "' (lower case) in query.");
                 }
-                processedColumnLabels.add(columnLabel);
+                processedColumnLabels.add(columnLabel.toLowerCase());
 
-                Optional<Converter> converter = getConverterForResultSetColumn(metaData, i, columnLabel, false);
-                if (converter.isPresent()) {
-                    ResultSetColumn resultSetColumn = new ResultSetColumn(i, columnLabel, converter.get());
+                if (converter == null) {
+                    Optional<Converter> converterForResultSetColumn = getConverterForResultSetColumn(metaData, i, columnLabel, false);
+                    if (converterForResultSetColumn.isPresent()) {
+                        converter = converterForResultSetColumn.get();
+                    }
+                }
+
+                if (converter != null) {
+                    ResultSetColumn resultSetColumn = new ResultSetColumn(i, columnLabel, converter);
                     boolean nullable = metaData.isNullable(i) == ResultSetMetaData.columnNullable;
                     resultSetColumn.setNullable(nullable);
                     resultSetColumns.add(resultSetColumn);
-                    converters.put(columnLabel, converter.get());
+                    converters.put(columnLabel, converter);
                 }
             }
 
@@ -246,7 +266,7 @@ public abstract class AbstractQuery<T> {
             return of(getConverterByColumnType(metaData, position));
         } else {
             String msg = "Unable to determine a Converter instance for column '" + columnLabel + "'. ";
-            msg += "Annotate the query with /*:type*/ or " +
+            msg += "Annotate the query with `col_name as \"col_name: type\"` or " +
                     "register a converter with Query#addConverter() / Query#setConverters().";
 
             throw new IllegalStateException(msg);

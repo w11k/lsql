@@ -1,8 +1,9 @@
 package com.w11k.lsql.cli.tests.schema_public;
 
+@javax.inject.Singleton
 public class Person2_Table extends com.w11k.lsql.TypedTable<Person2_Row, java.lang.Integer>  {
 
-    @com.google.inject.Inject
+    @javax.inject.Inject
     public Person2_Table(com.w11k.lsql.LSql lSql) {
         super(lSql, "PERSON2", Person2_Row.class);
     }

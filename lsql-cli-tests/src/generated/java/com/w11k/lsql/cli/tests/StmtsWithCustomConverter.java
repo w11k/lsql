@@ -4,6 +4,7 @@ import com.w11k.lsql.cli.tests.structural_fields.*;
 import com.w11k.lsql.cli.tests.stmtswithcustomconverter.*;
 import java.util.*;
 
+@javax.inject.Singleton
 public class StmtsWithCustomConverter {
 
     // Statement: load ----------------------------
@@ -200,7 +201,7 @@ public class StmtsWithCustomConverter {
 
     private final com.w11k.lsql.LSql lSql;
 
-    @com.google.inject.Inject
+    @javax.inject.Inject
     public StmtsWithCustomConverter(com.w11k.lsql.LSql lSql) {
         this.lSql = lSql;
     }

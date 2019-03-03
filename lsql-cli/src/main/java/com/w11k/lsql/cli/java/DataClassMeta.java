@@ -22,9 +22,21 @@ public final class DataClassMeta {
                                        String columnRowKeyName,
                                        Class<?> fieldType) {
 
+        this.checkDuplicate(columnInternalSqlName, columnsJavaCodeName);
+
         DataClassFieldMeta field = new DataClassFieldMeta(columnInternalSqlName, columnsJavaCodeName, columnRowKeyName, fieldType);
         this.fields.add(field);
         return field;
+    }
+
+    private void checkDuplicate(String sqlname, String javaName) {
+        for (DataClassFieldMeta field : this.fields) {
+            if (field.columnsJavaCodeName.equals(javaName)) {
+                throw new RuntimeException(
+                        "Duplicate column: (sql:" + sqlname + ", java:" + javaName + ") conflicts with " +
+                                "(sql:" + field.columnInternalSqlName + ", java:" + field.columnsJavaCodeName + ")");
+            }
+        }
     }
 
     public String getClassName() {

@@ -4,6 +4,7 @@ import com.w11k.lsql.cli.tests.structural_fields.*;
 import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.*;
 import java.util.*;
 
+@javax.inject.Singleton
 public class StmtsCamelCase2 {
 
     // Statement: loadPersonsByAgeAndFirstName ----------------------------
@@ -213,7 +214,7 @@ public class StmtsCamelCase2 {
 
     private final com.w11k.lsql.LSql lSql;
 
-    @com.google.inject.Inject
+    @javax.inject.Inject
     public StmtsCamelCase2(com.w11k.lsql.LSql lSql) {
         this.lSql = lSql;
     }

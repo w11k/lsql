@@ -1,8 +1,9 @@
 package com.w11k.lsql.cli.tests.schema_public;
 
+@javax.inject.Singleton
 public class Checks_Table extends com.w11k.lsql.TypedTable<Checks_Row, com.w11k.lsql.NoPrimaryKeyColumn>  {
 
-    @com.google.inject.Inject
+    @javax.inject.Inject
     public Checks_Table(com.w11k.lsql.LSql lSql) {
         super(lSql, "CHECKS", Checks_Row.class);
     }

@@ -15,7 +15,7 @@ import java.util.Map;
 
 public abstract class AnnotatedSqlStatementToQuery<T> {
 
-    private final AnnotatedSqlStatement AnnotatedSqlStatement;
+    private final AnnotatedSqlStatement annotatedSqlStatement;
 
     private final Map<String, Converter> parameterConverters = Maps.newHashMap();
 
@@ -24,7 +24,7 @@ public abstract class AnnotatedSqlStatementToQuery<T> {
     }
 
     public AnnotatedSqlStatementToQuery(AnnotatedSqlStatement AnnotatedSqlStatement, Map<String, Converter> parameterConverters) {
-        this.AnnotatedSqlStatement = AnnotatedSqlStatement;
+        this.annotatedSqlStatement = AnnotatedSqlStatement;
         this.parameterConverters.putAll(parameterConverters);
     }
 
@@ -43,11 +43,11 @@ public abstract class AnnotatedSqlStatementToQuery<T> {
 
     public T query(Map<String, Object> queryParameters) {
         try {
-            PreparedStatement ps = this.AnnotatedSqlStatement.createPreparedStatement(queryParameters, this.parameterConverters);
+            PreparedStatement ps = this.annotatedSqlStatement.createPreparedStatement(queryParameters, this.parameterConverters);
             return createQueryInstance(
-                    this.AnnotatedSqlStatement.getlSql(),
-                    ps,
-                    this.AnnotatedSqlStatement.getOutConverters());
+                    this.annotatedSqlStatement.getlSql(),
+                    ps/*,
+                    this.annotatedSqlStatement.getOutConverters()*/);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -64,7 +64,7 @@ public abstract class AnnotatedSqlStatementToQuery<T> {
 
     public void execute(Map<String, Object> queryParameters) {
         try {
-            PreparedStatement ps = this.AnnotatedSqlStatement.createPreparedStatement(queryParameters, this.parameterConverters);
+            PreparedStatement ps = this.annotatedSqlStatement.createPreparedStatement(queryParameters, this.parameterConverters);
             ps.execute();
         } catch (SQLException e) {
             throw new DatabaseAccessException(e);
@@ -72,9 +72,9 @@ public abstract class AnnotatedSqlStatementToQuery<T> {
     }
 
     public ImmutableMap<String, List<AnnotatedSqlStatement.Parameter>> getParameters() {
-        return this.AnnotatedSqlStatement.getParameters();
+        return this.annotatedSqlStatement.getParameters();
     }
 
-    abstract protected T createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters);
+    abstract protected T createQueryInstance(LSql lSql, PreparedStatement ps/*, Map<String, Converter> outConverters*/);
 
 }

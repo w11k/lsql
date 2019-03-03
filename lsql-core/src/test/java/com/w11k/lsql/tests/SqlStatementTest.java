@@ -399,7 +399,7 @@ public class SqlStatementTest extends AbstractLSqlTest {
         setup();
 
         AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
-                "select count(id) as count_id /*:string*/, max(age) as max_age /*:long*/ from person;");
+                "select count(id) as \"count_id: string\", max(age) as \"max_age: long\" from person;");
         PlainQuery query = statement.query();
         List<Row> rows = query.toList();
         assertEquals(rows.size(), 1);
@@ -408,19 +408,19 @@ public class SqlStatementTest extends AbstractLSqlTest {
         assertTrue(row.get("maxAge") instanceof Long);
     }
 
-    @Test()
-    public void resultSetTypeAnnotationsWithQuotedIdentifier() {
-        setup();
-
-        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
-                "select count(id) as \"count_id\" /*:string*/, max(age) as \"max_age\" /*:long*/ from person;");
-        PlainQuery query = statement.query();
-        List<Row> rows = query.toList();
-        assertEquals(rows.size(), 1);
-        Row row = rows.get(0);
-        assertTrue(row.get("countId") instanceof String);
-        assertTrue(row.get("maxAge") instanceof Long);
-    }
+//    @Test()
+//    public void resultSetTypeAnnotationsWithQuotedIdentifier() {
+//        setup();
+//
+//        AnnotatedSqlStatementToQuery<PlainQuery> statement = lSql.createSqlStatement(
+//                "select count(id) as \"count_id\" /*:string*/, max(age) as \"max_age\" /*:long*/ from person;");
+//        PlainQuery query = statement.query();
+//        List<Row> rows = query.toList();
+//        assertEquals(rows.size(), 1);
+//        Row row = rows.get(0);
+//        assertTrue(row.get("countId") instanceof String);
+//        assertTrue(row.get("maxAge") instanceof Long);
+//    }
 
     @Test()
     public void explicitParameterConverter() {

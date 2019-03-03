@@ -3,6 +3,7 @@ package com.w11k.lsql.cli.tests;
 import com.w11k.lsql.cli.tests.structural_fields.*;
 import java.util.*;
 
+@javax.inject.Singleton
 public class StmtsOnlyVoids {
 
     // Statement: statementA ----------------------------
@@ -189,7 +190,7 @@ public class StmtsOnlyVoids {
 
     private final com.w11k.lsql.LSql lSql;
 
-    @com.google.inject.Inject
+    @javax.inject.Inject
     public StmtsOnlyVoids(com.w11k.lsql.LSql lSql) {
         this.lSql = lSql;
     }

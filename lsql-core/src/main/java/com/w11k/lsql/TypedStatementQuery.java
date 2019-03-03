@@ -1,10 +1,9 @@
 package com.w11k.lsql;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.query.PlainQuery;
-import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
 import com.w11k.lsql.statement.AnnotatedSqlStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
@@ -34,12 +33,16 @@ public abstract class TypedStatementQuery<T> {
                         "",
                         this.sqlStatement);
 
-        AnnotatedSqlStatementToQuery<PlainQuery> sqlStatement = new AnnotatedSqlStatementToQuery<PlainQuery>(stmtToPs) {
-            @Override
-            protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
-                return new PlainQuery(lSql, ps, outConverters);
-            }
-        };
+        AnnotatedSqlStatementToQuery<PlainQuery> sqlStatement =
+                new AnnotatedSqlStatementToQuery<PlainQuery>(stmtToPs/*, stmtToPs.getOutConverters()*/) {
+                    @Override
+                    protected PlainQuery createQueryInstance(LSql lSql,
+                                                             PreparedStatement ps/*,
+                                                             Map<String, Converter> outConverters*/) {
+
+                        return new PlainQuery(lSql, ps/*, outConverters*/);
+                    }
+                };
 
         return sqlStatement
                 .query(this.getQueryParameters())

@@ -1,4 +1,34 @@
 export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Case_Conversions2_Row {
+        id: number;
+        col1?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Case_Conversions2_Map {
+        id: number;
+        col1?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Case_Conversions1_Row {
+        aaaBbb?: number;
+        id: number;
+        aaabbb?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Case_Conversions1_Map {
+        aaa_bbb?: number;
+        id: number;
+        aaabbb?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
     export interface Custom_Converter_Row {
         field?: number;
     }
@@ -7,6 +37,62 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
 export namespace com_w11k_lsql_cli_tests_schema_public {
     export interface Custom_Converter_Map {
         field?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Api1_Row {
+        id: number;
+        firstName?: string;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Api1_Map {
+        id: number;
+        first_name?: string;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Api2_Row {
+        id: number;
+        firstName?: string;
+        age?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Api2_Map {
+        id: number;
+        first_name?: string;
+        age?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface A_Table_Row {
+        idPk: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface A_Table_Map {
+        id_pk: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Table_With_Two_Keys_Row {
+        key1: number;
+        key2: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_schema_public {
+    export interface Table_With_Two_Keys_Map {
+        key1: number;
+        key2: number;
     }
 }
 
@@ -57,18 +143,6 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface A_Table_Row {
-        idPk: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface A_Table_Map {
-        id_pk: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_schema_public {
     export interface Person1_Row {
         id: number;
         firstName?: string;
@@ -108,17 +182,31 @@ export namespace com_w11k_lsql_cli_tests_schema_public {
     }
 }
 
-export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Table_With_Two_Keys_Row {
-        key1: number;
-        key2: number;
+export namespace com_w11k_lsql_cli_tests_stmtscaseconversions {
+    export interface SaveCaseConversions_Row {
+        id: number;
+        oneTwo?: number;
+        onetwo?: number;
     }
 }
 
-export namespace com_w11k_lsql_cli_tests_schema_public {
-    export interface Table_With_Two_Keys_Map {
-        key1: number;
-        key2: number;
+export namespace com_w11k_lsql_cli_tests_stmtscaseconversions {
+    export interface SaveCaseConversions_Map {
+        id: number;
+        one_two?: number;
+        onetwo?: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_stmtstypeannotations {
+    export interface ColumnTypeAnnotation_Row {
+        id: number;
+    }
+}
+
+export namespace com_w11k_lsql_cli_tests_stmtstypeannotations {
+    export interface ColumnTypeAnnotation_Map {
+        id: number;
     }
 }
 
@@ -165,18 +253,6 @@ export namespace com_w11k_lsql_cli_tests_subdir_subsubdir_stmtscamelcase2 {
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsEscaped2_Row {
-        theid: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsEscaped2_Map {
-        theid: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmts1 {
     export interface LoadAllPersons_Row {
         id: number;
         firstName?: string;
@@ -191,28 +267,14 @@ export namespace com_w11k_lsql_cli_tests_stmts1 {
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsEscaped1_Row {
-        theid: number;
+    export interface LoadAllPersonsColumnAlias_Row {
+        pid: number;
     }
 }
 
 export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface LoadAllPersonsEscaped1_Map {
-        theid: number;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface KeepUnderscoreForCamelCase_Row {
-        aField: number;
-        afield?: string;
-    }
-}
-
-export namespace com_w11k_lsql_cli_tests_stmts1 {
-    export interface KeepUnderscoreForCamelCase_Map {
-        a_field: number;
-        afield?: string;
+    export interface LoadAllPersonsColumnAlias_Map {
+        pid: number;
     }
 }
 

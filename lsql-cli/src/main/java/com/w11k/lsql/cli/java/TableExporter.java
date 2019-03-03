@@ -43,6 +43,9 @@ public class TableExporter {
     private void createContent() {
         DataClassMeta dcm = this.dataClassExporter.getDataClassMeta();
         content.append("package ").append(dcm.getPackageName()).append(";\n\n");
+        if (this.javaExporter.getDependencyInjection().equals(CliArgs.DependencyInjection.JAVA)) {
+            content.append("@javax.inject.Singleton\n");
+        }
         content.append("public class ").append(getClassName()).append(" extends ").append(TypedTable.class.getCanonicalName());
         content.append("<").append(this.dataClassExporter.getClassName());
         content.append(", ");
@@ -78,9 +81,12 @@ public class TableExporter {
     }
 
     private void contentConstructor() {
-        if (this.javaExporter.isGuice()) {
+        if (this.javaExporter.getDependencyInjection().equals(CliArgs.DependencyInjection.GUICE)) {
             content.append("    @com.google.inject.Inject\n");
+        } else if (this.javaExporter.getDependencyInjection().equals(CliArgs.DependencyInjection.JAVA)) {
+            content.append("    @javax.inject.Inject\n");
         }
+
         content.append("    public ").append(getClassName())
                 .append("(").append(LSql.class.getCanonicalName()).append(" lSql) {\n");
 

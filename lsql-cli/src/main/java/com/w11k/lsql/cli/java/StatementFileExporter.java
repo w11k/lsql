@@ -80,6 +80,7 @@ public final class StatementFileExporter {
                         getJavaCodeName(stmt.getStatementName(), false, true),
                         joinStringsAsPackageName(
                                 this.javaExporter.getPackageName(), this.getSubPackageName(), this.stmtFileClassName.toLowerCase()));
+
                 query.query().createResultSetWithColumns().getColumns().forEach(c -> {
                     String colName = c.getName();
                     String fieldName = getJavaCodeName(colName, false, false);
@@ -128,6 +129,9 @@ public final class StatementFileExporter {
 
         content.append("\n");
 
+        if (this.javaExporter.getDependencyInjection().equals(CliArgs.DependencyInjection.JAVA)) {
+            content.append("@javax.inject.Singleton\n");
+        }
         content.append("public class ")
                 .append(stmtFileClassName)
                 .append(" {\n\n");
@@ -146,8 +150,10 @@ public final class StatementFileExporter {
 
         // constructor
         content.append("    private final ").append(LSql.class.getCanonicalName()).append(" lSql;\n\n");
-        if (this.javaExporter.isGuice()) {
+        if (this.javaExporter.getDependencyInjection().equals(CliArgs.DependencyInjection.GUICE)) {
             content.append("    @com.google.inject.Inject\n");
+        } else if (this.javaExporter.getDependencyInjection().equals(CliArgs.DependencyInjection.JAVA)) {
+            content.append("    @javax.inject.Inject\n");
         }
         content.append("    public ").append(stmtFileClassName).append("(")
                 .append(LSql.class.getCanonicalName()).append(" lSql) {\n")

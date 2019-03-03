@@ -28,7 +28,7 @@ public class JavaExporter {
 
     private String packageName;
 
-    private boolean guice = false;
+    private CliArgs.DependencyInjection dependencyInjection;
 
     private List<DataClassMeta> generatedDataClasses = emptyList();
 
@@ -155,7 +155,7 @@ public class JavaExporter {
         }
 
         // generate Guice module
-        if (this.guice) {
+        if (this.dependencyInjection.equals(CliArgs.DependencyInjection.GUICE)) {
             new GuiceModuleExporter(this, guiceModuleClasses).export();
         }
 
@@ -179,12 +179,12 @@ public class JavaExporter {
         this.outputDir = outputDir;
     }
 
-    public boolean isGuice() {
-        return guice;
+    public CliArgs.DependencyInjection getDependencyInjection() {
+        return dependencyInjection;
     }
 
-    public void setGuice(boolean guice) {
-        this.guice = guice;
+    public void setDependencyInjection(CliArgs.DependencyInjection dependencyInjection) {
+        this.dependencyInjection = dependencyInjection;
     }
 
     public LSql getlSql() {

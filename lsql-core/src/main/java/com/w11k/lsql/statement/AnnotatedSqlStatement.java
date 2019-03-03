@@ -33,10 +33,10 @@ public class AnnotatedSqlStatement {
 
     private static final String QUERY_ARG_END = "/**/";
 
-    private static final Pattern OUT_TYPE_ANNOTATION = Pattern.compile(
-            "(/\\*\\s*:\\s*(\\w*)\\s*\\*/)",
-            Pattern.MULTILINE
-    );
+//    private static final Pattern OUT_TYPE_ANNOTATION = Pattern.compile(
+//            "(/\\*\\s*:\\s*(\\w*)\\s*\\*/)",
+//            Pattern.MULTILINE
+//    );
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -52,7 +52,7 @@ public class AnnotatedSqlStatement {
 
     private final Map<String, List<Parameter>> parameters;
 
-    private final Map<String, Converter> outConverters;
+//    private final Map<String, Converter> outConverters;
 
     public AnnotatedSqlStatement(LSql lSql, String statementSourceName, String statementName, String typeAnnotation, String sqlString) {
         this.lSql = lSql;
@@ -61,7 +61,7 @@ public class AnnotatedSqlStatement {
         this.typeAnnotation = typeAnnotation.trim();
         this.sqlString = sqlString;
         this.parameters = parseParameters();
-        this.outConverters = parseOutConverters();
+//        this.outConverters = parseOutConverters();
     }
 
     public com.w11k.lsql.LSql getlSql() {
@@ -88,9 +88,9 @@ public class AnnotatedSqlStatement {
         return ImmutableMap.copyOf(this.parameters);
     }
 
-    public Map<String, Converter> getOutConverters() {
-        return outConverters;
-    }
+//    public Map<String, Converter> getOutConverters() {
+//        return outConverters;
+//    }
 
     private Map<String, List<Parameter>> parseParameters() {
         Map<String, List<Parameter>> found = Maps.newHashMap();
@@ -171,6 +171,7 @@ public class AnnotatedSqlStatement {
         return name.trim();
     }
 
+    /*
     private Map<String, Converter> parseOutConverters() {
         Matcher matcher = OUT_TYPE_ANNOTATION.matcher(this.sqlString);
 
@@ -194,6 +195,7 @@ public class AnnotatedSqlStatement {
 
         return converters;
     }
+    */
 
     private void log(Map<String, Object> queryParameters) {
         if (this.logger.isTraceEnabled()) {

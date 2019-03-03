@@ -1,8 +1,9 @@
 package com.w11k.lsql.cli.tests.schema_public;
 
+@javax.inject.Singleton
 public class Crud_Table extends com.w11k.lsql.TypedTable<Crud_Row, java.lang.Integer>  {
 
-    @com.google.inject.Inject
+    @javax.inject.Inject
     public Crud_Table(com.w11k.lsql.LSql lSql) {
         super(lSql, "CRUD", Crud_Row.class);
     }
