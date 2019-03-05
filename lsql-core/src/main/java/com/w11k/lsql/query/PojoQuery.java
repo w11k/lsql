@@ -8,6 +8,7 @@ import com.w11k.lsql.converter.Converter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Map;
 
 public class PojoQuery<T> extends AbstractQuery<T> {
 
@@ -38,8 +39,8 @@ public class PojoQuery<T> extends AbstractQuery<T> {
         }
     };
 
-    public PojoQuery(LSql lSql, PreparedStatement preparedStatement, Class<T> pojoClass/*, Map<String, Converter> outConverters*/) {
-        super(lSql, preparedStatement/*, outConverters*/);
+    public PojoQuery(LSql lSql, PreparedStatement preparedStatement, Class<T> pojoClass, Map<String, Converter> outConverters) {
+        super(lSql, preparedStatement, outConverters);
         this.pojoMapper = PojoMapper.getFor(pojoClass);
         this.pojoClass = pojoClass;
     }

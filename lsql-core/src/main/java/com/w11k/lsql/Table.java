@@ -397,7 +397,7 @@ public class Table {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        PlainQuery query = new PlainQuery(lSql, ps/*, null*/) {
+        PlainQuery query = new PlainQuery(lSql, ps, null) {
             @Override
             protected RowDeserializer<Row> getRowDeserializer() {
                 return rowDeserializer;

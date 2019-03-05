@@ -17,7 +17,10 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,10 +36,10 @@ public class AnnotatedSqlStatement {
 
     private static final String QUERY_ARG_END = "/**/";
 
-//    private static final Pattern OUT_TYPE_ANNOTATION = Pattern.compile(
-//            "(/\\*\\s*:\\s*(\\w*)\\s*\\*/)",
-//            Pattern.MULTILINE
-//    );
+    // column foo: typeAlias
+    private static final Pattern COLUMN_CONFIGURATION = Pattern.compile(
+            "\\s*--\\s*column\\s+(.*):(.*)"
+    );
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -52,7 +55,7 @@ public class AnnotatedSqlStatement {
 
     private final Map<String, List<Parameter>> parameters;
 
-//    private final Map<String, Converter> outConverters;
+    private final Map<String, Converter> outConverters;
 
     public AnnotatedSqlStatement(LSql lSql, String statementSourceName, String statementName, String typeAnnotation, String sqlString) {
         this.lSql = lSql;
@@ -61,7 +64,7 @@ public class AnnotatedSqlStatement {
         this.typeAnnotation = typeAnnotation.trim();
         this.sqlString = sqlString;
         this.parameters = parseParameters();
-//        this.outConverters = parseOutConverters();
+        this.outConverters = parseOutConverters();
     }
 
     public com.w11k.lsql.LSql getlSql() {
@@ -88,9 +91,9 @@ public class AnnotatedSqlStatement {
         return ImmutableMap.copyOf(this.parameters);
     }
 
-//    public Map<String, Converter> getOutConverters() {
-//        return outConverters;
-//    }
+    public Map<String, Converter> getOutConverters() {
+        return outConverters;
+    }
 
     private Map<String, List<Parameter>> parseParameters() {
         Map<String, List<Parameter>> found = Maps.newHashMap();
@@ -171,31 +174,22 @@ public class AnnotatedSqlStatement {
         return name.trim();
     }
 
-    /*
     private Map<String, Converter> parseOutConverters() {
-        Matcher matcher = OUT_TYPE_ANNOTATION.matcher(this.sqlString);
-
+        Iterable<String> lines = on("\n").split(this.sqlString);
         Map<String, Converter> converters = Maps.newHashMap();
-        while (matcher.find()) {
-            // find word left from OUT_TYPE_ANNOTATION
-            String alias = matcher.group(2);
-            String textBeforeAlias = this.sqlString.substring(0, matcher.start(1)).trim();
-            LinkedList<String> wordsBeforeAlias = newLinkedList(on(anyOf(" ,\t\n")).split(textBeforeAlias));
-            String wordLeft = wordsBeforeAlias.getLast();
 
-            // unquote ResultSet column alias
-            if (wordLeft.startsWith("\"") && wordLeft.endsWith("\"")) {
-                wordLeft = wordLeft.substring(1, wordLeft.length() - 1);
+        for (String line : lines) {
+            Matcher matcher = COLUMN_CONFIGURATION.matcher(line);
+            while (matcher.find()) {
+                String columnName = matcher.group(1).trim();
+                String typeAlias = matcher.group(2).trim();
+                Converter converter = this.lSql.getConverterForAlias(typeAlias);
+                converters.put(columnName, converter);
             }
-
-            String javaColumnName = this.getlSql().convertExternalSqlToInternalSql(wordLeft);
-            Converter converter = this.getlSql().getConverterForAlias(alias);
-            converters.put(javaColumnName, converter);
         }
 
         return converters;
     }
-    */
 
     private void log(Map<String, Object> queryParameters) {
         if (this.logger.isTraceEnabled()) {
@@ -364,7 +358,7 @@ public class AnnotatedSqlStatement {
         }
     }
 
-    private final class ParameterInPreparedStatement {
+    private static final class ParameterInPreparedStatement {
 
         Parameter parameter;
 

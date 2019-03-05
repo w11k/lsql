@@ -231,8 +231,8 @@ public class LSql {
         try {
             return new PlainQuery(
                     this,
-                    st.createPreparedStatement(Collections.emptyMap(), null)/*,
-                    st.getOutConverters()*/);
+                    st.createPreparedStatement(Collections.emptyMap(), null),
+                    st.getOutConverters());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -257,8 +257,8 @@ public class LSql {
             return new PojoQuery<>(
                     this,
                     st.createPreparedStatement(Collections.emptyMap(), null),
-                    pojoClass/*,
-                    st.getOutConverters()*/);
+                    pojoClass,
+                    st.getOutConverters());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -284,8 +284,8 @@ public class LSql {
 
         return new AnnotatedSqlStatementToQuery<PlainQuery>(stmtToPs) {
             @Override
-            protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps/*, Map<String, Converter> outConverters*/) {
-                return new PlainQuery(lSql, ps/*, outConverters*/) {
+            protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new PlainQuery(lSql, ps, outConverters) {
                     @Override
                     protected RowDeserializer<Row> getRowDeserializer() {
                         return RowDeserializer.INSTANCE_SPECIAL_ROWKEY;

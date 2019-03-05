@@ -46,8 +46,8 @@ public abstract class AnnotatedSqlStatementToQuery<T> {
             PreparedStatement ps = this.annotatedSqlStatement.createPreparedStatement(queryParameters, this.parameterConverters);
             return createQueryInstance(
                     this.annotatedSqlStatement.getlSql(),
-                    ps/*,
-                    this.annotatedSqlStatement.getOutConverters()*/);
+                    ps,
+                    this.annotatedSqlStatement.getOutConverters());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -75,6 +75,6 @@ public abstract class AnnotatedSqlStatementToQuery<T> {
         return this.annotatedSqlStatement.getParameters();
     }
 
-    abstract protected T createQueryInstance(LSql lSql, PreparedStatement ps/*, Map<String, Converter> outConverters*/);
+    abstract protected T createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters);
 
 }

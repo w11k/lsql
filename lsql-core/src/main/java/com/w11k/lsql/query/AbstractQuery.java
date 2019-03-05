@@ -33,13 +33,13 @@ public abstract class AbstractQuery<T> {
 
     private boolean ignoreDuplicateColumns = false;
 
-    public AbstractQuery(LSql lSql, PreparedStatement preparedStatement/*, Map<String, Converter> outConverters*/) {
+    public AbstractQuery(LSql lSql, PreparedStatement preparedStatement, Map<String, Converter> outConverters) {
         this.lSql = lSql;
         this.preparedStatement = preparedStatement;
 
-//        if (outConverters != null) {
-//            this.setConverters(outConverters);
-//        }
+        if (outConverters != null) {
+            this.setConverters(outConverters);
+        }
 
         Integer defaultQueryTimeoutInSeconds = lSql.getConfig().getDefaultQueryTimeoutInSeconds();
         if (defaultQueryTimeoutInSeconds != null) {

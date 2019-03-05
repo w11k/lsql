@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.w11k.lsql.LSql;
+import com.w11k.lsql.converter.Converter;
 import com.w11k.lsql.query.PlainQuery;
 import com.w11k.lsql.query.PojoQuery;
 import com.w11k.lsql.statement.AnnotatedSqlStatement;
@@ -57,8 +58,8 @@ public class LSqlFile {
         final AnnotatedSqlStatement stmtToPs = getStatement(name);
         return new AnnotatedSqlStatementToQuery<PlainQuery>(stmtToPs) {
             @Override
-            protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps/*, Map<String, Converter> outConverters*/) {
-                return new PlainQuery(LSqlFile.this.lSql, ps/*, outConverters*/);
+            protected PlainQuery createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new PlainQuery(LSqlFile.this.lSql, ps, outConverters);
             }
         };
     }
@@ -68,8 +69,8 @@ public class LSqlFile {
         final AnnotatedSqlStatement stmtToPs = getStatement(name);
         return new AnnotatedSqlStatementToQuery<PojoQuery<T>>(stmtToPs) {
             @Override
-            protected PojoQuery<T> createQueryInstance(LSql lSql, PreparedStatement ps/*, Map<String, Converter> outConverters*/) {
-                return new PojoQuery<>(LSqlFile.this.lSql, ps, pojoClass/*, outConverters*/);
+            protected PojoQuery<T> createQueryInstance(LSql lSql, PreparedStatement ps, Map<String, Converter> outConverters) {
+                return new PojoQuery<>(LSqlFile.this.lSql, ps, pojoClass, outConverters);
             }
         };
     }
