@@ -18,7 +18,6 @@ public final class CliArgs {
             .put("schema", "comma separated list of schemas, omit to use default schema")
             .put("package", "root package for all generated classes")
             .put("sqlStatements", "root directory that contains SQL statement files")
-            .put("dto", "root directory that contains Java files with embedded DTO declarations")
             .put("outDirJava", "output directory for all generated Java classes")
             .put("outDirTypeScript", "output directory for the generated TypeScript file domain.d.ts")
             .put("di", "Specify in which DI container the generated classes are used. Valid values: guice, java")

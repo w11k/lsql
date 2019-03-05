@@ -1,8 +1,8 @@
 package com.w11k.lsql.cli_tests.tests;
 
 import com.google.common.reflect.Invokable;
-import com.w11k.lsql.cli.tests.schema_public.Api1_Row;
-import com.w11k.lsql.cli.tests.schema_public.Api2_Row;
+import com.w11k.lsql.cli.schema_public.Api1_Row;
+import com.w11k.lsql.cli.schema_public.Api2_Row;
 import org.testng.annotations.Test;
 
 import javax.annotation.Nonnull;

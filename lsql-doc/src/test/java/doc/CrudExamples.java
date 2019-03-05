@@ -11,7 +11,7 @@ import setup.Db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-import static com.w11k.lsql.cli.tests.TestUtils.pathRelativeToProjectRoot;
+import static com.w11k.lsql.cli.TestUtils.pathRelativeToProjectRoot;
 
 
 public class CrudExamples {

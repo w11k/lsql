@@ -1,7 +1,7 @@
 package com.w11k.lsql.cli_tests.tests;
 
 import com.w11k.lsql.LSql;
-import com.w11k.lsql.cli.tests.TestCliConfig;
+import com.w11k.lsql.cli.TestCliConfig;
 import com.w11k.lsql.jdbc.ConnectionProviders;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.testng.annotations.BeforeMethod;
@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import static com.w11k.lsql.cli.tests.TestCliConfig.createTables;
+import static com.w11k.lsql.cli.TestCliConfig.createTables;
 
 public class AbstractTestCliTest {
 

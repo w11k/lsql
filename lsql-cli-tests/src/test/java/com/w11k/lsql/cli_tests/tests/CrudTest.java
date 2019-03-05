@@ -1,7 +1,8 @@
 package com.w11k.lsql.cli_tests.tests;
 
 import com.google.common.base.Optional;
-import com.w11k.lsql.cli.tests.schema_public.*;
+import com.w11k.lsql.cli.schema_public.Crud_Row;
+import com.w11k.lsql.cli.schema_public.Crud_Table;
 import com.w11k.lsql.utils.JdbcTestUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;

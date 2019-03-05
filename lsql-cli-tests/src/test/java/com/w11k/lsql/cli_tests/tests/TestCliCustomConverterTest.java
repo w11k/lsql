@@ -1,12 +1,12 @@
 package com.w11k.lsql.cli_tests.tests;
 
-import com.w11k.lsql.cli.tests.StmtsWithCustomConverter;
-import com.w11k.lsql.cli.tests.TestCliConfig;
-import com.w11k.lsql.cli.tests.schema_public.Custom_Converter_Row;
-import com.w11k.lsql.cli.tests.schema_public.Custom_Converter_Table;
-import com.w11k.lsql.cli.tests.schema_public.Person1_Row;
-import com.w11k.lsql.cli.tests.schema_public.Person1_Table;
-import com.w11k.lsql.cli.tests.stmtswithcustomconverter.Load;
+import com.w11k.lsql.cli.StmtsWithCustomConverter;
+import com.w11k.lsql.cli.TestCliConfig;
+import com.w11k.lsql.cli.schema_public.Custom_Converter_Row;
+import com.w11k.lsql.cli.schema_public.Custom_Converter_Table;
+import com.w11k.lsql.cli.schema_public.Person1_Row;
+import com.w11k.lsql.cli.schema_public.Person1_Table;
+import com.w11k.lsql.cli.stmtswithcustomconverter.Load;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

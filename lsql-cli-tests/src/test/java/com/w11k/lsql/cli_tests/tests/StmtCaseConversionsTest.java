@@ -1,9 +1,9 @@
 package com.w11k.lsql.cli_tests.tests;
 
-import com.w11k.lsql.cli.tests.schema_public.Person2_Row;
-import com.w11k.lsql.cli.tests.schema_public.Person2_Table;
-import com.w11k.lsql.cli.tests.subdir.subsubdir.StmtsCamelCase2;
-import com.w11k.lsql.cli.tests.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
+import com.w11k.lsql.cli.schema_public.Person2_Row;
+import com.w11k.lsql.cli.schema_public.Person2_Table;
+import com.w11k.lsql.cli.subdir.subsubdir.StmtsCamelCase2;
+import com.w11k.lsql.cli.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
 import org.testng.annotations.Test;
 
 import java.util.List;
