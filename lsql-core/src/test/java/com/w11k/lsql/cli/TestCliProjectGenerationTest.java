@@ -22,12 +22,12 @@ public final class TestCliProjectGenerationTest {
 
     @Test
     public void createTestFiles() throws SQLException, ClassNotFoundException, IOException {
-        File genJavaDir = TestUtils.pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/generated/java");
+        File genJavaDir = TestUtils.pathRelativeToProjectRoot("pom.xml", "../lsql-generation-tests/src/generated/java");
         if (genJavaDir.exists()) {
             MoreFiles.deleteRecursively(genJavaDir.toPath());
         }
 
-        File genTSDir = TestUtils.pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/generated/ts");
+        File genTSDir = TestUtils.pathRelativeToProjectRoot("pom.xml", "../lsql-generation-tests/src/generated/ts");
         if (genTSDir.exists()) {
             MoreFiles.deleteRecursively(genTSDir.toPath());
         }

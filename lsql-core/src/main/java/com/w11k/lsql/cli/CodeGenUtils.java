@@ -84,7 +84,7 @@ public final class CodeGenUtils {
 
     public static String joinStringsAsPackageName(String... packageNames) {
         List<String> packages = Arrays.stream(packageNames)
-                .map(p -> p.trim().equals("") ? null : p) // change '' to null so that `skipNulls()` can filter
+                .map(p -> p == null || p.trim().equals("") ? null : p) // change '' to null so that `skipNulls()` can filter
                 .collect(Collectors.toList());
 
         return Joiner.on(".").skipNulls().join(packages);

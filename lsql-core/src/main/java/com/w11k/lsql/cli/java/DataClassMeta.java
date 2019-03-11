@@ -51,6 +51,15 @@ public final class DataClassMeta {
         return fields;
     }
 
+    @Override
+    public String toString() {
+        return "DataClassMeta{" +
+                "className='" + className + '\'' +
+                ", packageName='" + packageName + '\'' +
+                ", fields=" + fields +
+                '}';
+    }
+
     public static class DataClassFieldMeta {
 
         private final String columnInternalSqlName;
@@ -93,6 +102,17 @@ public final class DataClassMeta {
 
         public void setNullable(boolean nullable) {
             this.nullable = nullable;
+        }
+
+        @Override
+        public String toString() {
+            return "DataClassFieldMeta{" +
+                    "columnInternalSqlName='" + columnInternalSqlName + '\'' +
+                    ", columnsJavaCodeName='" + columnsJavaCodeName + '\'' +
+                    ", columnRowKeyName='" + columnRowKeyName + '\'' +
+                    ", fieldType=" + fieldType +
+                    ", nullable=" + nullable +
+                    '}';
         }
     }
 }

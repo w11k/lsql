@@ -32,6 +32,10 @@ public class JavaExporter {
 
     private List<DataClassMeta> generatedDataClasses = emptyList();
 
+    /**
+     * @param lSql
+     * @param schemas pass null to featch all schemas
+     */
     public JavaExporter(LSql lSql, String schemas) {
         this.lSql = lSql;
         this.fetchMetaDataForAllTables(schemas);

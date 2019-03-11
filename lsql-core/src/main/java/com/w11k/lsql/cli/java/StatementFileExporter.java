@@ -1,28 +1,27 @@
 package com.w11k.lsql.cli.java;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.CodeGenUtils;
 import com.w11k.lsql.query.PlainQuery;
-import com.w11k.lsql.sqlfile.LSqlFile;
-import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
 import com.w11k.lsql.statement.AnnotatedSqlStatement;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.io.MoreFiles.getNameWithoutExtension;
 import static com.w11k.lsql.cli.CodeGenUtils.*;
 
 public final class StatementFileExporter {
 
-    private final File stmtSourceFile;
-
     private final LSql lSql;
+
     private final JavaExporter javaExporter;
+
+    private final String fullFilePath;
 
     private final String stmtFilesRootDir;
 
@@ -38,25 +37,22 @@ public final class StatementFileExporter {
 
     public StatementFileExporter(LSql lSql,
                                  JavaExporter javaExporter,
-                                 File stmtSourceFile,
-                                 String stmtFilesRootDir) {
+                                 String stmtFilesRootDir,
+                                 String fullFilePath,
+                                 String fileName,
+                                 Map<String, AnnotatedSqlStatementToQuery<PlainQuery>> statements) {
         this.lSql = lSql;
         this.javaExporter = javaExporter;
-        this.stmtSourceFile = stmtSourceFile;
+        this.fullFilePath = fullFilePath;
         this.stmtFilesRootDir = stmtFilesRootDir;
-
         this.targetPackageName = this.getPackageNameForStatement();
-        this.stmtFileClassName = getNameWithoutExtension(this.stmtSourceFile.toPath());
-
-        // read statements in file
-        LSqlFile lSqlFile = new LSqlFile(lSql, stmtSourceFile.getAbsolutePath(), stmtSourceFile.getAbsolutePath());
-        ImmutableMap<String, AnnotatedSqlStatement> statements = lSqlFile.getStatements();
+        this.stmtFileClassName = this.getFileNameWithoutExtension(fileName);
 
         // process statements
         boolean containsOnlyVoidStatements = true;
         for (String stmtName : statements.keySet()) {
-            AnnotatedSqlStatementToQuery<PlainQuery> query = lSqlFile.statement(stmtName);
-            AnnotatedSqlStatement stmt = lSqlFile.getSqlStatementToPreparedStatement(stmtName);
+            AnnotatedSqlStatementToQuery<PlainQuery> query = statements.get(stmtName);
+            AnnotatedSqlStatement stmt = query.getAnnotatedSqlStatement();
 
             if (stmt.getTypeAnnotation().toLowerCase().equals("nogen")) {
                 continue;
@@ -69,7 +65,7 @@ public final class StatementFileExporter {
                     lSql,
                     query,
                     stmt,
-                    stmtSourceFile.getName()
+                    fileName
             );
             this.typedStatementMetas.add(typedStatementMeta);
 
@@ -99,6 +95,11 @@ public final class StatementFileExporter {
         }
 
         this.containsOnlyVoidStatements = containsOnlyVoidStatements;
+    }
+
+    private String getFileNameWithoutExtension(String fileName) {
+        int idx = fileName.lastIndexOf(".");
+        return idx == -1 ? fileName : fileName.substring(0, idx);
     }
 
     public Set<StructuralTypingField> exportAndGetStructuralTypingFields() {
@@ -182,7 +183,7 @@ public final class StatementFileExporter {
     public String getSubPackageName() {
         return CodeGenUtils.getSubPathFromFileInParent(
                 this.stmtFilesRootDir,
-                this.stmtSourceFile.getAbsolutePath()
+                this.fullFilePath
         );
     }
 

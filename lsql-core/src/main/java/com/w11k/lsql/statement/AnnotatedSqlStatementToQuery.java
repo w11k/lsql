@@ -33,6 +33,10 @@ public abstract class AnnotatedSqlStatementToQuery<T> {
         return this;
     }
 
+    public AnnotatedSqlStatement getAnnotatedSqlStatement() {
+        return annotatedSqlStatement;
+    }
+
     public T query() {
         return query(Maps.newHashMap());
     }

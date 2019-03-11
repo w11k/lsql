@@ -12,8 +12,7 @@
   <modules>
     <module>lsql-core</module>
     <module>lsql-guice</module>
-    <module>lsql-cli</module>
-    <module>lsql-cli-tests</module>
+    <module>lsql-generation-tests</module>
     <module>lsql-benchmarks</module>
     <module>lsql-doc</module>
   </modules>

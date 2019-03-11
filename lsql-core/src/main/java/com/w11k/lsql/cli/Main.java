@@ -9,6 +9,9 @@ import com.w11k.lsql.cli.java.JavaExporter;
 import com.w11k.lsql.cli.java.StatementFileExporter;
 import com.w11k.lsql.cli.typescript.TypeScriptExporter;
 import com.w11k.lsql.jdbc.ConnectionProviders;
+import com.w11k.lsql.query.PlainQuery;
+import com.w11k.lsql.sqlfile.LSqlFile;
+import com.w11k.lsql.statement.AnnotatedSqlStatementToQuery;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -16,6 +19,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.w11k.lsql.cli.CodeGenUtils.log;
@@ -88,8 +92,17 @@ public class Main {
             for (Path child : children) {
                 File file = child.toFile();
                 if (file.isFile() && file.getName().endsWith(".sql")) {
-                    StatementFileExporter statementFileExporter =
-                            new StatementFileExporter(lSql, javaExporter, file, cliArgs.getSqlStatements());
+
+                    LSqlFile lSqlFile = new LSqlFile(lSql, file.toString(), file.toString());
+                    Map<String, AnnotatedSqlStatementToQuery<PlainQuery>> statementToQueries
+                            = lSqlFile.getStatementToQueries();
+
+                    StatementFileExporter statementFileExporter = new StatementFileExporter(
+                            lSql,
+                            javaExporter,
+                            cliArgs.getSqlStatements(), file.toPath().toString(), file.getName(),
+                            statementToQueries
+                    );
 
                     list.add(statementFileExporter);
                 }

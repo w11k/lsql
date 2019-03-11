@@ -54,6 +54,15 @@ public class LSqlFile {
         return copyOf(statements);
     }
 
+    public Map<String, AnnotatedSqlStatementToQuery<PlainQuery>> getStatementToQueries() {
+        Map<String, AnnotatedSqlStatementToQuery<PlainQuery>> statements = Maps.newHashMap();
+        this.getStatements().forEach((key, stmt) -> {
+            AnnotatedSqlStatementToQuery<PlainQuery> stmtToQuery = this.statement(key);
+            statements.put(key, stmtToQuery);
+        });
+        return statements;
+    }
+
     public AnnotatedSqlStatementToQuery<PlainQuery> statement(String name) {
         final AnnotatedSqlStatement stmtToPs = getStatement(name);
         return new AnnotatedSqlStatementToQuery<PlainQuery>(stmtToPs) {
