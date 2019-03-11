@@ -5,7 +5,7 @@ public class Api2_Table extends com.w11k.lsql.TypedTable<Api2_Row, java.lang.Int
 
     @javax.inject.Inject
     public Api2_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "API2", Api2_Row.class);
+        super(lSql, "PUBLIC.API2", Api2_Row.class);
     }
 
     public static final String NAME = "API2";

@@ -51,6 +51,29 @@ public class Table {
         }
     }
 
+    Table(LSql lSql,
+          String sqlSchemaName,
+          String sqlTableName,
+          String primaryKeyColumn) {
+
+        this.lSql = lSql;
+        setSchemaAndTableName(sqlSchemaName, sqlTableName);
+        this.primaryKeyColumn = Optional.fromNullable(primaryKeyColumn);
+
+        // TODO: remove fetchMeta call, pass column info as constructor parameter
+        this.fetchMeta();
+
+        if (logger.isDebugEnabled()) {
+            // TOOD
+//            StringBuilder msg = new StringBuilder("Read schema for table '" + this.sqlSchemaAndTableName + "':\n");
+//            for (Column column : columns.values()) {
+//                msg.append("    ").append(column).append("\n");
+//            }
+//
+//            logger.debug(msg.toString());
+        }
+    }
+
     public LSql getlSql() {
         return lSql;
     }
@@ -592,15 +615,8 @@ public class Table {
                 sqlSchema = tables.getString(2);
             }
 
-            if (sqlSchema != null && !sqlSchema.equals("")) {
-                this.sqlSchemaAndTableName = sqlSchema + "." + sqlTableName;
-            } else {
-                this.sqlSchemaAndTableName = sqlTableName;
-            }
+            setSchemaAndTableName(sqlSchema, sqlTableName);
 
-            sqlSchema = sqlSchema != null ? sqlSchema : "";
-            this.schemaName = sqlSchema;
-            this.tableName = sqlTableName;
 
             // Fetch Primary Key
             ResultSet primaryKeys =
@@ -645,6 +661,19 @@ public class Table {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setSchemaAndTableName(String sqlSchema, String sqlTableName) {
+        if (sqlSchema != null && !sqlSchema.equals("")) {
+            this.sqlSchemaAndTableName = sqlSchema + "." + sqlTableName;
+            this.schemaName = sqlSchema;
+        } else {
+            this.sqlSchemaAndTableName = sqlTableName;
+            this.schemaName = null;
+
+        }
+
+        this.tableName = sqlTableName;
     }
 
     private void setValuesInPreparedStatement(RowSerializer<Row> rowSerializer,

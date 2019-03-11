@@ -91,6 +91,7 @@ public class TableExporter {
                 .append("(").append(LSql.class.getCanonicalName()).append(" lSql) {\n");
 
         content.append("        super(lSql, \"")
+                .append(this.table.getSchemaName()).append(".")
                 .append(this.table.getTableName()).append("\", ")
                 .append(this.dataClassExporter.getClassName()).append(".class);\n");
 

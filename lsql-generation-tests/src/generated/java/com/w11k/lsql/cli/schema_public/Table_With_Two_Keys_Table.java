@@ -5,7 +5,7 @@ public class Table_With_Two_Keys_Table extends com.w11k.lsql.TypedTable<Table_Wi
 
     @javax.inject.Inject
     public Table_With_Two_Keys_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "TABLE_WITH_TWO_KEYS", Table_With_Two_Keys_Row.class);
+        super(lSql, "PUBLIC.TABLE_WITH_TWO_KEYS", Table_With_Two_Keys_Row.class);
     }
 
     public static final String NAME = "TABLE_WITH_TWO_KEYS";
