@@ -13,7 +13,6 @@
     <module>lsql-core</module>
     <module>lsql-guice</module>
     <module>lsql-generation-tests</module>
-    <module>lsql-benchmarks</module>
     <module>lsql-doc</module>
   </modules>
 

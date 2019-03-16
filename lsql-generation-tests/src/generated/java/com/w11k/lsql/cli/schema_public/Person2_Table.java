@@ -5,7 +5,7 @@ public class Person2_Table extends com.w11k.lsql.TypedTable<Person2_Row, java.la
 
     @javax.inject.Inject
     public Person2_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "PUBLIC.PERSON2", Person2_Row.class);
+        super(lSql, "PUBLIC", "PERSON2", null, Person2_Row.class);
     }
 
     public static final String NAME = "PERSON2";

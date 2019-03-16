@@ -11,15 +11,20 @@ public abstract class TypedTable<T extends TableRow, I> {
 
     private Supplier<Table> table;
 
-    public TypedTable(LSql lSql, String tableName, Class<T> tableRowClass) {
-        this.setupLazyTableGetter(lSql, tableName);
-    }
+    public TypedTable(LSql lSql,
+                      String schemaName,
+                      String tableName,
+                      String primaryKeyColumn,
+                      Class<T> tableRowClass) {
 
-    private void setupLazyTableGetter(LSql lSql, String tableName) {
         final Table[] tableInstance = new Table[1];
         this.table = () -> {
             if (tableInstance[0] == null) {
-                tableInstance[0] = lSql.tableBySqlName(tableName);
+                tableInstance[0] = new Table(
+                        lSql,
+                        schemaName,
+                        tableName,
+                        primaryKeyColumn);
             }
             return tableInstance[0];
         };

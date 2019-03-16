@@ -21,7 +21,7 @@ public class StmtsTypeAnnotations {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class columnTypeAnnotationQuery extends com.w11k.lsql.TypedStatementQuery<ColumnTypeAnnotation> implements com.w11k.lsql.TableRow {
+    public final class columnTypeAnnotationQuery extends com.w11k.lsql.TypedStatementQuery<ColumnTypeAnnotation_Row> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
@@ -40,7 +40,7 @@ public class StmtsTypeAnnotations {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
         }
@@ -65,8 +65,8 @@ public class StmtsTypeAnnotations {
             return "columnTypeAnnotationQuery{" + "" + "}";
         }
 
-        protected ColumnTypeAnnotation createTypedRow(com.w11k.lsql.Row row) {
-            return ColumnTypeAnnotation.fromInternalMap(row);
+        protected ColumnTypeAnnotation_Row createTypedRow(com.w11k.lsql.Row row) {
+            return ColumnTypeAnnotation_Row.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {

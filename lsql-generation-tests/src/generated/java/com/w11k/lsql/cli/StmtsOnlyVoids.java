@@ -57,7 +57,7 @@ public class StmtsOnlyVoids {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
             return map;
@@ -148,7 +148,7 @@ public class StmtsOnlyVoids {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
             return map;

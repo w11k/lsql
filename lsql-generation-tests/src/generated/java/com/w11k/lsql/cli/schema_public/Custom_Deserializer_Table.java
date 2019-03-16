@@ -5,7 +5,7 @@ public class Custom_Deserializer_Table extends com.w11k.lsql.TypedTable<Custom_D
 
     @javax.inject.Inject
     public Custom_Deserializer_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "PUBLIC.CUSTOM_DESERIALIZER", Custom_Deserializer_Row.class);
+        super(lSql, "PUBLIC", "CUSTOM_DESERIALIZER", null, Custom_Deserializer_Row.class);
     }
 
     public static final String NAME = "CUSTOM_DESERIALIZER";

@@ -68,15 +68,15 @@ public abstract class TypedStatementQuery<T> {
         }
     }
 
-//    public <R> Optional<R> first(final Function<T, R> mapper) {
-//        return this.first().transform(t -> {
-//            try {
-//                return mapper.apply(t);
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
-//    }
+    public <R> Optional<R> first(final Function<T, R> mapper) {
+        return this.first().transform(t -> {
+            try {
+                return mapper.apply(t);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 
     public abstract String getStatementFileName();
 

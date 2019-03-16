@@ -15,9 +15,9 @@ public final class ApiTest extends AbstractTestCliTest {
 
     @Test
     public void useStaticUtilFields() {
-        assertEquals(Api1_Row.FIELD_ID, "id");
+        assertEquals(Api1_Row.INTERNAL_FIELD_ID, "id");
         assertEquals(Api1_Row.ROW_KEY_ID, "id");
-        assertEquals(Api1_Row.FIELD_FIRST_NAME, "first_name");
+        assertEquals(Api1_Row.INTERNAL_FIELD_FIRST_NAME, "first_name");
         assertEquals(Api1_Row.ROW_KEY_FIRST_NAME, "firstName");
     }
 
@@ -105,7 +105,7 @@ public final class ApiTest extends AbstractTestCliTest {
         Map<String, Object> map = person1Row.toInternalMap();
 
         assertTrue(map.containsKey("first_name"));
-        assertTrue(map.containsKey(Api1_Row.FIELD_FIRST_NAME));
+        assertTrue(map.containsKey(Api1_Row.INTERNAL_FIELD_FIRST_NAME));
     }
 
     @Test
@@ -113,7 +113,7 @@ public final class ApiTest extends AbstractTestCliTest {
         Api1_Row person1Row = new Api1_Row()
                 .withFirstName("Max");
 
-        Map<String, Object> map = person1Row.toRow();
+        Map<String, Object> map = person1Row.toRowMap();
         assertTrue(map.containsKey(Api1_Row.ROW_KEY_FIRST_NAME));
     }
 

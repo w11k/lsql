@@ -47,7 +47,7 @@ public final class Person1_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String INTERNAL_FIELD_ID = "id";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ID = "id";
@@ -62,7 +62,7 @@ public final class Person1_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
         return new Person1_Row(id,firstName);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_FIRST_NAME = "first_name";
+    public static final String INTERNAL_FIELD_FIRST_NAME = "first_name";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_FIRST_NAME = "firstName";
@@ -106,7 +106,7 @@ public final class Person1_Row implements com.w11k.lsql.TableRow, Id_Integer, Fi
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
         map.put("firstName", this.firstName);

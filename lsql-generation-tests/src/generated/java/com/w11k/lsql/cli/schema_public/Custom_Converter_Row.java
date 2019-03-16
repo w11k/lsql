@@ -42,7 +42,7 @@ public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_FIELD = "field";
+    public static final String INTERNAL_FIELD_FIELD = "field";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_FIELD = "field";
@@ -82,7 +82,7 @@ public final class Custom_Converter_Row implements com.w11k.lsql.TableRow, Field
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("field", this.field);
         return map;

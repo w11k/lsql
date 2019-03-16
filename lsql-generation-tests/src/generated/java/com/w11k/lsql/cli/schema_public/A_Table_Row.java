@@ -42,7 +42,7 @@ public final class A_Table_Row implements com.w11k.lsql.TableRow, Id_Pk_Integer 
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_ID_PK = "id_pk";
+    public static final String INTERNAL_FIELD_ID_PK = "id_pk";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ID_PK = "idPk";
@@ -82,7 +82,7 @@ public final class A_Table_Row implements com.w11k.lsql.TableRow, Id_Pk_Integer 
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("idPk", this.idPk);
         return map;

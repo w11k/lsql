@@ -47,7 +47,7 @@ public final class Custom_Deserializer_Row implements com.w11k.lsql.TableRow, Da
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_DATA = "data";
+    public static final String INTERNAL_FIELD_DATA = "data";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_DATA = "data";
@@ -62,7 +62,7 @@ public final class Custom_Deserializer_Row implements com.w11k.lsql.TableRow, Da
         return new Custom_Deserializer_Row(data,id);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String INTERNAL_FIELD_ID = "id";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ID = "id";
@@ -106,7 +106,7 @@ public final class Custom_Deserializer_Row implements com.w11k.lsql.TableRow, Da
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("data", this.data);
         map.put("id", this.id);

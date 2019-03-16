@@ -32,7 +32,7 @@ public final class CustomDeserializerTest extends AbstractTestCliTest {
                                          ResultSet resultSet,
                                          int resultSetColumnPosition) throws Exception {
 
-                if (internalSqlColumnName.equals(Custom_Deserializer_Row.FIELD_DATA)) {
+                if (internalSqlColumnName.equals(Custom_Deserializer_Row.INTERNAL_FIELD_DATA)) {
                     result.add(ByteStreams.toByteArray(resultSet.getBinaryStream(resultSetColumnPosition)));
                 } else {
                     super.deserializeField(lSql, row, converter, internalSqlColumnName, resultSet, resultSetColumnPosition);

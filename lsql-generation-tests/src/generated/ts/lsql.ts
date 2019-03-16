@@ -6,7 +6,7 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Case_Conversions2_Map {
+    export interface Case_Conversions2_RowMap {
         id: number;
         col1?: number;
     }
@@ -21,8 +21,8 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Case_Conversions1_Map {
-        aaa_bbb?: number;
+    export interface Case_Conversions1_RowMap {
+        aaaBbb?: number;
         id: number;
         aaabbb?: number;
     }
@@ -35,7 +35,7 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Custom_Converter_Map {
+    export interface Custom_Converter_RowMap {
         field?: number;
     }
 }
@@ -48,9 +48,9 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Api1_Map {
+    export interface Api1_RowMap {
         id: number;
-        first_name?: string;
+        firstName?: string;
     }
 }
 
@@ -63,9 +63,9 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Api2_Map {
+    export interface Api2_RowMap {
         id: number;
-        first_name?: string;
+        firstName?: string;
         age?: number;
     }
 }
@@ -77,8 +77,8 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface A_Table_Map {
-        id_pk: number;
+    export interface A_Table_RowMap {
+        idPk: number;
     }
 }
 
@@ -90,7 +90,7 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Table_With_Two_Keys_Map {
+    export interface Table_With_Two_Keys_RowMap {
         key1: number;
         key2: number;
     }
@@ -104,7 +104,7 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Custom_Deserializer_Map {
+    export interface Custom_Deserializer_RowMap {
         data?: any;
         id: number;
     }
@@ -119,9 +119,9 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Person2_Map {
+    export interface Person2_RowMap {
         id: number;
-        first_name?: string;
+        firstName?: string;
         age?: number;
     }
 }
@@ -135,9 +135,9 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Crud_Map {
-        field_a?: number;
-        field_b?: string;
+    export interface Crud_RowMap {
+        fieldA?: number;
+        fieldB?: string;
         id: number;
     }
 }
@@ -150,9 +150,9 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Person1_Map {
+    export interface Person1_RowMap {
         id: number;
-        first_name?: string;
+        firstName?: string;
     }
 }
 
@@ -164,7 +164,7 @@ export namespace com_w11k_lsql_cli_schema_schema2 {
 }
 
 export namespace com_w11k_lsql_cli_schema_schema2 {
-    export interface Table_A_Map {
+    export interface Table_A_RowMap {
         id: number;
         col1?: string;
     }
@@ -177,7 +177,7 @@ export namespace com_w11k_lsql_cli_schema_public {
 }
 
 export namespace com_w11k_lsql_cli_schema_public {
-    export interface Checks_Map {
+    export interface Checks_RowMap {
         yesno: boolean;
     }
 }
@@ -191,9 +191,9 @@ export namespace com_w11k_lsql_cli_stmtscaseconversions {
 }
 
 export namespace com_w11k_lsql_cli_stmtscaseconversions {
-    export interface SaveCaseConversions_Map {
+    export interface SaveCaseConversions_RowMap {
         id: number;
-        one_two?: number;
+        oneTwo?: number;
         onetwo?: number;
     }
 }
@@ -205,7 +205,7 @@ export namespace com_w11k_lsql_cli_stmtstypeannotations {
 }
 
 export namespace com_w11k_lsql_cli_stmtstypeannotations {
-    export interface ColumnTypeAnnotation_Map {
+    export interface ColumnTypeAnnotation_RowMap {
         id: number;
     }
 }
@@ -217,7 +217,7 @@ export namespace com_w11k_lsql_cli_stmtswithcustomconverter {
 }
 
 export namespace com_w11k_lsql_cli_stmtswithcustomconverter {
-    export interface Load_Map {
+    export interface Load_RowMap {
         field?: number;
     }
 }
@@ -230,9 +230,9 @@ export namespace com_w11k_lsql_cli_stmtswithcustomconverter {
 }
 
 export namespace com_w11k_lsql_cli_stmtswithcustomconverter {
-    export interface TestQueryParamter_Map {
+    export interface TestQueryParamter_RowMap {
         id: number;
-        first_name?: string;
+        firstName?: string;
     }
 }
 
@@ -245,9 +245,9 @@ export namespace com_w11k_lsql_cli_subdir_subsubdir_stmtscamelcase2 {
 }
 
 export namespace com_w11k_lsql_cli_subdir_subsubdir_stmtscamelcase2 {
-    export interface LoadPersonsByAgeAndFirstName_Map {
+    export interface LoadPersonsByAgeAndFirstName_RowMap {
         id: number;
-        first_name?: string;
+        firstName?: string;
         age?: number;
     }
 }
@@ -260,9 +260,9 @@ export namespace com_w11k_lsql_cli_stmts1 {
 }
 
 export namespace com_w11k_lsql_cli_stmts1 {
-    export interface LoadAllPersons_Map {
+    export interface LoadAllPersons_RowMap {
         id: number;
-        first_name?: string;
+        firstName?: string;
     }
 }
 
@@ -273,7 +273,7 @@ export namespace com_w11k_lsql_cli_stmts1 {
 }
 
 export namespace com_w11k_lsql_cli_stmts1 {
-    export interface LoadAllPersonsColumnAlias_Map {
+    export interface LoadAllPersonsColumnAlias_RowMap {
         pid: number;
     }
 }
@@ -286,9 +286,9 @@ export namespace com_w11k_lsql_cli_stmts1 {
 }
 
 export namespace com_w11k_lsql_cli_stmts1 {
-    export interface QueryParamsWithDot_Map {
+    export interface QueryParamsWithDot_RowMap {
         id: number;
-        first_name?: string;
+        firstName?: string;
     }
 }
 

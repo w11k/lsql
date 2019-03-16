@@ -17,6 +17,8 @@ import static com.w11k.lsql.cli.CodeGenUtils.*;
 
 public final class StatementFileExporter {
 
+    public static final String QUERY_RESULT_SET_ROW_SUFFIX = "_Row";
+
     private final LSql lSql;
 
     private final JavaExporter javaExporter;
@@ -169,7 +171,7 @@ public final class StatementFileExporter {
 
     private void exportStatementRowClasses(Set<StructuralTypingField> structuralTypingFields) {
         for (DataClassMeta dataClassMeta : this.stmtRowDataClassMetaList) {
-            DataClassExporter dataClassExporter = new DataClassExporter(this.javaExporter, dataClassMeta, "");
+            DataClassExporter dataClassExporter = new DataClassExporter(this.javaExporter, dataClassMeta, QUERY_RESULT_SET_ROW_SUFFIX);
             structuralTypingFields.addAll(dataClassExporter.getStructuralTypingFields());
             dataClassExporter.export();
         }
