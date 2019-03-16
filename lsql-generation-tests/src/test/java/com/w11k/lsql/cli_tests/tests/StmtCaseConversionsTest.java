@@ -3,7 +3,7 @@ package com.w11k.lsql.cli_tests.tests;
 import com.w11k.lsql.cli.schema_public.Person2_Row;
 import com.w11k.lsql.cli.schema_public.Person2_Table;
 import com.w11k.lsql.cli.subdir.subsubdir.StmtsCamelCase2;
-import com.w11k.lsql.cli.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
+import com.w11k.lsql.cli.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName_Row;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -21,14 +21,14 @@ public final class StmtCaseConversionsTest extends AbstractTestCliTest {
                 .withAge(50));
 
         StmtsCamelCase2 statement = new StmtsCamelCase2(lSql);
-        List<LoadPersonsByAgeAndFirstName> list = statement.loadPersonsByAgeAndFirstName()
+        List<LoadPersonsByAgeAndFirstName_Row> list = statement.loadPersonsByAgeAndFirstName()
                 .withFirstName("a")
                 .withAge(50)
                 .toList();
 
         assertEquals(list.size(), 1);
 
-        LoadPersonsByAgeAndFirstName row = list.get(0);
+        LoadPersonsByAgeAndFirstName_Row row = list.get(0);
         assertEquals(row.getId(), new Integer(1));
         assertEquals(row.id, new Integer(1));
         assertEquals(row.getFirstName(), "a");

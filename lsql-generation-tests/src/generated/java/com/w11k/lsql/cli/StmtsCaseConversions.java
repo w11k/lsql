@@ -23,7 +23,7 @@ public class StmtsCaseConversions {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class saveCaseConversionsQuery extends com.w11k.lsql.TypedStatementQuery<SaveCaseConversions> implements com.w11k.lsql.TableRow {
+    public final class saveCaseConversionsQuery extends com.w11k.lsql.TypedStatementQuery<SaveCaseConversions_Row> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
@@ -42,7 +42,7 @@ public class StmtsCaseConversions {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
         }
@@ -67,8 +67,8 @@ public class StmtsCaseConversions {
             return "saveCaseConversionsQuery{" + "" + "}";
         }
 
-        protected SaveCaseConversions createTypedRow(com.w11k.lsql.Row row) {
-            return SaveCaseConversions.fromInternalMap(row);
+        protected SaveCaseConversions_Row createTypedRow(com.w11k.lsql.Row row) {
+            return SaveCaseConversions_Row.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {

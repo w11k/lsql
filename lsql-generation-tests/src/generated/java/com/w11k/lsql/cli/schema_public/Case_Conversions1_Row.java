@@ -52,7 +52,7 @@ public final class Case_Conversions1_Row implements com.w11k.lsql.TableRow, Aaa_
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_AAA_BBB = "aaa_bbb";
+    public static final String INTERNAL_FIELD_AAA_BBB = "aaa_bbb";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_AAA_BBB = "aaaBbb";
@@ -67,7 +67,7 @@ public final class Case_Conversions1_Row implements com.w11k.lsql.TableRow, Aaa_
         return new Case_Conversions1_Row(aaaBbb,id,aaabbb);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String INTERNAL_FIELD_ID = "id";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ID = "id";
@@ -82,7 +82,7 @@ public final class Case_Conversions1_Row implements com.w11k.lsql.TableRow, Aaa_
         return new Case_Conversions1_Row(aaaBbb,id,aaabbb);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_AAABBB = "aaabbb";
+    public static final String INTERNAL_FIELD_AAABBB = "aaabbb";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_AAABBB = "aaabbb";
@@ -130,7 +130,7 @@ public final class Case_Conversions1_Row implements com.w11k.lsql.TableRow, Aaa_
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("aaaBbb", this.aaaBbb);
         map.put("id", this.id);

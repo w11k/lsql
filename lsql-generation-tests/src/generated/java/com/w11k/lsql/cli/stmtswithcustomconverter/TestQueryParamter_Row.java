@@ -1,43 +1,43 @@
-package com.w11k.lsql.cli.stmts1;
+package com.w11k.lsql.cli.stmtswithcustomconverter;
 
 import com.w11k.lsql.cli.structural_fields.*;
 import java.util.*;
 
 @SuppressWarnings({"Duplicates", "WeakerAccess"})
-public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String {
+public final class TestQueryParamter_Row implements com.w11k.lsql.TableRow, Id_Integer, First_Name_String {
 
     // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
             Id_Integer
-            & First_Name_String> LoadAllPersons from(T source) {
-        Object target = new LoadAllPersons();
+            & First_Name_String> TestQueryParamter_Row from(T source) {
+        Object target = new TestQueryParamter_Row();
         target = ((Id_Integer) target).withId(source.getId());
         target = ((First_Name_String) target).withFirstName(source.getFirstName());
-        return (LoadAllPersons) target;
+        return (TestQueryParamter_Row) target;
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersons fromInternalMap(java.util.Map<String, Object> internalMap) {
-        return new LoadAllPersons((java.lang.Integer) internalMap.get("id"), (java.lang.String) internalMap.get("first_name"));
+    public static TestQueryParamter_Row fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new TestQueryParamter_Row((java.lang.Integer) internalMap.get("id"), (java.lang.String) internalMap.get("first_name"));
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersons fromRow(java.util.Map<String, Object> map) {
-        return new LoadAllPersons((java.lang.Integer) map.get("id"), (java.lang.String) map.get("firstName"));
+    public static TestQueryParamter_Row fromRow(java.util.Map<String, Object> map) {
+        return new TestQueryParamter_Row((java.lang.Integer) map.get("id"), (java.lang.String) map.get("firstName"));
     }
 
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
-    public LoadAllPersons() {
+    public TestQueryParamter_Row() {
         this.id = null;
         this.firstName = null;
     }
 
     @SuppressWarnings("NullableProblems")
-    private LoadAllPersons(
+    private TestQueryParamter_Row(
             java.lang.Integer id,
             java.lang.String firstName) {
         this.id = id;
@@ -47,7 +47,7 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String INTERNAL_FIELD_ID = "id";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ID = "id";
@@ -58,11 +58,11 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         return this.id;
     }
 
-    public LoadAllPersons withId(@javax.annotation.Nonnull java.lang.Integer id) {
-        return new LoadAllPersons(id,firstName);
+    public TestQueryParamter_Row withId(@javax.annotation.Nonnull java.lang.Integer id) {
+        return new TestQueryParamter_Row(id,firstName);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_FIRST_NAME = "first_name";
+    public static final String INTERNAL_FIELD_FIRST_NAME = "first_name";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_FIRST_NAME = "firstName";
@@ -73,8 +73,8 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         return this.firstName;
     }
 
-    public LoadAllPersons withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
-        return new LoadAllPersons(id,firstName);
+    public TestQueryParamter_Row withFirstName(@javax.annotation.Nullable java.lang.String firstName) {
+        return new TestQueryParamter_Row(id,firstName);
     }
 
     // class methods ----------
@@ -106,7 +106,7 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
         map.put("firstName", this.firstName);
@@ -119,7 +119,7 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LoadAllPersons that = (LoadAllPersons) o;
+        TestQueryParamter_Row that = (TestQueryParamter_Row) o;
         return     Objects.equals(id, that.id) && 
             Objects.equals(firstName, that.firstName);
     }
@@ -131,7 +131,7 @@ public final class LoadAllPersons implements com.w11k.lsql.TableRow, Id_Integer,
 
     @Override
     public String toString() {
-        return "LoadAllPersons{" + "id=" + id
+        return "TestQueryParamter_Row{" + "id=" + id
             + ", " + "firstName=" + firstName + "}";
     }
 

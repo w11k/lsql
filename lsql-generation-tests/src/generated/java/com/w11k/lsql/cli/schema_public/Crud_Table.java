@@ -5,7 +5,7 @@ public class Crud_Table extends com.w11k.lsql.TypedTable<Crud_Row, java.lang.Int
 
     @javax.inject.Inject
     public Crud_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "PUBLIC.CRUD", Crud_Row.class);
+        super(lSql, "PUBLIC", "CRUD", null, Crud_Row.class);
     }
 
     public static final String NAME = "CRUD";

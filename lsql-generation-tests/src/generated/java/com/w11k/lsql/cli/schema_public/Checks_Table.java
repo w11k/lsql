@@ -5,7 +5,7 @@ public class Checks_Table extends com.w11k.lsql.TypedTable<Checks_Row, com.w11k.
 
     @javax.inject.Inject
     public Checks_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "PUBLIC.CHECKS", Checks_Row.class);
+        super(lSql, "PUBLIC", "CHECKS", null, Checks_Row.class);
     }
 
     public static final String NAME = "CHECKS";

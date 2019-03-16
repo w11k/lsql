@@ -224,7 +224,7 @@ public class DataClassExporter {
     }
 
     private void contentToRow(StringBuilder content) {
-        content.append(indentString()).append("    public java.util.Map<String, Object> toRow() {\n");
+        content.append(indentString()).append("    public java.util.Map<String, Object> toRowMap() {\n");
         content.append(indentString()).append("        java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
 
         for (DataClassMeta.DataClassFieldMeta field : this.dataClassMeta.getFields()) {
@@ -390,7 +390,7 @@ public class DataClassExporter {
         String staticName = field.getColumnInternalSqlName();
 
         this.addSuppressWarningsUnused(4, content);
-        content.append(indentString()).append("    public static final String FIELD_").append(staticName.toUpperCase())
+        content.append(indentString()).append("    public static final String INTERNAL_FIELD_").append(staticName.toUpperCase())
                 .append(" = ")
                 .append("\"")
                 .append(field.getColumnInternalSqlName())

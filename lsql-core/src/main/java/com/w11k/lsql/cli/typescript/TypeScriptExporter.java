@@ -40,12 +40,12 @@ public class TypeScriptExporter {
 
     private void exportClasses(StringBuilder content) {
         for (DataClassMeta dcm : this.dataClassMetaList) {
-            this.exportDataClass(content, dcm);
-            this.exportDataClassMap(content, dcm);
+            this.exportDataClassRow(content, dcm);
+            this.exportDataClassRowMap(content, dcm);
         }
     }
 
-    private void exportDataClass(StringBuilder content, DataClassMeta dcMeta) {
+    private void exportDataClassRow(StringBuilder content, DataClassMeta dcMeta) {
         content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
         content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "_Row")).append(" {\n");
         this.exportFields(content, dcMeta);
@@ -53,13 +53,13 @@ public class TypeScriptExporter {
         content.append("}\n\n");
     }
 
-    private void exportDataClassMap(StringBuilder content, DataClassMeta dcMeta) {
+    private void exportDataClassRowMap(StringBuilder content, DataClassMeta dcMeta) {
         content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
-        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "_Map")).append(" {\n");
+        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "_RowMap")).append(" {\n");
         for (DataClassMeta.DataClassFieldMeta field : dcMeta.getFields()) {
             Class<?> javaType = field.getFieldType();
             String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);
-            content.append("        ").append(field.getColumnInternalSqlName());
+            content.append("        ").append(field.getColumnRowKeyName());
             if (field.isNullable()) {
                 content.append("?");
             }

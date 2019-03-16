@@ -8,6 +8,7 @@ import com.w11k.lsql.TypedStatementQuery;
 import java.util.List;
 
 import static com.w11k.lsql.cli.CodeGenUtils.*;
+import static com.w11k.lsql.cli.java.StatementFileExporter.QUERY_RESULT_SET_ROW_SUFFIX;
 
 public final class TypedStatementExporter {
 
@@ -30,7 +31,7 @@ public final class TypedStatementExporter {
         String statementQueryClassName = statementName + this.statementClassNameSuffix;
 
         boolean isVoid = this.typedStatementMeta.getStatement().getTypeAnnotation().toLowerCase().equals("void");
-        String rowClassName = !isVoid ? firstCharUpperCase(statementName) : Void.class.getCanonicalName();
+        String rowClassName = !isVoid ? firstCharUpperCase(statementName) + QUERY_RESULT_SET_ROW_SUFFIX : Void.class.getCanonicalName();
 
         // SQL string for query
         content.append("    private final String sql_")

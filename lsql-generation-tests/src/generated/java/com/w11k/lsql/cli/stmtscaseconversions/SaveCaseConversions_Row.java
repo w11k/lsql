@@ -4,7 +4,7 @@ import com.w11k.lsql.cli.structural_fields.*;
 import java.util.*;
 
 @SuppressWarnings({"Duplicates", "WeakerAccess"})
-public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Integer, One_Two_Integer, Onetwo_Integer {
+public final class SaveCaseConversions_Row implements com.w11k.lsql.TableRow, Id_Integer, One_Two_Integer, Onetwo_Integer {
 
     // static methods ----------
 
@@ -12,35 +12,35 @@ public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Int
     public static <T extends 
             Id_Integer
             & One_Two_Integer
-            & Onetwo_Integer> SaveCaseConversions from(T source) {
-        Object target = new SaveCaseConversions();
+            & Onetwo_Integer> SaveCaseConversions_Row from(T source) {
+        Object target = new SaveCaseConversions_Row();
         target = ((Id_Integer) target).withId(source.getId());
         target = ((One_Two_Integer) target).withOneTwo(source.getOneTwo());
         target = ((Onetwo_Integer) target).withOnetwo(source.getOnetwo());
-        return (SaveCaseConversions) target;
+        return (SaveCaseConversions_Row) target;
     }
 
     @SuppressWarnings("unused")
-    public static SaveCaseConversions fromInternalMap(java.util.Map<String, Object> internalMap) {
-        return new SaveCaseConversions((java.lang.Integer) internalMap.get("id"), (java.lang.Integer) internalMap.get("one_two"), (java.lang.Integer) internalMap.get("onetwo"));
+    public static SaveCaseConversions_Row fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new SaveCaseConversions_Row((java.lang.Integer) internalMap.get("id"), (java.lang.Integer) internalMap.get("one_two"), (java.lang.Integer) internalMap.get("onetwo"));
     }
 
     @SuppressWarnings("unused")
-    public static SaveCaseConversions fromRow(java.util.Map<String, Object> map) {
-        return new SaveCaseConversions((java.lang.Integer) map.get("id"), (java.lang.Integer) map.get("oneTwo"), (java.lang.Integer) map.get("onetwo"));
+    public static SaveCaseConversions_Row fromRow(java.util.Map<String, Object> map) {
+        return new SaveCaseConversions_Row((java.lang.Integer) map.get("id"), (java.lang.Integer) map.get("oneTwo"), (java.lang.Integer) map.get("onetwo"));
     }
 
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
-    public SaveCaseConversions() {
+    public SaveCaseConversions_Row() {
         this.id = null;
         this.oneTwo = null;
         this.onetwo = null;
     }
 
     @SuppressWarnings("NullableProblems")
-    private SaveCaseConversions(
+    private SaveCaseConversions_Row(
             java.lang.Integer id,
             java.lang.Integer oneTwo,
             java.lang.Integer onetwo) {
@@ -52,7 +52,7 @@ public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Int
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String INTERNAL_FIELD_ID = "id";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ID = "id";
@@ -63,11 +63,11 @@ public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Int
         return this.id;
     }
 
-    public SaveCaseConversions withId(@javax.annotation.Nonnull java.lang.Integer id) {
-        return new SaveCaseConversions(id,oneTwo,onetwo);
+    public SaveCaseConversions_Row withId(@javax.annotation.Nonnull java.lang.Integer id) {
+        return new SaveCaseConversions_Row(id,oneTwo,onetwo);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_ONE_TWO = "one_two";
+    public static final String INTERNAL_FIELD_ONE_TWO = "one_two";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ONE_TWO = "oneTwo";
@@ -78,11 +78,11 @@ public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Int
         return this.oneTwo;
     }
 
-    public SaveCaseConversions withOneTwo(@javax.annotation.Nullable java.lang.Integer oneTwo) {
-        return new SaveCaseConversions(id,oneTwo,onetwo);
+    public SaveCaseConversions_Row withOneTwo(@javax.annotation.Nullable java.lang.Integer oneTwo) {
+        return new SaveCaseConversions_Row(id,oneTwo,onetwo);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_ONETWO = "onetwo";
+    public static final String INTERNAL_FIELD_ONETWO = "onetwo";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ONETWO = "onetwo";
@@ -93,8 +93,8 @@ public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Int
         return this.onetwo;
     }
 
-    public SaveCaseConversions withOnetwo(@javax.annotation.Nullable java.lang.Integer onetwo) {
-        return new SaveCaseConversions(id,oneTwo,onetwo);
+    public SaveCaseConversions_Row withOnetwo(@javax.annotation.Nullable java.lang.Integer onetwo) {
+        return new SaveCaseConversions_Row(id,oneTwo,onetwo);
     }
 
     // class methods ----------
@@ -130,7 +130,7 @@ public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Int
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
         map.put("oneTwo", this.oneTwo);
@@ -144,7 +144,7 @@ public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Int
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SaveCaseConversions that = (SaveCaseConversions) o;
+        SaveCaseConversions_Row that = (SaveCaseConversions_Row) o;
         return     Objects.equals(id, that.id) && 
             Objects.equals(oneTwo, that.oneTwo) && 
             Objects.equals(onetwo, that.onetwo);
@@ -157,7 +157,7 @@ public final class SaveCaseConversions implements com.w11k.lsql.TableRow, Id_Int
 
     @Override
     public String toString() {
-        return "SaveCaseConversions{" + "id=" + id
+        return "SaveCaseConversions_Row{" + "id=" + id
             + ", " + "oneTwo=" + oneTwo
             + ", " + "onetwo=" + onetwo + "}";
     }

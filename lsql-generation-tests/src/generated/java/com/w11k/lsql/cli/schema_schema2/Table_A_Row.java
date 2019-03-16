@@ -47,7 +47,7 @@ public final class Table_A_Row implements com.w11k.lsql.TableRow, Id_Integer, Co
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_ID = "id";
+    public static final String INTERNAL_FIELD_ID = "id";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_ID = "id";
@@ -62,7 +62,7 @@ public final class Table_A_Row implements com.w11k.lsql.TableRow, Id_Integer, Co
         return new Table_A_Row(id,col1);
     }
     @SuppressWarnings("unused")
-    public static final String FIELD_COL1 = "col1";
+    public static final String INTERNAL_FIELD_COL1 = "col1";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_COL1 = "col1";
@@ -106,7 +106,7 @@ public final class Table_A_Row implements com.w11k.lsql.TableRow, Id_Integer, Co
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", this.id);
         map.put("col1", this.col1);

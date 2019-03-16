@@ -6,7 +6,7 @@ import com.w11k.lsql.cli.schema_public.Custom_Converter_Row;
 import com.w11k.lsql.cli.schema_public.Custom_Converter_Table;
 import com.w11k.lsql.cli.schema_public.Person1_Row;
 import com.w11k.lsql.cli.schema_public.Person1_Table;
-import com.w11k.lsql.cli.stmtswithcustomconverter.Load;
+import com.w11k.lsql.cli.stmtswithcustomconverter.Load_Row;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -19,7 +19,7 @@ public final class TestCliCustomConverterTest extends AbstractTestCliTest {
                 .withField(1));
 
         StmtsWithCustomConverter stmt = new StmtsWithCustomConverter(this.lSql);
-        Load loaded = stmt.load()
+        Load_Row loaded = stmt.load()
                 .withField(new TestCliConfig.CustomType(1))
                 .first()
                 .get();

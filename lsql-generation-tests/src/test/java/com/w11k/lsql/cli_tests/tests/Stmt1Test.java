@@ -9,9 +9,9 @@ import com.w11k.lsql.cli.schema_public.Person1_Row;
 import com.w11k.lsql.cli.schema_public.Person1_Table;
 import com.w11k.lsql.cli.schema_public.Person2_Row;
 import com.w11k.lsql.cli.schema_public.Person2_Table;
-import com.w11k.lsql.cli.stmts1.QueryParamsWithDot;
+import com.w11k.lsql.cli.stmts1.QueryParamsWithDot_Row;
 import com.w11k.lsql.cli.subdir.subsubdir.StmtsCamelCase2;
-import com.w11k.lsql.cli.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName;
+import com.w11k.lsql.cli.subdir.subsubdir.stmtscamelcase2.LoadPersonsByAgeAndFirstName_Row;
 import org.testng.annotations.Test;
 
 import javax.annotation.Nonnull;
@@ -124,7 +124,7 @@ public final class Stmt1Test extends AbstractTestCliTest {
         Map<String, Object> map = person1Row.toInternalMap();
 
         assertTrue(map.containsKey("first_name"));
-        assertTrue(map.containsKey(Person1_Row.FIELD_FIRST_NAME));
+        assertTrue(map.containsKey(Person1_Row.INTERNAL_FIELD_FIRST_NAME));
     }
 
     @Test
@@ -132,7 +132,7 @@ public final class Stmt1Test extends AbstractTestCliTest {
         Person1_Row person1Row = new Person1_Row()
                 .withFirstName("Max");
 
-        Map<String, Object> map = person1Row.toRow();
+        Map<String, Object> map = person1Row.toRowMap();
         assertTrue(map.containsKey(Person1_Row.ROW_KEY_FIRST_NAME));
     }
 
@@ -154,14 +154,14 @@ public final class Stmt1Test extends AbstractTestCliTest {
                 .withAge(50));
 
         StmtsCamelCase2 statement = new StmtsCamelCase2(lSql);
-        List<LoadPersonsByAgeAndFirstName> list = statement.loadPersonsByAgeAndFirstName()
+        List<LoadPersonsByAgeAndFirstName_Row> list = statement.loadPersonsByAgeAndFirstName()
                 .withFirstName("a")
                 .withAge(50)
                 .toList();
 
         assertEquals(list.size(), 1);
 
-        LoadPersonsByAgeAndFirstName row = list.get(0);
+        LoadPersonsByAgeAndFirstName_Row row = list.get(0);
         assertEquals(row.getId(), new Integer(1));
         assertEquals(row.id, new Integer(1));
         assertEquals(row.getFirstName(), "a");
@@ -177,13 +177,13 @@ public final class Stmt1Test extends AbstractTestCliTest {
                 .withFirstName("a"));
 
         Stmts1 statement = new Stmts1(lSql);
-        List<QueryParamsWithDot> list = statement.queryParamsWithDot()
+        List<QueryParamsWithDot_Row> list = statement.queryParamsWithDot()
                 .withPerson1Id(99)
                 .toList();
 
         assertEquals(list.size(), 1);
 
-        QueryParamsWithDot row = list.get(0);
+        QueryParamsWithDot_Row row = list.get(0);
         assertEquals(row.getId(), new Integer(99));
         assertEquals(row.getFirstName(), "a");
     }
@@ -199,7 +199,7 @@ public final class Stmt1Test extends AbstractTestCliTest {
 
         // validate insert
         StmtsCamelCase2 statement = new StmtsCamelCase2(lSql);
-        Optional<LoadPersonsByAgeAndFirstName> row = statement.loadPersonsByAgeAndFirstName()
+        Optional<LoadPersonsByAgeAndFirstName_Row> row = statement.loadPersonsByAgeAndFirstName()
                 .withFirstName("a")
                 .withAge(50)
                 .first();

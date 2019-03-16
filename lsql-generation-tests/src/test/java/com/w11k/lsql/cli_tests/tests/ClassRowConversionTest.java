@@ -16,7 +16,7 @@ public final class ClassRowConversionTest extends AbstractTestCliTest {
                 .withId(1)
                 .withFirstName("Max");
 
-        Map<String, Object> p1asRow = p1.toRow();
+        Map<String, Object> p1asRow = p1.toRowMap();
         assertEquals(p1asRow.get(this.lSql.convertInternalSqlToRowKey("id")), 1);
         assertEquals(p1asRow.get(this.lSql.convertInternalSqlToRowKey("first_name")), "Max");
     }

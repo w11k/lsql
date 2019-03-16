@@ -26,7 +26,7 @@ public class StmtsCamelCase2 {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadPersonsByAgeAndFirstNameQuery extends com.w11k.lsql.TypedStatementQuery<LoadPersonsByAgeAndFirstName> implements com.w11k.lsql.TableRow, First_Name_String, Age_Number {
+    public final class loadPersonsByAgeAndFirstNameQuery extends com.w11k.lsql.TypedStatementQuery<LoadPersonsByAgeAndFirstName_Row> implements com.w11k.lsql.TableRow, First_Name_String, Age_Number {
 
         // constructors ----------
 
@@ -76,7 +76,7 @@ public class StmtsCamelCase2 {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("firstName", this.firstName);
             map.put("age", this.age);
@@ -105,8 +105,8 @@ public class StmtsCamelCase2 {
                 + ", " + "age=" + age + "}";
         }
 
-        protected LoadPersonsByAgeAndFirstName createTypedRow(com.w11k.lsql.Row row) {
-            return LoadPersonsByAgeAndFirstName.fromInternalMap(row);
+        protected LoadPersonsByAgeAndFirstName_Row createTypedRow(com.w11k.lsql.Row row) {
+            return LoadPersonsByAgeAndFirstName_Row.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -172,7 +172,7 @@ public class StmtsCamelCase2 {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("firstName", this.firstName);
             return map;

@@ -5,7 +5,7 @@ public class Table_A_Table extends com.w11k.lsql.TypedTable<Table_A_Row, java.la
 
     @javax.inject.Inject
     public Table_A_Table(com.w11k.lsql.LSql lSql) {
-        super(lSql, "SCHEMA2.TABLE_A", Table_A_Row.class);
+        super(lSql, "SCHEMA2", "TABLE_A", null, Table_A_Row.class);
     }
 
     public static final String NAME = "TABLE_A";

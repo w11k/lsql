@@ -21,7 +21,7 @@ public class StmtsWithCustomConverter {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadQuery extends com.w11k.lsql.TypedStatementQuery<Load> implements com.w11k.lsql.TableRow, Field_Com_W11k_Lsql_Cli_Testcliconfig_Customtype {
+    public final class loadQuery extends com.w11k.lsql.TypedStatementQuery<Load_Row> implements com.w11k.lsql.TableRow, Field_Com_W11k_Lsql_Cli_Testcliconfig_Customtype {
 
         // constructors ----------
 
@@ -58,7 +58,7 @@ public class StmtsWithCustomConverter {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("field", this.field);
             return map;
@@ -84,8 +84,8 @@ public class StmtsWithCustomConverter {
             return "loadQuery{" + "field=" + field + "}";
         }
 
-        protected Load createTypedRow(com.w11k.lsql.Row row) {
-            return Load.fromInternalMap(row);
+        protected Load_Row createTypedRow(com.w11k.lsql.Row row) {
+            return Load_Row.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -118,7 +118,7 @@ public class StmtsWithCustomConverter {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class testQueryParamterQuery extends com.w11k.lsql.TypedStatementQuery<TestQueryParamter> implements com.w11k.lsql.TableRow, Id_Number {
+    public final class testQueryParamterQuery extends com.w11k.lsql.TypedStatementQuery<TestQueryParamter_Row> implements com.w11k.lsql.TableRow, Id_Number {
 
         // constructors ----------
 
@@ -155,7 +155,7 @@ public class StmtsWithCustomConverter {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("id", this.id);
             return map;
@@ -181,8 +181,8 @@ public class StmtsWithCustomConverter {
             return "testQueryParamterQuery{" + "id=" + id + "}";
         }
 
-        protected TestQueryParamter createTypedRow(com.w11k.lsql.Row row) {
-            return TestQueryParamter.fromInternalMap(row);
+        protected TestQueryParamter_Row createTypedRow(com.w11k.lsql.Row row) {
+            return TestQueryParamter_Row.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {

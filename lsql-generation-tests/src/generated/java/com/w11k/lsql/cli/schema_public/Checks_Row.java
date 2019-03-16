@@ -42,7 +42,7 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_YESNO = "yesno";
+    public static final String INTERNAL_FIELD_YESNO = "yesno";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_YESNO = "yesno";
@@ -82,7 +82,7 @@ public final class Checks_Row implements com.w11k.lsql.TableRow, Yesno_Boolean {
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("yesno", this.yesno);
         return map;

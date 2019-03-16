@@ -4,37 +4,37 @@ import com.w11k.lsql.cli.structural_fields.*;
 import java.util.*;
 
 @SuppressWarnings({"Duplicates", "WeakerAccess"})
-public final class LoadAllPersonsColumnAlias implements com.w11k.lsql.TableRow, Pid_Integer {
+public final class LoadAllPersonsColumnAlias_Row implements com.w11k.lsql.TableRow, Pid_Integer {
 
     // static methods ----------
 
     @SuppressWarnings("unchecked")
     public static <T extends 
-            Pid_Integer> LoadAllPersonsColumnAlias from(T source) {
-        Object target = new LoadAllPersonsColumnAlias();
+            Pid_Integer> LoadAllPersonsColumnAlias_Row from(T source) {
+        Object target = new LoadAllPersonsColumnAlias_Row();
         target = ((Pid_Integer) target).withPid(source.getPid());
-        return (LoadAllPersonsColumnAlias) target;
+        return (LoadAllPersonsColumnAlias_Row) target;
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersonsColumnAlias fromInternalMap(java.util.Map<String, Object> internalMap) {
-        return new LoadAllPersonsColumnAlias((java.lang.Integer) internalMap.get("pid"));
+    public static LoadAllPersonsColumnAlias_Row fromInternalMap(java.util.Map<String, Object> internalMap) {
+        return new LoadAllPersonsColumnAlias_Row((java.lang.Integer) internalMap.get("pid"));
     }
 
     @SuppressWarnings("unused")
-    public static LoadAllPersonsColumnAlias fromRow(java.util.Map<String, Object> map) {
-        return new LoadAllPersonsColumnAlias((java.lang.Integer) map.get("pid"));
+    public static LoadAllPersonsColumnAlias_Row fromRow(java.util.Map<String, Object> map) {
+        return new LoadAllPersonsColumnAlias_Row((java.lang.Integer) map.get("pid"));
     }
 
     // constructors ----------
 
     @SuppressWarnings("ConstantConditions")
-    public LoadAllPersonsColumnAlias() {
+    public LoadAllPersonsColumnAlias_Row() {
         this.pid = null;
     }
 
     @SuppressWarnings("NullableProblems")
-    private LoadAllPersonsColumnAlias(
+    private LoadAllPersonsColumnAlias_Row(
             java.lang.Integer pid) {
         this.pid = pid;
     }
@@ -42,7 +42,7 @@ public final class LoadAllPersonsColumnAlias implements com.w11k.lsql.TableRow, 
     // fields ----------
 
     @SuppressWarnings("unused")
-    public static final String FIELD_PID = "pid";
+    public static final String INTERNAL_FIELD_PID = "pid";
 
     @SuppressWarnings("unused")
     public static final String ROW_KEY_PID = "pid";
@@ -53,8 +53,8 @@ public final class LoadAllPersonsColumnAlias implements com.w11k.lsql.TableRow, 
         return this.pid;
     }
 
-    public LoadAllPersonsColumnAlias withPid(@javax.annotation.Nonnull java.lang.Integer pid) {
-        return new LoadAllPersonsColumnAlias(pid);
+    public LoadAllPersonsColumnAlias_Row withPid(@javax.annotation.Nonnull java.lang.Integer pid) {
+        return new LoadAllPersonsColumnAlias_Row(pid);
     }
 
     // class methods ----------
@@ -82,7 +82,7 @@ public final class LoadAllPersonsColumnAlias implements com.w11k.lsql.TableRow, 
         return map;
     }
 
-    public java.util.Map<String, Object> toRow() {
+    public java.util.Map<String, Object> toRowMap() {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("pid", this.pid);
         return map;
@@ -94,7 +94,7 @@ public final class LoadAllPersonsColumnAlias implements com.w11k.lsql.TableRow, 
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LoadAllPersonsColumnAlias that = (LoadAllPersonsColumnAlias) o;
+        LoadAllPersonsColumnAlias_Row that = (LoadAllPersonsColumnAlias_Row) o;
         return     Objects.equals(pid, that.pid);
     }
 
@@ -105,7 +105,7 @@ public final class LoadAllPersonsColumnAlias implements com.w11k.lsql.TableRow, 
 
     @Override
     public String toString() {
-        return "LoadAllPersonsColumnAlias{" + "pid=" + pid + "}";
+        return "LoadAllPersonsColumnAlias_Row{" + "pid=" + pid + "}";
     }
 
 }

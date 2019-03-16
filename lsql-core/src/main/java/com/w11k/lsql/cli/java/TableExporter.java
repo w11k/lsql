@@ -90,9 +90,13 @@ public class TableExporter {
         content.append("    public ").append(getClassName())
                 .append("(").append(LSql.class.getCanonicalName()).append(" lSql) {\n");
 
-        content.append("        super(lSql, \"")
-                .append(this.table.getSchemaName()).append(".")
-                .append(this.table.getTableName()).append("\", ")
+        content.append("        super(lSql, ")
+                .append("\"").append(this.table.getSchemaName()).append("\"")
+                .append(", ")
+                .append("\"").append(this.table.getTableName()).append("\"")
+                .append(", ")
+                .append("null")
+                .append(", ")
                 .append(this.dataClassExporter.getClassName()).append(".class);\n");
 
         content.append("    }\n\n");

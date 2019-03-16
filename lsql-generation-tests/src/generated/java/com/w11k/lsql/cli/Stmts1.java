@@ -19,7 +19,7 @@ public class Stmts1 {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadAllPersonsQuery extends com.w11k.lsql.TypedStatementQuery<LoadAllPersons> implements com.w11k.lsql.TableRow {
+    public final class loadAllPersonsQuery extends com.w11k.lsql.TypedStatementQuery<LoadAllPersons_Row> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
@@ -38,7 +38,7 @@ public class Stmts1 {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
         }
@@ -63,8 +63,8 @@ public class Stmts1 {
             return "loadAllPersonsQuery{" + "" + "}";
         }
 
-        protected LoadAllPersons createTypedRow(com.w11k.lsql.Row row) {
-            return LoadAllPersons.fromInternalMap(row);
+        protected LoadAllPersons_Row createTypedRow(com.w11k.lsql.Row row) {
+            return LoadAllPersons_Row.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -95,7 +95,7 @@ public class Stmts1 {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class loadAllPersonsColumnAliasQuery extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsColumnAlias> implements com.w11k.lsql.TableRow {
+    public final class loadAllPersonsColumnAliasQuery extends com.w11k.lsql.TypedStatementQuery<LoadAllPersonsColumnAlias_Row> implements com.w11k.lsql.TableRow {
 
         // constructors ----------
 
@@ -114,7 +114,7 @@ public class Stmts1 {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             return map;
         }
@@ -139,8 +139,8 @@ public class Stmts1 {
             return "loadAllPersonsColumnAliasQuery{" + "" + "}";
         }
 
-        protected LoadAllPersonsColumnAlias createTypedRow(com.w11k.lsql.Row row) {
-            return LoadAllPersonsColumnAlias.fromInternalMap(row);
+        protected LoadAllPersonsColumnAlias_Row createTypedRow(com.w11k.lsql.Row row) {
+            return LoadAllPersonsColumnAlias_Row.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -173,7 +173,7 @@ public class Stmts1 {
     }
 
     @SuppressWarnings({"Duplicates", "WeakerAccess"})
-    public final class queryParamsWithDotQuery extends com.w11k.lsql.TypedStatementQuery<QueryParamsWithDot> implements com.w11k.lsql.TableRow, Person1Id_Number {
+    public final class queryParamsWithDotQuery extends com.w11k.lsql.TypedStatementQuery<QueryParamsWithDot_Row> implements com.w11k.lsql.TableRow, Person1Id_Number {
 
         // constructors ----------
 
@@ -210,7 +210,7 @@ public class Stmts1 {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("person1Id", this.person1Id);
             return map;
@@ -236,8 +236,8 @@ public class Stmts1 {
             return "queryParamsWithDotQuery{" + "person1Id=" + person1Id + "}";
         }
 
-        protected QueryParamsWithDot createTypedRow(com.w11k.lsql.Row row) {
-            return QueryParamsWithDot.fromInternalMap(row);
+        protected QueryParamsWithDot_Row createTypedRow(com.w11k.lsql.Row row) {
+            return QueryParamsWithDot_Row.fromInternalMap(row);
         }
 
         protected java.util.Map<String, Object>  getQueryParameters() {
@@ -305,7 +305,7 @@ public class Stmts1 {
             return map;
         }
 
-        public java.util.Map<String, Object> toRow() {
+        public java.util.Map<String, Object> toRowMap() {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
             map.put("yesno", this.yesno);
             return map;
