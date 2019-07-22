@@ -10,13 +10,13 @@
     <version>0.35.1</version>
   </parent>
 
-  <artifactId>lsql-cli-tests</artifactId>
+  <artifactId>lsql-generation-tests</artifactId>
 
   <dependencies>
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
       <version>${project.parent.version}</version>
-      <artifactId>lsql-cli</artifactId>
+      <artifactId>lsql-core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>
