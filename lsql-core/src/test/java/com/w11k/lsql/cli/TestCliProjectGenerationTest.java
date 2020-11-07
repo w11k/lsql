@@ -1,6 +1,7 @@
 package com.w11k.lsql.cli;
 
 import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.java.CliArgs;
 import com.w11k.lsql.jdbc.ConnectionProviders;
@@ -24,12 +25,12 @@ public final class TestCliProjectGenerationTest {
     public void createTestFiles() throws SQLException, ClassNotFoundException, IOException {
         File genJavaDir = TestUtils.pathRelativeToProjectRoot("pom.xml", "../lsql-generation-tests/src/generated/java");
         if (genJavaDir.exists()) {
-            MoreFiles.deleteRecursively(genJavaDir.toPath());
+            MoreFiles.deleteRecursively(genJavaDir.toPath(), RecursiveDeleteOption.ALLOW_INSECURE);
         }
 
         File genTSDir = TestUtils.pathRelativeToProjectRoot("pom.xml", "../lsql-generation-tests/src/generated/ts");
         if (genTSDir.exists()) {
-            MoreFiles.deleteRecursively(genTSDir.toPath());
+            MoreFiles.deleteRecursively(genTSDir.toPath(), RecursiveDeleteOption.ALLOW_INSECURE);
         }
 
         String url = "jdbc:h2:mem:" + UUID.randomUUID() + ";mode=postgresql";

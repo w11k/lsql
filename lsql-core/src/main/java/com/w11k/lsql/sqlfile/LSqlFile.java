@@ -140,6 +140,10 @@ public class LSqlFile {
                                     stmtName + "'. Did you add ';' at the end?");
                 }
                 sub = sub.substring(0, endMatcher.end()).trim();
+
+                // Required for generation on Windows
+                sub = sub.replaceAll("\r\n", "\n");
+
                 endOfLastMatch = startMatcher.start() + (startMatcher.end() - startMatcher.start()) + endMatcher.end();
 
                 if (!this.areAllLinesCommented(sub)) {
