@@ -1,4 +1,9 @@
 
+**0.36.0**
+
+- generate TypeScript typings in a dedicated file per table
+
+
 **0.35.0**
 
 *breaking change:* 

@@ -29,28 +29,25 @@ public class TypeScriptExporter {
     }
 
     public void export() {
-        StringBuilder content = new StringBuilder();
-        this.exportClasses(content);
-
         //noinspection ResultOfMethodCallIgnored
         this.outputDir.mkdirs();
-        File output = new File(this.outputDir, "lsql.ts");
-        CodeGenUtils.writeContent(content.toString(), output);
+        this.exportClasses();
     }
 
-    private void exportClasses(StringBuilder content) {
+    private void exportClasses() {
         for (DataClassMeta dcm : this.dataClassMetaList) {
+            File output = new File(this.outputDir, createNamespaceNameFromPackage(dcm) + ".ts");
+            StringBuilder content = new StringBuilder();
             this.exportDataClassRow(content, dcm);
             this.exportDataClassRowMap(content, dcm);
+            CodeGenUtils.writeContent(content.toString(), output);
         }
     }
 
     private void exportDataClassRow(StringBuilder content, DataClassMeta dcMeta) {
-        content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
-        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "_Row")).append(" {\n");
+        content.append("export type ").append(firstCharUpperCase(dcMeta.getClassName() + "_Row = {\n"));
         this.exportFields(content, dcMeta);
-        content.append("    }\n");
-        content.append("}\n\n");
+        content.append("};\n\n");
     }
 
     private void exportDataClassRowMap(StringBuilder content, DataClassMeta dcMeta) {
