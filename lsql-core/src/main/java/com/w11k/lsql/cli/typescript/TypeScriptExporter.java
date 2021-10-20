@@ -4,7 +4,9 @@ import com.w11k.lsql.cli.CodeGenUtils;
 import com.w11k.lsql.cli.java.DataClassMeta;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.w11k.lsql.cli.CodeGenUtils.firstCharUpperCase;
@@ -35,12 +37,22 @@ public class TypeScriptExporter {
     }
 
     private void exportClasses() {
+        Map<String, String> files = new LinkedHashMap<>();
+
         for (DataClassMeta dcm : this.dataClassMetaList) {
-            File output = new File(this.outputDir, createNamespaceNameFromPackage(dcm) + ".ts");
+            String fileName = createNamespaceNameFromPackage(dcm) + ".ts";
             StringBuilder content = new StringBuilder();
+
             this.exportDataClassRow(content, dcm);
             this.exportDataClassRowMap(content, dcm);
-            CodeGenUtils.writeContent(content.toString(), output);
+
+            String currentFileContent = files.get(fileName);
+            files.put(fileName, currentFileContent == null ? content.toString() : currentFileContent + content);
+        }
+
+        for (Map.Entry<String, String> entry : files.entrySet()) {
+            File output = new File(this.outputDir, entry.getKey());
+            CodeGenUtils.writeContent(entry.getValue(), output);
         }
     }
 
@@ -51,8 +63,7 @@ public class TypeScriptExporter {
     }
 
     private void exportDataClassRowMap(StringBuilder content, DataClassMeta dcMeta) {
-        content.append("export namespace ").append(createNamespaceNameFromPackage(dcMeta)).append(" {\n");
-        content.append("    export interface ").append(firstCharUpperCase(dcMeta.getClassName() + "_RowMap")).append(" {\n");
+        content.append("export type ").append(firstCharUpperCase(dcMeta.getClassName() + "_RowMap = {\n"));
         for (DataClassMeta.DataClassFieldMeta field : dcMeta.getFields()) {
             Class<?> javaType = field.getFieldType();
             String tsTypeName = this.getTypeScriptTypeNameForJavaType(javaType);
@@ -62,7 +73,6 @@ public class TypeScriptExporter {
             }
             content.append(": ").append(tsTypeName).append(";\n");
         }
-        content.append("    }\n");
         content.append("}\n\n");
     }
 
