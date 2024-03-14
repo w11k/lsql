@@ -1,6 +1,4 @@
 
-[![Build Status](https://travis-ci.org/w11k/lsql.svg?branch=master)](https://travis-ci.org/w11k/lsql)
-
 # Literate SQL - A Java Database Library
 
 LSql (Literate SQL) is a Java database library focusing on type-safety and the preservation of the relational data model.  
