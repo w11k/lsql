@@ -2,6 +2,7 @@
 
 # Maven
 */target
+target
 
 # IntelliJ
 *.iml
