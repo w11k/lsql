@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.w11k.lsql</groupId>
     <artifactId>lsql-parent</artifactId>
-    <version>0.34.0</version>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>lsql-cli</artifactId>
@@ -43,7 +43,7 @@
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
-      <version>6.1.0.jre8</version>
+      <version>12.6.3.jre8</version>
       <scope>test</scope>
     </dependency>
 

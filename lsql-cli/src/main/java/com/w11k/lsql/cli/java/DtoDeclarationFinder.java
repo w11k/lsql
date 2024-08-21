@@ -1,6 +1,5 @@
 package com.w11k.lsql.cli.java;
 
-import com.google.common.io.MoreFiles;
 import com.w11k.lsql.cli.CodeGenUtils;
 
 import java.io.File;
@@ -8,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.w11k.lsql.cli.CodeGenUtils.joinStringsAsPackageName;
@@ -29,12 +29,13 @@ public final class DtoDeclarationFinder {
         List<DataClassExporter> dataClassExporters = newLinkedList();
 
         Path rootDir = new File(this.dtoDeclarationLocation).toPath();
-        Iterable<Path> children = MoreFiles.directoryTreeTraverser().preOrderTraversal(rootDir);
-        for (Path child : children) {
-            File file = child.toFile();
-            if (file.isFile() && file.getName().endsWith(".java")) {
-                dataClassExporters.addAll(this.checkFileForDtoDeclarations(file));
-            }
+        try (Stream<Path> paths = Files.walk(rootDir)) {
+            paths
+                    .map(Path::toFile)
+                    .filter(file -> file.isFile() && file.getName().endsWith(".java"))
+                    .forEach(file -> dataClassExporters.addAll(this.checkFileForDtoDeclarations(file)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return dataClassExporters;

@@ -1,6 +1,7 @@
 package com.w11k.lsql.cli.tests;
 
 import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
 import com.w11k.lsql.LSql;
 import com.w11k.lsql.cli.Main;
 import com.w11k.lsql.cli.java.CliArgs;
@@ -28,12 +29,14 @@ public final class TestCliProjectGenerationTest {
     public void createTestFiles() throws SQLException, ClassNotFoundException, IOException {
         File genJavaDir = pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/generated/java");
         if (genJavaDir.exists()) {
-            MoreFiles.deleteRecursively(genJavaDir.toPath());
+            /* On macOS the option ALLOW_INSECURE is needed. see https://guava.dev/releases/snapshot/api/docs/com/google/common/io/MoreFiles.html#deleteRecursively(java.nio.file.Path,com.google.common.io.RecursiveDeleteOption...) */
+            MoreFiles.deleteRecursively(genJavaDir.toPath(), RecursiveDeleteOption.ALLOW_INSECURE);
         }
 
         File genTSDir = pathRelativeToProjectRoot("pom.xml", "../lsql-cli-tests/src/generated/ts");
         if (genTSDir.exists()) {
-            MoreFiles.deleteRecursively(genTSDir.toPath());
+            /* On macOS the option ALLOW_INSECURE is needed. see https://guava.dev/releases/snapshot/api/docs/com/google/common/io/MoreFiles.html#deleteRecursively(java.nio.file.Path,com.google.common.io.RecursiveDeleteOption...) */
+            MoreFiles.deleteRecursively(genTSDir.toPath(), RecursiveDeleteOption.ALLOW_INSECURE);
         }
 
         String url = "jdbc:h2:mem:" + UUID.randomUUID() + ";mode=postgresql";

@@ -1,6 +1,13 @@
 # Maven
 */target
+target
+test-output
+
 
 # IntelliJ
 *.iml
 .idea
+
+
+# macOS
+.DS_Store
